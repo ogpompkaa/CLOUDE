@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Symulator Kariery</title>
+<style>
+  :root {
+    --bg1: #0f1220;
+    --bg2: #1a1f3a;
+    --card: #1e2340;
+    --card-border: #2e3560;
+    --accent: #6c8cff;
+    --accent2: #4fd1c5;
+    --danger: #ff6b6b;
+    --warning: #ffb454;
+    --good: #4fd18a;
+    --text: #e8ebff;
+    --text-dim: #9aa3d6;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; min-height: 100%;
+    background: radial-gradient(circle at top, var(--bg2), var(--bg1));
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  #app { max-width: 780px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  h1 { font-size: 1.6rem; margin: 0 0 4px; letter-spacing: 0.5px; }
+  .subtitle { color: var(--text-dim); margin: 0 0 24px; font-size: 0.95rem; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+
+  /* --- Start screen --- */
+  #start-screen input {
+    width: 100%; padding: 10px 12px; border-radius: 8px;
+    border: 1px solid var(--card-border); background: #10142a; color: var(--text);
+    font-size: 1rem; margin: 10px 0 16px;
+  }
+  #start-screen input:focus { outline: 2px solid var(--accent); }
+
+  button {
+    cursor: pointer; border: none; border-radius: 10px;
+    font-size: 0.95rem; font-weight: 600; padding: 12px 16px;
+    background: var(--accent); color: #0b0d1a;
+    transition: transform 0.08s ease, opacity 0.15s ease;
+  }
+  button:hover:not(:disabled) { transform: translateY(-1px); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  button.secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text); }
+  button.danger { background: var(--danger); color: #240a0a; }
+
+  /* --- Header / stats --- */
+  #header-row {
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+  }
+  #identity { font-size: 1.05rem; font-weight: 700; }
+  #job-title { color: var(--accent2); }
+  #meta { color: var(--text-dim); font-size: 0.85rem; }
+
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px; margin-top: 14px;
+  }
+  .stat-block { }
+  .stat-label { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 4px; }
+  .bar-track { height: 8px; border-radius: 6px; background: #10142a; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s ease; }
+  .money-value { font-size: 1.1rem; font-weight: 700; }
+
+  /* --- Actions --- */
+  #actions-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;
+  }
+  #actions-grid button { text-align: left; }
+  .action-title { display: block; }
+  .action-cost { display: block; font-size: 0.72rem; font-weight: 400; opacity: 0.8; margin-top: 2px; }
+
+  #retire-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+
+  /* --- Log --- */
+  #log {
+    max-height: 220px; overflow-y: auto; display: flex; flex-direction: column-reverse;
+    gap: 6px; font-size: 0.88rem;
+  }
+  #log .entry { padding: 6px 10px; border-radius: 8px; background: #10142a; border-left: 3px solid var(--card-border); }
+  #log .entry.good { border-left-color: var(--good); }
+  #log .entry.bad { border-left-color: var(--danger); }
+  #log .entry.info { border-left-color: var(--accent); }
+
+  /* --- Modal --- */
+  #modal-overlay {
+    position: fixed; inset: 0; background: rgba(5, 6, 15, 0.75);
+    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 10;
+  }
+  #modal-box { max-width: 420px; width: 100%; text-align: center; }
+  #modal-box h2 { margin-top: 0; }
+  #modal-stats { text-align: left; margin: 16px 0; color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; }
+  #modal-stats b { color: var(--text); }
+
+  .hidden { display: none !important; }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="card">
+    <h1>💼 Symulator Kariery</h1>
+    <p class="subtitle">Zacznij jako stażysta i przepracuj się na sam szczyt. Każda decyzja kosztuje energię, pieniądze albo czas — Twój wybór.</p>
+    <label for="name-input">Jak masz na imię?</label>
+    <input id="name-input" type="text" maxlength="20" placeholder="np. Ola" autocomplete="off">
+    <button id="start-btn">Rozpocznij karierę</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="hidden">
+
+    <div class="card" id="header-card">
+      <div id="header-row">
+        <div id="identity">👤 <span id="player-name"></span> — <span id="job-title"></span></div>
+        <div id="meta"><span id="player-age"></span> lat · Miesiąc <span id="player-month"></span>/12 · Tura <span id="player-turn"></span></div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-block">
+          <div class="stat-label"><span>💰 Pieniądze</span><span class="money-value" id="stat-money"></span></div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label"><span>⚡ Energia</span><span id="stat-energy-num"></span></div>
+          <div class="bar-track"><div class="bar-fill" id="stat-energy" style="background: var(--warning);"></div></div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label"><span>😊 Szczęście</span><span id="stat-happiness-num"></span></div>
+          <div class="bar-track"><div class="bar-fill" id="stat-happiness" style="background: var(--good);"></div></div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label"><span>🧠 Umiejętności</span><span id="stat-skill-num"></span></div>
+          <div class="bar-track"><div class="bar-fill" id="stat-skill" style="background: var(--accent2);"></div></div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label"><span>⭐ Reputacja</span><span id="stat-rep-num"></span></div>
+          <div class="bar-track"><div class="bar-fill" id="stat-rep" style="background: var(--accent);"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="actions-grid">
+        <button id="btn-work"><span class="action-title">🛠️ Pracuj</span><span class="action-cost"></span></button>
+        <button id="btn-study"><span class="action-title">📚 Ucz się</span><span class="action-cost"></span></button>
+        <button id="btn-rest"><span class="action-title">🛋️ Odpoczywaj</span><span class="action-cost"></span></button>
+        <button id="btn-network"><span class="action-title">🤝 Networkuj</span><span class="action-cost"></span></button>
+        <button id="btn-fun"><span class="action-title">🎉 Baw się</span><span class="action-cost"></span></button>
+        <button id="btn-invest"><span class="action-title">📈 Inwestuj</span><span class="action-cost"></span></button>
+        <button id="btn-promote"><span class="action-title">🚀 Aplikuj o awans</span><span class="action-cost"></span></button>
+      </div>
+      <div id="retire-row">
+        <button class="secondary" id="btn-newgame">Nowa gra</button>
+        <button class="danger" id="btn-retire">🏖️ Przejdź na emeryturę</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="log"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" class="hidden">
+  <div class="card" id="modal-box">
+    <h2 id="modal-title"></h2>
+    <p id="modal-text"></p>
+    <div id="modal-stats"></div>
+    <button id="modal-btn">Zagraj ponownie</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const STORAGE_KEY = "career-sim-save-v1";
+
+  const CAREER_LEVELS = [
+    { title: "Stażysta",            salary: 1800,  reqSkill: 0,   reqRep: 0  },
+    { title: "Junior",              salary: 3200,  reqSkill: 15,  reqRep: 5  },
+    { title: "Specjalista",         salary: 5000,  reqSkill: 35,  reqRep: 15 },
+    { title: "Starszy Specjalista", salary: 8000,  reqSkill: 55,  reqRep: 30 },
+    { title: "Kierownik",           salary: 12000, reqSkill: 75,  reqRep: 50 },
+    { title: "Dyrektor",            salary: 18000, reqSkill: 90,  reqRep: 70 },
+    { title: "Wiceprezes",          salary: 25000, reqSkill: 100, reqRep: 85 },
+    { title: "Prezes",              salary: 40000, reqSkill: 100, reqRep: 95 },
+  ];
+
+  const RANDOM_EVENTS = [
+    { chance: 0.10, type: "good", text: "Dostałeś roczną premię!", effect: s => { s.money += 1200; } },
+    { chance: 0.10, type: "bad",  text: "Awaria sprzętu w domu — nagła naprawa.", effect: s => { s.money -= 500; } },
+    { chance: 0.10, type: "good", text: "Poznałeś inspirującego mentora.", effect: s => { s.skill = clamp(s.skill + 6, 0, 100); } },
+    { chance: 0.10, type: "bad",  text: "Przeziębienie trzyma Cię w łóżku kilka dni.", effect: s => { s.energy = clamp(s.energy - 20, 0, 100); s.happiness = clamp(s.happiness - 8, 0, 100); } },
+    { chance: 0.10, type: "good", text: "Kolega dobrze wyraża się o Tobie przed szefem.", effect: s => { s.reputation = clamp(s.reputation + 6, 0, 100); } },
+    { chance: 0.08, type: "good", text: "Drobna wygrana w firmowej loterii świątecznej.", effect: s => { s.money += 300; } },
+    { chance: 0.10, type: "bad",  text: "Napięty deadline w pracy odbija się na nastroju.", effect: s => { s.happiness = clamp(s.happiness - 10, 0, 100); } },
+    { chance: 0.08, type: "info", text: "Konkurencja proponuje Ci kawę i rozmowę — poszerzasz sieć kontaktów.", effect: s => { s.reputation = clamp(s.reputation + 3, 0, 100); s.energy = clamp(s.energy - 5, 0, 100); } },
+    { chance: 0.06, type: "bad",  text: "Nieprzewidziany wydatek — podatek wyrównawczy.", effect: s => { s.money -= 350; } },
+    { chance: 0.06, type: "good", text: "Twój artykuł / projekt zauważa branża.", effect: s => { s.reputation = clamp(s.reputation + 8, 0, 100); s.skill = clamp(s.skill + 3, 0, 100); } },
+  ];
+
+  let state = null;
+
+  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+  function money(v) { return (v < 0 ? "-" : "") + Math.abs(Math.round(v)).toLocaleString("pl-PL") + " zł"; }
+
+  function defaultState(name) {
+    return {
+      name: name || "Bohater",
+      age: 18,
+      month: 0,
+      turn: 0,
+      money: 800,
+      energy: 100,
+      happiness: 70,
+      skill: 0,
+      reputation: 0,
+      levelIndex: 0,
+      over: false,
+      log: [],
+    };
+  }
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function load() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (e) { return null; }
+  }
+
+  function addLog(text, type) {
+    state.log.unshift({ text: text, type: type || "info" });
+    if (state.log.length > 60) state.log.length = 60;
+  }
+
+  function currentLevel() { return CAREER_LEVELS[state.levelIndex]; }
+  function nextLevel() { return CAREER_LEVELS[state.levelIndex + 1] || null; }
+
+  function livingCost() {
+    return 500 + Math.floor((state.age - 18)) * 4;
+  }
+
+  function advanceTurn() {
+    state.turn += 1;
+    state.month += 1;
+    if (state.month >= 12) {
+      state.month = 0;
+      state.age += 1;
+    }
+    const cost = livingCost();
+    state.money -= cost;
+
+    // random event
+    let roll = Math.random();
+    let acc = 0;
+    for (const ev of RANDOM_EVENTS) {
+      acc += ev.chance;
+      if (roll < acc) {
+        ev.effect(state);
+        addLog("📰 " + ev.text, ev.type);
+        break;
+      }
+    }
+
+    checkGameOver();
+  }
+
+  function checkGameOver() {
+    if (state.over) return;
+    if (state.money <= -3000) {
+      state.over = true;
+      showEndModal("Bankructwo", "Twoje długi przerosły Twoje możliwości spłaty. Kariera dobiega końca w najgorszy możliwy sposób.");
+    } else if (state.happiness <= 0) {
+      state.over = true;
+      showEndModal("Wypalenie zawodowe", "Zabrakło Ci sił psychicznych, by kontynuować. Czas na długą przerwę od pracy.");
+    } else if (state.age >= 70) {
+      state.over = true;
+      showEndModal("Emerytura", "Osiągnąłeś wiek emerytalny. Oto podsumowanie Twojej kariery.");
+    }
+  }
+
+  function computeScore() {
+    const avgHappy = state.happiness;
+    return Math.round(
+      state.money / 50 +
+      state.skill * 4 +
+      state.reputation * 4 +
+      state.levelIndex * 250 +
+      avgHappy * 2
+    );
+  }
+
+  function showEndModal(title, text) {
+    document.getElementById("modal-title").textContent = title;
+    document.getElementById("modal-text").textContent = text;
+    const lvl = currentLevel();
+    document.getElementById("modal-stats").innerHTML =
+      "<div><b>Stanowisko:</b> " + lvl.title + "</div>" +
+      "<div><b>Wiek:</b> " + state.age + " lat</div>" +
+      "<div><b>Pieniądze:</b> " + money(state.money) + "</div>" +
+      "<div><b>Umiejętności:</b> " + Math.round(state.skill) + "/100</div>" +
+      "<div><b>Reputacja:</b> " + Math.round(state.reputation) + "/100</div>" +
+      "<div><b>Wynik końcowy:</b> " + computeScore() + " pkt</div>";
+    document.getElementById("modal-overlay").classList.remove("hidden");
+    save();
+  }
+
+  // --- Actions ---
+
+  function actionWork() {
+    if (state.energy < 25) return;
+    state.energy = clamp(state.energy - 25, 0, 100);
+    const lvl = currentLevel();
+    state.money += Math.round(lvl.salary / 12 * 4);
+    state.skill = clamp(state.skill + (1 + Math.random() * 2), 0, 100);
+    state.happiness = clamp(state.happiness - 3, 0, 100);
+    addLog("🛠️ Przepracowałeś miesiąc jako " + lvl.title + " i zarobiłeś " + money(Math.round(lvl.salary / 12 * 4)) + ".", "info");
+    advanceTurn();
+    render();
+  }
+
+  function actionStudy() {
+    const cost = 300;
+    if (state.energy < 30 || state.money < cost) return;
+    state.energy = clamp(state.energy - 30, 0, 100);
+    state.money -= cost;
+    state.skill = clamp(state.skill + (5 + Math.random() * 4), 0, 100);
+    addLog("📚 Ukończyłeś kurs i podniosłeś swoje umiejętności.", "good");
+    advanceTurn();
+    render();
+  }
+
+  function actionRest() {
+    state.energy = clamp(state.energy + 40, 0, 100);
+    state.happiness = clamp(state.happiness + 5, 0, 100);
+    addLog("🛋️ Odpocząłeś i naładowałeś baterie.", "good");
+    advanceTurn();
+    render();
+  }
+
+  function actionNetwork() {
+    if (state.energy < 15) return;
+    state.energy = clamp(state.energy - 15, 0, 100);
+    state.reputation = clamp(state.reputation + (4 + Math.random() * 4), 0, 100);
+    addLog("🤝 Poszerzyłeś sieć kontaktów zawodowych.", "good");
+    advanceTurn();
+    render();
+  }
+
+  function actionFun() {
+    const cost = 200;
+    if (state.money < cost) return;
+    state.money -= cost;
+    state.energy = clamp(state.energy - 10, 0, 100);
+    state.happiness = clamp(state.happiness + 15, 0, 100);
+    addLog("🎉 Wyszedłeś się zabawić — nastrój w górę.", "good");
+    advanceTurn();
+    render();
+  }
+
+  function actionInvest() {
+    const amount = Math.min(state.money, 500);
+    if (amount < 100) return;
+    const success = Math.random() < 0.5;
+    if (success) {
+      state.money += amount;
+      addLog("📈 Inwestycja się opłaciła! Podwoiłeś " + money(amount) + ".", "good");
+    } else {
+      state.money -= amount;
+      addLog("📉 Inwestycja poszła źle. Straciłeś " + money(amount) + ".", "bad");
+    }
+    advanceTurn();
+    render();
+  }
+
+  function actionPromote() {
+    if (state.energy < 20) return;
+    state.energy = clamp(state.energy - 20, 0, 100);
+    const next = nextLevel();
+    if (!next) {
+      addLog("🚀 Jesteś już na szczycie drabinki kariery.", "info");
+    } else if (state.skill >= next.reqSkill && state.reputation >= next.reqRep) {
+      const overshoot = (state.skill - next.reqSkill) + (state.reputation - next.reqRep);
+      const chance = clamp(0.55 + overshoot / 200, 0.5, 0.95);
+      if (Math.random() < chance) {
+        state.levelIndex += 1;
+        state.happiness = clamp(state.happiness + 10, 0, 100);
+        addLog("🚀 Awans! Twoje nowe stanowisko: " + CAREER_LEVELS[state.levelIndex].title + ".", "good");
+      } else {
+        state.happiness = clamp(state.happiness - 5, 0, 100);
+        addLog("🚀 Rozmowa awansowa nie poszła po Twojej myśli. Spróbuj ponownie później.", "bad");
+      }
+    } else {
+      addLog("🚀 Nie spełniasz jeszcze wymagań na stanowisko " + next.title + " (potrzeba " + next.reqSkill + " umiejętności i " + next.reqRep + " reputacji).", "bad");
+    }
+    advanceTurn();
+    render();
+  }
+
+  function actionRetire() {
+    state.over = true;
+    showEndModal("Dobrowolna emerytura", "Postanowiłeś zakończyć karierę zawodową na własnych warunkach.");
+  }
+
+  function newGame() {
+    localStorage.removeItem(STORAGE_KEY);
+    document.getElementById("modal-overlay").classList.add("hidden");
+    document.getElementById("game-screen").classList.add("hidden");
+    document.getElementById("start-screen").classList.remove("hidden");
+    document.getElementById("name-input").value = "";
+    document.getElementById("name-input").focus();
+  }
+
+  function startGame() {
+    const name = document.getElementById("name-input").value.trim() || "Bohater";
+    state = defaultState(name);
+    addLog("🎬 Rozpoczynasz karierę jako " + currentLevel().title + ". Powodzenia!", "info");
+    document.getElementById("start-screen").classList.add("hidden");
+    document.getElementById("game-screen").classList.remove("hidden");
+    save();
+    render();
+  }
+
+  function render() {
+    document.getElementById("player-name").textContent = state.name;
+    document.getElementById("job-title").textContent = currentLevel().title;
+    document.getElementById("player-age").textContent = state.age;
+    document.getElementById("player-month").textContent = state.month + 1;
+    document.getElementById("player-turn").textContent = state.turn;
+
+    document.getElementById("stat-money").textContent = money(state.money);
+    document.getElementById("stat-money").style.color = state.money < 0 ? "var(--danger)" : "var(--text)";
+
+    setBar("energy", state.energy);
+    setBar("happiness", state.happiness);
+    setBar("skill", state.skill);
+    setBar("rep", state.reputation);
+
+    const next = nextLevel();
+    document.querySelector("#btn-promote .action-cost").textContent = next
+      ? "Wymaga: " + next.reqSkill + " umiej. / " + next.reqRep + " rep. · -20 energii"
+      : "Jesteś na szczycie";
+
+    document.querySelector("#btn-work .action-cost").textContent = "-25 energii, +pieniądze, +umiejętności";
+    document.querySelector("#btn-study .action-cost").textContent = "-30 energii, -300 zł, ++umiejętności";
+    document.querySelector("#btn-rest .action-cost").textContent = "+40 energii, +szczęście";
+    document.querySelector("#btn-network .action-cost").textContent = "-15 energii, +reputacja";
+    document.querySelector("#btn-fun .action-cost").textContent = "-200 zł, -10 energii, ++szczęście";
+    document.querySelector("#btn-invest .action-cost").textContent = "Ryzykuje do 500 zł, 50/50";
+
+    document.getElementById("btn-work").disabled = state.energy < 25 || state.over;
+    document.getElementById("btn-study").disabled = state.energy < 30 || state.money < 300 || state.over;
+    document.getElementById("btn-rest").disabled = state.over;
+    document.getElementById("btn-network").disabled = state.energy < 15 || state.over;
+    document.getElementById("btn-fun").disabled = state.money < 200 || state.over;
+    document.getElementById("btn-invest").disabled = state.money < 100 || state.over;
+    document.getElementById("btn-promote").disabled = state.energy < 20 || state.over || !nextLevel();
+
+    const logEl = document.getElementById("log");
+    logEl.innerHTML = state.log.map(e => '<div class="entry ' + e.type + '">' + e.text + "</div>").join("");
+
+    save();
+  }
+
+  function setBar(key, value) {
+    const v = clamp(value, 0, 100);
+    document.getElementById("stat-" + key).style.width = v + "%";
+    document.getElementById("stat-" + key + "-num").textContent = Math.round(v);
+  }
+
+  // --- wiring ---
+  document.getElementById("start-btn").addEventListener("click", startGame);
+  document.getElementById("name-input").addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
+  document.getElementById("btn-work").addEventListener("click", actionWork);
+  document.getElementById("btn-study").addEventListener("click", actionStudy);
+  document.getElementById("btn-rest").addEventListener("click", actionRest);
+  document.getElementById("btn-network").addEventListener("click", actionNetwork);
+  document.getElementById("btn-fun").addEventListener("click", actionFun);
+  document.getElementById("btn-invest").addEventListener("click", actionInvest);
+  document.getElementById("btn-promote").addEventListener("click", actionPromote);
+  document.getElementById("btn-retire").addEventListener("click", actionRetire);
+  document.getElementById("btn-newgame").addEventListener("click", newGame);
+  document.getElementById("modal-btn").addEventListener("click", newGame);
+
+  // --- boot ---
+  const existing = load();
+  if (existing) {
+    state = existing;
+    document.getElementById("start-screen").classList.add("hidden");
+    document.getElementById("game-screen").classList.remove("hidden");
+    render();
+    if (state.over) {
+      const lvl = currentLevel();
+      showEndModal("Twoja poprzednia kariera", "Ostatnia zapisana sesja zakończyła się. Kliknij, aby zacząć od nowa.");
+    }
+  }
+})();
+</script>
+</body>
+</html>
