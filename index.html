@@ -109,6 +109,17 @@
   #modal-stats { text-align: left; margin: 16px 0; color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; }
   #modal-stats b { color: var(--text); }
 
+  /* --- Map veto --- */
+  #veto-overlay {
+    position: fixed; inset: 0; background: rgba(5, 6, 15, 0.75);
+    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 10;
+  }
+  #veto-box { max-width: 420px; width: 100%; text-align: center; }
+  #veto-box p { color: var(--text-dim); font-size: 0.85rem; }
+  #veto-maps { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .veto-map-btn { background: #10142a; border: 1px solid var(--card-border); color: var(--text); text-align: left; }
+  .veto-map-btn:hover { border-color: var(--accent); }
+
   .hidden { display: none !important; }
 
   ::-webkit-scrollbar { width: 8px; }
@@ -121,7 +132,7 @@
   <!-- START SCREEN -->
   <div id="start-screen" class="card">
     <h1>🔫 Kariera Progracza CS2</h1>
-    <p class="subtitle">Zacznij jako nikt w mixach, wspinaj się przez drużyny i rangi aż po legendę sceny. Trenuj, graj mecze, transferuj się do lepszych organizacji i uważaj na wypalenie.</p>
+    <p class="subtitle">Zacznij jako nikt w mixach, wspinaj się przez drużyny i Premier Rating aż po legendę sceny. Trenuj, banuj mapy i graj mecze o realnym wyniku rundowym, transferuj się do lepszych organizacji i uważaj na wypalenie.</p>
     <p class="disclaimer">Fanowska gra inspirowana sceną Counter-Strike 2, niepowiązana z Valve.</p>
 
     <label for="nick-input">Twój pseudonim</label>
@@ -148,7 +159,7 @@
         <div id="identity">🎮 <span id="player-name"></span> — <span id="team-name"></span></div>
         <div id="meta"><span id="player-age"></span> lat · Tydzień <span id="player-week"></span>/52 · Tura <span id="player-turn"></span></div>
       </div>
-      <div id="rank-row">Ranga: <b id="player-rank"></b> · Rola: <span id="player-role"></span></div>
+      <div id="rank-row">Premier Rating: <b id="player-rank"></b> · Rola: <span id="player-role"></span></div>
 
       <div class="stats-grid">
         <div class="stat-label"><span>💰 Pieniądze</span><span class="money-value" id="stat-money"></span></div>
@@ -214,6 +225,15 @@
   </div>
 </div>
 
+<!-- VETO -->
+<div id="veto-overlay" class="hidden">
+  <div class="card" id="veto-box">
+    <h2>🗺️ Wybór mapy</h2>
+    <p>Drużyny naprzemiennie banują mapy z puli — zostały trzy. Wybierz, na czym zagracie.</p>
+    <div id="veto-maps"></div>
+  </div>
+</div>
+
 <script>
 (function () {
   "use strict";
@@ -237,19 +257,25 @@
   };
 
   const TEAMS = [
-    { name: "Wolny Agent",              salary: 0,     reqAim: 0,   reqSense: 0,   reqRep: 0  },
-    { name: "Drużyna Amatorska",        salary: 250,   reqAim: 20,  reqSense: 15,  reqRep: 10 },
-    { name: "Tier 3 (Liga Otwarta)",    salary: 600,   reqAim: 35,  reqSense: 30,  reqRep: 25 },
-    { name: "Tier 2 (Liga Zaawansowana)", salary: 1400, reqAim: 50, reqSense: 45,  reqRep: 40 },
-    { name: "Tier 1 (Liga Profesjonalna)", salary: 3000, reqAim: 65, reqSense: 60, reqRep: 55 },
-    { name: "Top Kontender",            salary: 6000,  reqAim: 80,  reqSense: 75,  reqRep: 70 },
-    { name: "Legenda Sceny",            salary: 12000, reqAim: 92,  reqSense: 88,  reqRep: 85 },
+    { name: "Wolny Agent",              salary: 0,     reqAim: 0,   reqSense: 0,   reqRep: 0,  reqPremier: 0 },
+    { name: "Drużyna Amatorska",        salary: 250,   reqAim: 20,  reqSense: 15,  reqRep: 10, reqPremier: 7000 },
+    { name: "Tier 3 (Liga Otwarta)",    salary: 600,   reqAim: 35,  reqSense: 30,  reqRep: 25, reqPremier: 12000 },
+    { name: "Tier 2 (Liga Zaawansowana)", salary: 1400, reqAim: 50, reqSense: 45,  reqRep: 40, reqPremier: 17000 },
+    { name: "Tier 1 (Liga Profesjonalna)", salary: 3000, reqAim: 65, reqSense: 60, reqRep: 55, reqPremier: 21000 },
+    { name: "Top Kontender",            salary: 6000,  reqAim: 80,  reqSense: 75,  reqRep: 70, reqPremier: 26000 },
+    { name: "Legenda Sceny",            salary: 12000, reqAim: 92,  reqSense: 88,  reqRep: 85, reqPremier: 29000 },
   ];
 
-  const RANKS = [
-    "Silver", "Silver Elite", "Gold Nova", "Gold Nova Master", "Master Guardian",
-    "Master Guardian Elite", "Distinguished Master Guardian", "Legendary Eagle",
-    "Legendary Eagle Master", "Global Elite",
+  const MAPS = ["Mirage", "Inferno", "Nuke", "Ancient", "Anubis", "Dust II", "Vertigo", "Overpass", "Train"];
+
+  const PREMIER_TIERS = [
+    { max: 4999,      name: "Szary" },
+    { max: 9999,      name: "Jasnoniebieski" },
+    { max: 14999,     name: "Niebieski" },
+    { max: 19999,     name: "Fioletowy" },
+    { max: 24999,     name: "Różowy" },
+    { max: 29999,     name: "Czerwony" },
+    { max: Infinity,  name: "Złoty" },
   ];
 
   const RANDOM_EVENTS = [
@@ -266,7 +292,6 @@
   ];
 
   let state = null;
-  let role = null;
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
   function money(v) { return (v < 0 ? "-" : "") + Math.abs(Math.round(v)).toLocaleString("pl-PL") + " zł"; }
@@ -285,6 +310,7 @@
       gameSense: 5,
       teamwork: 10,
       reputation: 20,
+      premierRating: 3000,
       teamTierIndex: 0,
       over: false,
       log: [],
@@ -301,10 +327,9 @@
   function currentRole() { return ROLES[state.role] || ROLES.awper; }
   function currentTeam() { return TEAMS[state.teamTierIndex]; }
   function nextTeam() { return TEAMS[state.teamTierIndex + 1] || null; }
-  function currentRankName() {
-    const avg = (state.aim + state.gameSense) / 2;
-    const idx = clamp(Math.floor(avg / 10), 0, RANKS.length - 1);
-    return RANKS[idx];
+  function premierTier() {
+    const idx = PREMIER_TIERS.findIndex(t => state.premierRating <= t.max);
+    return PREMIER_TIERS[idx === -1 ? PREMIER_TIERS.length - 1 : idx];
   }
 
   function addLog(text, type) {
@@ -368,7 +393,8 @@
     return Math.round(
       state.money / 50 +
       state.aim * 3 + state.gameSense * 3 + state.teamwork * 2 + state.reputation * 3 +
-      state.teamTierIndex * 300
+      state.teamTierIndex * 300 +
+      state.premierRating / 50
     );
   }
 
@@ -377,7 +403,7 @@
     document.getElementById("modal-text").textContent = text;
     document.getElementById("modal-stats").innerHTML =
       "<div><b>Drużyna:</b> " + currentTeam().name + "</div>" +
-      "<div><b>Ranga:</b> " + currentRankName() + "</div>" +
+      "<div><b>Premier Rating:</b> " + Math.round(state.premierRating).toLocaleString("pl-PL") + " (" + premierTier().name + ")</div>" +
       "<div><b>Wiek:</b> " + state.age + " lat</div>" +
       "<div><b>Pieniądze:</b> " + money(state.money) + "</div>" +
       "<div><b>Aim / Game Sense:</b> " + Math.round(state.aim) + " / " + Math.round(state.gameSense) + "</div>" +
@@ -425,24 +451,75 @@
     advanceTurn(); render();
   }
 
+  let vetoOffers = [];
+
   function actionCompete() {
-    if (state.energy < 25 || state.over || state.teamTierIndex < 1) return;
+    if (state.energy < 25 || state.over) return;
+    const shuffled = MAPS.slice().sort(() => Math.random() - 0.5);
+    vetoOffers = shuffled.slice(0, 3);
+    showVeto();
+  }
+
+  function showVeto() {
+    const container = document.getElementById("veto-maps");
+    container.innerHTML = vetoOffers.map((m, i) => '<button class="veto-map-btn" data-idx="' + i + '">' + m + "</button>").join("");
+    container.querySelectorAll(".veto-map-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = parseInt(btn.getAttribute("data-idx"), 10);
+        document.getElementById("veto-overlay").classList.add("hidden");
+        resolveMatch(vetoOffers[idx]);
+      });
+    });
+    document.getElementById("veto-overlay").classList.remove("hidden");
+  }
+
+  function simulateRounds(winChance) {
+    let my = 0, opp = 0;
+    while (my < 13 && opp < 13) {
+      const variance = (Math.random() - 0.5) * 0.3;
+      if (Math.random() < clamp(winChance + variance, 0.08, 0.95)) my += 1; else opp += 1;
+    }
+    return { my: my, opp: opp };
+  }
+
+  function resolveMatch(map) {
     state.energy = clamp(state.energy - 25, 0, 100);
-    const perf = state.aim * 0.4 + state.gameSense * 0.3 + state.teamwork * 0.3;
-    const difficulty = 25 + state.teamTierIndex * 10;
+    const inTeam = state.teamTierIndex >= 1;
+    const comfort = (Math.random() - 0.5) * 10;
+    const teamBonus = state.teamTierIndex * 2;
+    const perf = state.aim * 0.45 + state.gameSense * 0.35 + state.teamwork * 0.2 + comfort + teamBonus;
+    const difficulty = 20 + (inTeam ? state.teamTierIndex * 10 : 0);
     const winChance = clamp(0.5 + (perf - difficulty) / 120, 0.15, 0.9);
-    const win = Math.random() < winChance;
+    const result = simulateRounds(winChance);
+    const win = result.my > result.opp;
+    const margin = clamp(Math.abs(result.my - result.opp) / 13, 0.15, 1);
     const team = currentTeam();
+    const score = result.my + ":" + result.opp;
+
     if (win) {
-      const prize = Math.round(team.salary * (0.4 + Math.random() * 0.8));
-      state.money += prize;
-      state.reputation = clamp(state.reputation + (3 + Math.random() * 4), 0, 100);
+      const premierGain = Math.round(150 + margin * 250);
+      state.premierRating = clamp(state.premierRating + premierGain, 0, 35000);
       state.motivation = clamp(state.motivation + 5, 0, 100);
-      addLog("🏆 Wygrywacie mecz! Zdobywasz " + money(prize) + " nagrody.", "good");
+      if (inTeam) {
+        const prize = Math.round(team.salary * (0.3 + margin * 0.9));
+        state.money += prize;
+        state.reputation = clamp(state.reputation + 2 + margin * 5, 0, 100);
+        addLog("🏆 " + map + " (" + team.name + "): wygrywacie mecz drużynowy " + score + "! +" + money(prize) + ", +" + premierGain + " Premier Rating.", "good");
+      } else {
+        state.reputation = clamp(state.reputation + 1 + margin * 2, 0, 100);
+        addLog("🎮 " + map + " (solo queue Premier): wygrywasz " + score + "! +" + premierGain + " Premier Rating.", "good");
+      }
     } else {
-      state.reputation = clamp(state.reputation - (2 + Math.random() * 3), 0, 100);
+      const premierLoss = Math.round(100 + margin * 200);
+      state.premierRating = clamp(state.premierRating - premierLoss, 0, 35000);
       state.motivation = clamp(state.motivation - 6, 0, 100);
-      addLog("💀 Przegrywacie mecz. Drużyna analizuje błędy.", "bad");
+      if (inTeam) {
+        state.reputation = clamp(state.reputation - (1 + margin * 4), 0, 100);
+        addLog("💀 " + map + " (" + team.name + "): przegrywacie mecz drużynowy " + score + ". -" + premierLoss + " Premier Rating.", "bad");
+      } else {
+        state.reputation = clamp(state.reputation - (0.5 + margin * 1.5), 0, 100);
+        addLog("💀 " + map + " (solo queue Premier): przegrywasz " + score + ". -" + premierLoss + " Premier Rating.", "bad");
+      }
     }
     advanceTurn(); render();
   }
@@ -487,8 +564,8 @@
     const next = nextTeam();
     if (!next) {
       addLog("✍️ Jesteś już w najlepszej organizacji na scenie.", "info");
-    } else if (state.aim >= next.reqAim && state.gameSense >= next.reqSense && state.reputation >= next.reqRep) {
-      const overshoot = (state.aim - next.reqAim) + (state.gameSense - next.reqSense) + (state.reputation - next.reqRep);
+    } else if (state.aim >= next.reqAim && state.gameSense >= next.reqSense && state.reputation >= next.reqRep && state.premierRating >= next.reqPremier) {
+      const overshoot = (state.aim - next.reqAim) + (state.gameSense - next.reqSense) + (state.reputation - next.reqRep) + (state.premierRating - next.reqPremier) / 200;
       const chance = clamp(0.5 + overshoot / 200, 0.45, 0.92);
       if (Math.random() < chance) {
         state.teamTierIndex += 1;
@@ -500,7 +577,7 @@
         addLog("❌ Trial się nie udał. Wracasz do gry i próbujesz dalej.", "bad");
       }
     } else {
-      addLog("✍️ Nie spełniasz jeszcze wymagań do gry w " + next.name + " (Aim " + next.reqAim + ", Game Sense " + next.reqSense + ", Reputacja " + next.reqRep + ").", "bad");
+      addLog("✍️ Nie spełniasz jeszcze wymagań do gry w " + next.name + " (Aim " + next.reqAim + ", Game Sense " + next.reqSense + ", Reputacja " + next.reqRep + ", Premier Rating " + next.reqPremier.toLocaleString("pl-PL") + ").", "bad");
     }
     advanceTurn(); render();
   }
@@ -536,7 +613,7 @@
     document.getElementById("player-age").textContent = state.age;
     document.getElementById("player-week").textContent = state.week + 1;
     document.getElementById("player-turn").textContent = state.turn;
-    document.getElementById("player-rank").textContent = currentRankName();
+    document.getElementById("player-rank").textContent = premierTier().name + " (" + Math.round(state.premierRating).toLocaleString("pl-PL") + ")";
     document.getElementById("player-role").textContent = currentRole().label;
 
     document.getElementById("stat-money").textContent = money(state.money);
@@ -551,13 +628,15 @@
 
     const next = nextTeam();
     document.querySelector("#btn-transfer .action-cost").textContent = next
-      ? "Wymaga: Aim " + next.reqAim + " / Sense " + next.reqSense + " / Rep " + next.reqRep + " · -15 energii"
+      ? "Wymaga: Aim " + next.reqAim + " / Sense " + next.reqSense + " / Rep " + next.reqRep + " / PR " + next.reqPremier.toLocaleString("pl-PL") + " · -15 energii"
       : "Jesteś na szczycie sceny";
 
     document.querySelector("#btn-aim .action-cost").textContent = "-20 energii, +Aim";
     document.querySelector("#btn-sense .action-cost").textContent = "-20 energii, +Game Sense";
     document.querySelector("#btn-scrim .action-cost").textContent = "-15 energii, +Zgranie (z drużyną)";
-    document.querySelector("#btn-compete .action-cost").textContent = state.teamTierIndex >= 1 ? "-25 energii, szansa na nagrodę" : "Wymaga drużyny";
+    document.querySelector("#btn-compete .action-cost").textContent = state.teamTierIndex >= 1
+      ? "-25 energii, mecz drużynowy: kasa + Premier Rating"
+      : "-25 energii, solo queue Premier: buduje ranking";
     document.querySelector("#btn-stream .action-cost").textContent = "-10 energii, +pieniądze, +reputacja";
     document.querySelector("#btn-skins .action-cost").textContent = "Ryzykuje do 400 zł, 48/52";
     document.querySelector("#btn-rest .action-cost").textContent = "+40 energii, +motywacja";
@@ -565,7 +644,7 @@
     document.getElementById("btn-aim").disabled = state.energy < 20 || state.over;
     document.getElementById("btn-sense").disabled = state.energy < 20 || state.over;
     document.getElementById("btn-scrim").disabled = state.energy < 15 || state.over;
-    document.getElementById("btn-compete").disabled = state.energy < 25 || state.over || state.teamTierIndex < 1;
+    document.getElementById("btn-compete").disabled = state.energy < 25 || state.over;
     document.getElementById("btn-stream").disabled = state.energy < 10 || state.over;
     document.getElementById("btn-skins").disabled = state.money < 50 || state.over;
     document.getElementById("btn-rest").disabled = state.over;
