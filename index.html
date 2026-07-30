@@ -125,6 +125,33 @@
   .veto-map-btn { background: #10142a; border: 1px solid var(--card-border); color: var(--text); text-align: left; }
   .veto-map-btn:hover { border-color: var(--accent); }
 
+  /* --- Shop --- */
+  #shop-overlay {
+    position: fixed; inset: 0; background: rgba(5, 6, 15, 0.75);
+    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 10;
+  }
+  #shop-box { max-width: 480px; width: 100%; text-align: left; }
+  #shop-box h2 { text-align: center; margin-top: 0; }
+  #shop-box p { color: var(--text-dim); font-size: 0.85rem; }
+  #shop-items { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; max-height: 55vh; overflow-y: auto; }
+  .shop-item { background: #10142a; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .shop-item-info { flex: 1; }
+  .shop-item-name { font-weight: 700; }
+  .shop-item-desc { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
+  .shop-buy-btn { flex-shrink: 0; padding: 8px 12px; font-size: 0.8rem; text-align: center; white-space: nowrap; }
+  .shop-buy-btn.owned { background: var(--good); color: #062016; }
+
+  /* --- Autoplay --- */
+  #autoplay-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+  #autoplay-row > div { display: flex; flex-direction: column; }
+  #autoplay-row label { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 4px; }
+  #autoplay-row select, #autoplay-row input {
+    padding: 10px 12px; border-radius: 8px; border: 1px solid var(--card-border);
+    background: #0e1224; color: var(--text); font-size: 0.9rem;
+  }
+  #auto-strategy { min-width: 190px; flex: 1; }
+  #auto-turns { width: 80px; }
+
   .hidden { display: none !important; }
 
   ::-webkit-scrollbar { width: 8px; }
@@ -164,7 +191,7 @@
         <div id="identity">🎮 <span id="player-name"></span> — <span id="team-name"></span></div>
         <div id="meta"><span id="player-age"></span> lat · Tydzień <span id="player-week"></span>/52 · Tura <span id="player-turn"></span></div>
       </div>
-      <div id="rank-row">Premier Rating: <b id="player-rank"></b> · Rola: <span id="player-role"></span></div>
+      <div id="rank-row">Premier Rating: <b id="player-rank"></b> · Rola: <span id="player-role"></span> · Ulepszenia: <span id="upgrades-count"></span></div>
 
       <div class="stats-grid">
         <div class="stat-label"><span>💰 Pieniądze</span><span class="money-value" id="stat-money"></span></div>
@@ -206,10 +233,32 @@
         <button id="btn-skins"><span class="action-title">📦 Handluj Skinami</span><span class="action-cost"></span></button>
         <button id="btn-rest"><span class="action-title">😴 Odpoczywaj</span><span class="action-cost"></span></button>
         <button id="btn-transfer"><span class="action-title">✍️ Szukaj / Transfer</span><span class="action-cost"></span></button>
+        <button id="btn-shop"><span class="action-title">🛒 Sklep</span><span class="action-cost">Sprzęt i personel</span></button>
       </div>
       <div id="retire-row">
         <button class="secondary" id="btn-newgame">Nowa gra</button>
         <button class="danger" id="btn-retire">🏁 Zakończ karierę</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="autoplay-row">
+        <div style="flex: 1; min-width: 180px;">
+          <label for="auto-strategy">Tryb automatyczny</label>
+          <select id="auto-strategy">
+            <option value="balanced">Zbalansowany</option>
+            <option value="aim">Skup się na Aim</option>
+            <option value="sense">Skup się na Game Sense</option>
+            <option value="teamwork">Skup się na Zgraniu</option>
+            <option value="money">Zarabiaj (stream)</option>
+            <option value="rank">Buduj Premier Rating</option>
+          </select>
+        </div>
+        <div>
+          <label for="auto-turns">Ile tur</label>
+          <input id="auto-turns" type="number" min="1" max="52" value="4">
+        </div>
+        <button id="btn-autoplay">⏩ Zagraj automatycznie</button>
       </div>
     </div>
 
@@ -236,6 +285,16 @@
     <h2>🗺️ Wybór mapy</h2>
     <p>Drużyny naprzemiennie banują mapy z puli — zostały trzy. Wybierz, na czym zagracie.</p>
     <div id="veto-maps"></div>
+  </div>
+</div>
+
+<!-- SHOP -->
+<div id="shop-overlay" class="hidden">
+  <div class="card" id="shop-box">
+    <h2>🛒 Sklep</h2>
+    <p>Sprzęt i personel dają stałe bonusy — część wymaga cotygodniowego utrzymania.</p>
+    <div id="shop-items"></div>
+    <button class="secondary" id="shop-close-btn" style="margin-top: 14px; width: 100%;">Zamknij</button>
   </div>
 </div>
 
@@ -283,9 +342,18 @@
     { max: Infinity,  name: "Złoty" },
   ];
 
+  const UPGRADES = [
+    { id: "gear",    name: "Sprzęt Pro (mysz + słuchawki)", desc: "+15% do przyrostu Aim z treningu", cost: 1200, upkeep: 0 },
+    { id: "monitor", name: "Monitor 240Hz",                 desc: "+15% do przyrostu Aim i Game Sense z treningu", cost: 2000, upkeep: 0 },
+    { id: "coach",   name: "Osobisty coach",                desc: "Pasywnie +0.3 Game Sense co turę, niezależnie od akcji", cost: 2500, upkeep: 100 },
+    { id: "physio",  name: "Fizjoterapeuta",                desc: "Rzadsze kontuzje, +25% skuteczności odpoczynku", cost: 1500, upkeep: 60 },
+    { id: "psych",   name: "Psycholog sportowy",             desc: "Łagodniejszy wpływ złych wydarzeń na motywację", cost: 1000, upkeep: 50 },
+    { id: "manager", name: "Manager / Agent",                desc: "+25% zarobków ze streamowania", cost: 2000, upkeep: 80 },
+  ];
+
   const RANDOM_EVENTS = [
     { chance: 0.10, type: "good", text: "Twój clip z akcji trafia na Reddita.", effect: s => { s.reputation = clamp(s.reputation + 5, 0, 100); } },
-    { chance: 0.09, type: "bad",  text: "Kontuzja nadgarstka (RSI) daje o sobie znać.", effect: s => { s.energy = clamp(s.energy - 20, 0, 100); s.motivation = clamp(s.motivation - 6, 0, 100); s.aim = clamp(s.aim - 2, 0, 100); } },
+    { id: "rsi", chance: 0.09, type: "bad",  text: "Kontuzja nadgarstka (RSI) daje o sobie znać.", effect: s => { s.energy = clamp(s.energy - 20, 0, 100); s.motivation = clamp(s.motivation - 6, 0, 100); s.aim = clamp(s.aim - 2, 0, 100); } },
     { chance: 0.09, type: "bad",  text: "Kłótnia w drużynie psuje wspólną grę.", effect: s => { s.teamwork = clamp(s.teamwork - 8, 0, 100); } },
     { chance: 0.09, type: "good", text: "Producent sprzętu proponuje mały kontrakt sponsorski.", effect: s => { s.money += 400; } },
     { chance: 0.08, type: "good", text: "Twój highlight trafia do edytu turnieju.", effect: s => { s.reputation = clamp(s.reputation + 4, 0, 100); s.money += 150; } },
@@ -317,6 +385,7 @@
       reputation: 20,
       premierRating: 3000,
       teamTierIndex: 0,
+      upgrades: {},
       over: false,
       log: [],
     };
@@ -341,6 +410,11 @@
     return PREMIER_TIERS[idx === -1 ? PREMIER_TIERS.length - 1 : idx];
   }
 
+  function owned(id) { return !!(state.upgrades && state.upgrades[id]); }
+  function totalUpkeep() {
+    return UPGRADES.reduce((sum, u) => sum + (owned(u.id) ? u.upkeep : 0), 0);
+  }
+
   function addLog(text, type) {
     state.log.unshift({ text: text, type: type || "info" });
     if (state.log.length > 60) state.log.length = 60;
@@ -357,7 +431,10 @@
     }
 
     state.money -= livingCost();
+    state.money -= totalUpkeep();
     if (state.teamTierIndex >= 1) state.money += currentTeam().salary;
+
+    if (owned("coach")) state.gameSense = clamp(state.gameSense + 0.3, 0, 100);
 
     // aging reflex decline
     if (state.age >= 27 && Math.random() < 0.18) {
@@ -370,9 +447,11 @@
     let roll = Math.random();
     let acc = 0;
     for (const ev of RANDOM_EVENTS) {
-      acc += ev.chance;
+      const effChance = (ev.id === "rsi" && owned("physio")) ? ev.chance * 0.4 : ev.chance;
+      acc += effChance;
       if (roll < acc) {
         ev.effect(state);
+        if (ev.type === "bad" && owned("psych")) state.motivation = clamp(state.motivation + 3, 0, 100);
         addLog("📰 " + ev.text, ev.type);
         break;
       }
@@ -427,7 +506,8 @@
   function actionTrainAim() {
     if (state.energy < 20 || state.over) return;
     state.energy = clamp(state.energy - 20, 0, 100);
-    const gain = (2 + Math.random() * 3) * currentRole().aimMult;
+    const gearBonus = 1 + (owned("gear") ? 0.15 : 0) + (owned("monitor") ? 0.15 : 0);
+    const gain = (2 + Math.random() * 3) * currentRole().aimMult * gearBonus;
     state.aim = clamp(state.aim + gain, 0, 100);
     state.motivation = clamp(state.motivation - 2, 0, 100);
     addLog("🎯 Trenujesz celność na serwerach aim treningowych.", "info");
@@ -437,7 +517,8 @@
   function actionTrainSense() {
     if (state.energy < 20 || state.over) return;
     state.energy = clamp(state.energy - 20, 0, 100);
-    const gain = (2 + Math.random() * 3) * currentRole().senseMult;
+    const gearBonus = 1 + (owned("monitor") ? 0.15 : 0);
+    const gain = (2 + Math.random() * 3) * currentRole().senseMult * gearBonus;
     state.gameSense = clamp(state.gameSense + gain, 0, 100);
     state.motivation = clamp(state.motivation - 2, 0, 100);
     addLog("🧠 Analizujesz dema i taktyki przeciwników.", "info");
@@ -537,7 +618,8 @@
     if (state.energy < 10 || state.over) return;
     state.energy = clamp(state.energy - 10, 0, 100);
     const base = 100 + state.reputation * 4;
-    const earn = Math.round(base * (0.7 + Math.random() * 0.6));
+    const managerBonus = owned("manager") ? 1.25 : 1;
+    const earn = Math.round(base * (0.7 + Math.random() * 0.6) * managerBonus);
     state.money += earn;
     state.reputation = clamp(state.reputation + 1 + Math.random() * 2, 0, 100);
     state.motivation = clamp(state.motivation - 3, 0, 100);
@@ -561,8 +643,9 @@
 
   function actionRest() {
     if (state.over) return;
-    state.energy = clamp(state.energy + 40, 0, 100);
-    state.motivation = clamp(state.motivation + 8, 0, 100);
+    const physioBonus = owned("physio") ? 1.25 : 1;
+    state.energy = clamp(state.energy + 40 * physioBonus, 0, 100);
+    state.motivation = clamp(state.motivation + 8 * physioBonus, 0, 100);
     addLog("😴 Odpoczywasz i regenerujesz siły.", "good");
     advanceTurn(); render();
   }
@@ -596,6 +679,103 @@
     showEndModal("Dobrowolne zakończenie kariery", "Postanawiasz zakończyć karierę zawodową na własnych warunkach.");
   }
 
+  // --- Shop ---
+
+  function renderShop() {
+    const container = document.getElementById("shop-items");
+    container.innerHTML = UPGRADES.map(u => {
+      const isOwned = owned(u.id);
+      const canAfford = state.money >= u.cost;
+      const label = isOwned ? "Posiadane" : (money(u.cost) + (u.upkeep ? " + " + money(u.upkeep) + "/tydz." : ""));
+      return '<div class="shop-item">' +
+        '<div class="shop-item-info">' +
+          '<div class="shop-item-name">' + u.name + '</div>' +
+          '<div class="shop-item-desc">' + u.desc + '</div>' +
+        '</div>' +
+        '<button class="shop-buy-btn' + (isOwned ? ' owned' : '') + '" data-id="' + u.id + '"' + ((isOwned || !canAfford) ? ' disabled' : '') + '>' + label + '</button>' +
+      '</div>';
+    }).join("");
+    container.querySelectorAll(".shop-buy-btn").forEach(btn => {
+      btn.addEventListener("click", () => buyUpgrade(btn.getAttribute("data-id")));
+    });
+  }
+
+  function buyUpgrade(id) {
+    const u = UPGRADES.find(x => x.id === id);
+    if (!u || owned(id) || state.money < u.cost || state.over) return;
+    state.money -= u.cost;
+    state.upgrades[id] = true;
+    addLog("🛒 Kupujesz: " + u.name + ".", "good");
+    renderShop();
+    render();
+  }
+
+  function openShop() { renderShop(); document.getElementById("shop-overlay").classList.remove("hidden"); }
+  function closeShop() { document.getElementById("shop-overlay").classList.add("hidden"); }
+
+  // --- Autoplay ---
+
+  function autoCompete() {
+    if (state.energy < 25 || state.over) return false;
+    const map = MAPS[Math.floor(Math.random() * MAPS.length)];
+    resolveMatch(map);
+    return true;
+  }
+
+  function playOneAutoTurn(strategy) {
+    if (state.over) return false;
+    const canAim = state.energy >= 20;
+    const canSense = state.energy >= 20;
+    const canScrim = state.energy >= 15;
+    const canCompete = state.energy >= 25;
+    const canStream = state.energy >= 10;
+
+    if (state.money < 400 && canStream) { actionStream(); return true; }
+
+    switch (strategy) {
+      case "aim": canAim ? actionTrainAim() : actionRest(); break;
+      case "sense": canSense ? actionTrainSense() : actionRest(); break;
+      case "teamwork": canScrim ? actionScrim() : actionRest(); break;
+      case "money": canStream ? actionStream() : actionRest(); break;
+      case "rank":
+        if (canCompete) autoCompete();
+        else if (canStream) actionStream();
+        else actionRest();
+        break;
+      default: {
+        const r = Math.random();
+        if (r < 0.3 && canAim) actionTrainAim();
+        else if (r < 0.6 && canSense) actionTrainSense();
+        else if (r < 0.8 && canScrim) actionScrim();
+        else if (canCompete) autoCompete();
+        else if (canStream) actionStream();
+        else actionRest();
+      }
+    }
+    return true;
+  }
+
+  const AUTO_STRATEGY_LABELS = {
+    balanced: "Zbalansowany", aim: "Aim", sense: "Game Sense",
+    teamwork: "Zgranie", money: "Zarabianie", rank: "Premier Rating",
+  };
+
+  function runAutoPlay() {
+    if (state.over) return;
+    const strategy = document.getElementById("auto-strategy").value;
+    let turns = parseInt(document.getElementById("auto-turns").value, 10);
+    if (!turns || turns < 1) turns = 1;
+    turns = clamp(turns, 1, 52);
+    let played = 0;
+    for (let i = 0; i < turns; i++) {
+      if (state.over) break;
+      playOneAutoTurn(strategy);
+      played += 1;
+    }
+    addLog("⏩ Automatyczna gra: rozegrano " + played + " " + (played === 1 ? "turę" : "tur") + " (" + AUTO_STRATEGY_LABELS[strategy] + ").", "info");
+    render();
+  }
+
   function newGame() {
     localStorage.removeItem(STORAGE_KEY);
     document.getElementById("modal-overlay").classList.add("hidden");
@@ -624,6 +804,7 @@
     document.getElementById("player-turn").textContent = state.turn;
     document.getElementById("player-rank").textContent = premierTier().name + " (" + Math.round(state.premierRating).toLocaleString("pl-PL") + ")";
     document.getElementById("player-role").textContent = currentRole().label;
+    document.getElementById("upgrades-count").textContent = UPGRADES.filter(u => owned(u.id)).length + "/" + UPGRADES.length;
 
     document.getElementById("stat-money").textContent = money(state.money);
     document.getElementById("stat-money").style.color = state.money < 0 ? "var(--danger)" : "var(--text)";
@@ -658,6 +839,8 @@
     document.getElementById("btn-skins").disabled = state.money < 50 || state.over;
     document.getElementById("btn-rest").disabled = state.over;
     document.getElementById("btn-transfer").disabled = state.energy < 15 || state.over || !nextTeam();
+    document.getElementById("btn-shop").disabled = state.over;
+    document.getElementById("btn-autoplay").disabled = state.over;
 
     const logEl = document.getElementById("log");
     logEl.innerHTML = state.log.map(e => '<div class="entry ' + e.type + '">' + e.text + "</div>").join("");
@@ -691,12 +874,16 @@
   document.getElementById("btn-retire").addEventListener("click", actionRetire);
   document.getElementById("btn-newgame").addEventListener("click", newGame);
   document.getElementById("modal-btn").addEventListener("click", newGame);
+  document.getElementById("btn-shop").addEventListener("click", openShop);
+  document.getElementById("shop-close-btn").addEventListener("click", closeShop);
+  document.getElementById("btn-autoplay").addEventListener("click", runAutoPlay);
 
   // --- boot ---
   updateRoleDesc();
   const existing = load();
   if (existing) {
     state = existing;
+    if (!state.upgrades) state.upgrades = {};
     document.getElementById("start-screen").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
     render();
