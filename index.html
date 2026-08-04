@@ -6,9 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Kariera CS2">
+<meta name="apple-mobile-web-app-title" content="Esport Org">
 <meta name="theme-color" content="#0b0e14">
-<title>Kariera Progracza CS2</title>
+<title>Organizacja Esportowa</title>
 <style>
   :root {
     --bg1: #0b0e14;
@@ -30,11 +30,13 @@
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
-  #app { max-width: 820px; margin: 0 auto; padding: 24px 16px 60px; }
+  #app { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
 
-  h1 { font-size: 1.6rem; margin: 0 0 4px; letter-spacing: 0.5px; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: 0.5px; }
+  h2 { font-size: 1.1rem; margin: 0 0 4px; }
   .subtitle { color: var(--text-dim); margin: 0 0 20px; font-size: 0.9rem; }
   .disclaimer { color: var(--text-dim); font-size: 0.75rem; margin: 0 0 20px; opacity: 0.7; }
+  .section-title { font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px; }
 
   .card {
     background: var(--card);
@@ -44,19 +46,17 @@
     margin-bottom: 16px;
   }
 
-  /* --- Start screen --- */
-  #start-screen input, #start-screen select {
+  #start-screen input {
     width: 100%; padding: 10px 12px; border-radius: 8px;
     border: 1px solid var(--card-border); background: #0e1224; color: var(--text);
     font-size: 1rem; margin: 8px 0 16px;
   }
-  #start-screen input:focus, #start-screen select:focus { outline: 2px solid var(--accent); }
+  #start-screen input:focus { outline: 2px solid var(--accent); }
   #start-screen label { font-size: 0.9rem; color: var(--text-dim); }
-  .role-desc { font-size: 0.78rem; color: var(--text-dim); margin: -10px 0 16px; }
 
   button {
     cursor: pointer; border: none; border-radius: 10px;
-    font-size: 0.95rem; font-weight: 600; padding: 12px 16px;
+    font-size: 0.9rem; font-weight: 600; padding: 11px 15px;
     background: var(--accent); color: #1a0f00;
     transition: transform 0.08s ease, opacity 0.15s ease;
   }
@@ -64,97 +64,96 @@
   button:disabled { opacity: 0.35; cursor: not-allowed; }
   button.secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text); }
   button.danger { background: var(--danger); color: #260707; }
+  button.good { background: var(--good); color: #062016; }
+  button.small { padding: 7px 11px; font-size: 0.78rem; }
 
-  /* --- Header / stats --- */
-  #header-row {
-    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-  }
-  #identity { font-size: 1.05rem; font-weight: 700; }
-  #team-name { color: var(--accent2); }
+  /* --- Header --- */
+  #header-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  #org-name { font-size: 1.1rem; font-weight: 700; }
   #meta { color: var(--text-dim); font-size: 0.82rem; text-align: right; }
-  #rank-row { margin-top: 6px; font-size: 0.85rem; color: var(--text-dim); }
-  #rank-row b { color: var(--accent); }
-
   .stats-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
     gap: 14px; margin-top: 14px;
   }
   .stat-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-dim); margin-bottom: 4px; }
   .bar-track { height: 8px; border-radius: 6px; background: #0e1224; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s ease; }
-  .money-value { font-size: 1.1rem; font-weight: 700; }
+  .stat-big { font-size: 1.15rem; font-weight: 700; }
+  #ap-value { color: var(--accent); font-weight: 700; }
 
-  /* --- Actions --- */
-  #actions-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;
+  /* --- Division tabs --- */
+  #div-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
+  .div-tab {
+    flex-shrink: 0; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--card-border);
+    background: #10142a; color: var(--text); cursor: pointer; white-space: nowrap; font-weight: 600; font-size: 0.85rem;
   }
-  #actions-grid button { text-align: left; }
+  .div-tab.active { border-color: var(--accent); background: #262146; }
+  .div-tab .div-tab-sub { display: block; font-size: 0.68rem; font-weight: 400; color: var(--text-dim); margin-top: 2px; }
+
+  #open-titles { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .open-title-card {
+    flex: 1; min-width: 150px; background: #10142a; border: 1px solid var(--card-border); border-radius: 10px; padding: 10px 12px;
+  }
+  .open-title-card .otc-name { font-weight: 700; font-size: 0.85rem; }
+  .open-title-card .otc-genre { font-size: 0.72rem; color: var(--text-dim); margin: 2px 0 8px; }
+
+  /* --- Roster --- */
+  .roster-slot {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 12px; border-radius: 10px; background: #10142a; border: 1px solid var(--card-border); margin-bottom: 8px; gap: 10px;
+  }
+  .roster-slot.empty { opacity: 0.75; }
+  .player-name { font-weight: 700; font-size: 0.9rem; }
+  .player-meta { font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
+  .candidate-card {
+    background: #191038; border: 1px solid var(--accent); border-radius: 10px; padding: 12px; margin-bottom: 10px;
+  }
+  .candidate-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+  #division-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 14px; }
+  #division-actions button { text-align: left; }
   .action-title { display: block; }
-  .action-cost { display: block; font-size: 0.72rem; font-weight: 400; opacity: 0.8; margin-top: 2px; }
+  .action-cost { display: block; font-size: 0.7rem; font-weight: 400; opacity: 0.8; margin-top: 2px; }
 
-  #retire-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+  #org-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  #org-actions button { text-align: left; }
 
-  /* --- Log --- */
+  .sponsor-chip {
+    display: inline-block; background: #10142a; border: 1px solid var(--card-border); border-radius: 8px;
+    padding: 6px 10px; font-size: 0.78rem; margin: 4px 6px 0 0;
+  }
+
+  #retire-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+
   #log {
     max-height: 220px; overflow-y: auto; display: flex; flex-direction: column-reverse;
-    gap: 6px; font-size: 0.88rem;
+    gap: 6px; font-size: 0.85rem;
   }
-  #log .entry { padding: 6px 10px; border-radius: 8px; background: #0e1224; border-left: 3px solid var(--card-border); }
+  #log .entry { padding: 6px 10px; border-radius: 8px; background: #10142a; border-left: 3px solid var(--card-border); }
   #log .entry.good { border-left-color: var(--good); }
   #log .entry.bad { border-left-color: var(--danger); }
   #log .entry.info { border-left-color: var(--accent); }
 
-  /* --- Modal --- */
-  #modal-overlay {
+  #modal-overlay, #shop-overlay {
     position: fixed; inset: 0; background: rgba(5, 6, 15, 0.75);
     display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 10;
   }
   #modal-box { max-width: 440px; width: 100%; text-align: center; }
-  #modal-box h2 { margin-top: 0; }
   #modal-stats { text-align: left; margin: 16px 0; color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; }
   #modal-stats b { color: var(--text); }
 
-  /* --- Map veto --- */
-  #veto-overlay {
-    position: fixed; inset: 0; background: rgba(5, 6, 15, 0.75);
-    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 10;
-  }
-  #veto-box { max-width: 420px; width: 100%; text-align: center; }
-  #veto-box p { color: var(--text-dim); font-size: 0.85rem; }
-  #veto-maps { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
-  .veto-map-btn { background: #10142a; border: 1px solid var(--card-border); color: var(--text); text-align: left; }
-  .veto-map-btn:hover { border-color: var(--accent); }
-
-  /* --- Shop --- */
-  #shop-overlay {
-    position: fixed; inset: 0; background: rgba(5, 6, 15, 0.75);
-    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 10;
-  }
   #shop-box { max-width: 480px; width: 100%; text-align: left; }
-  #shop-box h2 { text-align: center; margin-top: 0; }
+  #shop-box h2 { text-align: center; }
   #shop-box p { color: var(--text-dim); font-size: 0.85rem; }
   #shop-items { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; max-height: 55vh; overflow-y: auto; }
   .shop-item { background: #10142a; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-  .shop-item-info { flex: 1; }
   .shop-item-name { font-weight: 700; }
   .shop-item-desc { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
   .shop-buy-btn { flex-shrink: 0; padding: 8px 12px; font-size: 0.8rem; text-align: center; white-space: nowrap; }
   .shop-buy-btn.owned { background: var(--good); color: #062016; }
 
-  /* --- Autoplay --- */
-  #autoplay-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
-  #autoplay-row > div { display: flex; flex-direction: column; }
-  #autoplay-row label { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 4px; }
-  #autoplay-row select, #autoplay-row input {
-    padding: 10px 12px; border-radius: 8px; border: 1px solid var(--card-border);
-    background: #0e1224; color: var(--text); font-size: 0.9rem;
-  }
-  #auto-strategy { min-width: 190px; flex: 1; }
-  #auto-turns { width: 80px; }
-
   .hidden { display: none !important; }
-
-  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
 </style>
 </head>
@@ -163,24 +162,14 @@
 
   <!-- START SCREEN -->
   <div id="start-screen" class="card">
-    <h1>🔫 Kariera Progracza CS2</h1>
-    <p class="subtitle">Zacznij jako nikt w mixach, wspinaj się przez drużyny i Premier Rating aż po legendę sceny. Trenuj, banuj mapy i graj mecze o realnym wyniku rundowym, transferuj się do lepszych organizacji i uważaj na wypalenie.</p>
-    <p class="disclaimer">Fanowska gra inspirowana sceną Counter-Strike 2, niepowiązana z Valve.</p>
+    <h1>🏢 Organizacja Esportowa</h1>
+    <p class="subtitle">Zbuduj wielotytułową organizację esportową od zera. Otwieraj oddziały w różnych grach, skautuj i rozwijaj zawodników, podpisuj sponsorów i pnij się w rankingach lig.</p>
+    <p class="disclaimer">Fanowska gra z fikcyjnymi tytułami esportowymi, niezwiązana z żadnym realnym wydawcą.</p>
 
-    <label for="nick-input">Twój pseudonim</label>
-    <input id="nick-input" type="text" maxlength="20" placeholder="np. n0va" autocomplete="off">
+    <label for="org-name-input">Nazwa Twojej organizacji</label>
+    <input id="org-name-input" type="text" maxlength="24" placeholder="np. Aurora Esports" autocomplete="off">
 
-    <label for="role-select">Twoja rola w drużynie</label>
-    <select id="role-select">
-      <option value="awper">AWPer</option>
-      <option value="entry">Entry Fragger</option>
-      <option value="support">Support</option>
-      <option value="igl">IGL (Lider)</option>
-      <option value="lurker">Lurker</option>
-    </select>
-    <div class="role-desc" id="role-desc"></div>
-
-    <button id="start-btn">Rozpocznij karierę</button>
+    <button id="start-btn">Załóż organizację</button>
   </div>
 
   <!-- GAME SCREEN -->
@@ -188,77 +177,44 @@
 
     <div class="card" id="header-card">
       <div id="header-row">
-        <div id="identity">🎮 <span id="player-name"></span> — <span id="team-name"></span></div>
-        <div id="meta"><span id="player-age"></span> lat · Tydzień <span id="player-week"></span>/52 · Tura <span id="player-turn"></span></div>
+        <div id="org-name-display" style="font-size:1.1rem; font-weight:700;"></div>
+        <div id="meta">Tydzień <span id="week-num"></span> · Rok <span id="year-num"></span></div>
       </div>
-      <div id="rank-row">Premier Rating: <b id="player-rank"></b> · Rola: <span id="player-role"></span> · Ulepszenia: <span id="upgrades-count"></span></div>
-
       <div class="stats-grid">
-        <div class="stat-label"><span>💰 Pieniądze</span><span class="money-value" id="stat-money"></span></div>
-        <div class="stat-label" style="width:100%"></div>
         <div>
-          <div class="stat-label"><span>⚡ Energia</span><span id="stat-energy-num"></span></div>
-          <div class="bar-track"><div class="bar-fill" id="stat-energy" style="background: var(--warning);"></div></div>
-        </div>
-        <div>
-          <div class="stat-label"><span>🙂 Motywacja</span><span id="stat-motivation-num"></span></div>
-          <div class="bar-track"><div class="bar-fill" id="stat-motivation" style="background: var(--good);"></div></div>
-        </div>
-        <div>
-          <div class="stat-label"><span>🎯 Aim</span><span id="stat-aim-num"></span></div>
-          <div class="bar-track"><div class="bar-fill" id="stat-aim" style="background: var(--accent2);"></div></div>
-        </div>
-        <div>
-          <div class="stat-label"><span>🧠 Game Sense</span><span id="stat-sense-num"></span></div>
-          <div class="bar-track"><div class="bar-fill" id="stat-sense" style="background: #a78bfa;"></div></div>
-        </div>
-        <div>
-          <div class="stat-label"><span>🤝 Zgranie</span><span id="stat-teamwork-num"></span></div>
-          <div class="bar-track"><div class="bar-fill" id="stat-teamwork" style="background: #60a5fa;"></div></div>
+          <div class="stat-label"><span>💰 Budżet</span></div>
+          <div class="stat-big" id="stat-money"></div>
         </div>
         <div>
           <div class="stat-label"><span>⭐ Reputacja</span><span id="stat-rep-num"></span></div>
           <div class="bar-track"><div class="bar-fill" id="stat-rep" style="background: var(--accent);"></div></div>
         </div>
+        <div>
+          <div class="stat-label"><span>⚡ Punkty Akcji</span></div>
+          <div class="stat-big"><span id="ap-value"></span></div>
+        </div>
       </div>
     </div>
 
     <div class="card">
-      <div id="actions-grid">
-        <button id="btn-aim"><span class="action-title">🎯 Trenuj Aim</span><span class="action-cost"></span></button>
-        <button id="btn-sense"><span class="action-title">🧠 Analizuj Grę</span><span class="action-cost"></span></button>
-        <button id="btn-scrim"><span class="action-title">🤝 Scrimuj</span><span class="action-cost"></span></button>
-        <button id="btn-compete"><span class="action-title">🏆 Zagraj Mecz</span><span class="action-cost"></span></button>
-        <button id="btn-stream"><span class="action-title">📹 Streamuj</span><span class="action-cost"></span></button>
-        <button id="btn-skins"><span class="action-title">📦 Handluj Skinami</span><span class="action-cost"></span></button>
-        <button id="btn-rest"><span class="action-title">😴 Odpoczywaj</span><span class="action-cost"></span></button>
-        <button id="btn-transfer"><span class="action-title">✍️ Szukaj / Transfer</span><span class="action-cost"></span></button>
-        <button id="btn-shop"><span class="action-title">🛒 Sklep</span><span class="action-cost">Sprzęt i personel</span></button>
+      <div class="section-title">Twoje oddziały</div>
+      <div id="div-tabs"></div>
+      <div id="open-titles"></div>
+    </div>
+
+    <div class="card" id="division-panel"></div>
+
+    <div class="card">
+      <div class="section-title">Zarządzanie organizacją</div>
+      <div id="sponsors-row" style="margin-bottom: 10px;"></div>
+      <div id="org-actions">
+        <button id="btn-sponsor"><span class="action-title">🤝 Podpisz sponsora</span><span class="action-cost"></span></button>
+        <button id="btn-shop"><span class="action-title">🏗️ Infrastruktura</span><span class="action-cost">Ulepszenia HQ</span></button>
+        <button id="btn-endweek"><span class="action-title">📅 Zakończ tydzień</span><span class="action-cost">Wypłaty, przychody, wydarzenia</span></button>
       </div>
       <div id="retire-row">
         <button class="secondary" id="btn-newgame">Nowa gra</button>
-        <button class="danger" id="btn-retire">🏁 Zakończ karierę</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div id="autoplay-row">
-        <div style="flex: 1; min-width: 180px;">
-          <label for="auto-strategy">Tryb automatyczny</label>
-          <select id="auto-strategy">
-            <option value="balanced">Zbalansowany</option>
-            <option value="aim">Skup się na Aim</option>
-            <option value="sense">Skup się na Game Sense</option>
-            <option value="teamwork">Skup się na Zgraniu</option>
-            <option value="money">Zarabiaj (stream)</option>
-            <option value="rank">Buduj Premier Rating</option>
-          </select>
-        </div>
-        <div>
-          <label for="auto-turns">Ile tur</label>
-          <input id="auto-turns" type="number" min="1" max="52" value="4">
-        </div>
-        <button id="btn-autoplay">⏩ Zagraj automatycznie</button>
+        <button class="danger" id="btn-retire">🏁 Zakończ działalność</button>
       </div>
     </div>
 
@@ -279,20 +235,11 @@
   </div>
 </div>
 
-<!-- VETO -->
-<div id="veto-overlay" class="hidden">
-  <div class="card" id="veto-box">
-    <h2>🗺️ Wybór mapy</h2>
-    <p>Drużyny naprzemiennie banują mapy z puli — zostały trzy. Wybierz, na czym zagracie.</p>
-    <div id="veto-maps"></div>
-  </div>
-</div>
-
 <!-- SHOP -->
 <div id="shop-overlay" class="hidden">
   <div class="card" id="shop-box">
-    <h2>🛒 Sklep</h2>
-    <p>Sprzęt i personel dają stałe bonusy — część wymaga cotygodniowego utrzymania.</p>
+    <h2>🏗️ Infrastruktura HQ</h2>
+    <p>Ulepszenia działają na wszystkie oddziały naraz. Część wymaga cotygodniowego utrzymania.</p>
     <div id="shop-items"></div>
     <button class="secondary" id="shop-close-btn" style="margin-top: 14px; width: 100%;">Zamknij</button>
   </div>
@@ -302,89 +249,78 @@
 (function () {
   "use strict";
 
-  const STORAGE_KEY = "cs2-career-sim-save-v1";
+  const STORAGE_KEY = "esports-org-sim-save-v1";
 
-  const ROLES = {
-    awper:   { label: "AWPer",          aimMult: 1.5, senseMult: 1.0, teamworkMult: 1.0, repMult: 1.0, energyMult: 1.0 },
-    entry:   { label: "Entry Fragger",  aimMult: 1.0, senseMult: 1.0, teamworkMult: 1.0, repMult: 1.5, energyMult: 1.0 },
-    support: { label: "Support",        aimMult: 1.0, senseMult: 1.0, teamworkMult: 1.5, repMult: 1.0, energyMult: 1.0 },
-    igl:     { label: "IGL (Lider)",    aimMult: 0.8, senseMult: 1.5, teamworkMult: 1.0, repMult: 1.0, energyMult: 1.0 },
-    lurker:  { label: "Lurker",         aimMult: 1.0, senseMult: 1.0, teamworkMult: 1.0, repMult: 1.0, energyMult: 0.8 },
-  };
-
-  const ROLE_DESC = {
-    awper:   "Szybciej rozwijasz Aim, ale to Ty musisz wygrywać duele o granaty.",
-    entry:   "Wchodzisz pierwszy — szybciej budujesz Reputację, ale ryzykujesz więcej.",
-    support: "Grasz dla drużyny — szybciej budujesz Zgranie z zespołem.",
-    igl:     "Czytasz grę lepiej niż ktokolwiek — szybszy Game Sense, ale wolniejszy Aim.",
-    lurker:  "Grasz oszczędnie — Twoje akcje kosztują mniej Energii.",
-  };
-
-  const TEAMS = [
-    { name: "Wolny Agent",              salary: 0,     reqAim: 0,   reqSense: 0,   reqRep: 0,  reqPremier: 0 },
-    { name: "Drużyna Amatorska",        salary: 250,   reqAim: 20,  reqSense: 15,  reqRep: 10, reqPremier: 7000 },
-    { name: "Tier 3 (Liga Otwarta)",    salary: 600,   reqAim: 35,  reqSense: 30,  reqRep: 25, reqPremier: 12000 },
-    { name: "Tier 2 (Liga Zaawansowana)", salary: 1400, reqAim: 50, reqSense: 45,  reqRep: 40, reqPremier: 17000 },
-    { name: "Tier 1 (Liga Profesjonalna)", salary: 3000, reqAim: 65, reqSense: 60, reqRep: 55, reqPremier: 21000 },
-    { name: "Top Kontender",            salary: 6000,  reqAim: 80,  reqSense: 75,  reqRep: 70, reqPremier: 26000 },
-    { name: "Legenda Sceny",            salary: 12000, reqAim: 92,  reqSense: 88,  reqRep: 85, reqPremier: 29000 },
+  const TITLES = [
+    { id: "tactical",    name: "Tactical Ops",  genre: "Taktyczna strzelanka 5v5", icon: "🔫", entryCost: 3000 },
+    { id: "rift",        name: "Rift Legends",  genre: "MOBA 5v5",                 icon: "⚔️", entryCost: 4000 },
+    { id: "battlezone",  name: "Battle Zone",   genre: "Battle royale",            icon: "🪂", entryCost: 3500 },
+    { id: "velocity",    name: "Velocity GP",   genre: "Wyścigi symulacyjne",      icon: "🏎️", entryCost: 5000 },
+    { id: "ironfist",    name: "Iron Fist",     genre: "Bijatyka 1v1",             icon: "🥊", entryCost: 2500 },
+    { id: "cardmasters", name: "Card Masters",  genre: "Karciana strategiczna",    icon: "🃏", entryCost: 2000 },
   ];
 
-  const MAPS = ["Mirage", "Inferno", "Nuke", "Ancient", "Anubis", "Dust II", "Vertigo", "Overpass", "Train"];
-
-  const PREMIER_TIERS = [
-    { max: 4999,      name: "Szary" },
-    { max: 9999,      name: "Jasnoniebieski" },
-    { max: 14999,     name: "Niebieski" },
-    { max: 19999,     name: "Fioletowy" },
-    { max: 24999,     name: "Różowy" },
-    { max: 29999,     name: "Czerwony" },
-    { max: Infinity,  name: "Złoty" },
+  const DIVISION_TIERS = [
+    { name: "Amatorska",     prizeBase: 800,   reqSkill: 0,  reqRep: 0  },
+    { name: "Tier 3",        prizeBase: 2000,  reqSkill: 25, reqRep: 10 },
+    { name: "Tier 2",        prizeBase: 4500,  reqSkill: 40, reqRep: 25 },
+    { name: "Tier 1",        prizeBase: 9000,  reqSkill: 55, reqRep: 40 },
+    { name: "Top Kontender", prizeBase: 16000, reqSkill: 70, reqRep: 55 },
+    { name: "Legenda",       prizeBase: 30000, reqSkill: 85, reqRep: 70 },
   ];
 
-  const UPGRADES = [
-    { id: "gear",    name: "Sprzęt Pro (mysz + słuchawki)", desc: "+15% do przyrostu Aim z treningu", cost: 1200, upkeep: 0 },
-    { id: "monitor", name: "Monitor 240Hz",                 desc: "+15% do przyrostu Aim i Game Sense z treningu", cost: 2000, upkeep: 0 },
-    { id: "coach",   name: "Osobisty coach",                desc: "Pasywnie +0.3 Game Sense co turę, niezależnie od akcji", cost: 2500, upkeep: 100 },
-    { id: "physio",  name: "Fizjoterapeuta",                desc: "Rzadsze kontuzje, +25% skuteczności odpoczynku", cost: 1500, upkeep: 60 },
-    { id: "psych",   name: "Psycholog sportowy",             desc: "Łagodniejszy wpływ złych wydarzeń na motywację", cost: 1000, upkeep: 50 },
-    { id: "manager", name: "Manager / Agent",                desc: "+25% zarobków ze streamowania", cost: 2000, upkeep: 80 },
+  const HQ_UPGRADES = [
+    { id: "facility",   name: "Dom Gamingowy",        desc: "+30% skuteczności treningu we wszystkich oddziałach", cost: 5000, upkeep: 0 },
+    { id: "analysts",   name: "Zespół Analityków",    desc: "+50% wzrostu umiejętności z wygranych meczów",        cost: 4000, upkeep: 150 },
+    { id: "medical",    name: "Sztab Medyczny",       desc: "Szybsza regeneracja morale zawodników",               cost: 3000, upkeep: 100 },
+    { id: "pr",         name: "Zespół PR",            desc: "+30% reputacji ze zwycięstw i sponsorów",             cost: 3500, upkeep: 120 },
+    { id: "scouting",   name: "Dyrektor Skautingu",   desc: "Skauting pokazuje 2 kandydatów zamiast 1",            cost: 4500, upkeep: 150 },
+    { id: "management", name: "Biuro Zarządu",        desc: "+1 Punkt Akcji na tydzień",                           cost: 6000, upkeep: 200 },
   ];
+
+  const NAME_POOL = ["Zephyr","Kex","Rell","Nyx","Byte","Ghost","Vantage","Lumen","Frost","Blaze","Orbit","Static","Nova","Pixel","Rogue","Shade","Vertex","Cipher","Drift","Flux","Halo","Ion","Jinx","Krypt","Lynx","Mirage","Nex","Onyx","Prism","Quill","Raze","Sable","Tempo","Umbra","Volt","Wisp","Xen","Yara","Zed","Astra"];
+  const SPONSOR_NAMES = ["NitroFuel","ByteWear","PulseGear","QuantumChips","ZenithEnergy","VoltCola","ApexPeripherals","NovaBank","HyperNet","TitanChairs","CoreDrinks","PrimeAudio","FluxMonitors","OrbitTelecom","SparkWear"];
 
   const RANDOM_EVENTS = [
-    { chance: 0.10, type: "good", text: "Twój clip z akcji trafia na Reddita.", effect: s => { s.reputation = clamp(s.reputation + 5, 0, 100); } },
-    { id: "rsi", chance: 0.09, type: "bad",  text: "Kontuzja nadgarstka (RSI) daje o sobie znać.", effect: s => { s.energy = clamp(s.energy - 20, 0, 100); s.motivation = clamp(s.motivation - 6, 0, 100); s.aim = clamp(s.aim - 2, 0, 100); } },
-    { chance: 0.09, type: "bad",  text: "Kłótnia w drużynie psuje wspólną grę.", effect: s => { s.teamwork = clamp(s.teamwork - 8, 0, 100); } },
-    { chance: 0.09, type: "good", text: "Producent sprzętu proponuje mały kontrakt sponsorski.", effect: s => { s.money += 400; } },
-    { chance: 0.08, type: "good", text: "Twój highlight trafia do edytu turnieju.", effect: s => { s.reputation = clamp(s.reputation + 4, 0, 100); s.money += 150; } },
-    { chance: 0.09, type: "good", text: "Fani wspierają Cię po ciężkim tygodniu.", effect: s => { s.motivation = clamp(s.motivation + 8, 0, 100); } },
-    { chance: 0.08, type: "bad",  text: "Aktualizacja gry miesza meta — musisz się dostosować.", effect: s => { s.gameSense = clamp(s.gameSense - 3, 0, 100); } },
-    { chance: 0.07, type: "bad",  text: "W sieci krążą bezpodstawne plotki o smurfowaniu.", effect: s => { s.reputation = clamp(s.reputation - 6, 0, 100); s.motivation = clamp(s.motivation - 4, 0, 100); } },
-    { chance: 0.07, type: "info", text: "Nocny maraton scrimów z drużyną.", effect: s => { s.energy = clamp(s.energy - 10, 0, 100); s.teamwork = clamp(s.teamwork + 4, 0, 100); } },
-    { chance: 0.06, type: "good", text: "Wygrywasz mały zakład na skiny ze znajomym.", effect: s => { s.money += 200; } },
+    { chance: 0.12, type: "good", text: "Viralowy klip jednego z Twoich zawodników przyciąga nowych fanów.", effect: s => { s.reputation = clamp(s.reputation + 4, 0, 100); } },
+    { chance: 0.10, type: "bad",  text: "Nieoczekiwana faktura za wynajem biura.", effect: s => { s.money -= Math.round(500 + Math.random() * 500); } },
+    { chance: 0.10, type: "good", text: "Organizacja trafia na listę najbardziej obiecujących marek esportowych.", effect: s => { s.reputation = clamp(s.reputation + 6, 0, 100); } },
+    { chance: 0.10, type: "bad",  text: "Konflikt w szatni obniża morale jednego z oddziałów.", effect: s => { const d = randomDivision(s); if (d) d.roster.forEach(p => { if (p) p.morale = clamp(p.morale - 6, 0, 100); }); } },
+    { chance: 0.08, type: "good", text: "Sponsor przekazuje dodatkowy bonus za dobre wyniki.", effect: s => { s.money += Math.round(300 + Math.random() * 400); } },
+    { chance: 0.08, type: "bad",  text: "Jeden z zawodników choruje i traci nieco formy.", effect: s => { const d = randomDivision(s); const p = randomPlayer(d); if (p) p.skill = clamp(p.skill - 3, 0, 100); } },
+    { chance: 0.08, type: "info", text: "Branżowy portal publikuje wywiad z Twoją organizacją.", effect: s => { s.reputation = clamp(s.reputation + 2, 0, 100); } },
+    { chance: 0.06, type: "good", text: "Inwestor oferuje drobny zastrzyk gotówki w zamian za promocję.", effect: s => { s.money += 800; } },
   ];
 
   let state = null;
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
   function money(v) { return (v < 0 ? "-" : "") + Math.abs(Math.round(v)).toLocaleString("pl-PL") + " zł"; }
+  function randomName() { return NAME_POOL[Math.floor(Math.random() * NAME_POOL.length)] + Math.floor(Math.random() * 100); }
 
-  function defaultState(nick, roleKey) {
+  function randomDivision(s) {
+    if (!s.divisions.length) return null;
+    return s.divisions[Math.floor(Math.random() * s.divisions.length)];
+  }
+  function randomPlayer(div) {
+    if (!div) return null;
+    const filled = div.roster.filter(p => p);
+    if (!filled.length) return null;
+    return filled[Math.floor(Math.random() * filled.length)];
+  }
+
+  function defaultState(orgName) {
     return {
-      nick: nick || "Gracz",
-      role: roleKey,
-      age: 17,
+      orgName: orgName || "Moja Organizacja",
       week: 0,
-      turn: 0,
-      money: 500,
-      energy: 100,
-      motivation: 70,
-      aim: 5,
-      gameSense: 5,
-      teamwork: 10,
-      reputation: 20,
-      premierRating: 3000,
-      teamTierIndex: 0,
+      year: 1,
+      money: 15000,
+      reputation: 10,
+      actionPoints: 3,
+      divisions: [],
+      divisionsEverOpened: 0,
+      selectedDivisionId: null,
+      sponsors: [],
       upgrades: {},
       over: false,
       log: [],
@@ -392,7 +328,7 @@
   }
 
   function save() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable (e.g. file:// origin) — play without persistence */ }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable */ }
   }
   function load() {
     try {
@@ -402,166 +338,57 @@
     } catch (e) { return null; }
   }
 
-  function currentRole() { return ROLES[state.role] || ROLES.awper; }
-  function currentTeam() { return TEAMS[state.teamTierIndex]; }
-  function nextTeam() { return TEAMS[state.teamTierIndex + 1] || null; }
-  function premierTier() {
-    const idx = PREMIER_TIERS.findIndex(t => state.premierRating <= t.max);
-    return PREMIER_TIERS[idx === -1 ? PREMIER_TIERS.length - 1 : idx];
-  }
-
   function owned(id) { return !!(state.upgrades && state.upgrades[id]); }
-  function totalUpkeep() {
-    return UPGRADES.reduce((sum, u) => sum + (owned(u.id) ? u.upkeep : 0), 0);
-  }
+  function maxActionPoints() { return 3 + (owned("management") ? 1 : 0); }
 
   function addLog(text, type) {
     state.log.unshift({ text: text, type: type || "info" });
     if (state.log.length > 60) state.log.length = 60;
   }
 
-  function livingCost() { return 150 + Math.max(0, state.age - 17) * 3; }
+  function getDivision(id) { return state.divisions.find(d => d.id === id) || null; }
+  function selectedDivision() { return state.selectedDivisionId ? getDivision(state.selectedDivisionId) : null; }
 
-  function advanceTurn() {
-    state.turn += 1;
-    state.week += 1;
-    if (state.week >= 52) {
-      state.week = 0;
-      state.age += 1;
-    }
+  function generatePlayer(tier) {
+    const skill = clamp(10 + tier * 5 + Math.random() * 25, 0, 100);
+    return { name: randomName(), skill: skill, morale: Math.round(60 + Math.random() * 20), salary: Math.round(80 + skill * 7) };
+  }
 
-    state.money -= livingCost();
-    state.money -= totalUpkeep();
-    if (state.teamTierIndex >= 1) state.money += currentTeam().salary;
+  // --- Score / end game ---
 
-    if (owned("coach")) state.gameSense = clamp(state.gameSense + 0.3, 0, 100);
-
-    // aging reflex decline
-    if (state.age >= 27 && Math.random() < 0.18) {
-      const dec = 1 + Math.random() * 2;
-      state.aim = clamp(state.aim - dec, 0, 100);
-      addLog("⏳ Refleks nieco słabnie wraz z wiekiem.", "bad");
-    }
-
-    // random event
-    let roll = Math.random();
-    let acc = 0;
-    for (const ev of RANDOM_EVENTS) {
-      const effChance = (ev.id === "rsi" && owned("physio")) ? ev.chance * 0.4 : ev.chance;
-      acc += effChance;
-      if (roll < acc) {
-        ev.effect(state);
-        if (ev.type === "bad" && owned("psych")) state.motivation = clamp(state.motivation + 3, 0, 100);
-        addLog("📰 " + ev.text, ev.type);
-        break;
-      }
-    }
-
-    checkGameOver();
+  function computeScore() {
+    const totalWins = state.divisions.reduce((s, d) => s + d.wins, 0);
+    const bestTier = state.divisions.reduce((m, d) => Math.max(m, d.tier), 0);
+    return Math.round(
+      state.money / 50 + state.reputation * 5 + totalWins * 40 + bestTier * 300 + state.divisionsEverOpened * 100
+    );
   }
 
   function checkGameOver() {
     if (state.over) return;
-    if (state.money <= -3000) {
+    if (state.money <= -5000) {
       state.over = true;
-      showEndModal("Bankructwo", "Twoje finanse padły. Bez sprzętu i miejsca do treningu kariera się kończy.");
-    } else if (state.motivation <= 0) {
-      state.over = true;
-      showEndModal("Wypalenie", "Presja gry zawodowej Cię przerosła. Odchodzisz ze sceny na dłuższą przerwę.");
-    } else if (state.reputation <= 0 && state.turn > 25) {
-      state.over = true;
-      showEndModal("Toksyczna reputacja", "Twoje zachowanie odstraszyło drużyny i sponsorów. Nikt nie chce Cię już podpisać.");
-    } else if (state.age >= 35) {
-      state.over = true;
-      showEndModal("Koniec kariery (wiek)", "Refleks już nie ten co kiedyś. Czas przekazać pałeczkę młodszym zawodnikom.");
+      showEndModal("Bankructwo", "Organizacja nie udźwignęła własnych kosztów. Wierzyciele przejmują to, co zostało.");
     }
-  }
-
-  function computeScore() {
-    return Math.round(
-      state.money / 50 +
-      state.aim * 3 + state.gameSense * 3 + state.teamwork * 2 + state.reputation * 3 +
-      state.teamTierIndex * 300 +
-      state.premierRating / 50
-    );
   }
 
   function showEndModal(title, text) {
     document.getElementById("modal-title").textContent = title;
     document.getElementById("modal-text").textContent = text;
+    const divisionsList = state.divisions.map(d => d.title + " (" + DIVISION_TIERS[d.tier].name + ")").join(", ") || "brak";
+    const totalWins = state.divisions.reduce((s, d) => s + d.wins, 0);
     document.getElementById("modal-stats").innerHTML =
-      "<div><b>Drużyna:</b> " + currentTeam().name + "</div>" +
-      "<div><b>Premier Rating:</b> " + Math.round(state.premierRating).toLocaleString("pl-PL") + " (" + premierTier().name + ")</div>" +
-      "<div><b>Wiek:</b> " + state.age + " lat</div>" +
-      "<div><b>Pieniądze:</b> " + money(state.money) + "</div>" +
-      "<div><b>Aim / Game Sense:</b> " + Math.round(state.aim) + " / " + Math.round(state.gameSense) + "</div>" +
+      "<div><b>Budżet:</b> " + money(state.money) + "</div>" +
       "<div><b>Reputacja:</b> " + Math.round(state.reputation) + "/100</div>" +
+      "<div><b>Oddziały:</b> " + divisionsList + "</div>" +
+      "<div><b>Łączne zwycięstwa:</b> " + totalWins + "</div>" +
+      "<div><b>Otwarto w karierze:</b> " + state.divisionsEverOpened + " oddziałów</div>" +
       "<div><b>Wynik końcowy:</b> " + computeScore() + " pkt</div>";
     document.getElementById("modal-overlay").classList.remove("hidden");
     save();
   }
 
-  // --- Actions ---
-
-  function actionTrainAim() {
-    if (state.energy < 20 || state.over) return;
-    state.energy = clamp(state.energy - 20, 0, 100);
-    const gearBonus = 1 + (owned("gear") ? 0.15 : 0) + (owned("monitor") ? 0.15 : 0);
-    const gain = (2 + Math.random() * 3) * currentRole().aimMult * gearBonus;
-    state.aim = clamp(state.aim + gain, 0, 100);
-    state.motivation = clamp(state.motivation - 2, 0, 100);
-    addLog("🎯 Trenujesz celność na serwerach aim treningowych.", "info");
-    advanceTurn(); render();
-  }
-
-  function actionTrainSense() {
-    if (state.energy < 20 || state.over) return;
-    state.energy = clamp(state.energy - 20, 0, 100);
-    const gearBonus = 1 + (owned("monitor") ? 0.15 : 0);
-    const gain = (2 + Math.random() * 3) * currentRole().senseMult * gearBonus;
-    state.gameSense = clamp(state.gameSense + gain, 0, 100);
-    state.motivation = clamp(state.motivation - 2, 0, 100);
-    addLog("🧠 Analizujesz dema i taktyki przeciwników.", "info");
-    advanceTurn(); render();
-  }
-
-  function actionScrim() {
-    if (state.energy < 15 || state.over) return;
-    state.energy = clamp(state.energy - 15, 0, 100);
-    if (state.teamTierIndex >= 1) {
-      const gain = (3 + Math.random() * 3) * currentRole().teamworkMult;
-      state.teamwork = clamp(state.teamwork + gain, 0, 100);
-      addLog("🤝 Scrimujesz z drużyną, poprawiacie zgranie.", "good");
-    } else {
-      const gain = 1 + Math.random() * 2;
-      state.aim = clamp(state.aim + gain * 0.5, 0, 100);
-      state.gameSense = clamp(state.gameSense + gain * 0.5, 0, 100);
-      addLog("🎮 Grasz w mixie z losowymi graczami, trochę trenujesz formę.", "info");
-    }
-    advanceTurn(); render();
-  }
-
-  let vetoOffers = [];
-
-  function actionCompete() {
-    if (state.energy < 25 || state.over) return;
-    const shuffled = MAPS.slice().sort(() => Math.random() - 0.5);
-    vetoOffers = shuffled.slice(0, 3);
-    showVeto();
-  }
-
-  function showVeto() {
-    const container = document.getElementById("veto-maps");
-    container.innerHTML = vetoOffers.map((m, i) => '<button class="veto-map-btn" data-idx="' + i + '">' + m + "</button>").join("");
-    container.querySelectorAll(".veto-map-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const idx = parseInt(btn.getAttribute("data-idx"), 10);
-        document.getElementById("veto-overlay").classList.add("hidden");
-        resolveMatch(vetoOffers[idx]);
-      });
-    });
-    document.getElementById("veto-overlay").classList.remove("hidden");
-  }
+  // --- Round simulation (reused for tournament matches) ---
 
   function simulateRounds(winChance) {
     let my = 0, opp = 0;
@@ -572,208 +399,223 @@
     return { my: my, opp: opp };
   }
 
-  function resolveMatch(map) {
-    state.energy = clamp(state.energy - 25, 0, 100);
-    const inTeam = state.teamTierIndex >= 1;
-    const comfort = (Math.random() - 0.5) * 10;
-    const teamBonus = state.teamTierIndex * 2;
-    const perf = state.aim * 0.45 + state.gameSense * 0.35 + state.teamwork * 0.2 + comfort + teamBonus;
-    const difficulty = 20 + (inTeam ? state.teamTierIndex * 10 : 0);
-    const winChance = clamp(0.5 + (perf - difficulty) / 120, 0.15, 0.9);
+  // --- Division actions ---
+
+  function openDivision(titleId) {
+    if (state.over || state.actionPoints < 1) return;
+    const title = TITLES.find(t => t.id === titleId);
+    if (!title || getDivision(titleId)) return;
+    if (state.money < title.entryCost) { addLog("Za mało pieniędzy, by otworzyć oddział " + title.name + ".", "bad"); render(); return; }
+    state.actionPoints -= 1;
+    state.money -= title.entryCost;
+    state.divisions.push({ id: titleId, title: title.name, icon: title.icon, tier: 0, roster: [null, null, null, null, null], pendingCandidate: null, wins: 0, losses: 0 });
+    state.divisionsEverOpened += 1;
+    state.selectedDivisionId = titleId;
+    addLog("🏢 Otwierasz nowy oddział: " + title.name + "!", "good");
+    render();
+  }
+
+  function closeDivision(divId) {
+    const idx = state.divisions.findIndex(d => d.id === divId);
+    if (idx === -1) return;
+    const div = state.divisions[idx];
+    const title = TITLES.find(t => t.id === divId);
+    const refund = Math.round(title.entryCost * 0.3);
+    state.money += refund;
+    state.divisions.splice(idx, 1);
+    if (state.selectedDivisionId === divId) {
+      state.selectedDivisionId = state.divisions.length ? state.divisions[0].id : null;
+    }
+    addLog("🗑️ Zamykasz oddział " + div.title + ", odzyskujesz " + money(refund) + ".", "bad");
+    render();
+  }
+
+  function scoutPlayer(divId) {
+    if (state.over || state.actionPoints < 1) return;
+    const div = getDivision(divId);
+    if (!div || div.pendingCandidate) return;
+    const emptyIdx = div.roster.findIndex(p => p === null);
+    if (emptyIdx === -1) { addLog("Skład " + div.title + " jest już pełny.", "bad"); render(); return; }
+    state.actionPoints -= 1;
+    const candidates = [generatePlayer(div.tier)];
+    if (owned("scouting")) candidates.push(generatePlayer(div.tier));
+    div.pendingCandidate = candidates;
+    addLog("🔎 Skautujesz nowych kandydatów dla " + div.title + ".", "info");
+    render();
+  }
+
+  function signCandidate(divId, idx) {
+    const div = getDivision(divId);
+    if (!div || !div.pendingCandidate || !div.pendingCandidate[idx]) return;
+    const cand = div.pendingCandidate[idx];
+    const signingBonus = cand.salary * 2;
+    if (state.money < signingBonus) { addLog("Za mało pieniędzy na bonus podpisania.", "bad"); render(); return; }
+    const emptyIdx = div.roster.findIndex(p => p === null);
+    if (emptyIdx === -1) { addLog("Skład jest już pełny.", "bad"); div.pendingCandidate = null; render(); return; }
+    state.money -= signingBonus;
+    div.roster[emptyIdx] = cand;
+    div.pendingCandidate = null;
+    addLog("✍️ Podpisujesz zawodnika " + cand.name + " (" + div.title + ").", "good");
+    render();
+  }
+
+  function rejectCandidates(divId) {
+    const div = getDivision(divId);
+    if (!div) return;
+    div.pendingCandidate = null;
+    render();
+  }
+
+  function releasePlayer(divId, slotIdx) {
+    const div = getDivision(divId);
+    if (!div) return;
+    const p = div.roster[slotIdx];
+    if (!p) return;
+    div.roster[slotIdx] = null;
+    state.reputation = clamp(state.reputation - 2, 0, 100);
+    addLog("👋 Zwalniasz zawodnika " + p.name + " z " + div.title + ".", "bad");
+    render();
+  }
+
+  function trainDivision(divId) {
+    if (state.over || state.actionPoints < 1) return;
+    const div = getDivision(divId);
+    if (!div) return;
+    const filled = div.roster.filter(p => p);
+    if (!filled.length) { addLog("Brak zawodników do trenowania w " + div.title + ".", "bad"); render(); return; }
+    const cost = 300;
+    if (state.money < cost) { addLog("Za mało pieniędzy na sesję treningową.", "bad"); render(); return; }
+    state.actionPoints -= 1;
+    state.money -= cost;
+    const bonus = owned("facility") ? 1.3 : 1;
+    filled.forEach(p => { p.skill = clamp(p.skill + (2 + Math.random() * 3) * bonus, 0, 100); });
+    addLog("📈 Trenujecie oddział " + div.title + ".", "good");
+    render();
+  }
+
+  function competeDivision(divId) {
+    if (state.over || state.actionPoints < 1) return;
+    const div = getDivision(divId);
+    if (!div) return;
+    const active = div.roster.filter(p => p);
+    if (active.length < 3) { addLog("Potrzebujesz co najmniej 3 zawodników, by rywalizować w " + div.title + ".", "bad"); render(); return; }
+    state.actionPoints -= 1;
+    const avgSkill = active.reduce((s, p) => s + p.skill, 0) / active.length;
+    const difficulty = 20 + div.tier * 10;
+    const winChance = clamp(0.5 + (avgSkill - difficulty) / 100, 0.15, 0.88);
     const result = simulateRounds(winChance);
     const win = result.my > result.opp;
     const margin = clamp(Math.abs(result.my - result.opp) / 13, 0.15, 1);
-    const team = currentTeam();
+    const tierInfo = DIVISION_TIERS[div.tier];
     const score = result.my + ":" + result.opp;
+    const prBonus = owned("pr") ? 1.3 : 1;
+    const analystBonus = owned("analysts") ? 1.5 : 1;
 
     if (win) {
-      const premierGain = Math.round(150 + margin * 250);
-      state.premierRating = clamp(state.premierRating + premierGain, 0, 35000);
-      state.motivation = clamp(state.motivation + 5, 0, 100);
-      if (inTeam) {
-        const prize = Math.round(team.salary * (0.3 + margin * 0.9));
-        state.money += prize;
-        state.reputation = clamp(state.reputation + 2 + margin * 5, 0, 100);
-        addLog("🏆 " + map + " (" + team.name + "): wygrywacie mecz drużynowy " + score + "! +" + money(prize) + ", +" + premierGain + " Premier Rating.", "good");
-      } else {
-        state.reputation = clamp(state.reputation + 1 + margin * 2, 0, 100);
-        addLog("🎮 " + map + " (solo queue Premier): wygrywasz " + score + "! +" + premierGain + " Premier Rating.", "good");
-      }
+      const prize = Math.round(tierInfo.prizeBase * (0.4 + margin * 0.9));
+      state.money += prize;
+      state.reputation = clamp(state.reputation + (1 + margin * 4) * prBonus, 0, 100);
+      div.wins += 1;
+      active.forEach(p => { p.skill = clamp(p.skill + (0.5 + Math.random()) * analystBonus, 0, 100); p.morale = clamp(p.morale + 3, 0, 100); });
+      addLog("🏆 " + div.title + " wygrywa mecz ligowy " + score + "! +" + money(prize) + ".", "good");
     } else {
-      const premierLoss = Math.round(100 + margin * 200);
-      state.premierRating = clamp(state.premierRating - premierLoss, 0, 35000);
-      state.motivation = clamp(state.motivation - 6, 0, 100);
-      if (inTeam) {
-        state.reputation = clamp(state.reputation - (1 + margin * 4), 0, 100);
-        addLog("💀 " + map + " (" + team.name + "): przegrywacie mecz drużynowy " + score + ". -" + premierLoss + " Premier Rating.", "bad");
-      } else {
-        state.reputation = clamp(state.reputation - (0.5 + margin * 1.5), 0, 100);
-        addLog("💀 " + map + " (solo queue Premier): przegrywasz " + score + ". -" + premierLoss + " Premier Rating.", "bad");
-      }
+      state.reputation = clamp(state.reputation - (1 + margin * 2), 0, 100);
+      div.losses += 1;
+      active.forEach(p => { p.morale = clamp(p.morale - 4, 0, 100); });
+      addLog("💀 " + div.title + " przegrywa mecz ligowy " + score + ".", "bad");
     }
-    advanceTurn(); render();
+    render();
   }
 
-  function actionStream() {
-    if (state.energy < 10 || state.over) return;
-    state.energy = clamp(state.energy - 10, 0, 100);
-    const base = 100 + state.reputation * 4;
-    const managerBonus = owned("manager") ? 1.25 : 1;
-    const earn = Math.round(base * (0.7 + Math.random() * 0.6) * managerBonus);
-    state.money += earn;
-    state.reputation = clamp(state.reputation + 1 + Math.random() * 2, 0, 100);
-    state.motivation = clamp(state.motivation - 3, 0, 100);
-    addLog("📹 Streamujesz rozgrywkę, zarabiasz " + money(earn) + " i budujesz rozpoznawalność.", "good");
-    advanceTurn(); render();
-  }
-
-  function actionSkins() {
-    const amount = Math.min(state.money, 400);
-    if (amount < 50 || state.over) return;
-    const success = Math.random() < 0.48;
-    if (success) {
-      state.money += amount;
-      addLog("📦 Ceny skinów poszły w górę! Zarabiasz " + money(amount) + ".", "good");
-    } else {
-      state.money -= amount;
-      addLog("📉 Rynek skinów się załamał. Tracisz " + money(amount) + ".", "bad");
-    }
-    advanceTurn(); render();
-  }
-
-  function actionRest() {
-    if (state.over) return;
-    const physioBonus = owned("physio") ? 1.25 : 1;
-    state.energy = clamp(state.energy + 40 * physioBonus, 0, 100);
-    state.motivation = clamp(state.motivation + 8 * physioBonus, 0, 100);
-    addLog("😴 Odpoczywasz i regenerujesz siły.", "good");
-    advanceTurn(); render();
-  }
-
-  function actionTransfer() {
-    if (state.energy < 15 || state.over) return;
-    state.energy = clamp(state.energy - 15, 0, 100);
-    const next = nextTeam();
-    if (!next) {
-      addLog("✍️ Jesteś już w najlepszej organizacji na scenie.", "info");
-    } else if (state.aim >= next.reqAim && state.gameSense >= next.reqSense && state.reputation >= next.reqRep && state.premierRating >= next.reqPremier) {
-      const overshoot = (state.aim - next.reqAim) + (state.gameSense - next.reqSense) + (state.reputation - next.reqRep) + (state.premierRating - next.reqPremier) / 200;
-      const chance = clamp(0.5 + overshoot / 200, 0.45, 0.92);
+  function promoteDivision(divId) {
+    if (state.over || state.actionPoints < 1) return;
+    const div = getDivision(divId);
+    if (!div) return;
+    const next = DIVISION_TIERS[div.tier + 1];
+    if (!next) { addLog(div.title + " jest już na szczycie sceny.", "info"); render(); return; }
+    const active = div.roster.filter(p => p);
+    const avgSkill = active.length ? active.reduce((s, p) => s + p.skill, 0) / active.length : 0;
+    state.actionPoints -= 1;
+    if (avgSkill >= next.reqSkill && state.reputation >= next.reqRep) {
+      const chance = clamp(0.5 + (avgSkill - next.reqSkill) / 100, 0.4, 0.9);
       if (Math.random() < chance) {
-        state.teamTierIndex += 1;
-        state.teamwork = 30;
-        state.motivation = clamp(state.motivation + 10, 0, 100);
-        addLog("✍️ Podpisujesz kontrakt z organizacją: " + currentTeam().name + "!", "good");
+        div.tier += 1;
+        addLog("🚀 Awans! " + div.title + " gra teraz w lidze: " + DIVISION_TIERS[div.tier].name + ".", "good");
       } else {
-        state.motivation = clamp(state.motivation - 5, 0, 100);
-        addLog("❌ Trial się nie udał. Wracasz do gry i próbujesz dalej.", "bad");
+        addLog("❌ Próba awansu " + div.title + " nie powiodła się w tym sezonie.", "bad");
       }
     } else {
-      addLog("✍️ Nie spełniasz jeszcze wymagań do gry w " + next.name + " (Aim " + next.reqAim + ", Game Sense " + next.reqSense + ", Reputacja " + next.reqRep + ", Premier Rating " + next.reqPremier.toLocaleString("pl-PL") + ").", "bad");
+      addLog("Nie spełniacie jeszcze wymagań do awansu w " + div.title + " (śr. skill " + next.reqSkill + ", reputacja " + next.reqRep + ").", "bad");
     }
-    advanceTurn(); render();
+    render();
   }
 
-  function actionRetire() {
-    state.over = true;
-    showEndModal("Dobrowolne zakończenie kariery", "Postanawiasz zakończyć karierę zawodową na własnych warunkach.");
-  }
+  // --- Org-level actions ---
 
-  // --- Shop ---
-
-  function renderShop() {
-    const container = document.getElementById("shop-items");
-    container.innerHTML = UPGRADES.map(u => {
-      const isOwned = owned(u.id);
-      const canAfford = state.money >= u.cost;
-      const label = isOwned ? "Posiadane" : (money(u.cost) + (u.upkeep ? " + " + money(u.upkeep) + "/tydz." : ""));
-      return '<div class="shop-item">' +
-        '<div class="shop-item-info">' +
-          '<div class="shop-item-name">' + u.name + '</div>' +
-          '<div class="shop-item-desc">' + u.desc + '</div>' +
-        '</div>' +
-        '<button class="shop-buy-btn' + (isOwned ? ' owned' : '') + '" data-id="' + u.id + '"' + ((isOwned || !canAfford) ? ' disabled' : '') + '>' + label + '</button>' +
-      '</div>';
-    }).join("");
-    container.querySelectorAll(".shop-buy-btn").forEach(btn => {
-      btn.addEventListener("click", () => buyUpgrade(btn.getAttribute("data-id")));
-    });
+  function signSponsor() {
+    if (state.over || state.actionPoints < 1) return;
+    const MAX_SPONSORS = 3;
+    if (state.sponsors.length >= MAX_SPONSORS) { addLog("Masz już maksymalną liczbę sponsorów.", "bad"); render(); return; }
+    const reqRep = 10 + state.sponsors.length * 20;
+    if (state.reputation < reqRep) { addLog("Potrzebujesz reputacji " + reqRep + ", by przyciągnąć kolejnego sponsora.", "bad"); render(); return; }
+    state.actionPoints -= 1;
+    const used = state.sponsors.map(s => s.name);
+    const pool = SPONSOR_NAMES.filter(n => !used.includes(n));
+    const name = (pool.length ? pool : SPONSOR_NAMES)[Math.floor(Math.random() * (pool.length ? pool.length : SPONSOR_NAMES.length))];
+    const income = Math.round(200 + state.reputation * 15 + Math.random() * 300);
+    state.sponsors.push({ name: name, income: income });
+    addLog("🤝 Podpisujecie umowę sponsorską z " + name + "! +" + money(income) + "/tydzień.", "good");
+    render();
   }
 
   function buyUpgrade(id) {
-    const u = UPGRADES.find(x => x.id === id);
+    const u = HQ_UPGRADES.find(x => x.id === id);
     if (!u || owned(id) || state.money < u.cost || state.over) return;
     state.money -= u.cost;
     state.upgrades[id] = true;
-    addLog("🛒 Kupujesz: " + u.name + ".", "good");
+    addLog("🏗️ Budujecie: " + u.name + ".", "good");
     renderShop();
     render();
   }
 
-  function openShop() { renderShop(); document.getElementById("shop-overlay").classList.remove("hidden"); }
-  function closeShop() { document.getElementById("shop-overlay").classList.add("hidden"); }
+  function endWeek() {
+    if (state.over) return;
+    state.week += 1;
+    if (state.week > 52) { state.week = 1; state.year += 1; }
 
-  // --- Autoplay ---
+    let totalSalaries = 0;
+    state.divisions.forEach(div => div.roster.forEach(p => { if (p) totalSalaries += p.salary; }));
+    const hqUpkeep = HQ_UPGRADES.reduce((s, u) => s + (owned(u.id) ? u.upkeep : 0), 0);
+    const sponsorIncome = state.sponsors.reduce((s, sp) => s + sp.income, 0);
 
-  function autoCompete() {
-    if (state.energy < 25 || state.over) return false;
-    const map = MAPS[Math.floor(Math.random() * MAPS.length)];
-    resolveMatch(map);
-    return true;
-  }
+    state.money -= totalSalaries;
+    state.money -= hqUpkeep;
+    state.money += sponsorIncome;
 
-  function playOneAutoTurn(strategy) {
-    if (state.over) return false;
-    const canAim = state.energy >= 20;
-    const canSense = state.energy >= 20;
-    const canScrim = state.energy >= 15;
-    const canCompete = state.energy >= 25;
-    const canStream = state.energy >= 10;
+    const moraleRegen = owned("medical") ? 3 : 1;
+    state.divisions.forEach(div => div.roster.forEach(p => { if (p) p.morale = clamp(p.morale + moraleRegen, 0, 100); }));
 
-    if (state.money < 400 && canStream) { actionStream(); return true; }
-
-    switch (strategy) {
-      case "aim": canAim ? actionTrainAim() : actionRest(); break;
-      case "sense": canSense ? actionTrainSense() : actionRest(); break;
-      case "teamwork": canScrim ? actionScrim() : actionRest(); break;
-      case "money": canStream ? actionStream() : actionRest(); break;
-      case "rank":
-        if (canCompete) autoCompete();
-        else if (canStream) actionStream();
-        else actionRest();
+    let roll = Math.random();
+    let acc = 0;
+    for (const ev of RANDOM_EVENTS) {
+      acc += ev.chance;
+      if (roll < acc) {
+        ev.effect(state);
+        addLog("📰 " + ev.text, ev.type);
         break;
-      default: {
-        const r = Math.random();
-        if (r < 0.3 && canAim) actionTrainAim();
-        else if (r < 0.6 && canSense) actionTrainSense();
-        else if (r < 0.8 && canScrim) actionScrim();
-        else if (canCompete) autoCompete();
-        else if (canStream) actionStream();
-        else actionRest();
       }
     }
-    return true;
+
+    state.actionPoints = maxActionPoints();
+    addLog("📅 Koniec tygodnia " + state.week + ". Wypłaty: " + money(totalSalaries + hqUpkeep) + ", przychód sponsorów: " + money(sponsorIncome) + ".", "info");
+
+    checkGameOver();
+    render();
   }
 
-  const AUTO_STRATEGY_LABELS = {
-    balanced: "Zbalansowany", aim: "Aim", sense: "Game Sense",
-    teamwork: "Zgranie", money: "Zarabianie", rank: "Premier Rating",
-  };
-
-  function runAutoPlay() {
-    if (state.over) return;
-    const strategy = document.getElementById("auto-strategy").value;
-    let turns = parseInt(document.getElementById("auto-turns").value, 10);
-    if (!turns || turns < 1) turns = 1;
-    turns = clamp(turns, 1, 52);
-    let played = 0;
-    for (let i = 0; i < turns; i++) {
-      if (state.over) break;
-      playOneAutoTurn(strategy);
-      played += 1;
-    }
-    addLog("⏩ Automatyczna gra: rozegrano " + played + " " + (played === 1 ? "turę" : "tur") + " (" + AUTO_STRATEGY_LABELS[strategy] + ").", "info");
-    render();
+  function actionRetire() {
+    state.over = true;
+    showEndModal("Koniec działalności", "Postanawiasz zamknąć organizację na własnych warunkach.");
   }
 
   function newGame() {
@@ -781,66 +623,152 @@
     document.getElementById("modal-overlay").classList.add("hidden");
     document.getElementById("game-screen").classList.add("hidden");
     document.getElementById("start-screen").classList.remove("hidden");
-    document.getElementById("nick-input").value = "";
-    document.getElementById("nick-input").focus();
+    document.getElementById("org-name-input").value = "";
+    document.getElementById("org-name-input").focus();
   }
 
   function startGame() {
-    const nick = document.getElementById("nick-input").value.trim() || "Gracz";
-    const roleKey = document.getElementById("role-select").value;
-    state = defaultState(nick, roleKey);
-    addLog("🎬 Rozpoczynasz karierę jako " + ROLES[roleKey].label + ". Powodzenia na serwerach!", "info");
+    const orgName = document.getElementById("org-name-input").value.trim() || "Moja Organizacja";
+    state = defaultState(orgName);
+    addLog("🎬 Zakładasz organizację " + orgName + ". Otwórz swój pierwszy oddział, by zacząć rywalizację!", "info");
     document.getElementById("start-screen").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
     save();
     render();
   }
 
-  function render() {
-    document.getElementById("player-name").textContent = state.nick;
-    document.getElementById("team-name").textContent = currentTeam().name;
-    document.getElementById("player-age").textContent = state.age;
-    document.getElementById("player-week").textContent = state.week + 1;
-    document.getElementById("player-turn").textContent = state.turn;
-    document.getElementById("player-rank").textContent = premierTier().name + " (" + Math.round(state.premierRating).toLocaleString("pl-PL") + ")";
-    document.getElementById("player-role").textContent = currentRole().label;
-    document.getElementById("upgrades-count").textContent = UPGRADES.filter(u => owned(u.id)).length + "/" + UPGRADES.length;
+  // --- Rendering ---
 
+  function renderShop() {
+    const container = document.getElementById("shop-items");
+    container.innerHTML = HQ_UPGRADES.map(u => {
+      const isOwned = owned(u.id);
+      const canAfford = state.money >= u.cost;
+      const label = isOwned ? "Posiadane" : (money(u.cost) + (u.upkeep ? " + " + money(u.upkeep) + "/tydz." : ""));
+      return '<div class="shop-item">' +
+        '<div><div class="shop-item-name">' + u.name + '</div><div class="shop-item-desc">' + u.desc + '</div></div>' +
+        '<button class="shop-buy-btn' + (isOwned ? ' owned' : '') + '" data-id="' + u.id + '"' + ((isOwned || !canAfford) ? ' disabled' : '') + '>' + label + '</button>' +
+      '</div>';
+    }).join("");
+    container.querySelectorAll(".shop-buy-btn").forEach(btn => {
+      btn.addEventListener("click", () => buyUpgrade(btn.getAttribute("data-id")));
+    });
+  }
+  function openShop() { renderShop(); document.getElementById("shop-overlay").classList.remove("hidden"); }
+  function closeShop() { document.getElementById("shop-overlay").classList.add("hidden"); }
+
+  function renderDivisionTabs() {
+    const tabs = document.getElementById("div-tabs");
+    if (!state.divisions.length) {
+      tabs.innerHTML = '<div style="color:var(--text-dim); font-size:0.85rem;">Nie masz jeszcze żadnego oddziału — otwórz pierwszy poniżej.</div>';
+    } else {
+      tabs.innerHTML = state.divisions.map(d => {
+        const active = d.id === state.selectedDivisionId ? " active" : "";
+        return '<button class="div-tab' + active + '" data-id="' + d.id + '">' + d.icon + ' ' + d.title +
+          '<span class="div-tab-sub">' + DIVISION_TIERS[d.tier].name + ' · ' + d.wins + 'W-' + d.losses + 'L</span></button>';
+      }).join("");
+      tabs.querySelectorAll(".div-tab").forEach(btn => {
+        btn.addEventListener("click", () => { state.selectedDivisionId = btn.getAttribute("data-id"); render(); });
+      });
+    }
+
+    const openContainer = document.getElementById("open-titles");
+    const unopened = TITLES.filter(t => !getDivision(t.id));
+    openContainer.innerHTML = unopened.map(t => {
+      const canAfford = state.money >= t.entryCost && state.actionPoints >= 1;
+      return '<div class="open-title-card">' +
+        '<div class="otc-name">' + t.icon + ' ' + t.name + '</div>' +
+        '<div class="otc-genre">' + t.genre + '</div>' +
+        '<button class="small" data-open="' + t.id + '"' + (canAfford ? '' : ' disabled') + '>Otwórz — ' + money(t.entryCost) + '</button>' +
+      '</div>';
+    }).join("");
+    openContainer.querySelectorAll("[data-open]").forEach(btn => {
+      btn.addEventListener("click", () => openDivision(btn.getAttribute("data-open")));
+    });
+  }
+
+  function renderDivisionPanel() {
+    const panel = document.getElementById("division-panel");
+    const div = selectedDivision();
+    if (!div) {
+      panel.innerHTML = '<div class="section-title">Oddział</div><p style="color:var(--text-dim); font-size:0.9rem;">Wybierz albo otwórz oddział, żeby zarządzać składem i grać mecze ligowe.</p>';
+      return;
+    }
+    const tierInfo = DIVISION_TIERS[div.tier];
+    const nextTier = DIVISION_TIERS[div.tier + 1];
+
+    let html = '<div class="section-title">' + div.icon + ' ' + div.title + ' — ' + tierInfo.name + '</div>';
+
+    if (div.pendingCandidate) {
+      html += div.pendingCandidate.map((c, i) =>
+        '<div class="candidate-card">' +
+          '<div class="player-name">' + c.name + '</div>' +
+          '<div class="player-meta">Skill ' + Math.round(c.skill) + ' · Pensja ' + money(c.salary) + '/tydz. · Bonus podpisania ' + money(c.salary * 2) + '</div>' +
+          '<div class="candidate-actions">' +
+            '<button class="small good" data-sign="' + i + '">Podpisz</button>' +
+            '<button class="small secondary" data-reject="1">Odrzuć</button>' +
+          '</div>' +
+        '</div>'
+      ).join("");
+    }
+
+    html += div.roster.map((p, idx) => {
+      if (!p) return '<div class="roster-slot empty"><div class="player-name">Pusty slot</div><button class="small" data-scout="1">🔎 Skautuj</button></div>';
+      return '<div class="roster-slot"><div><div class="player-name">' + p.name + '</div><div class="player-meta">Skill ' + Math.round(p.skill) + ' · Morale ' + Math.round(p.morale) + ' · ' + money(p.salary) + '/tydz.</div></div><button class="small secondary" data-release="' + idx + '">Zwolnij</button></div>';
+    }).join("");
+
+    html += '<div id="division-actions">' +
+      '<button data-train="1"><span class="action-title">📈 Trenuj oddział</span><span class="action-cost">1 AP + 300 zł</span></button>' +
+      '<button data-compete="1"><span class="action-title">🏆 Zagraj mecz ligowy</span><span class="action-cost">1 AP, min. 3 zawodników</span></button>' +
+      '<button data-promote="1"><span class="action-title">🚀 Awansuj ligę</span><span class="action-cost">' + (nextTier ? "Wymaga śr. skill " + nextTier.reqSkill + " / rep " + nextTier.reqRep : "Już na szczycie") + '</span></button>' +
+      '<button class="danger" data-close="1"><span class="action-title">🗑️ Zamknij oddział</span><span class="action-cost">Zwrot 30% wpisowego</span></button>' +
+    '</div>';
+
+    panel.innerHTML = html;
+
+    const scoutBtn = panel.querySelector("[data-scout]");
+    if (scoutBtn) scoutBtn.addEventListener("click", () => scoutPlayer(div.id));
+    panel.querySelectorAll("[data-sign]").forEach(btn => btn.addEventListener("click", () => signCandidate(div.id, parseInt(btn.getAttribute("data-sign"), 10))));
+    const rejectBtn = panel.querySelector("[data-reject]");
+    if (rejectBtn) rejectBtn.addEventListener("click", () => rejectCandidates(div.id));
+    panel.querySelectorAll("[data-release]").forEach(btn => btn.addEventListener("click", () => releasePlayer(div.id, parseInt(btn.getAttribute("data-release"), 10))));
+    panel.querySelector("[data-train]").addEventListener("click", () => trainDivision(div.id));
+    panel.querySelector("[data-compete]").addEventListener("click", () => competeDivision(div.id));
+    panel.querySelector("[data-promote]").addEventListener("click", () => promoteDivision(div.id));
+    panel.querySelector("[data-close]").addEventListener("click", () => closeDivision(div.id));
+
+    const noAP = state.actionPoints < 1 || state.over;
+    const activeCount = div.roster.filter(p => p).length;
+    panel.querySelector("[data-train]").disabled = noAP || activeCount === 0 || state.money < 300;
+    panel.querySelector("[data-compete]").disabled = noAP || activeCount < 3;
+    panel.querySelector("[data-promote]").disabled = noAP || !nextTier;
+    if (scoutBtn) scoutBtn.disabled = noAP;
+  }
+
+  function render() {
+    document.getElementById("org-name-display").textContent = "🏢 " + state.orgName;
+    document.getElementById("week-num").textContent = state.week;
+    document.getElementById("year-num").textContent = state.year;
     document.getElementById("stat-money").textContent = money(state.money);
     document.getElementById("stat-money").style.color = state.money < 0 ? "var(--danger)" : "var(--text)";
+    document.getElementById("ap-value").textContent = state.actionPoints + " / " + maxActionPoints();
 
-    setBar("energy", state.energy);
-    setBar("motivation", state.motivation);
-    setBar("aim", state.aim);
-    setBar("sense", state.gameSense);
-    setBar("teamwork", state.teamwork);
-    setBar("rep", state.reputation);
+    const rep = clamp(state.reputation, 0, 100);
+    document.getElementById("stat-rep").style.width = rep + "%";
+    document.getElementById("stat-rep-num").textContent = Math.round(rep);
 
-    const next = nextTeam();
-    document.querySelector("#btn-transfer .action-cost").textContent = next
-      ? "Wymaga: Aim " + next.reqAim + " / Sense " + next.reqSense + " / Rep " + next.reqRep + " / PR " + next.reqPremier.toLocaleString("pl-PL") + " · -15 energii"
-      : "Jesteś na szczycie sceny";
+    renderDivisionTabs();
+    renderDivisionPanel();
 
-    document.querySelector("#btn-aim .action-cost").textContent = "-20 energii, +Aim";
-    document.querySelector("#btn-sense .action-cost").textContent = "-20 energii, +Game Sense";
-    document.querySelector("#btn-scrim .action-cost").textContent = "-15 energii, +Zgranie (z drużyną)";
-    document.querySelector("#btn-compete .action-cost").textContent = state.teamTierIndex >= 1
-      ? "-25 energii, mecz drużynowy: kasa + Premier Rating"
-      : "-25 energii, solo queue Premier: buduje ranking";
-    document.querySelector("#btn-stream .action-cost").textContent = "-10 energii, +pieniądze, +reputacja";
-    document.querySelector("#btn-skins .action-cost").textContent = "Ryzykuje do 400 zł, 48/52";
-    document.querySelector("#btn-rest .action-cost").textContent = "+40 energii, +motywacja";
+    const sponsorsRow = document.getElementById("sponsors-row");
+    sponsorsRow.innerHTML = state.sponsors.length
+      ? state.sponsors.map(s => '<span class="sponsor-chip">🤝 ' + s.name + " · +" + money(s.income) + "/tydz.</span>").join("")
+      : '<span style="color:var(--text-dim); font-size:0.82rem;">Brak podpisanych sponsorów.</span>';
 
-    document.getElementById("btn-aim").disabled = state.energy < 20 || state.over;
-    document.getElementById("btn-sense").disabled = state.energy < 20 || state.over;
-    document.getElementById("btn-scrim").disabled = state.energy < 15 || state.over;
-    document.getElementById("btn-compete").disabled = state.energy < 25 || state.over;
-    document.getElementById("btn-stream").disabled = state.energy < 10 || state.over;
-    document.getElementById("btn-skins").disabled = state.money < 50 || state.over;
-    document.getElementById("btn-rest").disabled = state.over;
-    document.getElementById("btn-transfer").disabled = state.energy < 15 || state.over || !nextTeam();
+    document.getElementById("btn-sponsor").disabled = state.actionPoints < 1 || state.over || state.sponsors.length >= 3;
     document.getElementById("btn-shop").disabled = state.over;
-    document.getElementById("btn-autoplay").disabled = state.over;
+    document.getElementById("btn-endweek").disabled = state.over;
+    document.querySelector("#btn-sponsor .action-cost").textContent = "1 AP, wymaga reputacji";
 
     const logEl = document.getElementById("log");
     logEl.innerHTML = state.log.map(e => '<div class="entry ' + e.type + '">' + e.text + "</div>").join("");
@@ -848,47 +776,29 @@
     save();
   }
 
-  function setBar(key, value) {
-    const v = clamp(value, 0, 100);
-    document.getElementById("stat-" + key).style.width = v + "%";
-    document.getElementById("stat-" + key + "-num").textContent = Math.round(v);
-  }
-
-  function updateRoleDesc() {
-    const key = document.getElementById("role-select").value;
-    document.getElementById("role-desc").textContent = ROLE_DESC[key];
-  }
-
   // --- wiring ---
-  document.getElementById("role-select").addEventListener("change", updateRoleDesc);
   document.getElementById("start-btn").addEventListener("click", startGame);
-  document.getElementById("nick-input").addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
-  document.getElementById("btn-aim").addEventListener("click", actionTrainAim);
-  document.getElementById("btn-sense").addEventListener("click", actionTrainSense);
-  document.getElementById("btn-scrim").addEventListener("click", actionScrim);
-  document.getElementById("btn-compete").addEventListener("click", actionCompete);
-  document.getElementById("btn-stream").addEventListener("click", actionStream);
-  document.getElementById("btn-skins").addEventListener("click", actionSkins);
-  document.getElementById("btn-rest").addEventListener("click", actionRest);
-  document.getElementById("btn-transfer").addEventListener("click", actionTransfer);
+  document.getElementById("org-name-input").addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
+  document.getElementById("btn-sponsor").addEventListener("click", signSponsor);
+  document.getElementById("btn-shop").addEventListener("click", openShop);
+  document.getElementById("shop-close-btn").addEventListener("click", closeShop);
+  document.getElementById("btn-endweek").addEventListener("click", endWeek);
   document.getElementById("btn-retire").addEventListener("click", actionRetire);
   document.getElementById("btn-newgame").addEventListener("click", newGame);
   document.getElementById("modal-btn").addEventListener("click", newGame);
-  document.getElementById("btn-shop").addEventListener("click", openShop);
-  document.getElementById("shop-close-btn").addEventListener("click", closeShop);
-  document.getElementById("btn-autoplay").addEventListener("click", runAutoPlay);
 
   // --- boot ---
-  updateRoleDesc();
   const existing = load();
   if (existing) {
     state = existing;
     if (!state.upgrades) state.upgrades = {};
+    if (!state.sponsors) state.sponsors = {};
+    if (typeof state.divisionsEverOpened !== "number") state.divisionsEverOpened = state.divisions.length;
     document.getElementById("start-screen").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
     render();
     if (state.over) {
-      showEndModal("Twoja poprzednia kariera", "Ostatnia zapisana sesja zakończyła się. Kliknij, aby zacząć od nowa.");
+      showEndModal("Twoja poprzednia organizacja", "Ostatnia zapisana sesja zakończyła się. Kliknij, aby zacząć od nowa.");
     }
   }
 })();
