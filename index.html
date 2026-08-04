@@ -7,241 +7,278 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Esport Org">
-<meta name="theme-color" content="#0b0e14">
+<meta name="theme-color" content="#1c1140">
 <title>Organizacja Esportowa</title>
 <style>
   :root {
-    --bg1: #0b0e14;
-    --bg2: #141a2e;
-    --card: #1a2036;
-    --card-border: #2a3358;
-    --accent: #ff9f1c;
-    --accent2: #4fd1c5;
-    --danger: #ff5c5c;
-    --warning: #ffb454;
+    --sky-top: #ffc2da;
+    --sky-mid: #8f6fe0;
+    --sky-bottom: #1c1140;
+    --bg-deep: #120a29;
+    --glass: rgba(35, 24, 66, 0.55);
+    --glass-strong: rgba(28, 18, 56, 0.82);
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --accent: #22c8f0;
+    --accent-deep: #0f8fb8;
+    --gold: #ffb648;
+    --pink: #ff5fa2;
     --good: #4fd18a;
-    --text: #e8ebff;
-    --text-dim: #99a1c9;
+    --danger: #ff5c7a;
+    --text: #f5f2ff;
+    --text-dim: #b6acdb;
   }
-  * { box-sizing: border-box; }
-  html, body {
-    margin: 0; padding: 0; min-height: 100%;
-    background: radial-gradient(circle at top, var(--bg2), var(--bg1));
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-  #app { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; min-height: 100%; background: var(--bg-deep); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
-  h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: 0.5px; }
-  h2 { font-size: 1.1rem; margin: 0 0 4px; }
-  .subtitle { color: var(--text-dim); margin: 0 0 20px; font-size: 0.9rem; }
-  .disclaimer { color: var(--text-dim); font-size: 0.75rem; margin: 0 0 20px; opacity: 0.7; }
-  .section-title { font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px; }
+  #bg-scene { position: fixed; inset: 0; z-index: 0; overflow: hidden;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 45%, var(--bg-deep) 100%); }
+  #bg-scene svg { position: absolute; bottom: 0; left: 0; width: 100%; height: 32vh; opacity: 0.4; }
+  #bg-scene::after { content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 20% 0%, rgba(255,255,255,0.18), transparent 45%); }
 
-  .card {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    padding: 18px 20px;
-    margin-bottom: 16px;
-  }
+  #app { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
 
+  h1 { font-size: 1.4rem; margin: 0 0 6px; letter-spacing: 0.3px; }
+  h2 { font-size: 0.95rem; margin: 0 0 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); }
+  p { margin: 0; }
+  .subtitle { color: var(--text-dim); margin: 0 0 18px; font-size: 0.9rem; line-height: 1.5; }
+  .disclaimer { color: var(--text-dim); font-size: 0.72rem; margin: 0 0 18px; opacity: 0.7; }
+
+  .glass { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px;
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+  .panel { padding: 18px; margin: 0 16px 16px; }
+
+  #start-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+  #start-screen { max-width: 420px; width: 100%; padding: 26px 24px; }
   #start-screen input {
-    width: 100%; padding: 10px 12px; border-radius: 8px;
-    border: 1px solid var(--card-border); background: #0e1224; color: var(--text);
-    font-size: 1rem; margin: 8px 0 16px;
+    width: 100%; padding: 12px 14px; border-radius: 14px;
+    border: 1px solid var(--glass-border); background: rgba(0,0,0,0.25); color: var(--text);
+    font-size: 1rem; margin: 8px 0 18px;
   }
   #start-screen input:focus { outline: 2px solid var(--accent); }
-  #start-screen label { font-size: 0.9rem; color: var(--text-dim); }
+  #start-screen label { font-size: 0.85rem; color: var(--text-dim); font-weight: 600; }
 
-  button {
-    cursor: pointer; border: none; border-radius: 10px;
-    font-size: 0.9rem; font-weight: 600; padding: 11px 15px;
-    background: var(--accent); color: #1a0f00;
-    transition: transform 0.08s ease, opacity 0.15s ease;
-  }
+  button { cursor: pointer; border: none; border-radius: 14px; font-size: 0.88rem; font-weight: 700;
+    padding: 12px 16px; background: var(--accent); color: #052029; font-family: inherit;
+    transition: transform 0.08s ease, opacity 0.15s ease; }
   button:hover:not(:disabled) { transform: translateY(-1px); }
   button:disabled { opacity: 0.35; cursor: not-allowed; }
-  button.secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text); }
-  button.danger { background: var(--danger); color: #260707; }
+  button.secondary { background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); color: var(--text); }
+  button.danger { background: var(--danger); color: #2a0510; }
   button.good { background: var(--good); color: #062016; }
-  button.small { padding: 7px 11px; font-size: 0.78rem; }
+  button.full { width: 100%; }
+  #start-btn { width: 100%; padding: 14px; font-size: 0.95rem; background: linear-gradient(135deg, var(--accent), #4fa8ff); color: #04222c; }
 
-  /* --- Header --- */
-  #header-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-  #org-name { font-size: 1.1rem; font-weight: 700; }
-  #meta { color: var(--text-dim); font-size: 0.82rem; text-align: right; }
-  .stats-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 14px; margin-top: 14px;
-  }
-  .stat-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-dim); margin-bottom: 4px; }
-  .bar-track { height: 8px; border-radius: 6px; background: #0e1224; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s ease; }
-  .stat-big { font-size: 1.15rem; font-weight: 700; }
-  #ap-value { color: var(--accent); font-weight: 700; }
+  /* --- HUD --- */
+  #hud-bar { position: sticky; top: 0; z-index: 6; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 10px 14px; background: var(--glass-strong); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--glass-border); }
+  .hud-pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08);
+    border: 1px solid var(--glass-border); border-radius: 999px; padding: 8px 13px; font-size: 0.82rem; font-weight: 800; white-space: nowrap; }
+  .hud-pill small { display: block; font-size: 0.62rem; font-weight: 600; color: var(--text-dim); }
+  #cta-endweek { margin-left: auto; border-radius: 999px; padding: 12px 18px;
+    background: linear-gradient(135deg, var(--accent), #4fa8ff); color: #04222c;
+    box-shadow: 0 6px 18px rgba(34,200,240,0.35); display: flex; align-items: center; gap: 6px; }
 
-  /* --- Division tabs --- */
-  #div-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
-  .div-tab {
-    flex-shrink: 0; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--card-border);
-    background: #10142a; color: var(--text); cursor: pointer; white-space: nowrap; font-weight: 600; font-size: 0.85rem;
-  }
-  .div-tab.active { border-color: var(--accent); background: #262146; }
-  .div-tab .div-tab-sub { display: block; font-size: 0.68rem; font-weight: 400; color: var(--text-dim); margin-top: 2px; }
+  /* --- Views / bottom nav --- */
+  #views { flex: 1; padding-top: 16px; padding-bottom: 24px; }
+  .view.hidden { display: none !important; }
 
-  #open-titles { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-  .open-title-card {
-    flex: 1; min-width: 150px; background: #10142a; border: 1px solid var(--card-border); border-radius: 10px; padding: 10px 12px;
-  }
-  .open-title-card .otc-name { font-weight: 700; font-size: 0.85rem; }
-  .open-title-card .otc-genre { font-size: 0.72rem; color: var(--text-dim); margin: 2px 0 8px; }
+  #bottom-nav { position: sticky; bottom: 0; z-index: 6; display: flex; justify-content: space-around;
+    background: var(--glass-strong); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border-top: 1px solid var(--glass-border); padding: 8px 6px calc(8px + env(safe-area-inset-bottom)); }
+  .nav-btn { background: none; border: none; color: var(--text-dim); display: flex; flex-direction: column;
+    align-items: center; gap: 2px; font-size: 0.65rem; font-weight: 800; padding: 6px 14px; border-radius: 14px; }
+  .nav-btn .nb-icon { font-size: 1.25rem; }
+  .nav-btn.active { color: var(--accent); background: rgba(34,200,240,0.14); }
 
-  /* --- Roster --- */
-  .roster-slot {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 12px; border-radius: 10px; background: #10142a; border: 1px solid var(--card-border); margin-bottom: 8px; gap: 10px;
-  }
-  .roster-slot.empty { opacity: 0.75; }
-  .player-name { font-weight: 700; font-size: 0.9rem; }
-  .player-meta { font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
-  .candidate-card {
-    background: #191038; border: 1px solid var(--accent); border-radius: 10px; padding: 12px; margin-bottom: 10px;
-  }
+  /* --- Room grid (divisions) --- */
+  #org-title { padding: 0 16px 4px; }
+  #org-title .org-name { font-size: 1.2rem; font-weight: 800; }
+  #org-title .org-sub { font-size: 0.8rem; color: var(--text-dim); margin-top: 2px; }
+
+  #room-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; padding: 0 16px 6px; }
+  .room-tile { border-radius: 18px; padding: 14px 13px; cursor: pointer; position: relative;
+    border: 2px solid transparent; color: #fff; text-align: left; min-height: 108px;
+    display: flex; flex-direction: column; justify-content: flex-end; box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
+  .room-tile.active { border-color: #fff; }
+  .room-tile .rt-icon { font-size: 1.5rem; }
+  .room-tile .rt-name { font-weight: 800; margin-top: 6px; font-size: 0.85rem; }
+  .room-tile .rt-sub { font-size: 0.68rem; opacity: 0.9; margin-top: 2px; }
+  .room-tile.locked { background: rgba(255,255,255,0.06) !important; box-shadow: none; border: 1px dashed var(--glass-border); }
+  .room-tile.locked .rt-name, .room-tile.locked .rt-sub { color: var(--text); opacity: 0.85; }
+  .room-tile.locked .rt-cost { font-size: 0.68rem; margin-top: 8px; background: rgba(34,200,240,0.18); color: var(--accent);
+    padding: 5px 9px; border-radius: 8px; display: inline-block; font-weight: 800; }
+  .room-tile.locked.unaffordable { opacity: 0.5; pointer-events: none; }
+
+  /* --- Division detail --- */
+  #division-detail-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  #division-detail-title .ddt-name { font-weight: 800; font-size: 1rem; }
+  #division-detail-title .ddt-tier { font-size: 0.75rem; color: var(--text-dim); }
+
+  .candidate-card { background: rgba(34,200,240,0.12); border: 1px solid var(--accent); border-radius: 16px; padding: 12px; margin-bottom: 10px; }
   .candidate-actions { display: flex; gap: 8px; margin-top: 8px; }
 
-  #division-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 14px; }
-  #division-actions button { text-align: left; }
-  .action-title { display: block; }
-  .action-cost { display: block; font-size: 0.7rem; font-weight: 400; opacity: 0.8; margin-top: 2px; }
+  .roster-card { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 16px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); margin-bottom: 8px; }
+  .rc-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 1.15rem; background: linear-gradient(135deg, var(--accent), #6a5cff); flex-shrink: 0; }
+  .rc-avatar.dim { background: rgba(255,255,255,0.08); }
+  .rc-info { flex: 1; min-width: 0; }
+  .rc-name { font-weight: 800; font-size: 0.86rem; }
+  .rc-meta { font-size: 0.7rem; color: var(--text-dim); margin-top: 1px; }
+  .bar-track { height: 6px; border-radius: 6px; background: rgba(0,0,0,0.3); overflow: hidden; margin-top: 5px; }
+  .bar-fill { height: 100%; border-radius: 6px; }
 
-  #org-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-  #org-actions button { text-align: left; }
+  #division-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 9px; margin-top: 14px; }
+  .pill-action { background: rgba(255,255,255,0.07); border: 1px solid var(--glass-border); color: var(--text);
+    text-align: left; border-radius: 16px; padding: 11px 13px; }
+  .pill-action .pa-title { display: block; font-weight: 800; font-size: 0.82rem; }
+  .pill-action .pa-cost { display: block; font-size: 0.66rem; color: var(--text-dim); margin-top: 2px; font-weight: 500; }
 
-  .sponsor-chip {
-    display: inline-block; background: #10142a; border: 1px solid var(--card-border); border-radius: 8px;
-    padding: 6px 10px; font-size: 0.78rem; margin: 4px 6px 0 0;
-  }
-
-  #retire-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
-
-  #log {
-    max-height: 220px; overflow-y: auto; display: flex; flex-direction: column-reverse;
-    gap: 6px; font-size: 0.85rem;
-  }
-  #log .entry { padding: 6px 10px; border-radius: 8px; background: #10142a; border-left: 3px solid var(--card-border); }
-  #log .entry.good { border-left-color: var(--good); }
-  #log .entry.bad { border-left-color: var(--danger); }
-  #log .entry.info { border-left-color: var(--accent); }
-
-  #modal-overlay, #shop-overlay {
-    position: fixed; inset: 0; background: rgba(5, 6, 15, 0.75);
-    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 10;
-  }
-  #modal-box { max-width: 440px; width: 100%; text-align: center; }
-  #modal-stats { text-align: left; margin: 16px 0; color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; }
-  #modal-stats b { color: var(--text); }
-
-  #shop-box { max-width: 480px; width: 100%; text-align: left; }
-  #shop-box h2 { text-align: center; }
-  #shop-box p { color: var(--text-dim); font-size: 0.85rem; }
-  #shop-items { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; max-height: 55vh; overflow-y: auto; }
-  .shop-item { background: #10142a; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-  .shop-item-name { font-weight: 700; }
-  .shop-item-desc { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
-  .shop-buy-btn { flex-shrink: 0; padding: 8px 12px; font-size: 0.8rem; text-align: center; white-space: nowrap; }
+  /* --- Shop / sponsors / log views --- */
+  .shop-item { display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; }
+  .shop-item-name { font-weight: 800; font-size: 0.85rem; }
+  .shop-item-desc { font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
+  .shop-buy-btn { flex-shrink: 0; padding: 9px 13px; font-size: 0.76rem; border-radius: 12px; white-space: nowrap; }
   .shop-buy-btn.owned { background: var(--good); color: #062016; }
+
+  .sponsor-card { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; }
+  .sponsor-card .sc-name { font-weight: 800; font-size: 0.85rem; }
+  .sponsor-card .sc-income { color: var(--good); font-weight: 800; font-size: 0.8rem; }
+
+  #log-feed { display: flex; flex-direction: column-reverse; gap: 8px; }
+  #log-feed .entry { padding: 10px 13px; border-radius: 14px; background: rgba(255,255,255,0.05);
+    border-left: 3px solid var(--glass-border); font-size: 0.84rem; }
+  #log-feed .entry.good { border-left-color: var(--good); }
+  #log-feed .entry.bad { border-left-color: var(--danger); }
+  #log-feed .entry.info { border-left-color: var(--accent); }
+
+  #org-manage-row { display: flex; gap: 10px; margin-top: 18px; }
+
+  /* --- Modal --- */
+  #modal-overlay { position: fixed; inset: 0; background: rgba(8, 4, 20, 0.75); display: flex;
+    align-items: center; justify-content: center; padding: 20px; z-index: 20; }
+  #modal-box { max-width: 420px; width: 100%; text-align: center; padding: 26px 22px; }
+  #modal-box h2 { text-transform: none; font-size: 1.2rem; color: var(--text); letter-spacing: normal; }
+  #modal-text { color: var(--text-dim); font-size: 0.9rem; margin-top: 8px; }
+  #modal-stats { text-align: left; margin: 16px 0; color: var(--text-dim); font-size: 0.88rem; line-height: 1.7;
+    background: rgba(0,0,0,0.2); border-radius: 14px; padding: 12px 14px; }
+  #modal-stats b { color: var(--text); }
 
   .hidden { display: none !important; }
   ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
 </style>
 </head>
 <body>
+
+<div id="bg-scene">
+  <svg viewBox="0 0 400 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="40" width="30" height="60" fill="#1c1140"/>
+    <rect x="34" y="20" width="22" height="80" fill="#241757"/>
+    <rect x="60" y="55" width="26" height="45" fill="#1c1140"/>
+    <rect x="90" y="10" width="18" height="90" fill="#2a1a63"/>
+    <rect x="112" y="45" width="30" height="55" fill="#1c1140"/>
+    <rect x="146" y="30" width="20" height="70" fill="#241757"/>
+    <rect x="170" y="0" width="16" height="100" fill="#2a1a63"/>
+    <rect x="190" y="50" width="28" height="50" fill="#1c1140"/>
+    <rect x="222" y="25" width="22" height="75" fill="#241757"/>
+    <rect x="248" y="15" width="18" height="85" fill="#2a1a63"/>
+    <rect x="270" y="48" width="26" height="52" fill="#1c1140"/>
+    <rect x="300" y="35" width="20" height="65" fill="#241757"/>
+    <rect x="324" y="5" width="18" height="95" fill="#2a1a63"/>
+    <rect x="346" y="55" width="24" height="45" fill="#1c1140"/>
+    <rect x="374" y="40" width="26" height="60" fill="#241757"/>
+  </svg>
+</div>
+
 <div id="app">
 
   <!-- START SCREEN -->
-  <div id="start-screen" class="card">
-    <h1>🏢 Organizacja Esportowa</h1>
-    <p class="subtitle">Zbuduj wielotytułową organizację esportową od zera. Otwieraj oddziały w różnych grach, skautuj i rozwijaj zawodników, podpisuj sponsorów i pnij się w rankingach lig.</p>
-    <p class="disclaimer">Fanowska gra z fikcyjnymi tytułami esportowymi, niezwiązana z żadnym realnym wydawcą.</p>
-
-    <label for="org-name-input">Nazwa Twojej organizacji</label>
-    <input id="org-name-input" type="text" maxlength="24" placeholder="np. Aurora Esports" autocomplete="off">
-
-    <button id="start-btn">Załóż organizację</button>
+  <div id="start-wrap">
+    <div id="start-screen" class="glass">
+      <h1>🏢 Organizacja Esportowa</h1>
+      <p class="subtitle">Zbuduj wielotytułową organizację esportową od zera. Otwieraj oddziały w różnych grach, skautuj i rozwijaj zawodników, podpisuj sponsorów i pnij się w rankingach lig.</p>
+      <p class="disclaimer">Fanowska gra z fikcyjnymi tytułami esportowymi, niezwiązana z żadnym realnym wydawcą.</p>
+      <label for="org-name-input">Nazwa Twojej organizacji</label>
+      <input id="org-name-input" type="text" maxlength="24" placeholder="np. Aurora Esports" autocomplete="off">
+      <button id="start-btn">Załóż organizację</button>
+    </div>
   </div>
 
   <!-- GAME SCREEN -->
-  <div id="game-screen" class="hidden">
+  <div id="game-screen" class="hidden" style="display:flex; flex-direction:column; min-height:100vh;">
 
-    <div class="card" id="header-card">
-      <div id="header-row">
-        <div id="org-name-display" style="font-size:1.1rem; font-weight:700;"></div>
-        <div id="meta">Tydzień <span id="week-num"></span> · Rok <span id="year-num"></span></div>
-      </div>
-      <div class="stats-grid">
-        <div>
-          <div class="stat-label"><span>💰 Budżet</span></div>
-          <div class="stat-big" id="stat-money"></div>
+    <div id="hud-bar">
+      <div class="hud-pill">💰 <span id="stat-money"></span></div>
+      <div class="hud-pill">⭐ <span id="stat-rep-num"></span><small>Reputacja</small></div>
+      <div class="hud-pill">⚡ <span id="ap-value"></span><small>Akcje</small></div>
+      <div class="hud-pill">📅 <span id="week-num"></span>/52<small>Rok <span id="year-num"></span></small></div>
+      <button id="cta-endweek">Zakończ tydzień →</button>
+    </div>
+
+    <div id="views">
+
+      <section id="view-hq" class="view">
+        <div id="org-title" class="panel" style="margin-bottom:12px; padding:0;">
+          <div class="org-name" id="org-name-display"></div>
+          <div class="org-sub">Zarządzaj swoim imperium esportowym</div>
         </div>
-        <div>
-          <div class="stat-label"><span>⭐ Reputacja</span><span id="stat-rep-num"></span></div>
-          <div class="bar-track"><div class="bar-fill" id="stat-rep" style="background: var(--accent);"></div></div>
+        <div id="room-grid"></div>
+        <div id="division-detail" class="glass panel"></div>
+      </section>
+
+      <section id="view-shop" class="view hidden">
+        <div class="glass panel">
+          <h2>🏗️ Infrastruktura HQ</h2>
+          <p style="color:var(--text-dim); font-size:0.82rem; margin-bottom:14px;">Ulepszenia działają na wszystkie oddziały naraz. Część wymaga cotygodniowego utrzymania.</p>
+          <div id="shop-items"></div>
         </div>
-        <div>
-          <div class="stat-label"><span>⚡ Punkty Akcji</span></div>
-          <div class="stat-big"><span id="ap-value"></span></div>
+      </section>
+
+      <section id="view-sponsors" class="view hidden">
+        <div class="glass panel">
+          <h2>🤝 Sponsorzy</h2>
+          <p style="color:var(--text-dim); font-size:0.82rem; margin-bottom:14px;">Maksymalnie 3 umowy sponsorskie naraz. Wyższa reputacja odblokowuje kolejne.</p>
+          <div id="sponsors-list"></div>
+          <button id="btn-sponsor" class="full" style="margin-top:8px;">🤝 Podpisz nowego sponsora</button>
         </div>
-      </div>
+      </section>
+
+      <section id="view-log" class="view hidden">
+        <div class="glass panel">
+          <h2>📜 Dziennik organizacji</h2>
+          <div id="log-feed"></div>
+          <div id="org-manage-row">
+            <button class="secondary full" id="btn-newgame">Nowa gra</button>
+            <button class="danger full" id="btn-retire">🏁 Zakończ działalność</button>
+          </div>
+        </div>
+      </section>
+
     </div>
 
-    <div class="card">
-      <div class="section-title">Twoje oddziały</div>
-      <div id="div-tabs"></div>
-      <div id="open-titles"></div>
-    </div>
-
-    <div class="card" id="division-panel"></div>
-
-    <div class="card">
-      <div class="section-title">Zarządzanie organizacją</div>
-      <div id="sponsors-row" style="margin-bottom: 10px;"></div>
-      <div id="org-actions">
-        <button id="btn-sponsor"><span class="action-title">🤝 Podpisz sponsora</span><span class="action-cost"></span></button>
-        <button id="btn-shop"><span class="action-title">🏗️ Infrastruktura</span><span class="action-cost">Ulepszenia HQ</span></button>
-        <button id="btn-endweek"><span class="action-title">📅 Zakończ tydzień</span><span class="action-cost">Wypłaty, przychody, wydarzenia</span></button>
-      </div>
-      <div id="retire-row">
-        <button class="secondary" id="btn-newgame">Nowa gra</button>
-        <button class="danger" id="btn-retire">🏁 Zakończ działalność</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div id="log"></div>
-    </div>
+    <nav id="bottom-nav">
+      <button class="nav-btn active" data-view="hq"><span class="nb-icon">🏢</span><span>Sztab</span></button>
+      <button class="nav-btn" data-view="shop"><span class="nb-icon">🏗️</span><span>Sklep</span></button>
+      <button class="nav-btn" data-view="sponsors"><span class="nb-icon">🤝</span><span>Sponsorzy</span></button>
+      <button class="nav-btn" data-view="log"><span class="nb-icon">📜</span><span>Dziennik</span></button>
+    </nav>
   </div>
 
 </div>
 
 <!-- MODAL -->
 <div id="modal-overlay" class="hidden">
-  <div class="card" id="modal-box">
+  <div class="glass" id="modal-box">
     <h2 id="modal-title"></h2>
     <p id="modal-text"></p>
     <div id="modal-stats"></div>
-    <button id="modal-btn">Zagraj ponownie</button>
-  </div>
-</div>
-
-<!-- SHOP -->
-<div id="shop-overlay" class="hidden">
-  <div class="card" id="shop-box">
-    <h2>🏗️ Infrastruktura HQ</h2>
-    <p>Ulepszenia działają na wszystkie oddziały naraz. Część wymaga cotygodniowego utrzymania.</p>
-    <div id="shop-items"></div>
-    <button class="secondary" id="shop-close-btn" style="margin-top: 14px; width: 100%;">Zamknij</button>
+    <button id="modal-btn" class="full">Zagraj ponownie</button>
   </div>
 </div>
 
@@ -249,15 +286,15 @@
 (function () {
   "use strict";
 
-  const STORAGE_KEY = "esports-org-sim-save-v1";
+  const STORAGE_KEY = "esports-org-sim-save-v2";
 
   const TITLES = [
-    { id: "tactical",    name: "Tactical Ops",  genre: "Taktyczna strzelanka 5v5", icon: "🔫", entryCost: 3000 },
-    { id: "rift",        name: "Rift Legends",  genre: "MOBA 5v5",                 icon: "⚔️", entryCost: 4000 },
-    { id: "battlezone",  name: "Battle Zone",   genre: "Battle royale",            icon: "🪂", entryCost: 3500 },
-    { id: "velocity",    name: "Velocity GP",   genre: "Wyścigi symulacyjne",      icon: "🏎️", entryCost: 5000 },
-    { id: "ironfist",    name: "Iron Fist",     genre: "Bijatyka 1v1",             icon: "🥊", entryCost: 2500 },
-    { id: "cardmasters", name: "Card Masters",  genre: "Karciana strategiczna",    icon: "🃏", entryCost: 2000 },
+    { id: "tactical",    name: "Tactical Ops",  genre: "Taktyczna strzelanka 5v5", icon: "🔫", entryCost: 3000, bg: "linear-gradient(135deg,#ff7a59,#ff3d68)" },
+    { id: "rift",        name: "Rift Legends",  genre: "MOBA 5v5",                 icon: "⚔️", entryCost: 4000, bg: "linear-gradient(135deg,#7b5cff,#3d8bff)" },
+    { id: "battlezone",  name: "Battle Zone",   genre: "Battle royale",            icon: "🪂", entryCost: 3500, bg: "linear-gradient(135deg,#33d17a,#1a8f5a)" },
+    { id: "velocity",    name: "Velocity GP",   genre: "Wyścigi symulacyjne",      icon: "🏎️", entryCost: 5000, bg: "linear-gradient(135deg,#22c1e0,#1668c4)" },
+    { id: "ironfist",    name: "Iron Fist",     genre: "Bijatyka 1v1",             icon: "🥊", entryCost: 2500, bg: "linear-gradient(135deg,#ff5c7a,#b3264d)" },
+    { id: "cardmasters", name: "Card Masters",  genre: "Karciana strategiczna",    icon: "🃏", entryCost: 2000, bg: "linear-gradient(135deg,#ffb85c,#e0862a)" },
   ];
 
   const DIVISION_TIERS = [
@@ -293,6 +330,7 @@
   ];
 
   let state = null;
+  let currentView = "hq";
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
   function money(v) { return (v < 0 ? "-" : "") + Math.abs(Math.round(v)).toLocaleString("pl-PL") + " zł"; }
@@ -388,7 +426,7 @@
     save();
   }
 
-  // --- Round simulation (reused for tournament matches) ---
+  // --- Round simulation ---
 
   function simulateRounds(winChance) {
     let my = 0, opp = 0;
@@ -574,7 +612,6 @@
     state.money -= u.cost;
     state.upgrades[id] = true;
     addLog("🏗️ Budujecie: " + u.name + ".", "good");
-    renderShop();
     render();
   }
 
@@ -622,7 +659,7 @@
     localStorage.removeItem(STORAGE_KEY);
     document.getElementById("modal-overlay").classList.add("hidden");
     document.getElementById("game-screen").classList.add("hidden");
-    document.getElementById("start-screen").classList.remove("hidden");
+    document.getElementById("start-wrap").classList.remove("hidden");
     document.getElementById("org-name-input").value = "";
     document.getElementById("org-name-input").focus();
   }
@@ -631,10 +668,19 @@
     const orgName = document.getElementById("org-name-input").value.trim() || "Moja Organizacja";
     state = defaultState(orgName);
     addLog("🎬 Zakładasz organizację " + orgName + ". Otwórz swój pierwszy oddział, by zacząć rywalizację!", "info");
-    document.getElementById("start-screen").classList.add("hidden");
+    document.getElementById("start-wrap").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
     save();
     render();
+  }
+
+  // --- View switching ---
+
+  function switchView(name) {
+    currentView = name;
+    document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
+    document.getElementById("view-" + name).classList.remove("hidden");
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.getAttribute("data-view") === name));
   }
 
   // --- Rendering ---
@@ -654,56 +700,61 @@
       btn.addEventListener("click", () => buyUpgrade(btn.getAttribute("data-id")));
     });
   }
-  function openShop() { renderShop(); document.getElementById("shop-overlay").classList.remove("hidden"); }
-  function closeShop() { document.getElementById("shop-overlay").classList.add("hidden"); }
 
-  function renderDivisionTabs() {
-    const tabs = document.getElementById("div-tabs");
-    if (!state.divisions.length) {
-      tabs.innerHTML = '<div style="color:var(--text-dim); font-size:0.85rem;">Nie masz jeszcze żadnego oddziału — otwórz pierwszy poniżej.</div>';
-    } else {
-      tabs.innerHTML = state.divisions.map(d => {
-        const active = d.id === state.selectedDivisionId ? " active" : "";
-        return '<button class="div-tab' + active + '" data-id="' + d.id + '">' + d.icon + ' ' + d.title +
-          '<span class="div-tab-sub">' + DIVISION_TIERS[d.tier].name + ' · ' + d.wins + 'W-' + d.losses + 'L</span></button>';
-      }).join("");
-      tabs.querySelectorAll(".div-tab").forEach(btn => {
-        btn.addEventListener("click", () => { state.selectedDivisionId = btn.getAttribute("data-id"); render(); });
-      });
-    }
-
-    const openContainer = document.getElementById("open-titles");
-    const unopened = TITLES.filter(t => !getDivision(t.id));
-    openContainer.innerHTML = unopened.map(t => {
-      const canAfford = state.money >= t.entryCost && state.actionPoints >= 1;
-      return '<div class="open-title-card">' +
-        '<div class="otc-name">' + t.icon + ' ' + t.name + '</div>' +
-        '<div class="otc-genre">' + t.genre + '</div>' +
-        '<button class="small" data-open="' + t.id + '"' + (canAfford ? '' : ' disabled') + '>Otwórz — ' + money(t.entryCost) + '</button>' +
-      '</div>';
-    }).join("");
-    openContainer.querySelectorAll("[data-open]").forEach(btn => {
-      btn.addEventListener("click", () => openDivision(btn.getAttribute("data-open")));
-    });
+  function renderSponsors() {
+    const list = document.getElementById("sponsors-list");
+    list.innerHTML = state.sponsors.length
+      ? state.sponsors.map(s => '<div class="sponsor-card"><span class="sc-name">🤝 ' + s.name + '</span><span class="sc-income">+' + money(s.income) + '/tydz.</span></div>').join("")
+      : '<p style="color:var(--text-dim); font-size:0.85rem;">Brak podpisanych sponsorów.</p>';
+    const btn = document.getElementById("btn-sponsor");
+    btn.disabled = state.actionPoints < 1 || state.over || state.sponsors.length >= 3;
   }
 
-  function renderDivisionPanel() {
-    const panel = document.getElementById("division-panel");
+  function renderRoomGrid() {
+    const grid = document.getElementById("room-grid");
+    let html = "";
+    state.divisions.forEach(d => {
+      const title = TITLES.find(t => t.id === d.id);
+      const active = d.id === state.selectedDivisionId ? " active" : "";
+      html += '<div class="room-tile' + active + '" style="background:' + title.bg + '" data-select="' + d.id + '">' +
+        '<div class="rt-icon">' + d.icon + '</div>' +
+        '<div class="rt-name">' + d.title + '</div>' +
+        '<div class="rt-sub">' + DIVISION_TIERS[d.tier].name + ' · ' + d.wins + 'W-' + d.losses + 'L</div>' +
+      '</div>';
+    });
+    TITLES.filter(t => !getDivision(t.id)).forEach(t => {
+      const canAfford = state.money >= t.entryCost && state.actionPoints >= 1;
+      html += '<div class="room-tile locked' + (canAfford ? '' : ' unaffordable') + '" data-open="' + t.id + '">' +
+        '<div class="rt-icon">' + t.icon + '</div>' +
+        '<div class="rt-name">' + t.name + '</div>' +
+        '<div class="rt-sub">' + t.genre + '</div>' +
+        '<div class="rt-cost">+ Otwórz — ' + money(t.entryCost) + '</div>' +
+      '</div>';
+    });
+    grid.innerHTML = html;
+    grid.querySelectorAll("[data-select]").forEach(el => el.addEventListener("click", () => { state.selectedDivisionId = el.getAttribute("data-select"); render(); }));
+    grid.querySelectorAll("[data-open]").forEach(el => el.addEventListener("click", () => openDivision(el.getAttribute("data-open"))));
+  }
+
+  function renderDivisionDetail() {
+    const panel = document.getElementById("division-detail");
     const div = selectedDivision();
     if (!div) {
-      panel.innerHTML = '<div class="section-title">Oddział</div><p style="color:var(--text-dim); font-size:0.9rem;">Wybierz albo otwórz oddział, żeby zarządzać składem i grać mecze ligowe.</p>';
+      panel.innerHTML = state.divisions.length
+        ? '<p style="color:var(--text-dim); font-size:0.88rem;">Wybierz oddział powyżej, żeby zarządzać składem i grać mecze ligowe.</p>'
+        : '<p style="color:var(--text-dim); font-size:0.88rem;">Nie masz jeszcze żadnego oddziału — stuknij kafelek "+" powyżej, żeby otworzyć pierwszy.</p>';
       return;
     }
     const tierInfo = DIVISION_TIERS[div.tier];
     const nextTier = DIVISION_TIERS[div.tier + 1];
 
-    let html = '<div class="section-title">' + div.icon + ' ' + div.title + ' — ' + tierInfo.name + '</div>';
+    let html = '<div id="division-detail-title"><div><div class="ddt-name">' + div.icon + ' ' + div.title + '</div><div class="ddt-tier">' + tierInfo.name + ' liga</div></div></div>';
 
     if (div.pendingCandidate) {
       html += div.pendingCandidate.map((c, i) =>
         '<div class="candidate-card">' +
-          '<div class="player-name">' + c.name + '</div>' +
-          '<div class="player-meta">Skill ' + Math.round(c.skill) + ' · Pensja ' + money(c.salary) + '/tydz. · Bonus podpisania ' + money(c.salary * 2) + '</div>' +
+          '<div class="rc-name">' + c.name + '</div>' +
+          '<div class="rc-meta">Skill ' + Math.round(c.skill) + ' · Pensja ' + money(c.salary) + '/tydz. · Bonus podpisania ' + money(c.salary * 2) + '</div>' +
           '<div class="candidate-actions">' +
             '<button class="small good" data-sign="' + i + '">Podpisz</button>' +
             '<button class="small secondary" data-reject="1">Odrzuć</button>' +
@@ -713,15 +764,15 @@
     }
 
     html += div.roster.map((p, idx) => {
-      if (!p) return '<div class="roster-slot empty"><div class="player-name">Pusty slot</div><button class="small" data-scout="1">🔎 Skautuj</button></div>';
-      return '<div class="roster-slot"><div><div class="player-name">' + p.name + '</div><div class="player-meta">Skill ' + Math.round(p.skill) + ' · Morale ' + Math.round(p.morale) + ' · ' + money(p.salary) + '/tydz.</div></div><button class="small secondary" data-release="' + idx + '">Zwolnij</button></div>';
+      if (!p) return '<div class="roster-card"><div class="rc-avatar dim">➕</div><div class="rc-info"><div class="rc-name" style="color:var(--text-dim)">Pusty slot</div></div><button class="shop-buy-btn" data-scout="1">🔎 Skautuj</button></div>';
+      return '<div class="roster-card"><div class="rc-avatar">🎮</div><div class="rc-info"><div class="rc-name">' + p.name + '</div><div class="rc-meta">Skill ' + Math.round(p.skill) + ' · Morale ' + Math.round(p.morale) + ' · ' + money(p.salary) + '/tydz.</div><div class="bar-track"><div class="bar-fill" style="width:' + Math.round(p.skill) + '%; background:var(--accent);"></div></div></div><button class="shop-buy-btn" data-release="' + idx + '">Zwolnij</button></div>';
     }).join("");
 
     html += '<div id="division-actions">' +
-      '<button data-train="1"><span class="action-title">📈 Trenuj oddział</span><span class="action-cost">1 AP + 300 zł</span></button>' +
-      '<button data-compete="1"><span class="action-title">🏆 Zagraj mecz ligowy</span><span class="action-cost">1 AP, min. 3 zawodników</span></button>' +
-      '<button data-promote="1"><span class="action-title">🚀 Awansuj ligę</span><span class="action-cost">' + (nextTier ? "Wymaga śr. skill " + nextTier.reqSkill + " / rep " + nextTier.reqRep : "Już na szczycie") + '</span></button>' +
-      '<button class="danger" data-close="1"><span class="action-title">🗑️ Zamknij oddział</span><span class="action-cost">Zwrot 30% wpisowego</span></button>' +
+      '<button class="pill-action" data-train="1"><span class="pa-title">📈 Trenuj oddział</span><span class="pa-cost">1 AP + 300 zł</span></button>' +
+      '<button class="pill-action" data-compete="1"><span class="pa-title">🏆 Zagraj mecz ligowy</span><span class="pa-cost">1 AP, min. 3 zawodników</span></button>' +
+      '<button class="pill-action" data-promote="1"><span class="pa-title">🚀 Awansuj ligę</span><span class="pa-cost">' + (nextTier ? "Śr. skill " + nextTier.reqSkill + " / rep " + nextTier.reqRep : "Już na szczycie") + '</span></button>' +
+      '<button class="pill-action" data-close="1" style="color:var(--danger);"><span class="pa-title">🗑️ Zamknij oddział</span><span class="pa-cost">Zwrot 30% wpisowego</span></button>' +
     '</div>';
 
     panel.innerHTML = html;
@@ -745,33 +796,24 @@
     if (scoutBtn) scoutBtn.disabled = noAP;
   }
 
+  function renderLog() {
+    document.getElementById("log-feed").innerHTML = state.log.map(e => '<div class="entry ' + e.type + '">' + e.text + "</div>").join("");
+  }
+
   function render() {
     document.getElementById("org-name-display").textContent = "🏢 " + state.orgName;
     document.getElementById("week-num").textContent = state.week;
     document.getElementById("year-num").textContent = state.year;
     document.getElementById("stat-money").textContent = money(state.money);
-    document.getElementById("stat-money").style.color = state.money < 0 ? "var(--danger)" : "var(--text)";
-    document.getElementById("ap-value").textContent = state.actionPoints + " / " + maxActionPoints();
+    document.getElementById("stat-rep-num").textContent = Math.round(clamp(state.reputation, 0, 100));
+    document.getElementById("ap-value").textContent = state.actionPoints + "/" + maxActionPoints();
+    document.getElementById("cta-endweek").disabled = state.over;
 
-    const rep = clamp(state.reputation, 0, 100);
-    document.getElementById("stat-rep").style.width = rep + "%";
-    document.getElementById("stat-rep-num").textContent = Math.round(rep);
-
-    renderDivisionTabs();
-    renderDivisionPanel();
-
-    const sponsorsRow = document.getElementById("sponsors-row");
-    sponsorsRow.innerHTML = state.sponsors.length
-      ? state.sponsors.map(s => '<span class="sponsor-chip">🤝 ' + s.name + " · +" + money(s.income) + "/tydz.</span>").join("")
-      : '<span style="color:var(--text-dim); font-size:0.82rem;">Brak podpisanych sponsorów.</span>';
-
-    document.getElementById("btn-sponsor").disabled = state.actionPoints < 1 || state.over || state.sponsors.length >= 3;
-    document.getElementById("btn-shop").disabled = state.over;
-    document.getElementById("btn-endweek").disabled = state.over;
-    document.querySelector("#btn-sponsor .action-cost").textContent = "1 AP, wymaga reputacji";
-
-    const logEl = document.getElementById("log");
-    logEl.innerHTML = state.log.map(e => '<div class="entry ' + e.type + '">' + e.text + "</div>").join("");
+    renderRoomGrid();
+    renderDivisionDetail();
+    renderShop();
+    renderSponsors();
+    renderLog();
 
     save();
   }
@@ -780,22 +822,22 @@
   document.getElementById("start-btn").addEventListener("click", startGame);
   document.getElementById("org-name-input").addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
   document.getElementById("btn-sponsor").addEventListener("click", signSponsor);
-  document.getElementById("btn-shop").addEventListener("click", openShop);
-  document.getElementById("shop-close-btn").addEventListener("click", closeShop);
-  document.getElementById("btn-endweek").addEventListener("click", endWeek);
+  document.getElementById("cta-endweek").addEventListener("click", endWeek);
   document.getElementById("btn-retire").addEventListener("click", actionRetire);
   document.getElementById("btn-newgame").addEventListener("click", newGame);
   document.getElementById("modal-btn").addEventListener("click", newGame);
+  document.querySelectorAll(".nav-btn").forEach(btn => btn.addEventListener("click", () => switchView(btn.getAttribute("data-view"))));
 
   // --- boot ---
   const existing = load();
   if (existing) {
     state = existing;
     if (!state.upgrades) state.upgrades = {};
-    if (!state.sponsors) state.sponsors = {};
+    if (!state.sponsors) state.sponsors = [];
     if (typeof state.divisionsEverOpened !== "number") state.divisionsEverOpened = state.divisions.length;
-    document.getElementById("start-screen").classList.add("hidden");
+    document.getElementById("start-wrap").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
+    switchView("hq");
     render();
     if (state.over) {
       showEndModal("Twoja poprzednia organizacja", "Ostatnia zapisana sesja zakończyła się. Kliknij, aby zacząć od nowa.");
