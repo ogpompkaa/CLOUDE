@@ -169,6 +169,28 @@
     background: rgba(0,0,0,0.2); border-radius: 14px; padding: 12px 14px; }
   #modal-stats b { color: var(--text); }
 
+  /* --- Season recap --- */
+  #season-overlay { position: fixed; inset: 0; background: rgba(8, 4, 20, 0.75); display: flex;
+    align-items: center; justify-content: center; padding: 20px; z-index: 21; }
+  #season-box { max-width: 440px; width: 100%; padding: 24px 22px; max-height: 85vh; overflow-y: auto; }
+  .season-recap-card { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 16px; padding: 14px; margin-top: 14px; }
+  .season-recap-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .season-recap-head .src-title { font-weight: 800; font-size: 0.92rem; }
+  .season-badge { font-size: 0.68rem; font-weight: 800; padding: 4px 10px; border-radius: 999px; }
+  .season-badge.up { background: rgba(79,209,138,0.2); color: var(--good); }
+  .season-badge.down { background: rgba(255,92,122,0.2); color: var(--danger); }
+  .season-badge.hold { background: rgba(34,200,240,0.18); color: var(--accent); }
+  .standings-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-top: 4px; }
+  .standings-table td { padding: 5px 4px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .standings-table tr.me td { color: var(--accent); font-weight: 800; }
+  .standings-table .st-rank { width: 24px; color: var(--text-dim); }
+  .standings-table .st-pts { text-align: right; }
+
+  /* --- Standings widget (in-season, mid-week) --- */
+  .standings-widget { background: rgba(0,0,0,0.18); border-radius: 16px; padding: 12px 14px; margin-bottom: 14px; }
+  .sw-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-dim); margin-bottom: 8px; }
+  .sw-opponent { font-size: 0.76rem; color: var(--text-dim); margin-top: 8px; }
+
   .hidden { display: none !important; }
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
@@ -282,6 +304,15 @@
   </div>
 </div>
 
+<!-- SEASON RECAP -->
+<div id="season-overlay" class="hidden">
+  <div class="glass" id="season-box">
+    <h2 style="text-align:center; text-transform:none; font-size:1.15rem;">🏆 Podsumowanie sezonu</h2>
+    <div id="season-recap-list"></div>
+    <button id="season-close-btn" class="full" style="margin-top:14px;">OK, gramy dalej</button>
+  </div>
+</div>
+
 <script>
 (function () {
   "use strict";
@@ -317,6 +348,9 @@
 
   const NAME_POOL = ["Zephyr","Kex","Rell","Nyx","Byte","Ghost","Vantage","Lumen","Frost","Blaze","Orbit","Static","Nova","Pixel","Rogue","Shade","Vertex","Cipher","Drift","Flux","Halo","Ion","Jinx","Krypt","Lynx","Mirage","Nex","Onyx","Prism","Quill","Raze","Sable","Tempo","Umbra","Volt","Wisp","Xen","Yara","Zed","Astra"];
   const SPONSOR_NAMES = ["NitroFuel","ByteWear","PulseGear","QuantumChips","ZenithEnergy","VoltCola","ApexPeripherals","NovaBank","HyperNet","TitanChairs","CoreDrinks","PrimeAudio","FluxMonitors","OrbitTelecom","SparkWear"];
+  const RIVAL_ORG_NAMES = ["Crimson Circuit","Obsidian Wolves","Neon Dynasty","Ashen Vanguard","Solaris Union","Voidwalkers","Ironclad Syndicate","Prism Collective","Wraith Company","Frostbyte Guild","Zenith Rising","Rustline Crew"];
+  const SEASON_LENGTH = 10;
+  const RIVALS_PER_SEASON = 4;
 
   const RANDOM_EVENTS = [
     { chance: 0.12, type: "good", text: "Viralowy klip jednego z Twoich zawodników przyciąga nowych fanów.", effect: s => { s.reputation = clamp(s.reputation + 4, 0, 100); } },
@@ -392,6 +426,20 @@
     return { name: randomName(), skill: skill, morale: Math.round(60 + Math.random() * 20), salary: Math.round(80 + skill * 7) };
   }
 
+  function generateRivals(tier) {
+    const base = DIVISION_TIERS[tier].reqSkill + 15;
+    const shuffled = RIVAL_ORG_NAMES.slice().sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, RIVALS_PER_SEASON).map(name => ({
+      name: name,
+      power: clamp(base + (Math.random() - 0.5) * 20, 10, 100),
+      points: 0,
+    }));
+  }
+
+  function newSeason(tier) {
+    return { week: 0, length: SEASON_LENGTH, rivals: generateRivals(tier) };
+  }
+
   // --- Score / end game ---
 
   function computeScore() {
@@ -426,6 +474,23 @@
     save();
   }
 
+  function showSeasonRecap(recaps) {
+    const badgeClass = { "Awans": "up", "Spadek": "down", "Utrzymanie": "hold" };
+    document.getElementById("season-recap-list").innerHTML = recaps.map(r =>
+      '<div class="season-recap-card">' +
+        '<div class="season-recap-head"><span class="src-title">' + r.divIcon + ' ' + r.divTitle + '</span><span class="season-badge ' + badgeClass[r.outcome] + '">' + r.outcome + '</span></div>' +
+        '<table class="standings-table">' +
+          r.table.map((row, i) =>
+            '<tr class="' + (row.isPlayer ? "me" : "") + '"><td class="st-rank">' + (i + 1) + '.</td><td>' + row.name + '</td><td class="st-pts">' + row.points + ' pkt</td></tr>'
+          ).join("") +
+        '</table>' +
+        '<div style="margin-top:8px; font-size:0.78rem; color:var(--good); font-weight:800;">+' + money(r.prize) + ' nagrody za sezon</div>' +
+      '</div>'
+    ).join("");
+    document.getElementById("season-overlay").classList.remove("hidden");
+    save();
+  }
+
   // --- Round simulation ---
 
   function simulateRounds(winChance) {
@@ -446,7 +511,11 @@
     if (state.money < title.entryCost) { addLog("Za mało pieniędzy, by otworzyć oddział " + title.name + ".", "bad"); render(); return; }
     state.actionPoints -= 1;
     state.money -= title.entryCost;
-    state.divisions.push({ id: titleId, title: title.name, icon: title.icon, tier: 0, roster: [null, null, null, null, null], pendingCandidate: null, wins: 0, losses: 0 });
+    state.divisions.push({
+      id: titleId, title: title.name, icon: title.icon, tier: 0,
+      roster: [null, null, null, null, null], pendingCandidate: null,
+      wins: 0, losses: 0, seasonPoints: 0, season: newSeason(0),
+    });
     state.divisionsEverOpened += 1;
     state.selectedDivisionId = titleId;
     addLog("🏢 Otwierasz nowy oddział: " + title.name + "!", "good");
@@ -531,15 +600,22 @@
     render();
   }
 
+  function nextOpponent(div) {
+    if (!div.season || !div.season.rivals.length) return null;
+    return div.season.rivals[div.season.week % div.season.rivals.length];
+  }
+
   function competeDivision(divId) {
     if (state.over || state.actionPoints < 1) return;
     const div = getDivision(divId);
     if (!div) return;
     const active = div.roster.filter(p => p);
     if (active.length < 3) { addLog("Potrzebujesz co najmniej 3 zawodników, by rywalizować w " + div.title + ".", "bad"); render(); return; }
+    const opponent = nextOpponent(div);
+    if (!opponent) return;
     state.actionPoints -= 1;
     const avgSkill = active.reduce((s, p) => s + p.skill, 0) / active.length;
-    const difficulty = 20 + div.tier * 10;
+    const difficulty = opponent.power;
     const winChance = clamp(0.5 + (avgSkill - difficulty) / 100, 0.15, 0.88);
     const result = simulateRounds(winChance);
     const win = result.my > result.opp;
@@ -554,38 +630,48 @@
       state.money += prize;
       state.reputation = clamp(state.reputation + (1 + margin * 4) * prBonus, 0, 100);
       div.wins += 1;
+      div.seasonPoints += 3;
       active.forEach(p => { p.skill = clamp(p.skill + (0.5 + Math.random()) * analystBonus, 0, 100); p.morale = clamp(p.morale + 3, 0, 100); });
-      addLog("🏆 " + div.title + " wygrywa mecz ligowy " + score + "! +" + money(prize) + ".", "good");
+      addLog("🏆 " + div.title + " vs " + opponent.name + ": wygrywacie " + score + "! +" + money(prize) + ".", "good");
     } else {
       state.reputation = clamp(state.reputation - (1 + margin * 2), 0, 100);
       div.losses += 1;
       active.forEach(p => { p.morale = clamp(p.morale - 4, 0, 100); });
-      addLog("💀 " + div.title + " przegrywa mecz ligowy " + score + ".", "bad");
+      addLog("💀 " + div.title + " vs " + opponent.name + ": przegrywacie " + score + ".", "bad");
     }
     render();
   }
 
-  function promoteDivision(divId) {
-    if (state.over || state.actionPoints < 1) return;
-    const div = getDivision(divId);
-    if (!div) return;
-    const next = DIVISION_TIERS[div.tier + 1];
-    if (!next) { addLog(div.title + " jest już na szczycie sceny.", "info"); render(); return; }
-    const active = div.roster.filter(p => p);
-    const avgSkill = active.length ? active.reduce((s, p) => s + p.skill, 0) / active.length : 0;
-    state.actionPoints -= 1;
-    if (avgSkill >= next.reqSkill && state.reputation >= next.reqRep) {
-      const chance = clamp(0.5 + (avgSkill - next.reqSkill) / 100, 0.4, 0.9);
-      if (Math.random() < chance) {
-        div.tier += 1;
-        addLog("🚀 Awans! " + div.title + " gra teraz w lidze: " + DIVISION_TIERS[div.tier].name + ".", "good");
-      } else {
-        addLog("❌ Próba awansu " + div.title + " nie powiodła się w tym sezonie.", "bad");
-      }
+  function resolveSeasonEnd(div) {
+    const table = [{ name: div.title + " (Ty)", points: div.seasonPoints, isPlayer: true }]
+      .concat(div.season.rivals.map(r => ({ name: r.name, points: r.points, isPlayer: false })))
+      .sort((a, b) => b.points - a.points);
+    const rank = table.findIndex(t => t.isPlayer) + 1;
+    const total = table.length;
+
+    let outcome = "Utrzymanie";
+    if (rank <= 2 && div.tier < DIVISION_TIERS.length - 1) {
+      div.tier += 1;
+      outcome = "Awans";
+      addLog("🚀 Koniec sezonu: " + div.title + " kończy na " + rank + ". miejscu i AWANSUJE do ligi " + DIVISION_TIERS[div.tier].name + "!", "good");
+    } else if (rank >= total - 1 && div.tier > 0) {
+      div.tier -= 1;
+      outcome = "Spadek";
+      addLog("📉 Koniec sezonu: " + div.title + " kończy na " + rank + ". miejscu i SPADA do ligi " + DIVISION_TIERS[div.tier].name + ".", "bad");
     } else {
-      addLog("Nie spełniacie jeszcze wymagań do awansu w " + div.title + " (śr. skill " + next.reqSkill + ", reputacja " + next.reqRep + ").", "bad");
+      addLog("🏁 Koniec sezonu: " + div.title + " kończy na " + rank + ". miejscu z " + div.seasonPoints + " pkt. Utrzymanie w lidze " + DIVISION_TIERS[div.tier].name + ".", "info");
     }
-    render();
+
+    const prize = Math.round(DIVISION_TIERS[div.tier].prizeBase * (total - rank + 1) / total * 1.5);
+    state.money += prize;
+    addLog("💰 Nagroda za sezon (" + div.title + "): +" + money(prize) + ".", "good");
+
+    const recap = { divTitle: div.title, divIcon: div.icon, rank: rank, total: total, outcome: outcome, prize: prize, table: table };
+
+    div.seasonPoints = 0;
+    div.season = newSeason(div.tier);
+
+    return recap;
   }
 
   // --- Org-level actions ---
@@ -646,8 +732,19 @@
     state.actionPoints = maxActionPoints();
     addLog("📅 Koniec tygodnia " + state.week + ". Wypłaty: " + money(totalSalaries + hqUpkeep) + ", przychód sponsorów: " + money(sponsorIncome) + ".", "info");
 
+    const seasonRecaps = [];
+    state.divisions.forEach(div => {
+      if (!div.season) div.season = newSeason(div.tier);
+      div.season.rivals.forEach(r => { r.points += Math.round(r.power / 12 + (Math.random() - 0.5) * 2); });
+      div.season.week += 1;
+      if (div.season.week >= div.season.length) {
+        seasonRecaps.push(resolveSeasonEnd(div));
+      }
+    });
+
     checkGameOver();
     render();
+    if (seasonRecaps.length) showSeasonRecap(seasonRecaps);
   }
 
   function actionRetire() {
@@ -746,9 +843,22 @@
       return;
     }
     const tierInfo = DIVISION_TIERS[div.tier];
-    const nextTier = DIVISION_TIERS[div.tier + 1];
 
     let html = '<div id="division-detail-title"><div><div class="ddt-name">' + div.icon + ' ' + div.title + '</div><div class="ddt-tier">' + tierInfo.name + ' liga</div></div></div>';
+
+    if (div.season) {
+      const standings = [{ name: div.title + " (Ty)", points: div.seasonPoints, isPlayer: true }]
+        .concat(div.season.rivals.map(r => ({ name: r.name, points: r.points, isPlayer: false })))
+        .sort((a, b) => b.points - a.points);
+      const opp = nextOpponent(div);
+      html += '<div class="standings-widget">' +
+        '<div class="sw-title">Tabela ligowa · sezon: tydzień ' + div.season.week + '/' + div.season.length + '</div>' +
+        '<table class="standings-table">' +
+          standings.map((row, i) => '<tr class="' + (row.isPlayer ? "me" : "") + '"><td class="st-rank">' + (i + 1) + '.</td><td>' + row.name + '</td><td class="st-pts">' + row.points + ' pkt</td></tr>').join("") +
+        '</table>' +
+        (opp ? '<div class="sw-opponent">Następny mecz: vs <b style="color:var(--text)">' + opp.name + '</b></div>' : '') +
+      '</div>';
+    }
 
     if (div.pendingCandidate) {
       html += div.pendingCandidate.map((c, i) =>
@@ -771,7 +881,6 @@
     html += '<div id="division-actions">' +
       '<button class="pill-action" data-train="1"><span class="pa-title">📈 Trenuj oddział</span><span class="pa-cost">1 AP + 300 zł</span></button>' +
       '<button class="pill-action" data-compete="1"><span class="pa-title">🏆 Zagraj mecz ligowy</span><span class="pa-cost">1 AP, min. 3 zawodników</span></button>' +
-      '<button class="pill-action" data-promote="1"><span class="pa-title">🚀 Awansuj ligę</span><span class="pa-cost">' + (nextTier ? "Śr. skill " + nextTier.reqSkill + " / rep " + nextTier.reqRep : "Już na szczycie") + '</span></button>' +
       '<button class="pill-action" data-close="1" style="color:var(--danger);"><span class="pa-title">🗑️ Zamknij oddział</span><span class="pa-cost">Zwrot 30% wpisowego</span></button>' +
     '</div>';
 
@@ -785,14 +894,12 @@
     panel.querySelectorAll("[data-release]").forEach(btn => btn.addEventListener("click", () => releasePlayer(div.id, parseInt(btn.getAttribute("data-release"), 10))));
     panel.querySelector("[data-train]").addEventListener("click", () => trainDivision(div.id));
     panel.querySelector("[data-compete]").addEventListener("click", () => competeDivision(div.id));
-    panel.querySelector("[data-promote]").addEventListener("click", () => promoteDivision(div.id));
     panel.querySelector("[data-close]").addEventListener("click", () => closeDivision(div.id));
 
     const noAP = state.actionPoints < 1 || state.over;
     const activeCount = div.roster.filter(p => p).length;
     panel.querySelector("[data-train]").disabled = noAP || activeCount === 0 || state.money < 300;
     panel.querySelector("[data-compete]").disabled = noAP || activeCount < 3;
-    panel.querySelector("[data-promote]").disabled = noAP || !nextTier;
     if (scoutBtn) scoutBtn.disabled = noAP;
   }
 
@@ -826,6 +933,7 @@
   document.getElementById("btn-retire").addEventListener("click", actionRetire);
   document.getElementById("btn-newgame").addEventListener("click", newGame);
   document.getElementById("modal-btn").addEventListener("click", newGame);
+  document.getElementById("season-close-btn").addEventListener("click", () => document.getElementById("season-overlay").classList.add("hidden"));
   document.querySelectorAll(".nav-btn").forEach(btn => btn.addEventListener("click", () => switchView(btn.getAttribute("data-view"))));
 
   // --- boot ---
@@ -835,6 +943,10 @@
     if (!state.upgrades) state.upgrades = {};
     if (!state.sponsors) state.sponsors = [];
     if (typeof state.divisionsEverOpened !== "number") state.divisionsEverOpened = state.divisions.length;
+    state.divisions.forEach(div => {
+      if (!div.season) div.season = newSeason(div.tier);
+      if (typeof div.seasonPoints !== "number") div.seasonPoints = 0;
+    });
     document.getElementById("start-wrap").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
     switchView("hq");
