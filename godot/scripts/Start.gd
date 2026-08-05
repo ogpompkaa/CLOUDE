@@ -13,6 +13,7 @@ func _ready() -> void:
 func _on_start_pressed() -> void:
 	var org_name = name_input.text.strip_edges()
 	GameState.new_game(org_name)
+	GameState.data.board_goal = GameLogic.generate_board_goal()
 	GameState.save()
 	get_tree().change_scene_to_file("res://scenes/HQ.tscn")
 

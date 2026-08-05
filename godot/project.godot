@@ -19,6 +19,7 @@ config/icon="res://assets/icon.svg"
 
 GameData="*res://scripts/GameData.gd"
 GameState="*res://scripts/GameState.gd"
+GameLogic="*res://scripts/GameLogic.gd"
 
 [display]
 
