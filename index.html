@@ -343,30 +343,30 @@
   const STORAGE_KEY = "esports-org-sim-save-v2";
 
   const TITLES = [
-    { id: "tactical",    name: "Tactical Ops",  genre: "Taktyczna strzelanka 5v5", icon: "🔫", entryCost: 3000, bg: "linear-gradient(135deg,#ff7a59,#ff3d68)" },
-    { id: "rift",        name: "Rift Legends",  genre: "MOBA 5v5",                 icon: "⚔️", entryCost: 4000, bg: "linear-gradient(135deg,#7b5cff,#3d8bff)" },
-    { id: "battlezone",  name: "Battle Zone",   genre: "Battle royale",            icon: "🪂", entryCost: 3500, bg: "linear-gradient(135deg,#33d17a,#1a8f5a)" },
-    { id: "velocity",    name: "Velocity GP",   genre: "Wyścigi symulacyjne",      icon: "🏎️", entryCost: 5000, bg: "linear-gradient(135deg,#22c1e0,#1668c4)" },
-    { id: "ironfist",    name: "Iron Fist",     genre: "Bijatyka 1v1",             icon: "🥊", entryCost: 2500, bg: "linear-gradient(135deg,#ff5c7a,#b3264d)" },
-    { id: "cardmasters", name: "Card Masters",  genre: "Karciana strategiczna",    icon: "🃏", entryCost: 2000, bg: "linear-gradient(135deg,#ffb85c,#e0862a)" },
+    { id: "tactical",    name: "Tactical Ops",  genre: "Taktyczna strzelanka 5v5", icon: "🔫", entryCost: 2200, bg: "linear-gradient(135deg,#ff7a59,#ff3d68)" },
+    { id: "rift",        name: "Rift Legends",  genre: "MOBA 5v5",                 icon: "⚔️", entryCost: 3000, bg: "linear-gradient(135deg,#7b5cff,#3d8bff)" },
+    { id: "battlezone",  name: "Battle Zone",   genre: "Battle royale",            icon: "🪂", entryCost: 2600, bg: "linear-gradient(135deg,#33d17a,#1a8f5a)" },
+    { id: "velocity",    name: "Velocity GP",   genre: "Wyścigi symulacyjne",      icon: "🏎️", entryCost: 3600, bg: "linear-gradient(135deg,#22c1e0,#1668c4)" },
+    { id: "ironfist",    name: "Iron Fist",     genre: "Bijatyka 1v1",             icon: "🥊", entryCost: 1900, bg: "linear-gradient(135deg,#ff5c7a,#b3264d)" },
+    { id: "cardmasters", name: "Card Masters",  genre: "Karciana strategiczna",    icon: "🃏", entryCost: 1500, bg: "linear-gradient(135deg,#ffb85c,#e0862a)" },
   ];
 
   const DIVISION_TIERS = [
-    { name: "Amatorska",     prizeBase: 800,   reqSkill: 0,  reqRep: 0  },
-    { name: "Tier 3",        prizeBase: 2000,  reqSkill: 25, reqRep: 10 },
-    { name: "Tier 2",        prizeBase: 4500,  reqSkill: 40, reqRep: 25 },
-    { name: "Tier 1",        prizeBase: 9000,  reqSkill: 55, reqRep: 40 },
-    { name: "Top Kontender", prizeBase: 16000, reqSkill: 70, reqRep: 55 },
-    { name: "Legenda",       prizeBase: 30000, reqSkill: 85, reqRep: 70 },
+    { name: "Amatorska",     prizeBase: 900,   reqSkill: 0,  reqRep: 0  },
+    { name: "Tier 3",        prizeBase: 1400,  reqSkill: 25, reqRep: 10 },
+    { name: "Tier 2",        prizeBase: 2100,  reqSkill: 40, reqRep: 25 },
+    { name: "Tier 1",        prizeBase: 3200,  reqSkill: 55, reqRep: 40 },
+    { name: "Top Kontender", prizeBase: 4800,  reqSkill: 70, reqRep: 55 },
+    { name: "Legenda",       prizeBase: 7200,  reqSkill: 85, reqRep: 70 },
   ];
 
   const HQ_UPGRADES = [
-    { id: "facility",   name: "Dom Gamingowy",        desc: "+30% skuteczności treningu we wszystkich oddziałach", cost: 5000, upkeep: 0 },
-    { id: "analysts",   name: "Zespół Analityków",    desc: "+50% wzrostu umiejętności z wygranych meczów",        cost: 4000, upkeep: 150 },
-    { id: "medical",    name: "Sztab Medyczny",       desc: "Szybsza regeneracja morale zawodników",               cost: 3000, upkeep: 100 },
-    { id: "pr",         name: "Zespół PR",            desc: "+30% reputacji ze zwycięstw i sponsorów",             cost: 3500, upkeep: 120 },
-    { id: "scouting",   name: "Dyrektor Skautingu",   desc: "Skauting pokazuje 2 kandydatów zamiast 1",            cost: 4500, upkeep: 150 },
-    { id: "management", name: "Biuro Zarządu",        desc: "+1 Punkt Akcji na tydzień",                           cost: 6000, upkeep: 200 },
+    { id: "facility",   name: "Dom Gamingowy",        desc: "+30% skuteczności treningu we wszystkich oddziałach", cost: 3200, upkeep: 0 },
+    { id: "analysts",   name: "Zespół Analityków",    desc: "+50% wzrostu umiejętności z wygranych meczów",        cost: 2600, upkeep: 100 },
+    { id: "medical",    name: "Sztab Medyczny",       desc: "Szybsza regeneracja morale zawodników",               cost: 2000, upkeep: 70 },
+    { id: "pr",         name: "Zespół PR",            desc: "+30% reputacji ze zwycięstw i sponsorów",             cost: 2300, upkeep: 80 },
+    { id: "scouting",   name: "Dyrektor Skautingu",   desc: "Skauting pokazuje 2 kandydatów zamiast 1",            cost: 3000, upkeep: 100 },
+    { id: "management", name: "Biuro Zarządu",        desc: "+1 Punkt Akcji na tydzień",                           cost: 4000, upkeep: 140 },
   ];
 
   const NAME_POOL = ["Zephyr","Kex","Rell","Nyx","Byte","Ghost","Vantage","Lumen","Frost","Blaze","Orbit","Static","Nova","Pixel","Rogue","Shade","Vertex","Cipher","Drift","Flux","Halo","Ion","Jinx","Krypt","Lynx","Mirage","Nex","Onyx","Prism","Quill","Raze","Sable","Tempo","Umbra","Volt","Wisp","Xen","Yara","Zed","Astra"];
@@ -473,7 +473,7 @@
 
   function generatePlayer(tier) {
     const skill = clamp(10 + tier * 5 + Math.random() * 25, 0, 100);
-    return { name: randomName(), skill: skill, morale: Math.round(60 + Math.random() * 20), salary: Math.round(80 + skill * 7), traits: rollTraits() };
+    return { name: randomName(), skill: skill, morale: Math.round(60 + Math.random() * 20), salary: Math.round(60 + skill * 4), traits: rollTraits() };
   }
 
   function generateMarketListing() {
@@ -560,14 +560,18 @@
 
   // --- Round simulation ---
 
-  function simulateRounds(winChance, reducedVariance) {
-    let my = 0, opp = 0;
-    const varianceScale = reducedVariance ? 0.15 : 0.3;
-    while (my < 13 && opp < 13) {
-      const variance = (Math.random() - 0.5) * varianceScale;
-      if (Math.random() < clamp(winChance + variance, 0.08, 0.95)) my += 1; else opp += 1;
+  // Simulating each round independently and racing to 13 makes even a small per-round
+  // edge compound into a near-certain match win over ~13-25 rounds. So the match winner
+  // is decided by a single roll at the (capped, tunable) match win chance, and the round
+  // simulation below only produces a plausible score SHAPE for that predetermined result.
+  function simulateRoundShape(reducedVariance) {
+    let a = 0, b = 0;
+    const varianceScale = reducedVariance ? 0.2 : 0.4;
+    while (a < 13 && b < 13) {
+      const roundChance = clamp(0.5 + (Math.random() - 0.5) * varianceScale, 0.08, 0.95);
+      if (Math.random() < roundChance) a += 1; else b += 1;
     }
-    return { my: my, opp: opp };
+    return { winnerScore: Math.max(a, b), loserScore: Math.min(a, b) };
   }
 
   // --- Division actions ---
@@ -689,7 +693,7 @@
     if (!div) return;
     const filled = div.roster.filter(p => p);
     if (!filled.length) { addLog("Brak zawodników do trenowania w " + div.title + ".", "bad"); render(); return; }
-    const cost = 300;
+    const cost = 250;
     if (state.money < cost) { addLog("Za mało pieniędzy na sesję treningową.", "bad"); render(); return; }
     state.actionPoints -= 1;
     state.money -= cost;
@@ -722,18 +726,20 @@
     state.actionPoints -= 1;
     const avgSkill = active.reduce((s, p) => s + p.skill, 0) / active.length;
     const difficulty = opponent.power;
-    const winChance = clamp(0.5 + (avgSkill - difficulty) / 100, 0.15, 0.88);
+    const winChance = clamp(0.5 + (avgSkill - difficulty) / 140, 0.2, 0.8);
     const hasConsistent = active.some(p => hasTrait(p, "consistent"));
-    const result = simulateRounds(winChance, hasConsistent);
-    const win = result.my > result.opp;
-    const margin = clamp(Math.abs(result.my - result.opp) / 13, 0.15, 1);
+    const win = Math.random() < winChance;
+    const shape = simulateRoundShape(hasConsistent);
+    const myScore = win ? shape.winnerScore : shape.loserScore;
+    const oppScore = win ? shape.loserScore : shape.winnerScore;
+    const margin = clamp(Math.abs(myScore - oppScore) / 13, 0.15, 1);
     const tierInfo = DIVISION_TIERS[div.tier];
-    const score = result.my + ":" + result.opp;
+    const score = myScore + ":" + oppScore;
     const prBonus = owned("pr") ? 1.3 : 1;
     const analystBonus = owned("analysts") ? 1.5 : 1;
 
     if (win) {
-      const prize = Math.round(tierInfo.prizeBase * (0.4 + margin * 0.9));
+      const prize = Math.round(tierInfo.prizeBase * (0.3 + margin * 0.6));
       state.money += prize;
       state.reputation = clamp(state.reputation + (1 + margin * 4) * prBonus, 0, 100);
       div.wins += 1;
@@ -775,7 +781,7 @@
       addLog("🏁 Koniec sezonu: " + div.title + " kończy na " + rank + ". miejscu z " + div.seasonPoints + " pkt. Utrzymanie w lidze " + DIVISION_TIERS[div.tier].name + ".", "info");
     }
 
-    const prize = Math.round(DIVISION_TIERS[div.tier].prizeBase * (total - rank + 1) / total * 1.5);
+    const prize = Math.round(DIVISION_TIERS[div.tier].prizeBase * (total - rank + 1) / total * 0.6);
     state.money += prize;
     addLog("💰 Nagroda za sezon (" + div.title + "): +" + money(prize) + ".", "good");
 
@@ -799,7 +805,7 @@
     const used = state.sponsors.map(s => s.name);
     const pool = SPONSOR_NAMES.filter(n => !used.includes(n));
     const name = (pool.length ? pool : SPONSOR_NAMES)[Math.floor(Math.random() * (pool.length ? pool.length : SPONSOR_NAMES.length))];
-    const income = Math.round(200 + state.reputation * 15 + Math.random() * 300);
+    const income = Math.round(100 + state.reputation * 8 + Math.random() * 150);
     state.sponsors.push({ name: name, income: income });
     addLog("🤝 Podpisujecie umowę sponsorską z " + name + "! +" + money(income) + "/tydzień.", "good");
     render();
