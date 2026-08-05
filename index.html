@@ -173,6 +173,13 @@
 
   #org-manage-row { display: flex; gap: 10px; margin-top: 18px; }
 
+  #achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+  .ach-badge { background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); border-radius: 14px;
+    padding: 10px 6px; text-align: center; }
+  .ach-badge.locked { opacity: 0.32; }
+  .ach-badge .ab-icon { font-size: 1.35rem; }
+  .ach-badge .ab-name { font-size: 0.6rem; font-weight: 800; margin-top: 4px; line-height: 1.15; }
+
   /* --- Modal --- */
   #modal-overlay { position: fixed; inset: 0; background: rgba(8, 4, 20, 0.75); display: flex;
     align-items: center; justify-content: center; padding: 20px; z-index: 20; }
@@ -264,6 +271,7 @@
           <div class="org-name" id="org-name-display"></div>
           <div class="org-sub">Zarządzaj swoim imperium esportowym</div>
         </div>
+        <div id="board-goal-card" class="glass panel" style="margin: 0 16px 12px;"></div>
         <div id="room-grid"></div>
         <div id="division-detail" class="glass panel"></div>
       </section>
@@ -295,6 +303,8 @@
 
       <section id="view-log" class="view hidden">
         <div class="glass panel">
+          <h2 id="achievements-title">🏅 Osiągnięcia</h2>
+          <div id="achievements-grid" style="margin-bottom: 18px;"></div>
           <h2>📜 Dziennik organizacji</h2>
           <div id="log-feed"></div>
           <div id="org-manage-row">
@@ -389,6 +399,25 @@
   const MARKET_SIZE = 6;
   const MARKET_LISTING_LIFESPAN = 3;
 
+  const BOARD_GOAL_DURATION = 10;
+
+  const ACHIEVEMENTS = [
+    { id: "first_division", name: "Pierwsze Kroki",         icon: "🏢", desc: "Otwórz swój pierwszy oddział.",                          check: s => s.divisionsEverOpened >= 1 },
+    { id: "first_win",       name: "Pierwsza Wygrana",       icon: "🏆", desc: "Wygraj pierwszy mecz ligowy.",                            check: s => s.divisions.reduce((a, d) => a + d.wins, 0) >= 1 },
+    { id: "first_promotion", name: "W Górę!",                icon: "🚀", desc: "Awansuj oddział do wyższej ligi.",                        check: s => s.divisions.some(d => d.tier >= 1) },
+    { id: "legend",          name: "Legenda Sceny",          icon: "👑", desc: "Doprowadź oddział do najwyższej ligi (Legenda).",         check: s => s.divisions.some(d => d.tier >= 5) },
+    { id: "all_titles",      name: "Multi-Gaming Empire",    icon: "🌐", desc: "Otwórz wszystkie 6 tytułów jednocześnie.",                check: s => s.divisions.length >= 6 },
+    { id: "hundred_wins",    name: "Setka",                  icon: "💯", desc: "Zdobądź łącznie 100 zwycięstw.",                          check: s => s.divisions.reduce((a, d) => a + d.wins, 0) >= 100 },
+    { id: "rich",            name: "Imperium Finansowe",     icon: "💰", desc: "Zgromadź budżet 50 000 zł.",                              check: s => s.money >= 50000 },
+    { id: "all_sponsors",    name: "Ulubieniec Marek",       icon: "🤝", desc: "Podpisz maksymalną liczbę sponsorów (3).",                check: s => s.sponsors.length >= 3 },
+    { id: "all_upgrades",    name: "Nowoczesna Infrastruktura", icon: "🏗️", desc: "Wykup wszystkie ulepszenia HQ.",                       check: s => HQ_UPGRADES.every(u => s.upgrades && s.upgrades[u.id]) },
+    { id: "market_shopper",  name: "Łowca Talentów",         icon: "💱", desc: "Kup zawodnika z rynku transferowego.",                    check: s => (s.marketPurchasesEver || 0) >= 1 },
+    { id: "survivor",        name: "Powrót z Krawędzi",      icon: "🩹", desc: "Wróć na plus po tym, jak budżet spadł poniżej -2000 zł.", check: s => s.hitNearBankruptcy && s.money >= 0 },
+    { id: "board_favorite",  name: "Ulubieniec Zarządu",     icon: "🎯", desc: "Zrealizuj cel zarządu.",                                  check: s => (s.boardGoalsCompleted || 0) >= 1 },
+  ];
+
+  const BOARD_GOAL_TYPES = ["money", "wins", "reputation", "sponsor"];
+
   const RANDOM_EVENTS = [
     { chance: 0.12, type: "good", text: "Viralowy klip jednego z Twoich zawodników przyciąga nowych fanów.", effect: s => { s.reputation = clamp(s.reputation + 4, 0, 100); } },
     { chance: 0.10, type: "bad",  text: "Nieoczekiwana faktura za wynajem biura.", effect: s => { s.money -= Math.round(500 + Math.random() * 500); } },
@@ -432,6 +461,12 @@
       sponsors: [],
       upgrades: {},
       transferMarket: [],
+      totalWeeks: 0,
+      boardGoal: null,
+      boardGoalsCompleted: 0,
+      marketPurchasesEver: 0,
+      hitNearBankruptcy: false,
+      achievementsUnlocked: {},
       over: false,
       log: [],
     };
@@ -505,6 +540,71 @@
 
   function newSeason(tier) {
     return { week: 0, length: SEASON_LENGTH, rivals: generateRivals(tier) };
+  }
+
+  function totalWins() { return state.divisions.reduce((a, d) => a + d.wins, 0); }
+
+  function generateBoardGoal() {
+    const type = BOARD_GOAL_TYPES[Math.floor(Math.random() * BOARD_GOAL_TYPES.length)];
+    const goal = {
+      type: type,
+      startWeek: state.totalWeeks,
+      deadlineWeek: state.totalWeeks + BOARD_GOAL_DURATION,
+      startMoney: state.money,
+      startWins: totalWins(),
+      completed: false,
+    };
+    if (type === "money") {
+      goal.target = 1500 + Math.floor(Math.random() * 3000);
+      goal.reward = Math.round(goal.target * 0.4);
+      goal.desc = "Zarząd oczekuje wzrostu budżetu o " + money(goal.target) + " w ciągu " + BOARD_GOAL_DURATION + " tyg.";
+    } else if (type === "wins") {
+      goal.target = 5 + Math.floor(Math.random() * 8);
+      goal.reward = goal.target * 150;
+      goal.desc = "Zarząd oczekuje " + goal.target + " zwycięstw ligowych w ciągu " + BOARD_GOAL_DURATION + " tyg.";
+    } else if (type === "reputation") {
+      goal.target = clamp(Math.round(state.reputation) + 8 + Math.floor(Math.random() * 15), 0, 100);
+      goal.reward = 1200;
+      goal.desc = "Zarząd oczekuje reputacji na poziomie " + goal.target + "/100 w ciągu " + BOARD_GOAL_DURATION + " tyg.";
+    } else {
+      goal.target = Math.min(3, state.sponsors.length + 1);
+      goal.reward = 1000;
+      goal.desc = "Zarząd oczekuje podpisania kolejnego sponsora w ciągu " + BOARD_GOAL_DURATION + " tyg.";
+    }
+    return goal;
+  }
+
+  function boardGoalProgress() {
+    const g = state.boardGoal;
+    if (!g) return 0;
+    if (g.type === "money") return clamp(Math.round(state.money - g.startMoney), 0, g.target);
+    if (g.type === "wins") return clamp(totalWins() - g.startWins, 0, g.target);
+    if (g.type === "reputation") return clamp(Math.round(state.reputation), 0, g.target);
+    if (g.type === "sponsor") return clamp(state.sponsors.length, 0, g.target);
+    return 0;
+  }
+
+  function checkBoardGoal() {
+    if (!state.boardGoal) return;
+    const g = state.boardGoal;
+    if (boardGoalProgress() >= g.target) {
+      state.money += g.reward;
+      state.reputation = clamp(state.reputation + 3, 0, 100);
+      state.boardGoalsCompleted = (state.boardGoalsCompleted || 0) + 1;
+      addLog("🎯 Cel zarządu zrealizowany! Nagroda: +" + money(g.reward) + ".", "good");
+      state.boardGoal = generateBoardGoal();
+      addLog("🎯 Nowy cel zarządu: " + state.boardGoal.desc, "info");
+    }
+  }
+
+  function checkAchievements() {
+    ACHIEVEMENTS.forEach(a => {
+      if (state.achievementsUnlocked[a.id]) return;
+      if (a.check(state)) {
+        state.achievementsUnlocked[a.id] = true;
+        addLog("🏅 Nowe osiągnięcie: " + a.name + "!", "good");
+      }
+    });
   }
 
   // --- Score / end game ---
@@ -682,6 +782,7 @@
     state.money -= listing.askingPrice;
     div.roster[emptyIdx] = { name: listing.name, skill: listing.skill, morale: listing.morale, salary: listing.salary, traits: listing.traits };
     state.transferMarket.splice(idx, 1);
+    state.marketPurchasesEver = (state.marketPurchasesEver || 0) + 1;
     refillMarket();
     addLog("💱 Kupujecie " + listing.name + " z rynku transferowego dla " + div.title + " za " + money(listing.askingPrice) + "!", "good");
     render();
@@ -894,6 +995,17 @@
       }
     });
 
+    state.totalWeeks += 1;
+    checkBoardGoal();
+    if (state.boardGoal && state.totalWeeks >= state.boardGoal.deadlineWeek) {
+      state.reputation = clamp(state.reputation - 4, 0, 100);
+      addLog("📉 Nie udało się zrealizować celu zarządu na czas. Zarząd jest niezadowolony (-4 reputacji).", "bad");
+      state.boardGoal = generateBoardGoal();
+      addLog("🎯 Nowy cel zarządu: " + state.boardGoal.desc, "info");
+    }
+
+    if (state.money < -2000) state.hitNearBankruptcy = true;
+
     checkGameOver();
     render();
     if (seasonRecaps.length) showSeasonRecap(seasonRecaps);
@@ -917,7 +1029,9 @@
     const orgName = document.getElementById("org-name-input").value.trim() || "Moja Organizacja";
     state = defaultState(orgName);
     refillMarket();
+    state.boardGoal = generateBoardGoal();
     addLog("🎬 Zakładasz organizację " + orgName + ". Otwórz swój pierwszy oddział, by zacząć rywalizację!", "info");
+    addLog("🎯 Pierwszy cel zarządu: " + state.boardGoal.desc, "info");
     document.getElementById("start-wrap").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
     save();
@@ -1062,7 +1176,7 @@
     }).join("");
 
     html += '<div id="division-actions">' +
-      '<button class="pill-action" data-train="1"><span class="pa-title">📈 Trenuj oddział</span><span class="pa-cost">1 AP + 300 zł</span></button>' +
+      '<button class="pill-action" data-train="1"><span class="pa-title">📈 Trenuj oddział</span><span class="pa-cost">1 AP + 250 zł</span></button>' +
       '<button class="pill-action" data-compete="1"><span class="pa-title">🏆 Zagraj mecz ligowy</span><span class="pa-cost">1 AP, min. 3 zawodników</span></button>' +
       '<button class="pill-action" data-close="1" style="color:var(--danger);"><span class="pa-title">🗑️ Zamknij oddział</span><span class="pa-cost">Zwrot 30% wpisowego</span></button>' +
     '</div>';
@@ -1082,13 +1196,36 @@
 
     const noAP = state.actionPoints < 1 || state.over;
     const activeCount = div.roster.filter(p => p).length;
-    panel.querySelector("[data-train]").disabled = noAP || activeCount === 0 || state.money < 300;
+    panel.querySelector("[data-train]").disabled = noAP || activeCount === 0 || state.money < 250;
     panel.querySelector("[data-compete]").disabled = noAP || activeCount < 3;
     if (scoutBtn) scoutBtn.disabled = noAP;
   }
 
   function renderLog() {
     document.getElementById("log-feed").innerHTML = state.log.map(e => '<div class="entry ' + e.type + '">' + e.text + "</div>").join("");
+  }
+
+  function renderBoardGoal() {
+    const card = document.getElementById("board-goal-card");
+    const g = state.boardGoal;
+    if (!g) { card.innerHTML = ""; return; }
+    const progress = boardGoalProgress();
+    const pct = clamp(Math.round((progress / g.target) * 100), 0, 100);
+    const weeksLeft = Math.max(0, g.deadlineWeek - state.totalWeeks);
+    card.innerHTML =
+      '<div class="section-title" style="margin-bottom:6px;">🎯 Cel Zarządu</div>' +
+      '<div style="font-size:0.85rem; font-weight:700;">' + g.desc + '</div>' +
+      '<div class="bar-track" style="margin-top:8px;"><div class="bar-fill" style="width:' + pct + '%; background:var(--gold);"></div></div>' +
+      '<div style="font-size:0.72rem; color:var(--text-dim); margin-top:4px;">' + progress + ' / ' + g.target + ' · zostało ' + weeksLeft + ' tyg. · nagroda: +' + money(g.reward) + '</div>';
+  }
+
+  function renderAchievements() {
+    const unlockedCount = ACHIEVEMENTS.filter(a => state.achievementsUnlocked[a.id]).length;
+    document.getElementById("achievements-title").textContent = "🏅 Osiągnięcia (" + unlockedCount + "/" + ACHIEVEMENTS.length + ")";
+    document.getElementById("achievements-grid").innerHTML = ACHIEVEMENTS.map(a => {
+      const unlocked = !!state.achievementsUnlocked[a.id];
+      return '<div class="ach-badge' + (unlocked ? '' : ' locked') + '" title="' + a.desc + '"><div class="ab-icon">' + a.icon + '</div><div class="ab-name">' + a.name + '</div></div>';
+    }).join("");
   }
 
   function render() {
@@ -1100,8 +1237,13 @@
     document.getElementById("ap-value").textContent = state.actionPoints + "/" + maxActionPoints();
     document.getElementById("cta-endweek").disabled = state.over;
 
+    checkBoardGoal();
+    checkAchievements();
+
     renderRoomGrid();
     renderDivisionDetail();
+    renderBoardGoal();
+    renderAchievements();
     renderMarket();
     renderShop();
     renderSponsors();
@@ -1136,6 +1278,12 @@
     });
     if (!state.transferMarket) state.transferMarket = [];
     refillMarket();
+    if (typeof state.totalWeeks !== "number") state.totalWeeks = 0;
+    if (typeof state.boardGoalsCompleted !== "number") state.boardGoalsCompleted = 0;
+    if (typeof state.marketPurchasesEver !== "number") state.marketPurchasesEver = 0;
+    if (typeof state.hitNearBankruptcy !== "boolean") state.hitNearBankruptcy = false;
+    if (!state.achievementsUnlocked) state.achievementsUnlocked = {};
+    if (!state.boardGoal) state.boardGoal = generateBoardGoal();
     document.getElementById("start-wrap").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
     switchView("hq");
