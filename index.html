@@ -89,7 +89,7 @@
     background: var(--glass-strong); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
     border-top: 1px solid var(--glass-border); padding: 8px 6px calc(8px + env(safe-area-inset-bottom)); }
   .nav-btn { background: none; border: none; color: var(--text-dim); display: flex; flex-direction: column;
-    align-items: center; gap: 2px; font-size: 0.65rem; font-weight: 800; padding: 6px 14px; border-radius: 14px; }
+    align-items: center; gap: 2px; font-size: 0.62rem; font-weight: 800; padding: 6px 9px; border-radius: 14px; }
   .nav-btn .nb-icon { font-size: 1.25rem; }
   .nav-btn.active { color: var(--accent); background: rgba(34,200,240,0.14); }
 
@@ -130,6 +130,20 @@
   .rc-meta { font-size: 0.7rem; color: var(--text-dim); margin-top: 1px; }
   .bar-track { height: 6px; border-radius: 6px; background: rgba(0,0,0,0.3); overflow: hidden; margin-top: 5px; }
   .bar-fill { height: 100%; border-radius: 6px; }
+
+  .trait-row { margin-top: 4px; display: flex; gap: 4px; flex-wrap: wrap; }
+  .trait-chip { font-size: 0.6rem; font-weight: 700; background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border);
+    border-radius: 999px; padding: 2px 7px; white-space: nowrap; }
+
+  .roster-btn-col { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+  .roster-btn-col button { padding: 7px 11px; font-size: 0.72rem; }
+
+  .market-card { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 16px;
+    padding: 12px 14px; margin-bottom: 10px; }
+  .market-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .mc-name { font-weight: 800; font-size: 0.86rem; }
+  .mc-meta { font-size: 0.7rem; color: var(--text-dim); margin-top: 1px; }
+  .mc-expiry { font-size: 0.66rem; color: var(--gold); margin-top: 4px; }
 
   #division-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 9px; margin-top: 14px; }
   .pill-action { background: rgba(255,255,255,0.07); border: 1px solid var(--glass-border); color: var(--text);
@@ -262,6 +276,14 @@
         </div>
       </section>
 
+      <section id="view-market" class="view hidden">
+        <div class="glass panel">
+          <h2>💱 Rynek Transferowy</h2>
+          <p style="color:var(--text-dim); font-size:0.82rem; margin-bottom:14px;">Zakupieni zawodnicy trafiają do aktualnie wybranego oddziału w zakładce Sztab. Niekupieni znikają — czasem podkrada ich konkurencja.</p>
+          <div id="market-items"></div>
+        </div>
+      </section>
+
       <section id="view-sponsors" class="view hidden">
         <div class="glass panel">
           <h2>🤝 Sponsorzy</h2>
@@ -286,6 +308,7 @@
 
     <nav id="bottom-nav">
       <button class="nav-btn active" data-view="hq"><span class="nb-icon">🏢</span><span>Sztab</span></button>
+      <button class="nav-btn" data-view="market"><span class="nb-icon">💱</span><span>Rynek</span></button>
       <button class="nav-btn" data-view="shop"><span class="nb-icon">🏗️</span><span>Sklep</span></button>
       <button class="nav-btn" data-view="sponsors"><span class="nb-icon">🤝</span><span>Sponsorzy</span></button>
       <button class="nav-btn" data-view="log"><span class="nb-icon">📜</span><span>Dziennik</span></button>
@@ -352,6 +375,20 @@
   const SEASON_LENGTH = 10;
   const RIVALS_PER_SEASON = 4;
 
+  const TRAITS = [
+    { id: "leader",     name: "Lider Drużyny",              icon: "🎖️", desc: "Podnosi morale całej drużyny co tydzień." },
+    { id: "toxic",      name: "Utalentowany, ale Toksyczny", icon: "☠️", desc: "Szybciej się rozwija, ale obniża morale reszty składu." },
+    { id: "injury",     name: "Podatny na Kontuzje",         icon: "🩹", desc: "Częściej łapie drobne kontuzje." },
+    { id: "consistent", name: "Stabilny",                    icon: "🧊", desc: "Drużyna gra mniej losowo, gdy jest w składzie." },
+    { id: "media",      name: "Gwiazda Mediów",              icon: "📸", desc: "Generuje dodatkową reputację co tydzień." },
+    { id: "mentor",     name: "Mentor",                      icon: "🧑‍🏫", desc: "Przyspiesza rozwój pozostałych zawodników w składzie." },
+    { id: "prodigy",    name: "Wschodzący Talent",           icon: "🌟", desc: "Bardzo szybki rozwój, ale wymaga uwagi (obniża własne morale)." },
+    { id: "volatile",   name: "Niestabilny Emocjonalnie",    icon: "🎭", desc: "Duże wahania morale po wygranych i porażkach." },
+  ];
+
+  const MARKET_SIZE = 6;
+  const MARKET_LISTING_LIFESPAN = 3;
+
   const RANDOM_EVENTS = [
     { chance: 0.12, type: "good", text: "Viralowy klip jednego z Twoich zawodników przyciąga nowych fanów.", effect: s => { s.reputation = clamp(s.reputation + 4, 0, 100); } },
     { chance: 0.10, type: "bad",  text: "Nieoczekiwana faktura za wynajem biura.", effect: s => { s.money -= Math.round(500 + Math.random() * 500); } },
@@ -394,6 +431,7 @@
       selectedDivisionId: null,
       sponsors: [],
       upgrades: {},
+      transferMarket: [],
       over: false,
       log: [],
     };
@@ -421,9 +459,38 @@
   function getDivision(id) { return state.divisions.find(d => d.id === id) || null; }
   function selectedDivision() { return state.selectedDivisionId ? getDivision(state.selectedDivisionId) : null; }
 
+  function rollTraits() {
+    const r = Math.random();
+    let count = 0;
+    if (r < 0.5) count = 1;
+    else if (r < 0.65) count = 2;
+    if (count === 0) return [];
+    return TRAITS.slice().sort(() => Math.random() - 0.5).slice(0, count).map(t => t.id);
+  }
+
+  function hasTrait(p, id) { return !!(p && p.traits && p.traits.includes(id)); }
+  function traitInfo(id) { return TRAITS.find(t => t.id === id); }
+
   function generatePlayer(tier) {
     const skill = clamp(10 + tier * 5 + Math.random() * 25, 0, 100);
-    return { name: randomName(), skill: skill, morale: Math.round(60 + Math.random() * 20), salary: Math.round(80 + skill * 7) };
+    return { name: randomName(), skill: skill, morale: Math.round(60 + Math.random() * 20), salary: Math.round(80 + skill * 7), traits: rollTraits() };
+  }
+
+  function generateMarketListing() {
+    const tierFlavor = Math.floor(Math.random() * DIVISION_TIERS.length);
+    const p = generatePlayer(tierFlavor);
+    return {
+      id: p.name + "-" + Math.random().toString(36).slice(2, 7),
+      name: p.name, skill: p.skill, morale: p.morale, salary: p.salary, traits: p.traits,
+      askingPrice: Math.round(p.salary * (4 + Math.random() * 4)),
+      weeksLeft: MARKET_LISTING_LIFESPAN,
+    };
+  }
+
+  function refillMarket() {
+    while (state.transferMarket.length < MARKET_SIZE) {
+      state.transferMarket.push(generateMarketListing());
+    }
   }
 
   function generateRivals(tier) {
@@ -493,10 +560,11 @@
 
   // --- Round simulation ---
 
-  function simulateRounds(winChance) {
+  function simulateRounds(winChance, reducedVariance) {
     let my = 0, opp = 0;
+    const varianceScale = reducedVariance ? 0.15 : 0.3;
     while (my < 13 && opp < 13) {
-      const variance = (Math.random() - 0.5) * 0.3;
+      const variance = (Math.random() - 0.5) * varianceScale;
       if (Math.random() < clamp(winChance + variance, 0.08, 0.95)) my += 1; else opp += 1;
     }
     return { my: my, opp: opp };
@@ -584,6 +652,37 @@
     render();
   }
 
+  function sellPlayer(divId, slotIdx) {
+    const div = getDivision(divId);
+    if (!div) return;
+    const p = div.roster[slotIdx];
+    if (!p) return;
+    const price = Math.round(p.salary * 3);
+    div.roster[slotIdx] = null;
+    state.money += price;
+    addLog("💰 Sprzedajecie zawodnika " + p.name + " z " + div.title + " za " + money(price) + ".", "good");
+    render();
+  }
+
+  function buyFromMarket(listingId) {
+    if (state.over || state.actionPoints < 1) return;
+    const div = selectedDivision();
+    if (!div) { addLog("Najpierw wybierz oddział, do którego chcesz dopisać zawodnika.", "bad"); render(); return; }
+    const emptyIdx = div.roster.findIndex(p => p === null);
+    if (emptyIdx === -1) { addLog("Skład " + div.title + " jest już pełny.", "bad"); render(); return; }
+    const idx = state.transferMarket.findIndex(l => l.id === listingId);
+    if (idx === -1) return;
+    const listing = state.transferMarket[idx];
+    if (state.money < listing.askingPrice) { addLog("Za mało pieniędzy na transfer " + listing.name + ".", "bad"); render(); return; }
+    state.actionPoints -= 1;
+    state.money -= listing.askingPrice;
+    div.roster[emptyIdx] = { name: listing.name, skill: listing.skill, morale: listing.morale, salary: listing.salary, traits: listing.traits };
+    state.transferMarket.splice(idx, 1);
+    refillMarket();
+    addLog("💱 Kupujecie " + listing.name + " z rynku transferowego dla " + div.title + " za " + money(listing.askingPrice) + "!", "good");
+    render();
+  }
+
   function trainDivision(divId) {
     if (state.over || state.actionPoints < 1) return;
     const div = getDivision(divId);
@@ -595,7 +694,14 @@
     state.actionPoints -= 1;
     state.money -= cost;
     const bonus = owned("facility") ? 1.3 : 1;
-    filled.forEach(p => { p.skill = clamp(p.skill + (2 + Math.random() * 3) * bonus, 0, 100); });
+    const hasMentor = filled.some(p => hasTrait(p, "mentor"));
+    filled.forEach(p => {
+      let mult = bonus;
+      if (hasTrait(p, "toxic")) mult *= 1.3;
+      if (hasTrait(p, "prodigy")) mult *= 1.4;
+      if (hasMentor && !hasTrait(p, "mentor")) mult *= 1.2;
+      p.skill = clamp(p.skill + (2 + Math.random() * 3) * mult, 0, 100);
+    });
     addLog("📈 Trenujecie oddział " + div.title + ".", "good");
     render();
   }
@@ -617,7 +723,8 @@
     const avgSkill = active.reduce((s, p) => s + p.skill, 0) / active.length;
     const difficulty = opponent.power;
     const winChance = clamp(0.5 + (avgSkill - difficulty) / 100, 0.15, 0.88);
-    const result = simulateRounds(winChance);
+    const hasConsistent = active.some(p => hasTrait(p, "consistent"));
+    const result = simulateRounds(winChance, hasConsistent);
     const win = result.my > result.opp;
     const margin = clamp(Math.abs(result.my - result.opp) / 13, 0.15, 1);
     const tierInfo = DIVISION_TIERS[div.tier];
@@ -631,12 +738,18 @@
       state.reputation = clamp(state.reputation + (1 + margin * 4) * prBonus, 0, 100);
       div.wins += 1;
       div.seasonPoints += 3;
-      active.forEach(p => { p.skill = clamp(p.skill + (0.5 + Math.random()) * analystBonus, 0, 100); p.morale = clamp(p.morale + 3, 0, 100); });
+      active.forEach(p => {
+        let growthMult = analystBonus;
+        if (hasTrait(p, "toxic")) growthMult *= 1.3;
+        if (hasTrait(p, "prodigy")) growthMult *= 1.4;
+        p.skill = clamp(p.skill + (0.5 + Math.random()) * growthMult, 0, 100);
+        p.morale = clamp(p.morale + (hasTrait(p, "volatile") ? 6 : 3), 0, 100);
+      });
       addLog("🏆 " + div.title + " vs " + opponent.name + ": wygrywacie " + score + "! +" + money(prize) + ".", "good");
     } else {
       state.reputation = clamp(state.reputation - (1 + margin * 2), 0, 100);
       div.losses += 1;
-      active.forEach(p => { p.morale = clamp(p.morale - 4, 0, 100); });
+      active.forEach(p => { p.morale = clamp(p.morale - (hasTrait(p, "volatile") ? 8 : 4), 0, 100); });
       addLog("💀 " + div.title + " vs " + opponent.name + ": przegrywacie " + score + ".", "bad");
     }
     render();
@@ -716,7 +829,40 @@
     state.money += sponsorIncome;
 
     const moraleRegen = owned("medical") ? 3 : 1;
-    state.divisions.forEach(div => div.roster.forEach(p => { if (p) p.morale = clamp(p.morale + moraleRegen, 0, 100); }));
+    state.divisions.forEach(div => {
+      const filled = div.roster.filter(p => p);
+      const hasLeader = filled.some(p => hasTrait(p, "leader"));
+      const hasToxic = filled.some(p => hasTrait(p, "toxic"));
+      filled.forEach(p => {
+        let delta = moraleRegen;
+        if (hasLeader) delta += 2;
+        if (hasToxic && !hasTrait(p, "toxic")) delta -= 1;
+        if (hasTrait(p, "prodigy")) delta -= 1;
+        p.morale = clamp(p.morale + delta, 0, 100);
+
+        if (hasTrait(p, "media")) state.reputation = clamp(state.reputation + 1, 0, 100);
+        if (hasTrait(p, "injury") && Math.random() < 0.06) {
+          p.skill = clamp(p.skill - (2 + Math.random() * 3), 0, 100);
+          p.morale = clamp(p.morale - 8, 0, 100);
+          addLog("🩹 " + p.name + " (" + div.title + ") łapie drobną kontuzję.", "bad");
+        }
+      });
+    });
+
+    state.transferMarket.forEach(l => { l.weeksLeft -= 1; });
+    const survivors = [];
+    state.transferMarket.forEach(l => {
+      if (l.weeksLeft <= 0) {
+        addLog("📤 " + l.name + " podpisuje kontrakt gdzie indziej i znika z rynku transferowego.", "info");
+      } else if (Math.random() < 0.12) {
+        const rival = RIVAL_ORG_NAMES[Math.floor(Math.random() * RIVAL_ORG_NAMES.length)];
+        addLog("📤 " + l.name + " zostaje podkradziony z rynku przez " + rival + "!", "bad");
+      } else {
+        survivors.push(l);
+      }
+    });
+    state.transferMarket = survivors;
+    refillMarket();
 
     let roll = Math.random();
     let acc = 0;
@@ -764,6 +910,7 @@
   function startGame() {
     const orgName = document.getElementById("org-name-input").value.trim() || "Moja Organizacja";
     state = defaultState(orgName);
+    refillMarket();
     addLog("🎬 Zakładasz organizację " + orgName + ". Otwórz swój pierwszy oddział, by zacząć rywalizację!", "info");
     document.getElementById("start-wrap").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
@@ -796,6 +943,27 @@
     container.querySelectorAll(".shop-buy-btn").forEach(btn => {
       btn.addEventListener("click", () => buyUpgrade(btn.getAttribute("data-id")));
     });
+  }
+
+  function renderMarket() {
+    const container = document.getElementById("market-items");
+    if (!state.transferMarket.length) {
+      container.innerHTML = '<p style="color:var(--text-dim); font-size:0.85rem;">Rynek jest chwilowo pusty — wróć za tydzień.</p>';
+      return;
+    }
+    container.innerHTML = state.transferMarket.map(l => {
+      const traitsHtml = (l.traits && l.traits.length)
+        ? '<div class="trait-row">' + l.traits.map(id => { const t = traitInfo(id); return t ? '<span class="trait-chip" title="' + t.desc + '">' + t.icon + ' ' + t.name + '</span>' : ""; }).join("") + '</div>'
+        : "";
+      const canAfford = state.money >= l.askingPrice && state.actionPoints >= 1;
+      return '<div class="market-card">' +
+        '<div class="market-card-top">' +
+          '<div><div class="mc-name">' + l.name + '</div><div class="mc-meta">Skill ' + Math.round(l.skill) + ' · Pensja ' + money(l.salary) + '/tydz.</div>' + traitsHtml + '<div class="mc-expiry">Wygasa za ' + l.weeksLeft + ' tydz.</div></div>' +
+          '<button class="shop-buy-btn" data-buy="' + l.id + '"' + (canAfford ? '' : ' disabled') + '>Kup — ' + money(l.askingPrice) + '</button>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+    container.querySelectorAll("[data-buy]").forEach(btn => btn.addEventListener("click", () => buyFromMarket(btn.getAttribute("data-buy"))));
   }
 
   function renderSponsors() {
@@ -860,11 +1028,20 @@
       '</div>';
     }
 
+    function traitChips(p) {
+      if (!p.traits || !p.traits.length) return "";
+      return '<div class="trait-row">' + p.traits.map(id => {
+        const t = traitInfo(id);
+        return t ? '<span class="trait-chip" title="' + t.desc + '">' + t.icon + ' ' + t.name + '</span>' : "";
+      }).join("") + '</div>';
+    }
+
     if (div.pendingCandidate) {
       html += div.pendingCandidate.map((c, i) =>
         '<div class="candidate-card">' +
           '<div class="rc-name">' + c.name + '</div>' +
           '<div class="rc-meta">Skill ' + Math.round(c.skill) + ' · Pensja ' + money(c.salary) + '/tydz. · Bonus podpisania ' + money(c.salary * 2) + '</div>' +
+          traitChips(c) +
           '<div class="candidate-actions">' +
             '<button class="small good" data-sign="' + i + '">Podpisz</button>' +
             '<button class="small secondary" data-reject="1">Odrzuć</button>' +
@@ -875,7 +1052,7 @@
 
     html += div.roster.map((p, idx) => {
       if (!p) return '<div class="roster-card"><div class="rc-avatar dim">➕</div><div class="rc-info"><div class="rc-name" style="color:var(--text-dim)">Pusty slot</div></div><button class="shop-buy-btn" data-scout="1">🔎 Skautuj</button></div>';
-      return '<div class="roster-card"><div class="rc-avatar">🎮</div><div class="rc-info"><div class="rc-name">' + p.name + '</div><div class="rc-meta">Skill ' + Math.round(p.skill) + ' · Morale ' + Math.round(p.morale) + ' · ' + money(p.salary) + '/tydz.</div><div class="bar-track"><div class="bar-fill" style="width:' + Math.round(p.skill) + '%; background:var(--accent);"></div></div></div><button class="shop-buy-btn" data-release="' + idx + '">Zwolnij</button></div>';
+      return '<div class="roster-card"><div class="rc-avatar">🎮</div><div class="rc-info"><div class="rc-name">' + p.name + '</div><div class="rc-meta">Skill ' + Math.round(p.skill) + ' · Morale ' + Math.round(p.morale) + ' · ' + money(p.salary) + '/tydz.</div><div class="bar-track"><div class="bar-fill" style="width:' + Math.round(p.skill) + '%; background:var(--accent);"></div></div>' + traitChips(p) + '</div><div class="roster-btn-col"><button class="shop-buy-btn" data-sell="' + idx + '">💰 Sprzedaj</button><button class="shop-buy-btn secondary" data-release="' + idx + '">Zwolnij</button></div></div>';
     }).join("");
 
     html += '<div id="division-actions">' +
@@ -892,6 +1069,7 @@
     const rejectBtn = panel.querySelector("[data-reject]");
     if (rejectBtn) rejectBtn.addEventListener("click", () => rejectCandidates(div.id));
     panel.querySelectorAll("[data-release]").forEach(btn => btn.addEventListener("click", () => releasePlayer(div.id, parseInt(btn.getAttribute("data-release"), 10))));
+    panel.querySelectorAll("[data-sell]").forEach(btn => btn.addEventListener("click", () => sellPlayer(div.id, parseInt(btn.getAttribute("data-sell"), 10))));
     panel.querySelector("[data-train]").addEventListener("click", () => trainDivision(div.id));
     panel.querySelector("[data-compete]").addEventListener("click", () => competeDivision(div.id));
     panel.querySelector("[data-close]").addEventListener("click", () => closeDivision(div.id));
@@ -918,6 +1096,7 @@
 
     renderRoomGrid();
     renderDivisionDetail();
+    renderMarket();
     renderShop();
     renderSponsors();
     renderLog();
@@ -946,7 +1125,11 @@
     state.divisions.forEach(div => {
       if (!div.season) div.season = newSeason(div.tier);
       if (typeof div.seasonPoints !== "number") div.seasonPoints = 0;
+      div.roster.forEach(p => { if (p && !p.traits) p.traits = []; });
+      if (div.pendingCandidate) div.pendingCandidate.forEach(c => { if (!c.traits) c.traits = []; });
     });
+    if (!state.transferMarket) state.transferMarket = [];
+    refillMarket();
     document.getElementById("start-wrap").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
     switchView("hq");
