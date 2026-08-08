@@ -1,8 +1,0 @@
-# Godot 4 local editor/import cache — regenerated automatically, must not be committed.
-.godot/
-export.cfg
-export_credentials.cfg
-*.translation
-
-# Export output
-/exports/
