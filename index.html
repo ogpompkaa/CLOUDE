@@ -2213,7 +2213,7 @@
   function maybeOffer(force) {
     const mv = marketValue();
     const targetTier = clamp(Math.floor(mv / 42), 0, 4);
-    const chance = force ? 1 : clamp((mv - 40) / 800, 0, 0.25) * (owned("manager") ? 2 : 1) * (state.extras && state.extras.lowBuyout ? 1.6 : 1) * diffDef().offerMul;
+    const chance = force ? 1 : clamp((mv - 35) / 550, 0, 0.32) * (owned("manager") ? 2 : 1) * (state.extras && state.extras.lowBuyout ? 1.6 : 1) * diffDef().offerMul;
     if (Math.random() > chance) return;
     if (state.offers.length >= 3) return;
     // awans co najwyżej o jeden poziom naraz
@@ -2397,12 +2397,14 @@
 
     // reakcja drużyny
     let note = "";
-    const expected = 1.0 + (state.team.tier - 2) * 0.02 + diffDef().expected;
+    const rel = playerPower() - matesAvg();
+    const expected = 0.93 + clamp(rel * 0.005, -0.05, 0.09) + diffDef().expected;
     if (ss.matches >= 6 && r < expected - 0.12) {
       state.team.patience--;
       if (state.team.patience <= 0) {
         const newTier = clamp(state.team.tier - 1, 0, 4);
         const nt = makeTeam(newTier);
+        nt.patience = 4;
         note = TR("season.cut", { team: state.team.name, next: nt.name });
         addLog(TR("log.dropped", { team: state.team.name, next: nt.name }), "bad");
         state.team = nt;
