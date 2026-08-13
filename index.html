@@ -1105,11 +1105,11 @@
     const adv = clamp(0.5 + (playerPower() - oppStr) * 0.012, 0.16, 0.88);
     live = {
       a: 0, b: 0, round: 0, k: 0, d: 0, dmg: 0, aces: 0, feed: [],
-      kpr: 0.42 + adv * 0.52, dieP: clamp(0.78 - (adv - 0.5) * 0.5, 0.34, 0.92),
+      kpr: 0.42 + adv * 0.52, dieP: clamp(0.68 - (adv - 0.5) * 0.5, 0.30, 0.88),
       mates: state.team.mates.map(m => {
         const ms = clamp(0.5 + (m.skill - oppStr) * 0.012, 0.14, 0.9);
         return { nick: m.nick, k: 0, d: 0, dmg: 0, kpr: 0.42 + ms * 0.52,
-                 dieP: clamp(0.78 - (ms - 0.5) * 0.5, 0.34, 0.92) };
+                 dieP: clamp(0.68 - (ms - 0.5) * 0.5, 0.30, 0.88) };
       }),
       oppStr: oppStr, mapName: mapName, oppName: oppName, title: title, mapNo: mapNo, bo: bo,
       speed: 0, timer: null, decisions: decisionsUsed, done: done, over: false,
@@ -1227,10 +1227,10 @@
     clearTimeout(L.timer);
     const rounds = Math.max(1, L.a + L.b);
     const kpr = L.k / rounds, dpr = L.d / rounds, adr = L.dmg / rounds;
-    const rating = clamp(0.5 * (kpr / 0.68) + 0.3 * (adr / 78) + 0.2 * ((1 - dpr) / 0.26) + matchMods.rating, 0.30, 2.20);
+    const rating = clamp(0.5 * (kpr / 0.68) + 0.3 * (adr / 78) + 0.2 * ((1 - dpr) / 0.32) + matchMods.rating, 0.30, 2.20);
     const mates = L.mates.map(m => {
       const mk = m.k / rounds, md = m.d / rounds, ma = m.dmg / rounds;
-      return { nick: m.nick, rating: +clamp(0.5 * (mk / 0.68) + 0.3 * (ma / 78) + 0.2 * ((1 - md) / 0.26), 0.30, 2.10).toFixed(2),
+      return { nick: m.nick, rating: +clamp(0.5 * (mk / 0.68) + 0.3 * (ma / 78) + 0.2 * ((1 - md) / 0.32), 0.30, 2.10).toFixed(2),
                kills: m.k, deaths: m.d, adr: Math.round(ma) };
     });
     const res = {
