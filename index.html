@@ -270,9 +270,9 @@
     justify-content: center; padding: 18px; z-index: 20; }
   #tutorial-overlay { z-index: 21; }
   #help-overlay { z-index: 27; }
-  #choice-overlay { z-index: 22; }
+  #modal-overlay { z-index: 22; }
   #rank-overlay { z-index: 23; }
-  #modal-overlay { z-index: 24; }
+  #choice-overlay { z-index: 24; }
   #save-overlay { z-index: 26; }
   .overlay-box { max-width: 470px; width: 100%; padding: 22px 20px; max-height: 88vh; overflow-y: auto; }
   .match-head { text-align: center; margin-bottom: 14px; }
@@ -842,12 +842,34 @@
     "rank.world": ["Świat", "World"],
     "rank.hint": ["Kliknij, aby zobaczyć pełny ranking", "Tap to see the full ranking"],
     "ladder.stage": ["Droga na scenę", "The climb"],
+    "ladder.monthTitle": ["Miesiąc grania", "A month of games"],
+    "ladder.monthSub": ["Kolejka: {q}", "Queue: {q}"],
+    "ladder.record": ["Bilans", "Record"],
+    "ladder.divWins": ["{n} wygranych w dywizji", "{n} division wins"],
+    "ladder.playMonth": ["Zagraj miesiąc", "Play the month"],
+    "le.school.all": ["Trenujesz po nocach. Aim rośnie, w domu jest chłodno.", "You practise through the night. Your aim climbs, home gets frosty."],
+    "le.school.mid": ["Ustalasz godziny. Mniej gry, więcej spokoju.", "You agree on hours. Less play, more calm."],
+    "le.stack.yes": ["Masz stały skład. Gracie zgraniej z tygodnia na tydzień.", "You have a regular five. You click better every week."],
+    "le.stack.no": ["Zostajesz solo. Twoje elo, Twoje zasady.", "You stay solo. Your elo, your rules."],
+    "le.cup.win": ["Wygrywacie turniej! Nagroda: {money}.", "You win the cup! Prize: {money}."],
+    "le.cup.lose": ["Odpadacie, ale kilka osób zapamiętało nick.", "You are knocked out, but a few people remember the nick."],
+    "le.cup.skip": ["Zostajesz przy swoim grafiku.", "You stick to your own schedule."],
+    "le.coach.broke": ["Nie stać Cię na sesje. Na razie.", "You cannot afford the sessions. Not yet."],
+    "le.coach.yes": ["Sesje robią robotę — widzisz na mapie rzeczy, których wcześniej nie było.",
+      "The sessions work — you see things on the map you never noticed."],
+    "le.coach.no": ["Sam przerabiasz dema. Wolniej, ale za darmo.", "You work through demos alone. Slower, but free."],
+    "le.tilt.good": ["Seria pęka, forma wraca.", "The streak breaks and your form returns."],
+    "le.tilt.bad": ["Kolejne przegrane. Głowa nie wytrzymuje.", "More losses. Your head gives out."],
+    "le.tilt.rest": ["Tydzień bez gry robi więcej niż dziesięć meczów.", "A week away does more than ten more matches."],
+    "le.academy.pass": ["Przechodzisz testy — trafiasz do składu akademii!", "You pass — you are in the academy squad!"],
+    "le.academy.fail": ["Odpadasz na testach. Wrócisz mocniejszy.", "You do not make the cut. You will come back stronger."],
+    "le.academy.skip": ["Zostajesz przy swoim planie.", "You stick to your plan."],
     "ladder.noTeam": ["bez drużyny", "no team"],
     "ladder.locked": ["zablokowane", "locked"],
     "ladder.matches": ["Rozegrane mecze", "Matches played"],
     "ladder.play": ["Zagraj tydzień", "Play the week"],
-    "ladder.hint": ["Wybierz, gdzie grasz w tym tygodniu. Energię wydajesz na trening jak zwykle.",
-      "Pick where you queue this week. Energy goes on training as usual."],
+    "ladder.hint": ["Wybierz, gdzie grasz w tym miesiącu. Energia to plan treningowy na te cztery tygodnie.",
+      "Pick where you queue this month. Energy is your training plan for those four weeks."],
     "ladder.needPremier": ["Wymaga {n} CS Rating", "Requires {n} CS Rating"],
     "ladder.needElo": ["Wymaga {n} elo na FACEIT", "Requires {n} FACEIT elo"],
     "ladder.goalTitle": ["Następny krok", "Next step"],
@@ -2074,8 +2096,9 @@
     const a = ACTIONS.find(x => x.id === id);
     if (!a || state.energy < a.cost) return;
     state.energy -= a.cost;
+    const spanMul = inLadder() ? 2.2 : 1;      // na drabince tydzień akcji to cały miesiąc pracy
     if (a.stat) {
-      const g = growth(a.stat, a.gain * (state.stamina < 30 ? 0.45 : 1));
+      const g = growth(a.stat, a.gain * spanMul * (state.stamina < 30 ? 0.45 : 1));
       state.stats[a.stat] = clamp(state.stats[a.stat] + g, 1, 99);
     }
     if (a.stam) state.stamina = clamp(state.stamina + (a.stam < 0 ? a.stam * (archDef().staminaMul || 1) : a.stam), 0, 100);
@@ -2219,7 +2242,7 @@
     const p = clamp(0.5 + (ladderPower() - opp) * 0.03, 0.15, 0.9);
     let w = 0, l = 0;
     for (let i = 0; i < 3; i++) { if (Math.random() < p) w++; else l++; }
-    const delta = Math.round((w - l) * irnd(180, 420) * (1 + L.premier / 40000));
+    const delta = Math.round((w - l) * irnd(260, 560) * (1 + L.premier / 40000));
     L.premier = clamp(L.premier + delta, 1000, 35000);
     L.matches += 3;
     addLog(TR("ladder.premierLog", { w: w, l: l, delta: (delta > 0 ? "+" : "") + delta, rating: L.premier }),
@@ -2234,7 +2257,7 @@
     let w = 0, l = 0;
     for (let i = 0; i < 3; i++) { if (Math.random() < p) w++; else l++; }
     const before = faceitLevel(L.elo);
-    L.elo = clamp(L.elo + (w - l) * irnd(25, 38), 100, 3000);
+    L.elo = clamp(L.elo + (w - l) * irnd(32, 48), 100, 3000);
     L.matches += 3;
     const after = faceitLevel(L.elo);
     addLog(TR("ladder.faceitLog", { w: w, l: l, elo: L.elo, lvl: after }), w >= l ? "good" : "bad");
@@ -2251,7 +2274,7 @@
     L.divWins += w;
     L.matches += 3;
     addLog(TR("ladder.eslLog", { div: tx(div.name), w: w, l: l, total: L.divWins }), w >= l ? "good" : "bad");
-    if (L.divWins >= div.promo * 3 && L.div < ESL_DIVS.length - 1) {
+    if (L.divWins >= div.promo * 2 && L.div < ESL_DIVS.length - 1) {
       L.div++;
       L.divWins = 0;
       L.mates = clamp(L.mates + 4, 0, 30);
@@ -2260,26 +2283,122 @@
     return { w: w, l: l };
   }
 
-  function ladderWeek() {
-    const q = state.ladder.queue;
-    if (q === "faceit" && !faceitUnlocked()) state.ladder.queue = "premier";
-    if (q === "esl" && !eslUnlocked()) state.ladder.queue = faceitUnlocked() ? "faceit" : "premier";
-    const res = state.ladder.queue === "esl" ? playEsl()
-      : state.ladder.queue === "faceit" ? playFaceit() : playPremier();
-    state.stamina = clamp(state.stamina - 7, 0, 100);
-    state.form = clamp(state.form + (res.w > res.l ? 5 : -4), 0, 100);
-    state.hype = clamp(state.hype + (state.ladder.queue === "esl" ? 0.8 : 0.2), 0, 100);
-    // rozwój z samej gry
-    ["aim", "reflex", "sense"].forEach(k => { state.stats[k] = clamp(state.stats[k] + growth(k, 0.6), 1, 99); });
+  // Wydarzenia z drabinki — dają decyzje zamiast samego klikania „dalej”
+  const LADDER_EVENTS = [
+    { id: "school", title: ["Szkoła kontra serwery", "School versus servers"],
+      text: ["Rodzice widzą oceny i pytają, ile czasu schodzi Ci na graniu.",
+             "Your parents have seen your grades and ask how much time the game is taking."], opts: [
+      { label: ["Granie na pełny etat", "Go all in on the game"], desc: ["Statystyki lecą w górę, atmosfera w domu w dół.", "Stats climb, the mood at home drops."],
+        eff: () => { ["aim", "reflex"].forEach(k => { state.stats[k] = clamp(state.stats[k] + growth(k, 3), 1, 99); });
+          state.mental = clamp(state.mental - 12, 0, 100); return TR("le.school.all"); } },
+      { label: ["Kompromis", "Find a balance"], desc: ["Mniej godzin, ale spokojna głowa.", "Fewer hours, but a clear head."],
+        eff: () => { state.stats.sense = clamp(state.stats.sense + growth("sense", 1.5), 1, 99);
+          state.mental = clamp(state.mental + 8, 0, 100); return TR("le.school.mid"); } },
+    ]},
+    { id: "stack", title: ["Propozycja stacka", "A five-stack offer"],
+      text: ["Znajomi z FACEIT-a szukają piątego do stałego składu.",
+             "Regulars from your FACEIT lobbies need a fifth for a permanent stack."], opts: [
+      { label: ["Wchodzę w skład", "Join the stack"], desc: ["Gracie razem — ligi ESEA idą znacznie lepiej.", "Playing together makes ESEA far easier."],
+        eff: () => { state.ladder.mates = clamp(state.ladder.mates + 6, 0, 30);
+          state.stats.team = clamp(state.stats.team + growth("team", 2.5), 1, 99); return TR("le.stack.yes"); } },
+      { label: ["Gram solo", "Stay solo"], desc: ["Sam odpowiadasz za swoje elo.", "Your elo stays entirely your own."],
+        eff: () => { state.stats.aim = clamp(state.stats.aim + growth("aim", 2), 1, 99); return TR("le.stack.no"); } },
+    ]},
+    { id: "cup", title: ["Turniej online", "Online cup"],
+      text: ["Otwarty turniej z pulą nagród. Zapisy kończą się dziś.",
+             "An open cup with a prize pool. Sign-ups close today."], opts: [
+      { label: ["Gramy", "Enter"], desc: ["Szansa na kasę i pierwsze zauważenie.", "A shot at cash and your first bit of attention."],
+        eff: () => {
+          const won = Math.random() < clamp(0.2 + (ladderPower() - 45) * 0.02, 0.05, 0.75);
+          if (won) { const m2 = irnd(2000, 9000); state.money += m2; state.career.earned += m2;
+            state.hype = clamp(state.hype + 6, 0, 100); return TR("le.cup.win", { money: money(m2) }); }
+          state.hype = clamp(state.hype + 1, 0, 100); return TR("le.cup.lose"); } },
+      { label: ["Odpuszczam", "Skip it"], desc: ["Wolisz spokojnie zbierać elo.", "You would rather grind elo in peace."],
+        eff: () => { state.stamina = clamp(state.stamina + 10, 0, 100); return TR("le.cup.skip"); } },
+    ]},
+    { id: "coach", title: ["Trener z internetu", "A coach from the internet"],
+      text: ["Były zawodnik oferuje płatne sesje indywidualne.",
+             "A former pro offers paid one-on-one sessions."], opts: [
+      { label: ["Płacę za sesje", "Pay for the sessions"], desc: ["Kosztuje, ale game sense skacze.", "It costs money, but your game sense jumps."],
+        eff: () => { if (state.money < 3000) return TR("le.coach.broke");
+          state.money -= 3000; state.stats.sense = clamp(state.stats.sense + growth("sense", 4), 1, 99);
+          state.stats.util = clamp(state.stats.util + growth("util", 3), 1, 99); return TR("le.coach.yes"); } },
+      { label: ["Uczę się sam", "Learn on your own"], desc: ["Dema i teoria za darmo.", "Demos and theory cost nothing."],
+        eff: () => { state.stats.sense = clamp(state.stats.sense + growth("sense", 1.5), 1, 99); return TR("le.coach.no"); } },
+    ]},
+    { id: "tilt", title: ["Seria porażek", "A losing streak"],
+      text: ["Kilkanaście przegranych z rzędu. Ręce same odpalają kolejny mecz.",
+             "A dozen losses in a row and your hands keep queueing anyway."], opts: [
+      { label: ["Gram dalej", "Keep queueing"], desc: ["Może się odbije. Albo pogłębi.", "It might turn around. Or get worse."],
+        eff: () => { if (Math.random() < 0.5) { state.form = clamp(state.form + 12, 0, 100); return TR("le.tilt.good"); }
+          state.mental = clamp(state.mental - 14, 0, 100); state.form = clamp(state.form - 10, 0, 100); return TR("le.tilt.bad"); } },
+      { label: ["Przerwa na tydzień", "Take a week off"], desc: ["Głowa odpoczywa, elo stoi.", "Your head rests, your elo does not move."],
+        eff: () => { state.mental = clamp(state.mental + 16, 0, 100); state.form = clamp(state.form + 5, 0, 100); return TR("le.tilt.rest"); } },
+    ]},
+    { id: "academy", title: ["Testy do akademii", "Academy tryouts"],
+      text: ["Organizacja z Twojego regionu robi otwarte testy do składu akademii.",
+             "An organisation from your region is holding open tryouts for its academy squad."], opts: [
+      { label: ["Jadę na testy", "Go to the tryouts"], desc: ["Ocenią Cię tu i teraz.", "They judge you on the spot."],
+        eff: () => {
+          const ok = Math.random() < clamp(0.15 + (ladderPower() - 48) * 0.022, 0.05, 0.8);
+          if (ok) { state.ladder.div = Math.max(state.ladder.div, 1); state.ladder.mates = clamp(state.ladder.mates + 5, 0, 30);
+            state.hype = clamp(state.hype + 8, 0, 100); maybeProOffer(); return TR("le.academy.pass"); }
+          state.mental = clamp(state.mental - 6, 0, 100); return TR("le.academy.fail"); } },
+      { label: ["Jeszcze nie teraz", "Not yet"], desc: ["Wolisz przyjść lepiej przygotowany.", "You would rather come back sharper."],
+        eff: () => { state.form = clamp(state.form + 4, 0, 100); return TR("le.academy.skip"); } },
+    ]},
+  ];
+
+  function runLadderEvent(done) {
+    const ev = pick(LADDER_EVENTS);
+    showChoice(tx(ev.title), tx(ev.text), ev.opts.map(o => ({ label: tx(o.label), desc: tx(o.desc) })), i => {
+      const txt = ev.opts[i].eff();
+      addLog(tx(ev.title) + ": " + txt, "info");
+      closeChoice();
+      showModal(tx(ev.title), txt, "");
+      modalAfterClose = done;
+    });
+  }
+
+  // Jeden klik na drabince to miesiąc grania — bez tego byłaby to sama klikanina
+  const LADDER_WEEKS = 4;
+
+  function ladderMonth() {
+    const L = state.ladder;
+    if (L.queue === "faceit" && !faceitUnlocked()) L.queue = "premier";
+    if (L.queue === "esl" && !eslUnlocked()) L.queue = faceitUnlocked() ? "faceit" : "premier";
+    const before = { premier: L.premier, elo: L.elo, div: L.div, lvl: faceitLevel(L.elo) };
+    let w = 0, l = 0;
+    for (let i = 0; i < LADDER_WEEKS; i++) {
+      const res = L.queue === "esl" ? playEsl() : L.queue === "faceit" ? playFaceit() : playPremier();
+      w += res.w; l += res.l;
+      state.stamina = clamp(state.stamina - 5, 0, 100);
+      state.form = clamp(state.form + (res.w > res.l ? 4 : -3), 0, 100);
+      ["aim", "reflex", "sense"].forEach(k => { state.stats[k] = clamp(state.stats[k] + growth(k, 0.6), 1, 99); });
+    }
+    state.hype = clamp(state.hype + (L.queue === "esl" ? 2.5 : 0.8), 0, 100);
     maybeProOffer();
-    advanceLadderWeek();
+
+    const rows = [];
+    if (L.queue === "premier") rows.push(["CS Rating", before.premier + " → " + L.premier]);
+    if (L.queue === "faceit") rows.push(["FACEIT elo", before.elo + " → " + L.elo + " (lvl " + faceitLevel(L.elo) + ")"]);
+    if (L.queue === "esl") rows.push([tx(ESL_DIVS[L.div].name), TR("ladder.divWins", { n: L.divWins })]);
+    rows.push([TR("ladder.record"), w + "W / " + l + "P"]);
+    showModal(TR("ladder.monthTitle"), TR("ladder.monthSub", { q: tx(QUEUES.find(q => q.id === L.queue).name) }),
+      rows.map(x => '<div class="recap-line"><span>' + esc(x[0]) + "</span><b>" + esc(x[1]) + "</b></div>").join(""));
+    modalAfterClose = () => {
+      advanceLadderMonth();
+      const seasonModalOpen = !document.getElementById("modal-overlay").classList.contains("hidden");
+      if (!seasonModalOpen && Math.random() < 0.4) { runLadderEvent(() => { render(); save(); }); return; }
+      render(); save();
+    };
   }
 
   // Organizacje zaczynają dzwonić dopiero z ESEA Advanced wzwyż
   function maybeProOffer() {
     const L = state.ladder;
     if (L.div < 2 || state.offers.length) return;
-    const chance = clamp((L.div - 1) * 0.05 + (ladderPower() - 55) * 0.006, 0, 0.22);
+    const chance = clamp((L.div - 1) * 0.16 + (ladderPower() - 50) * 0.012, 0, 0.55);
     if (Math.random() > chance) return;
     const t = clamp(L.div - 1, 0, 2);
     const team = makeTeam(t);
@@ -2292,16 +2411,16 @@
     addLog(TR("ladder.scouted", { team: team.name }), "gold");
   }
 
-  function advanceLadderWeek() {
-    state.money += 200;                       // drobne z turniejów online
-    state.stamina = clamp(state.stamina + 9, 0, 100);
-    state.mental = clamp(state.mental + 3, 0, 100);
+  function advanceLadderMonth() {
+    state.money += 800;                       // drobne z turniejów online
+    state.stamina = clamp(state.stamina + 20, 0, 100);
+    state.mental = clamp(state.mental + 8, 0, 100);
     state.energy = MAX_ENERGY;
     if (state.weekPlan && state.weekPlan.length) state.lastPlan = state.weekPlan.slice();
     state.weekPlan = [];
     state.offers.forEach(o => o.ttl--);
     state.offers = state.offers.filter(o => o.ttl > 0);
-    state.week++;
+    state.week += LADDER_WEEKS;
     if (state.week > SEASON_LENGTH) {
       state.week = 1;
       state.season++;
@@ -2333,7 +2452,7 @@
 
   function nextWeek() {
     if (inPhase2()) { nextWeek2(); return; }
-    if (inLadder()) { ladderWeek(); render(); save(); return; }
+    if (inLadder()) { ladderMonth(); render(); save(); return; }
     const ev = currentEvent();
     const isMatch = ev.type === "league" || ev.type === "event" || ev.type === "playoff";
     if (!isMatch) { advanceWeek(); render(); save(); return; }
@@ -3575,7 +3694,7 @@
         : faceitUnlocked() ? TR("ladder.goalFaceit") : TR("ladder.goalPremier", { n: FACEIT_GATE })) + "</div></div>";
     document.getElementById("btn-skip").classList.add("hidden");
     document.getElementById("week-hint").textContent = TR("ladder.hint");
-    document.getElementById("cta-next").innerHTML = TR("ladder.play") + " " + icon("arrow-right");
+    document.getElementById("cta-next").innerHTML = TR("ladder.playMonth") + " " + icon("arrow-right");
   }
 
   function renderCareer2() {

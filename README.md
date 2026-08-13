@@ -19,13 +19,19 @@ pod ekran telefonu, ale działa na każdej szerokości.
 
 ## Droga na scenę
 
-Kariera zaczyna się w wieku **12–13 lat**, bez drużyny i bez kontraktu. Grasz otwarty
-matchmaking i pniesz się po realnej drabince:
+Kariera zaczyna się w wieku **12–13 lat**, bez drużyny i bez kontraktu. Na tym etapie jeden
+klik to **cały miesiąc grania** (kilkanaście meczów w wybranej kolejce), więc droga na scenę
+to kilkadziesiąt decyzji, a nie kilkaset kliknięć. Pniesz się po realnej drabince:
 
 1. **CS2 Premier** — zbierasz CS Rating. Przy **15 000** lobby FACEIT przestają być stratą czasu.
 2. **FACEIT** — elo i poziomy 1–10. **Poziom 9 (1700 elo)** otwiera ligi ESEA.
 3. **ESEA / ESL** — Open, Main, Advanced i ESL Challenger League. Awans wymaga serii wygranych,
    a od **Advanced** zaczynają dzwonić organizacje.
+
+Co kilka miesięcy dzieje się coś, co wymaga decyzji: rodzice pytają o oceny, znajomi szukają
+piątego do stacka, pojawia się otwarty turniej, płatny trener, seria porażek albo testy do
+akademii. Wybory realnie zmieniają statystyki, psychikę i to, jak szybko wchodzisz wyżej.
+Typowa droga to pierwszy kontrakt około **17 roku życia**.
 
 Podpisanie pierwszego kontraktu kończy grind i uruchamia pełną karierę klubową opisaną niżej.
 W grze występuje **ponad 70 prawdziwych organizacji** podzielonych na regiony (Europa, WNP,
