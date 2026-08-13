@@ -3028,6 +3028,11 @@
     t = Math.min(t, state.team.tier + 1);
     if (t < state.team.tier && Math.random() < 0.75) return;
     const team = makeTeam(t);
+    // większość ofert przychodzi z Twojej sceny — wyjazd za granicę ma być decyzją, nie normą
+    if (Math.random() < 0.68) {
+      const local = ORGS.filter(o => o.r === myRegion() && Math.abs(o.t - t) <= 1 && o.n !== state.team.name);
+      if (local.length) team.name = pick(local).n;
+    }
     if (team.name === state.team.name) return;
     const offer = {
       id: "o" + Date.now() + Math.floor(Math.random() * 999),
