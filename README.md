@@ -38,8 +38,20 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
 - **Pieniądze** — sprzęt, trener, analityk, psycholog, menedżer, fizjoterapeuta i mieszkanie,
   a do tego portfel inwestycyjny liczony do punktów Hall of Fame.
 
-Kariera kończy się przejściem na emeryturę (samodzielnie albo z wiekiem), a jej podsumowaniem
-jest wynik Hall of Fame liczony z trofeów, rankingu, ratingu i zarobków.
+Przy pierwszym uruchomieniu przeprowadza Cię krótki samouczek, a pełne wyjaśnienie statystyk
+i systemów jest zawsze pod przyciskiem **?** w pasku u góry.
+
+## Drugi rozdział
+
+Kiedy zawieszasz myszkę — samodzielnie albo z wiekiem — nie musisz znikać ze sceny.
+Możesz zostać **trenerem** (Twój warsztat podnosi siłę drużyny w meczach), **analitykiem**
+(mniej losowości i stały dopływ zleceń) albo **streamerem** (bez meczów, za to z widownią,
+która rośnie od contentu i odpływa, gdy nic nie wrzucasz). Drugi rozdział ma własne akcje
+tygodniowe, własne trofea i toczy się w tym samym kalendarzu.
+
+Definitywne zakończenie kariery zapisuje ją w lokalnym **Hall of Fame** — galerii wszystkich
+Twoich zawodników z punktacją liczoną z trofeów, rankingu, ratingu i zarobków. Kolejne kariery
+dopisują się do listy, więc można je porównywać.
 
 ## Testy
 

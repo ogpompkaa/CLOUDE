@@ -137,7 +137,8 @@
     clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px); }
   .hud-pill .icon { color: var(--accent); }
   .hud-pill small { display: block; font-size: 0.58rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Inter', sans-serif; }
-  #cta-next { margin-left: auto; padding: 12px 16px; }
+  #cta-next { padding: 12px 16px; }
+  #btn-help { font-family: 'Rajdhani', sans-serif; }
 
   /* --- Views / nav --- */
   #views { flex: 1; padding-top: 16px; padding-bottom: 20px; }
@@ -260,6 +261,8 @@
   /* --- Match overlay / scoreboard --- */
   .overlay { position: fixed; inset: 0; background: rgba(4,4,7,0.85); display: flex; align-items: center;
     justify-content: center; padding: 18px; z-index: 20; }
+  #tutorial-overlay { z-index: 21; }
+  #help-overlay { z-index: 27; }
   #choice-overlay { z-index: 22; }
   #modal-overlay { z-index: 24; }
   #save-overlay { z-index: 26; }
@@ -353,6 +356,13 @@
 
   .infl-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 10px; }
 
+  .help-sec { margin-bottom: 14px; }
+  .help-sec h4 { font-family: 'Rajdhani', sans-serif; font-size: 0.86rem; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--accent); margin: 0 0 6px; }
+  .help-sec p, .help-sec li { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; margin: 0 0 5px; }
+  .help-sec ul { margin: 0; padding-left: 18px; }
+  .help-sec b { color: var(--text); }
+
   .hidden { display: none !important; }
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-thumb { background: var(--border-strong); }
@@ -415,6 +425,7 @@
       <div class="hud-pill"><svg class="icon"><use href="#i-coin"></use></svg> <span id="hud-money"></span></div>
       <div class="hud-pill"><svg class="icon"><use href="#i-bolt"></use></svg> <span id="hud-energy"></span><small>Energia</small></div>
       <div class="hud-pill"><svg class="icon"><use href="#i-calendar"></use></svg> <span id="hud-week"></span><small>Sezon <span id="hud-season"></span></small></div>
+      <button id="btn-help" class="secondary" title="Jak grać" style="padding:9px 11px; margin-left:auto;">?</button>
       <button id="cta-next">Dalej <svg class="icon"><use href="#i-arrow-right"></use></svg></button>
     </div>
 
@@ -515,7 +526,8 @@
         <div class="glass panel">
           <h2><svg class="icon"><use href="#i-doc"></use></svg> Dziennik</h2>
           <div id="log-feed"></div>
-          <button class="full" id="btn-fast" style="margin-top:16px;"></button>
+          <button class="full" id="btn-help2" style="margin-top:16px;"><svg class="icon"><use href="#i-doc"></use></svg> Jak grać — pomoc i słownik pojęć</button>
+          <button class="full" id="btn-fast" style="margin-top:10px;"></button>
           <div style="display:flex; gap:10px; margin-top:10px;">
             <button class="secondary full" id="btn-export">Eksportuj zapis</button>
             <button class="secondary full" id="btn-import">Wczytaj zapis</button>
@@ -575,6 +587,31 @@
   </div>
 </div>
 
+<!-- SAMOUCZEK -->
+<div id="tutorial-overlay" class="overlay hidden">
+  <div class="glass overlay-box" style="max-width:420px;">
+    <div style="text-align:center;">
+      <div id="tut-icon" style="color:var(--accent); font-size:1.8rem;"></div>
+      <div class="ev-name" id="tut-title" style="margin-top:6px;"></div>
+      <div class="match-sub" id="tut-step"></div>
+    </div>
+    <p class="muted" id="tut-text" style="margin:14px 0;"></p>
+    <div style="display:flex; gap:8px;">
+      <button class="secondary full" id="tut-skip">Pomiń</button>
+      <button class="primary full" id="tut-next">Dalej</button>
+    </div>
+  </div>
+</div>
+
+<!-- POMOC -->
+<div id="help-overlay" class="overlay hidden">
+  <div class="glass overlay-box" style="max-width:480px;">
+    <div class="ev-name" style="text-align:center;">Jak grać</div>
+    <div id="help-body" style="margin-top:14px;"></div>
+    <button class="full primary" id="help-close" style="margin-top:14px;">Zamknij</button>
+  </div>
+</div>
+
 <!-- SAVE / LOAD -->
 <div id="save-overlay" class="overlay hidden">
   <div class="glass overlay-box" style="max-width:460px;">
@@ -624,11 +661,11 @@
   ];
 
   const STAT_DEFS = [
-    { id: "aim",    name: "Aim",       icon: "crosshair" },
-    { id: "reflex", name: "Refleks",   icon: "run" },
-    { id: "sense",  name: "Game sense",icon: "brain" },
-    { id: "util",   name: "Utility",   icon: "bomb" },
-    { id: "team",   name: "Teamplay",  icon: "users" },
+    { id: "aim",    name: "Aim",        icon: "crosshair", hint: "Celność. Fundament AWP-era, entry i lurkera." },
+    { id: "reflex", name: "Refleks",    icon: "run",       hint: "Szybkość reakcji i peeki. Spada najszybciej z wiekiem." },
+    { id: "sense",  name: "Game sense", icon: "brain",     hint: "Czytanie gry. Kluczowy dla IGL-a, rośnie także po trzydziestce." },
+    { id: "util",   name: "Utility",    icon: "bomb",      hint: "Smoki, flashe, molotovy. Podstawa gry supporta." },
+    { id: "team",   name: "Teamplay",   icon: "users",     hint: "Tradey i współpraca. Podnosi skuteczność całego składu." },
   ];
 
   const TIERS = [
@@ -860,6 +897,7 @@
       ach: {}, log: [], rank: 0, retired: false,
       weekPlan: [], lastPlan: [], extras: {}, goal: null, nemesis: null, nemesisBeaten: 0, fastMatches: false,
       lead: 18, captain: false, captainTry: 0, transferTry: 0,
+      phase: null, craft: 0, rep: 0, audience: 0, trophies2: 0, tutorialDone: false,
     };
     state = s;
     s.team = makeTeam(0, "Team " + nick.toUpperCase().slice(0, 6));
@@ -1517,12 +1555,18 @@
     if (typeof state.captainTry !== "number") state.captainTry = 0;
     if (typeof state.transferTry !== "number") state.transferTry = 0;
     if (!state.career.recent) state.career.recent = [];
+    if (typeof state.phase === "undefined") state.phase = null;
+    if (typeof state.craft !== "number") state.craft = 0;
+    if (typeof state.rep !== "number") state.rep = 0;
+    if (typeof state.audience !== "number") state.audience = 0;
+    if (typeof state.trophies2 !== "number") state.trophies2 = 0;
   }
 
   // ---------- tydzień ----------
   function currentEvent() { return state.schedule[state.week - 1]; }
 
   function nextWeek() {
+    if (inPhase2()) { nextWeek2(); return; }
     const ev = currentEvent();
     const isMatch = ev.type === "league" || ev.type === "event" || ev.type === "playoff";
     if (!isMatch) { advanceWeek(); render(); save(); return; }
@@ -2008,9 +2052,320 @@
       : s > 800 ? "Legenda. Miejsce w Hall of Fame pewne."
       : s > 400 ? "Solidny pro. Ludzie pamiętają Twoje highlighty."
       : "Kariera skończona. Może analityk albo streamer?";
-    showModal("Koniec kariery", verdict,
+    showModal(inPhase2() ? "Koniec drogi" : "Koniec kariery zawodniczej", verdict,
       rows.map(x => '<div class="recap-line"><span>' + esc(x[0]) + '</span><b>' + esc(x[1]) + '</b></div>').join(""));
+    if (inPhase2()) finishCareer();
+    else modalAfterClose = offerSecondCareer;
     save();
+  }
+
+  function offerSecondCareer() {
+    const opts = [
+      { label: PHASES.coach.name, desc: PHASES.coach.desc },
+      { label: PHASES.analyst.name, desc: PHASES.analyst.desc },
+      { label: PHASES.streamer.name, desc: PHASES.streamer.desc },
+      { label: "Odejść ze sceny", desc: "Zamykasz temat. Kariera trafia do Hall of Fame." },
+    ];
+    showChoice("Co dalej po zawieszeniu myszki?",
+      "Twoje nazwisko wciąż coś znaczy. Możesz zostać w scenie w innej roli.", opts, i => {
+        closeChoice();
+        if (i === 3) { finishCareer(); showFinalModal(); return; }
+        startSecondCareer(["coach", "analyst", "streamer"][i]);
+      });
+  }
+
+  function finishCareer() {
+    state.retired = true;
+    const c = state.career;
+    pushHof({
+      nick: state.nick, role: role().name, phase: state.phase || null,
+      seasons: c.seasons.length, matches: c.matches,
+      rating: c.matches ? +(c.rating / c.matches).toFixed(2) : 0,
+      trophies: c.trophies.length, bestRank: c.bestRank, earned: c.earned, hof: hofScore(),
+      date: new Date().toISOString().slice(0, 10),
+    });
+    save();
+    render();
+  }
+
+  function showFinalModal() {
+    showModal("Hall of Fame", "Kariera zamknięta. Wynik trafił do lokalnej galerii sław.",
+      '<div class="recap-line"><span>Punkty Hall of Fame</span><b>' + hofScore() + "</b></div>");
+  }
+
+  // ---------- samouczek i pomoc ----------
+  const TUTORIAL = [
+    { icon: "bolt", title: "Tydzień ma 4 punkty energii",
+      text: "W zakładce Trening wydajesz energię na aim, refleks, analizę dem, utility, scrimy, streamy i regenerację. " +
+            "Kondycja i psychika nie odnawiają się w pełni co tydzień — jeśli będziesz tylko harować, złapiesz kontuzję albo się wypalisz." },
+    { icon: "crosshair", title: "Twoja rola decyduje, co się liczy",
+      text: "Każda rola waży statystyki inaczej: AWPer żyje z aimu, IGL z game sense'u, support z utility. " +
+            "W zakładce Trening statystyki kluczowe dla Twojej roli są podświetlone na niebiesko — to je rozwijaj najpierw." },
+    { icon: "users", title: "Mecze grasz runda po rundzie",
+      text: "W kluczowych momentach — runda pistoletowa, strata pięciu rund, piłka meczowa — podejmujesz decyzję. " +
+            "Widzisz szansę powodzenia liczoną z Twoich statystyk, psychiki i formy. Trafiona decyzja podnosi szanse zespołu i Twój rating." },
+    { icon: "swap", title: "Oferty przychodzą za wyniki",
+      text: "Graj powyżej oczekiwań swojego poziomu, buduj hype w mediach, a zadzwonią lepsze kluby. " +
+            "Przy podpisywaniu negocjujesz pensję, gwarancję miejsca i bonusy — ale za wygórowane żądania klub może zerwać rozmowy." },
+    { icon: "chart", title: "Cel: szczyt rankingu świata",
+      text: "44 zawodników AI rozwija kariery równolegle z Tobą. Jeden z nich jest Twoim rywalem i trafia do Twojej ligi. " +
+            "Wszystko — trofea, ranking, zarobki — składa się na punkty Hall of Fame na koniec kariery. Powodzenia." },
+  ];
+
+  let tutStep = 0;
+
+  function showTutorial() {
+    tutStep = 0;
+    renderTutStep();
+    document.getElementById("tutorial-overlay").classList.remove("hidden");
+  }
+
+  function renderTutStep() {
+    const t = TUTORIAL[tutStep];
+    document.getElementById("tut-icon").innerHTML = icon(t.icon);
+    document.getElementById("tut-title").textContent = t.title;
+    document.getElementById("tut-step").textContent = "Krok " + (tutStep + 1) + " z " + TUTORIAL.length;
+    document.getElementById("tut-text").textContent = t.text;
+    document.getElementById("tut-next").textContent = tutStep === TUTORIAL.length - 1 ? "Zaczynamy" : "Dalej";
+  }
+
+  function endTutorial() {
+    document.getElementById("tutorial-overlay").classList.add("hidden");
+    state.tutorialDone = true;
+    save();
+  }
+
+  const HELP = [
+    { h: "Statystyki zawodnika", body:
+      "<ul><li><b>Aim</b> — celność. Podstawa dla AWP-era, entry i lurkera.</li>" +
+      "<li><b>Refleks</b> — szybkość reakcji, peeki i timingi. Spada najszybciej z wiekiem.</li>" +
+      "<li><b>Game sense</b> — czytanie gry i taktyka. Kluczowy dla IGL-a, rośnie nawet po trzydziestce.</li>" +
+      "<li><b>Utility</b> — smoki, flashe, molotovy. Fundament gry supporta.</li>" +
+      "<li><b>Teamplay</b> — tradey i współpraca. Podnosi skuteczność całego składu.</li>" +
+      "<li><b>Przywództwo</b> — osobny atrybut spoza roli. Otwiera drogę do kapitana i próśb transferowych.</li></ul>" },
+    { h: "Kondycja, psychika, forma", body:
+      "<p><b>Kondycja</b> spada od treningów i meczów. Poniżej 25 grozi kontuzją, a przy niskiej wartości trening daje o połowę mniej.</p>" +
+      "<p><b>Psychika</b> spada po porażkach i od przemęczenia. Przy bardzo niskiej opuszczasz mecz z powodu wypalenia.</p>" +
+      "<p><b>Forma</b> to chwilowa dyspozycja — rośnie po dobrych meczach i scrimach, spada po porażkach.</p>" },
+    { h: "Jak liczony jest rating", body:
+      "<p>Rating meczu wychodzi z tego, co faktycznie zrobiłeś w rundach: fragów na rundę, obrażeń na rundę i przeżywalności. " +
+      "Przy wyrównanych siłach przeciętny występ to <b>1.00</b>. Powyżej 1.10 jesteś motorem zespołu, poniżej 0.90 — obciążeniem.</p>" },
+    { h: "Kontrakty i cele", body:
+      "<p>Każdy kontrakt niesie <b>cel od zarządu</b> na sezon: rating, liczba wygranych, playoff albo trofeum. " +
+      "Wykonany daje premię i cierpliwość klubu, niewykonany zbliża Cię do wylotu ze składu.</p>" +
+      "<p>Gwarancja miejsca w kontrakcie chroni przed benchowaniem, bonus za trofeum dopłaca do wygranych turniejów, " +
+      "a niskie odstępne sprawia, że inne kluby dzwonią częściej.</p>" },
+    { h: "Pieniądze", body:
+      "<p>Zarabiasz z pensji, nagród turniejowych, streamów i sponsorów. Wydajesz w zakładce Rynek: sprzęt i monitor " +
+      "podbijają statystyki, trener przyspiesza treningi, analityk wzmacnia drużynę w meczach, menedżer zwiększa liczbę ofert. " +
+      "Część z nich ma tygodniowe koszty utrzymania. Portfel inwestycyjny rośnie sam i liczy się do Hall of Fame.</p>" },
+    { h: "Ranking i koniec kariery", body:
+      "<p>Pozycja w rankingu świata zależy od ratingu sezonu, poziomu drużyny, trofeów i rozpoznawalności — liczona jest " +
+      "względem 44 rywali AI, którzy rozwijają się równolegle. Po 27. roku życia aim i refleks zaczynają spadać, " +
+      "a game sense rośnie. Karierę możesz zakończyć w dowolnym momencie w zakładce Profil.</p>" },
+  ];
+
+  function showHelp() {
+    document.getElementById("help-body").innerHTML = HELP.map(sec =>
+      '<div class="help-sec"><h4>' + sec.h + "</h4>" + sec.body + "</div>").join("");
+    document.getElementById("help-overlay").classList.remove("hidden");
+  }
+
+  // ---------- drugi rozdział: życie po karierze ----------
+  const PHASES = {
+    coach: {
+      name: "Trener", icon: "brain",
+      desc: "Prowadzisz skład z ławki. Twój warsztat podnosi siłę drużyny w meczach.",
+      craftName: "Warsztat trenerski", hasTeam: true,
+      actions: [
+        { id: "tactics", name: "Sesja taktyczna", icon: "brain", cost: 1, craft: 2.2, chem: 3, desc: "Nowe setupy i executy. Rozwija warsztat." },
+        { id: "drill",   name: "Trening składu",  icon: "crosshair", cost: 1, mates: 0.9, desc: "Podnosisz umiejętności zawodników." },
+        { id: "talk",    name: "Rozmowy 1 na 1",  icon: "users", cost: 1, chem: 7, rep: 1, desc: "Chemia w szatni rośnie." },
+        { id: "scout",   name: "Skauting",        icon: "search", cost: 1, rep: 3, money: 4000, desc: "Konsultacje dla klubu i kontakty w scenie." },
+      ],
+    },
+    analyst: {
+      name: "Analityk", icon: "chart",
+      desc: "Praca z danymi. Mniej losowości w meczach i stały dopływ zleceń.",
+      craftName: "Warsztat analityczny", hasTeam: true,
+      actions: [
+        { id: "model",  name: "Model przeciwnika", icon: "chart", cost: 1, craft: 2.4, desc: "Rozbierasz rywali na czynniki pierwsze." },
+        { id: "report", name: "Raport dla sztabu", icon: "doc", cost: 1, craft: 1.0, mates: 0.5, desc: "Skład gra pewniej dzięki przygotowaniu." },
+        { id: "consult",name: "Zlecenie z zewnątrz", icon: "coin", cost: 1, money: 9000, rep: 2, desc: "Analiza dla innej organizacji." },
+        { id: "study",  name: "Konferencja i nauka", icon: "globe", cost: 1, craft: 1.6, rep: 3, desc: "Podnosisz warsztat i rozpoznawalność." },
+      ],
+    },
+    streamer: {
+      name: "Streamer", icon: "cam",
+      desc: "Bez meczów i bez szatni. Budujesz widownię i zarabiasz na sobie.",
+      craftName: "Warsztat sceniczny", hasTeam: false,
+      actions: [
+        { id: "stream2", name: "Stream", icon: "cam", cost: 1, craft: 1.2, audience: 5, money: 0, desc: "Podstawa. Zarobek rośnie z widownią." },
+        { id: "clips",   name: "Klipy i montaż", icon: "cards", cost: 1, audience: 9, desc: "Krótkie formy przyciągają nowych widzów." },
+        { id: "collab",  name: "Kolaboracja", icon: "users", cost: 1, audience: 14, rep: 3, desc: "Wspólny stream z inną gwiazdą sceny." },
+        { id: "rest2",   name: "Wolne od kamery", icon: "bed", cost: 1, mental: 20, desc: "Odpoczynek. Wypalenie dopada też twórców." },
+      ],
+    },
+  };
+
+  function phaseDef() { return PHASES[state.phase] || null; }
+  function inPhase2() { return !!state.phase; }
+
+  function startSecondCareer(kind) {
+    const def = PHASES[kind];
+    state.phase = kind;
+    state.retired = false;
+    state.craft = clamp(20 + hofScore() / 60, 20, 55);
+    state.rep = state.hype;
+    state.audience = kind === "streamer" ? Math.round(5 + state.hype * 0.6) : 0;
+    state.energy = MAX_ENERGY;
+    state.week = 1;
+    state.phaseStart = state.season;
+    state.trophies2 = 0;
+    if (def.hasTeam) {
+      const t = clamp(Math.round(hofScore() / 400), 0, 4);
+      state.team = makeTeam(t);
+      state.team.salary = Math.max(3000, Math.round(tier(t).salary * 0.55));
+      state.league = makeLeague();
+      state.schedule = makeSchedule();
+    }
+    addLog("Nowy rozdział: zaczynasz jako " + def.name + ".", "gold");
+    switchView("career");
+    render(); save();
+  }
+
+  function doAction2(id) {
+    const def = phaseDef();
+    const a = def.actions.find(x => x.id === id);
+    if (!a || state.energy < a.cost) return;
+    state.energy -= a.cost;
+    if (a.craft) state.craft = clamp(state.craft + growthVal(state.craft, a.craft), 1, 99);
+    if (a.rep) state.rep = clamp(state.rep + a.rep, 0, 100);
+    if (a.chem && state.team) state.team.chem = clamp(state.team.chem + a.chem, 0, 100);
+    if (a.mates && state.team) {
+      state.team.mates.forEach(m => { m.skill = clamp(m.skill + a.mates * (0.5 + state.craft / 140), 25, 97); });
+    }
+    if (a.audience) state.audience = Math.round(state.audience + a.audience * (0.6 + state.rep / 90));
+    if (a.mental) state.mental = clamp(state.mental + a.mental, 0, 100);
+    if (a.money) { const m2 = Math.round(a.money * (0.7 + state.rep / 70)); state.money += m2; state.career.earned += m2; }
+    if (id === "stream2") {
+      const earn = Math.round(400 + state.audience * 55 * rnd(0.8, 1.25));
+      state.money += earn; state.career.earned += earn;
+      addLog("Stream: +" + money(earn) + " (widownia " + state.audience + "k)", "good");
+    }
+    render(); save();
+  }
+
+  // W drugim rozdziale drużyna gra sama — Ty tylko przygotowujesz ją do meczu
+  function nextWeek2() {
+    const ev = currentEvent();
+    const def = phaseDef();
+    if (!def.hasTeam || ev.type === "free") { advanceWeek2(); render(); save(); return; }
+
+    if (ev.type === "league") {
+      const opp = state.league.teams[ev.opp];
+      const won = simStaffMatch(opp.str);
+      const me = state.league.teams[0];
+      me.str = Math.round(staffTeamStrength());
+      const d = irnd(2, 11);
+      if (won) { me.w++; opp.l++; me.rd += d; opp.rd -= d; } else { me.l++; opp.w++; me.rd -= d; opp.rd += d; }
+      simRestOfLeague(ev.opp);
+      addLog("Liga vs " + opp.name + ": " + (won ? "wygrana" : "porażka"), won ? "good" : "bad");
+      showModal("Mecz ligowy", state.team.name + " vs " + opp.name + " — " + (won ? "wygrana" : "porażka") + ".",
+        '<div class="recap-line"><span>Twój wkład</span><b>' + esc(def.craftName) + " " + Math.round(state.craft) + "</b></div>" +
+        '<div class="recap-line"><span>Siła drużyny</span><b>' + Math.round(staffTeamStrength()) + "</b></div>");
+      modalAfterClose = () => { advanceWeek2(); render(); save(); };
+      return;
+    }
+
+    // turniej albo playoff: kilka serii pod rząd
+    const rounds = ev.type === "playoff" ? 2 : (ev.major ? 4 : 3);
+    let wins = 0;
+    const base = tier(state.team.tier).str + (ev.major ? 6 : 2);
+    for (let i = 0; i < rounds; i++) {
+      if (!simStaffMatch(base + i * 3)) break;
+      wins++;
+    }
+    const champ = wins === rounds;
+    const label = ev.name || "Playoff ligi";
+    const prize = Math.round(tier(state.team.tier).prize * (champ ? 0.8 : 0.25 * wins + 0.1));
+    state.money += prize; state.career.earned += prize;
+    if (champ) {
+      state.trophies2++;
+      state.career.trophies.push({ name: label + " (jako " + def.name.toLowerCase() + ")", season: state.season, major: !!ev.major });
+      state.rep = clamp(state.rep + 10, 0, 100);
+      addLog("Trofeum jako " + def.name.toLowerCase() + ": " + label, "gold");
+    }
+    showModal(label, champ ? "Mistrzostwo! Twój sztab dowiózł tytuł." : "Wygrane serie: " + wins + " z " + rounds + ".",
+      '<div class="recap-line"><span>Nagroda</span><b>' + money(prize) + "</b></div>");
+    modalAfterClose = () => { advanceWeek2(); render(); save(); };
+  }
+
+  function staffTeamStrength() {
+    return matesAvg() + (state.team.chem - 50) * 0.09 + (state.craft - 30) * 0.16;
+  }
+
+  function simStaffMatch(oppStr) {
+    const p = clamp(0.5 + (staffTeamStrength() - oppStr) * 0.02, 0.12, 0.9);
+    return Math.random() < p;
+  }
+
+  function advanceWeek2() {
+    const def = phaseDef();
+    state.money += state.team && def.hasTeam ? state.team.salary : 0;
+    if (def.hasTeam) state.career.earned += state.team.salary;
+    if (state.phase === "streamer") {
+      const passive = Math.round(state.audience * 12);
+      state.money += passive; state.career.earned += passive;
+      state.audience = Math.max(0, Math.round(state.audience * 0.985)); // widownia odpływa bez treści
+    }
+    state.money -= upkeepTotal();
+    state.mental = clamp(state.mental + 4, 0, 100);
+    state.energy = MAX_ENERGY;
+    if (state.team) state.team.mates.forEach(m => { m.skill = clamp(m.skill + rnd(-0.3, 0.5), 25, 97); });
+    state.week++;
+    if (state.week > SEASON_LENGTH) endSeason2();
+  }
+
+  function endSeason2() {
+    const def = phaseDef();
+    state.season++;
+    state.week = 1;
+    state.age++;
+    evolveWorld();
+    const rows = [
+      ["Rola", def.name],
+      [def.craftName, Math.round(state.craft)],
+      ["Rozpoznawalność", Math.round(state.rep) + "%"],
+    ];
+    if (def.hasTeam) {
+      const pos = sortedStandings().findIndex(t => t.me) + 1;
+      rows.push(["Drużyna", state.team.name + " (" + tier(state.team.tier).name + ")"]);
+      rows.push(["Miejsce w lidze", pos + "."]);
+      state.league = makeLeague();
+      state.schedule = makeSchedule();
+    } else {
+      rows.push(["Widownia", state.audience + "k"]);
+    }
+    rows.push(["Trofea w tym rozdziale", state.trophies2]);
+    checkAch();
+    showModal("Koniec sezonu " + (state.season - 1), "Drugi rozdział trwa. Masz " + state.age + " lat.",
+      rows.map(x => '<div class="recap-line"><span>' + esc(x[0]) + "</span><b>" + esc(x[1]) + "</b></div>").join(""));
+    save();
+  }
+
+  // ---------- Hall of Fame wielu karier ----------
+  const HOF_KEY = "cs2-hall-of-fame";
+  function loadHof() {
+    try { return JSON.parse(localStorage.getItem(HOF_KEY) || "[]"); } catch (e) { return []; }
+  }
+  function pushHof(entry) {
+    try {
+      const all = loadHof();
+      all.unshift(entry);
+      if (all.length > 20) all.length = 20;
+      localStorage.setItem(HOF_KEY, JSON.stringify(all));
+    } catch (e) { /* brak storage */ }
   }
 
   // ---------- overlays: wybory ----------
@@ -2134,6 +2489,7 @@
   }
 
   function renderCareer() {
+    if (inPhase2()) { renderCareer2(); return; }
     document.getElementById("pc-nick").textContent = state.nick;
     document.getElementById("pc-sub").textContent = role().name + " · " + state.age + " lat · " + state.team.name;
     const r = seasonRating();
@@ -2194,7 +2550,79 @@
     document.getElementById("cta-next").innerHTML = (currentEvent().type === "free" ? "Nowy tydzień " : "Zagraj ") + icon("arrow-right");
   }
 
+  function renderCareer2() {
+    const def = phaseDef();
+    document.getElementById("pc-nick").textContent = state.nick;
+    document.getElementById("pc-sub").textContent = def.name + " · " + state.age + " lat" +
+      (def.hasTeam ? " · " + state.team.name : " · własny kanał");
+    document.getElementById("pc-rating").textContent = Math.round(state.craft);
+    document.querySelector(".rating-lbl").textContent = def.craftName;
+    document.getElementById("pc-tags").innerHTML =
+      '<span class="tag acc">Drugi rozdział</span>' +
+      (def.hasTeam ? '<span class="tag">' + esc(tier(state.team.tier).name) + "</span>" : "") +
+      (state.trophies2 ? '<span class="tag gold">Trofea: ' + state.trophies2 + "</span>" : "");
+    const kv = [
+      ["Rozpoznawalność", Math.round(state.rep) + "%"],
+      ["Trofea łącznie", state.career.trophies.length],
+      ["Zarobki", money(state.career.earned)],
+    ];
+    if (def.hasTeam) {
+      kv.push(["Siła drużyny", Math.round(staffTeamStrength())]);
+      kv.push(["Chemia", Math.round(state.team.chem) + "%"]);
+      kv.push(["Pensja / tydz.", money(state.team.salary)]);
+    } else {
+      kv.push(["Widownia", state.audience + "k"]);
+      kv.push(["Psychika", Math.round(state.mental)]);
+      kv.push(["Utrzymanie", money(upkeepTotal())]);
+    }
+    document.getElementById("pc-kv").innerHTML = kv.map(x =>
+      '<div class="kv"><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + "</div></div>").join("");
+
+    const ev = currentEvent();
+    const box = document.getElementById("week-card");
+    if (!def.hasTeam) {
+      box.innerHTML = '<div class="ev-card rest"><div class="ev-name">Tydzień pracy nad kanałem</div>' +
+        '<div class="ev-sub">Streamy, klipy i kolaboracje. Widownia odpływa, jeśli nic nie wrzucasz.</div></div>';
+    } else if (ev.type === "league") {
+      const opp = state.league.teams[ev.opp];
+      box.innerHTML = '<div class="ev-card"><div class="ev-name">Mecz ligowy</div>' +
+        '<div class="ev-sub">' + esc(state.team.name) + " vs " + esc(opp.name) + " · siła " +
+        Math.round(staffTeamStrength()) + " vs " + opp.str + "</div></div>";
+    } else if (ev.type === "event" || ev.type === "playoff") {
+      box.innerHTML = '<div class="ev-card big"><div class="ev-name">' + esc(ev.name || "Playoff ligi") + "</div>" +
+        '<div class="ev-sub">Twoje przygotowanie decyduje, jak daleko zajdzie zespół.</div></div>';
+    } else {
+      box.innerHTML = '<div class="ev-card rest"><div class="ev-name">Tydzień bez meczu</div>' +
+        '<div class="ev-sub">Czas na pracę ze składem.</div></div>';
+    }
+    document.getElementById("goal-card").innerHTML = "";
+    document.getElementById("btn-skip").classList.add("hidden");
+    document.getElementById("week-hint").textContent = state.energy > 0
+      ? "Zostało " + state.energy + " pkt energii — rozplanuj tydzień w zakładce Trening."
+      : "Energia wyczerpana. Kliknij „Dalej”.";
+    document.getElementById("cta-next").innerHTML = "Dalej " + icon("arrow-right");
+  }
+
+  function renderTrain2() {
+    const def = phaseDef();
+    document.getElementById("btn-repeat-plan").classList.add("hidden");
+    document.getElementById("action-grid").innerHTML = def.actions.map(a =>
+      '<button class="act" data-act="' + a.id + '"' + (state.energy < a.cost ? " disabled" : "") + ">" +
+      '<span class="a-title">' + icon(a.icon) + esc(a.name) + "</span>" +
+      '<span class="a-desc">' + esc(a.desc) + "</span>" +
+      '<span class="a-cost">Energia: ' + a.cost + "</span></button>").join("");
+    const rows = [[def.craftName, state.craft], ["Rozpoznawalność", state.rep], ["Psychika", state.mental]];
+    if (!def.hasTeam) rows.push(["Widownia (skala)", clamp(state.audience / 5, 0, 100)]);
+    else rows.push(["Chemia składu", state.team.chem]);
+    document.getElementById("stat-list").innerHTML = rows.map(x =>
+      '<div class="stat-row"><div class="stat-name">' + esc(x[0]) + "</div>" +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + clamp(x[1], 0, 100) + "%; background:" + barColor(x[1]) + '"></div></div>' +
+      '<div class="stat-val">' + Math.round(x[0] === "Widownia (skala)" ? state.audience : x[1]) + "</div></div>").join("");
+  }
+
   function renderTrain() {
+    if (inPhase2()) { renderTrain2(); return; }
+    document.getElementById("btn-repeat-plan").classList.remove("hidden");
     const rp = document.getElementById("btn-repeat-plan");
     const plan = (state.lastPlan || []).map(id => (ACTIONS.find(a => a.id === id) || {}).name).filter(Boolean);
     rp.disabled = !plan.length || state.energy <= 0;
@@ -2210,7 +2638,8 @@
     const w = role().w;
     const rows = STAT_DEFS.map(sd => {
       const v = state.stats[sd.id];
-      return '<div class="stat-row' + (w[sd.id] >= 0.25 ? " key" : "") + '"><div class="stat-name">' + esc(sd.name) + "</div>" +
+      return '<div class="stat-row' + (w[sd.id] >= 0.25 ? " key" : "") + '" title="' + esc(sd.hint || "") +
+        '"><div class="stat-name">' + esc(sd.name) + "</div>" +
         '<div class="bar-track"><div class="bar-fill" style="width:' + v + "%; background:" + barColor(v) + '"></div></div>' +
         '<div class="stat-val">' + Math.round(v) + "</div></div>";
     });
@@ -2224,7 +2653,7 @@
 
   function renderTeam() {
     document.getElementById("team-title").textContent = state.team.name;
-    const nemHtml = state.nemesis
+    const nemHtml = state.nemesis && !inPhase2()
       ? '<div class="nem-box"><div class="n-title">Rywal kariery: ' + esc(state.nemesis.nick) + "</div>" +
         '<div class="n-desc">' + esc(state.nemesis.team) + " · ranking " + (nemesisRank() ? "#" + nemesisRank() : "poza top") +
         " · bilans starć " + state.nemesis.w + "-" + state.nemesis.l + "</div></div>"
@@ -2318,7 +2747,7 @@
     document.getElementById("player-card").innerHTML =
       '<div class="pcard"><div class="pc-avatar">' + icon("user") + "</div>" +
       '<div style="flex:1; min-width:0"><div class="pc-nick">' + esc(state.nick) + "</div>" +
-      '<div class="pc-sub">' + esc(role().name) + (state.captain ? " · kapitan" : "") + " · " + state.age + " lat · " +
+      '<div class="pc-sub">' + esc(inPhase2() ? phaseDef().name : role().name) + (state.captain && !inPhase2() ? " · kapitan" : "") + " · " + state.age + " lat · " +
       esc(state.team.name) + " (" + esc(tier(state.team.tier).name) + ")</div></div>" +
       '<div style="text-align:right"><div class="pc-big">' + (c.matches ? avg.toFixed(2) : "—") + "</div>" +
       '<div class="pc-lbl">Rating kariery</div></div></div>' +
@@ -2380,6 +2809,7 @@
   }
 
   function renderInfluence() {
+    if (inPhase2()) { document.getElementById("influence-box").innerHTML = ""; return; }
     const sc = Math.round(influenceScore());
     document.getElementById("influence-box").innerHTML =
       '<div class="goal-box" style="border-left-color: var(--accent);">' +
@@ -2422,6 +2852,13 @@
         '<div class="map-line"><span>S' + s.season + " · " + esc(s.team) + "</span><span>" + s.rating.toFixed(2) +
         " · " + s.wins + "W" + (s.rank ? " · #" + s.rank : "") + "</span></div>").join("");
     }
+    const hof = loadHof();
+    if (hof.length) {
+      html += '<h3 style="margin-top:14px">Hall of Fame (' + hof.length + ")</h3>" + hof.map(e =>
+        '<div class="map-line"><span>' + esc(e.nick) + " · " + esc(e.role) +
+        (e.phase ? " → " + esc((PHASES[e.phase] || {}).name || e.phase) : "") + "</span><span>" +
+        e.hof + " pkt · " + e.trophies + " trofeów</span></div>").join("");
+    }
     document.getElementById("career-stats").innerHTML = html;
 
     document.getElementById("log-feed").innerHTML = state.log.map(l =>
@@ -2451,6 +2888,7 @@
     document.getElementById("game-screen").classList.remove("hidden");
     switchView("career");
     render(); save();
+    if (!state.tutorialDone) showTutorial();
   }
 
   function newGame() {
@@ -2477,7 +2915,8 @@
   document.getElementById("cta-next").addEventListener("click", () => { if (!state.retired) nextWeek(); });
   document.getElementById("action-grid").addEventListener("click", e => {
     const b = e.target.closest("[data-act]");
-    if (b) doAction(b.dataset.act);
+    if (!b) return;
+    if (inPhase2()) doAction2(b.dataset.act); else doAction(b.dataset.act);
   });
   document.getElementById("ch-options").addEventListener("click", e => {
     const b = e.target.closest("[data-choice]");
@@ -2522,6 +2961,17 @@
     document.getElementById("lv-speed").textContent = SPEED_LABELS[live.speed];
   });
   document.getElementById("lv-skip").addEventListener("click", skipLive);
+  document.getElementById("tut-next").addEventListener("click", () => {
+    if (tutStep >= TUTORIAL.length - 1) { endTutorial(); return; }
+    tutStep++;
+    renderTutStep();
+  });
+  document.getElementById("tut-skip").addEventListener("click", endTutorial);
+  document.getElementById("btn-help").addEventListener("click", showHelp);
+  document.getElementById("btn-help2").addEventListener("click", showHelp);
+  document.getElementById("help-close").addEventListener("click", () => {
+    document.getElementById("help-overlay").classList.add("hidden");
+  });
   document.getElementById("btn-repeat-plan").addEventListener("click", repeatPlan);
   document.getElementById("btn-skip").addEventListener("click", skipToMatch);
   document.getElementById("btn-export").addEventListener("click", () => openSave("export"));

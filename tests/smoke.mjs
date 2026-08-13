@@ -45,6 +45,15 @@ await page.fill('#nick-input', 'żółw');           // polskie znaki muszą prz
 await page.click('#start-btn');
 await page.waitForSelector('#game-screen:not(.hidden)');
 
+// samouczek pokazuje się przy pierwszej karierze
+const tutorialShown = await page.isVisible('#tutorial-overlay:not(.hidden)');
+const tutorialSteps = tutorialShown ? await page.textContent('#tut-step') : '';
+await safeClick('#tut-skip');
+// ekran pomocy
+await safeClick('#btn-help');
+const helpSections = await page.$$eval('#help-body .help-sec h4', e => e.length).catch(() => 0);
+await safeClick('#help-close');
+
 const seen = { live: 0, choices: 0, missed: 0 };
 
 for (let i = 0; i < SEASON_WEEKS * SEASONS + 2; i++) {
@@ -73,6 +82,8 @@ for (let i = 0; i < SEASON_WEEKS * SEASONS + 2; i++) {
 
 async function drainOverlays() {
   for (let g = 0; g < 40; g++) {
+    if (await page.isVisible('#tutorial-overlay:not(.hidden)')) { await safeClick('#tut-skip'); continue; }
+    if (await page.isVisible('#help-overlay:not(.hidden)')) { await safeClick('#help-close'); continue; }
     if (await page.isVisible('#choice-overlay:not(.hidden)')) {
       seen.choices++;
       const opts = await page.$$('[data-choice]');
@@ -111,6 +122,8 @@ check('K/D w rozsądnym zakresie', kd > 0.5 && kd < 2.0, kd.toFixed(2));
 check('historia meczów zapisana', (c.recent || []).length > 0, (c.recent || []).length + ' wpisów');
 check('ranking świata żyje', Array.isArray(st.world) && st.world.length > 20, (st.world || []).length + ' rywali');
 check('cel od zarządu istnieje', !!st.goal, st.goal && st.goal.kind);
+check('samouczek startuje przy nowej karierze', tutorialShown, tutorialSteps);
+check('ekran pomocy ma sekcje', helpSections >= 5, helpSections + ' sekcji');
 
 // zapis i odczyt
 await page.click('.nav-btn[data-view="profile"]');
