@@ -2212,7 +2212,7 @@
   }
   function maybeOffer(force) {
     const mv = marketValue();
-    const targetTier = clamp(Math.floor(mv / 42), 0, 4);
+    const targetTier = clamp(Math.floor(mv / 34), 0, 4);
     const chance = force ? 1 : clamp((mv - 35) / 550, 0, 0.32) * (owned("manager") ? 2 : 1) * (state.extras && state.extras.lowBuyout ? 1.6 : 1) * diffDef().offerMul;
     if (Math.random() > chance) return;
     if (state.offers.length >= 3) return;
