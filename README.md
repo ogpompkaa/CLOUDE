@@ -52,12 +52,20 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
   W zakładce Profil można przełączyć mecze na tryb błyskawiczny.
 - **Kariera** — oferty transferowe z negocjacjami (pensja, gwarancja miejsca, wybór roli,
   bonus za trofea, odstępne), cele od zarządu na sezon, sponsorzy odblokowywani hype'em.
-- **Drużyna** — możesz walczyć o rolę kapitana i prosić zarząd o transfery, jeśli masz
-  wystarczającą pozycję w zespole. Przywództwo rośnie z rozmów w składzie.
+- **Drużyna** — koledzy mają charaktery (gwiazda, tilciarz, mentor, talent, weteran, dusza
+  zespołu, cichy zabójca), własne kariery i **relację z Tobą**, która rośnie od scrimów i
+  wspólnych wygranych. Mentor przyspiesza Twój rozwój, tilciarz pogłębia kryzysy, weteran
+  stabilizuje zespół. Między sezonami skład się zmienia: ktoś odchodzi do lepszego klubu,
+  ktoś kończy karierę, przychodzi ktoś nowy. Możesz też walczyć o rolę kapitana i prosić
+  zarząd o transfery.
 - **Świat** — 44 rywali AI z własnymi drużynami i karierami, żywy ranking Top 20,
   oraz rywal kariery, który trafia do Twojej ligi i którego trzeba wyprzedzić.
 - **Punkty rankingowe** — kafelek w karcie zawodnika; kliknięcie otwiera pełny ranking
   zawodników w Twoim regionie i na świecie, z Twoją pozycją pośrodku listy.
+- **Gala końca sezonu** — po podsumowaniu roku odsłaniane jest Top 10 świata, nagrody dla
+  zawodnika i debiutanta roku oraz drużyny sezonu, a przy dobrym roku także Twoje wyróżnienie.
+- **Kronika kariery** — oś czasu w profilu zbiera kamienie milowe: pierwszy kontrakt, poziom 9
+  na FACEIT, awanse w ESEA, trofea, Majory, wyprzedzenie rywala i transfery.
 - **Pieniądze** — sprzęt, trener, analityk, psycholog, menedżer, fizjoterapeuta i mieszkanie,
   a do tego portfel inwestycyjny liczony do punktów Hall of Fame.
 

@@ -222,6 +222,10 @@
   /* --- Team / standings --- */
   .mate-row { display: flex; align-items: center; gap: 11px; padding: 9px 11px; background: var(--bg-panel);
     border: 1px solid var(--border); margin-bottom: 7px; }
+  .trait-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+  .trait-chip { font-size: 0.6rem; font-weight: 700; background: var(--bg-panel-2); border: 1px solid var(--border);
+    padding: 2px 7px; white-space: nowrap; font-family: 'Inter', sans-serif; color: var(--text-dim); }
+  .trait-chip.bond { color: var(--accent); border-color: var(--accent); }
   .mate-av { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     background: var(--bg-panel-2); border: 1px solid var(--border-strong); color: var(--text-dim); }
   .mate-row.me .mate-av { color: var(--accent); border-color: var(--accent); }
@@ -742,6 +746,14 @@
     "team.info": ["{tier} · chemia składu {chem}% · kontrakt: {years} sez. · siła drużyny {str}",
       "{tier} · chemistry {chem}% · contract: {years} seasons · team strength {str}"],
     "team.you": ["(Ty)", "(You)"],
+    "team.bond": ["Relacja {n}%", "Bond {n}%"],
+    "squad.left": ["{nick} odchodzi", "{nick} leaves"],
+    "squad.retired": ["{nick} kończy karierę", "{nick} retires"],
+    "squad.age": ["{n} lat", "age {n}"],
+    "squad.joined": ["Nowy w składzie", "New in the lineup"],
+    "squad.leftLog": ["{nick} przenosi się do {team}.", "{nick} moves to {team}."],
+    "squad.retiredLog": ["{nick} kończy karierę zawodniczą.", "{nick} retires from playing."],
+    "squad.joinedLog": ["{nick} dołącza do składu.", "{nick} joins the lineup."],
     "team.years": ["{n} lat", "age {n}"],
     "market.shop": ["Inwestycje w karierę", "Career investments"],
     "market.offers": ["Oferty transferowe", "Transfer offers"],
@@ -959,7 +971,35 @@
     "live.map": ["mapa {n}", "map {n}"],
     "live.roundLine": ["Runda {n} · {a}:{b}", "Round {n} · {a}:{b}"],
     "live.ace": ["ACE!", "ACE!"],
-    "live.frags": ["{n} fragi", "{n} frags"],
+    "live.frags": ["{n} {word}", "{n} {word}"],
+    "hl.multi": ["{n}k na {spot}", "{n}k on {spot}"],
+    "hl.clutch": ["clutch wygrany na {spot}", "clutch won on {spot}"],
+    "hl.entry": ["{nick} otwiera rundę", "{nick} opens the round"],
+    "hl.util": ["idealne smoki na {spot}", "perfect smokes on {spot}"],
+    "hl.lost": ["przegrany 1v1 na {spot}", "lost 1v1 on {spot}"],
+    "hl.eco": ["{nick} ginie na wejściu", "{nick} dies on entry"],
+    "chr.firstContract": ["Pierwszy kontrakt: {team}", "First contract: {team}"],
+    "chr.faceit": ["FACEIT poziom {lvl}", "FACEIT level {lvl}"],
+    "chr.promo": ["Awans do {div}", "Promoted to {div}"],
+    "chr.trophy": ["Trofeum: {event}", "Trophy: {event}"],
+    "chr.major": ["MISTRZ MAJORA: {event}", "MAJOR CHAMPION: {event}"],
+    "chr.rival": ["Wyprzedzasz rywala {nick}", "You pass your rival {nick}"],
+    "chr.transfer": ["Transfer do {team}", "Transfer to {team}"],
+    "chr.chapter2": ["Nowy rozdział: {role}", "A new chapter: {role}"],
+    "chr.rank": ["Ranking świata: #{n}", "World ranking: #{n}"],
+    "chr.title": ["Kronika kariery", "Career chronicle"],
+    "gala.title": ["Gala końca sezonu {n}", "Season {n} awards night"],
+    "gala.sub": ["Scena podsumowuje rok.", "The scene sums up the year."],
+    "gala.top": ["Top 10 świata", "World top 10"],
+    "gala.yourPlace": ["Twoje miejsce", "Your place"],
+    "gala.awards": ["Nagrody", "Awards"],
+    "gala.mvp": ["Zawodnik roku", "Player of the year"],
+    "gala.rookie": ["Debiutant roku", "Rookie of the year"],
+    "gala.teamOfYear": ["Drużyna sezonu w lidze", "League team of the season"],
+    "gala.yours": ["Twoje wyróżnienie", "Your recognition"],
+    "gala.youMvp": ["Zawodnik roku — to Ty!", "Player of the year — that is you!"],
+    "gala.evp": ["Wyróżnienie za rating {r}", "Standout season, rating {r}"],
+    "log.transferLine": ["Transfer: {from} → {to} ({salary}/tydz.)", "Transfer: {from} → {to} ({salary}/wk)"],
     "live.speed0": ["Przyspiesz", "Speed up"],
     "live.speed1": ["Szybko ×2", "Fast ×2"],
     "live.speed2": ["Bardzo szybko", "Very fast"],
@@ -1378,17 +1418,51 @@
   function loadSave() {
     try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
   }
+  // Kronika: kamienie milowe, które warto przejrzeć po latach
+  function chronicle(text, kind) {
+    if (!state.career.timeline) state.career.timeline = [];
+    state.career.timeline.unshift({ s: state.season, age: state.age, text: text, kind: kind || "info" });
+    if (state.career.timeline.length > 60) state.career.timeline.length = 60;
+  }
+
   function addLog(text, type) {
     state.log.unshift({ t: "S" + state.season + " T" + state.week, text: text, type: type || "info" });
     if (state.log.length > 70) state.log.length = 70;
   }
 
   // ---------- setup ----------
+  // Charaktery kolegów z drużyny — zmieniają chemię, Twój rozwój i wahania formy zespołu
+  const MATE_TRAITS = [
+    { id: "star",    name: ["Gwiazda", "Star"],        desc: ["Bierze grę na siebie. Wygrywa rundy, ale i uwagę.", "Takes the game on himself. Wins rounds, and the spotlight."] },
+    { id: "tilter",  name: ["Tilciarz", "Tilter"],     desc: ["Po porażkach ciągnie szatnię w dół.", "Drags the locker room down after losses."] },
+    { id: "mentor",  name: ["Mentor", "Mentor"],       desc: ["Uczy Cię gry. Rozwijasz się szybciej.", "Teaches you the game. You develop faster."] },
+    { id: "rookie",  name: ["Talent", "Prospect"],     desc: ["Młody i głodny. Rośnie z tygodnia na tydzień.", "Young and hungry. Improves week by week."] },
+    { id: "joker",   name: ["Dusza zespołu", "Joker"], desc: ["Rozładowuje atmosferę, czasem kosztem skupienia.", "Keeps the mood up, sometimes at the cost of focus."] },
+    { id: "veteran", name: ["Weteran", "Veteran"],     desc: ["Widział wszystko. Zespół gra stabilniej.", "Has seen it all. The team plays steadier."] },
+    { id: "quiet",   name: ["Cichy zabójca", "Quiet one"], desc: ["Mało mówi, dużo fragguje.", "Says little, frags a lot."] },
+  ];
+
+  function traitInfo(id) { return MATE_TRAITS.find(t => t.id === id) || MATE_TRAITS[0]; }
+  function teamHasTrait(id) { return state.team && state.team.mates.some(m => (m.traits || []).indexOf(id) >= 0); }
+  function bestBond() {
+    if (!state.team) return 0;
+    return state.team.mates.reduce((a, m) => Math.max(a, m.bond || 0), 0);
+  }
+
   function makeMate(str, usedNicks) {
     let nick;
     do { nick = pick(NICK_POOL); } while (usedNicks.indexOf(nick) >= 0);
     usedNicks.push(nick);
-    return { nick: nick, skill: clamp(Math.round(str + rnd(-7, 7)), 25, 97), role: pick(ROLES).id, age: irnd(18, 28) };
+    const age = irnd(17, 29);
+    const traits = [pick(MATE_TRAITS).id];
+    if (Math.random() < 0.35) {
+      const second = pick(MATE_TRAITS).id;
+      if (second !== traits[0]) traits.push(second);
+    }
+    if (age <= 19 && traits.indexOf("rookie") < 0 && Math.random() < 0.5) traits[0] = "rookie";
+    if (age >= 27 && traits.indexOf("veteran") < 0 && Math.random() < 0.5) traits[0] = "veteran";
+    return { nick: nick, skill: clamp(Math.round(str + rnd(-7, 7)), 25, 97), role: pick(ROLES).id,
+             age: age, traits: traits, bond: irnd(20, 45), seasons: 0 };
   }
 
   function makeTeam(tierId, name) {
@@ -1457,7 +1531,7 @@
       seasonStats: { matches: 0, wins: 0, kills: 0, deaths: 0, adr: 0, rating: 0, best: 0 },
       offers: [], sponsors: [], shop: {}, invest: 0, injury: 0, world: null,
       career: { matches: 0, wins: 0, kills: 0, deaths: 0, rating: 0, aces: 0, mvps: 0, earned: 0,
-                trophies: [], seasons: [], bestRank: 0, bestRating: 0, recent: [] },
+                trophies: [], seasons: [], bestRank: 0, bestRating: 0, recent: [], timeline: [] },
       ach: {}, log: [], rank: 0, retired: false,
       weekPlan: [], lastPlan: [], extras: {}, goal: null, nemesis: null, nemesisBeaten: 0, fastMatches: false,
       lead: 18 + ((ARCHETYPES.find(a => a.id === archId) || {}).lead || 0), captain: false, captainTry: 0, transferTry: 0,
@@ -1752,7 +1826,8 @@
   function playerPower() { return clamp(skillScore() * condFactor(), 10, 105); }
   function matesAvg() { return state.team.mates.reduce((a, m) => a + m.skill, 0) / state.team.mates.length; }
   function teamStrength() {
-    return matesAvg() * 0.72 + playerPower() * 0.28 + (state.team.chem - 50) * 0.09 + (owned("analyst") ? 3 : 0) + (state.captain ? 2 : 0) + (state.lead - 30) * 0.03;
+    return matesAvg() * 0.72 + playerPower() * 0.28 + (state.team.chem - 50) * 0.09 + (owned("analyst") ? 3 : 0) + (state.captain ? 2 : 0) + (state.lead - 30) * 0.03
+      + (teamHasTrait("veteran") ? 1.5 : 0) + (teamHasTrait("igl") ? 1 : 0) + bestBond() * 0.03;
   }
 
   // ---------- symulacja meczu ----------
@@ -1829,6 +1904,12 @@
 
   // ---------- mecz na żywo ----------
   const LIVE_SPEEDS = [620, 260, 90];
+  const SPOTS = ["A", "B", "mid", "CT", "banany", "apps", "rampie", "connectorze"];
+  function fragWord(n) {
+    if (LANG === "en") return n === 1 ? "frag" : "frags";
+    if (n === 1) return "frag";
+    return (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? "fragi" : "fragów";
+  }
   function speedLabel(i) { return TR("live.speed" + i); }
   let live = null;
   let liveSkipAll = false;
@@ -1930,8 +2011,18 @@
       if (Math.random() < m.dieP) m.d++;
       m.dmg += mk * 80 + irnd(0, 46);
     });
-    L.feed.unshift({ won: won, text: TR("live.roundLine", { n: L.round, a: L.a, b: L.b }) +
-      (k ? " · " + (k === 5 ? TR("live.ace") : TR("live.frags", { n: k })) : "") });
+    let line = TR("live.roundLine", { n: L.round, a: L.a, b: L.b });
+    if (k === 5) line += " · " + TR("live.ace");
+    else if (k >= 3) line += " · " + TR("hl.multi", { n: k, spot: pick(SPOTS) });
+    else if (k > 0) line += " · " + TR("live.frags", { n: k, word: fragWord(k) });
+    // od czasu do czasu coś, co zapada w pamięć
+    if (Math.random() < 0.13) {
+      const mate = pick(L.mates);
+      line += " · " + (won
+        ? TR(pick(["hl.clutch", "hl.entry", "hl.util"]), { nick: mate.nick, spot: pick(SPOTS) })
+        : TR(pick(["hl.lost", "hl.eco"]), { nick: mate.nick, spot: pick(SPOTS) }));
+    }
+    L.feed.unshift({ won: won, text: line });
     if (L.feed.length > 40) L.feed.length = 40;
 
     if (mapOver(L)) { finishMap(); return; }
@@ -2051,7 +2142,14 @@
     state.stamina = clamp(state.stamina - 6 * res.maps.length, 0, 100);
     state.form = clamp(state.form + (res.won ? 7 : -6) + (res.me.rating - 1) * 22, 0, 100);
     state.mental = clamp(state.mental + (res.won ? 4 : (owned("psycho") ? -3 : -6)), 0, 100);
-    state.team.chem = clamp(state.team.chem + (res.won ? 2 : -2), 0, 100);
+    const tilt = teamHasTrait("tilter") ? 2 : 0;
+    const joke = teamHasTrait("joker") ? 1 : 0;
+    state.team.chem = clamp(state.team.chem + (res.won ? 2 + joke : -2 - tilt), 0, 100);
+    state.team.mates.forEach(m => {
+      m.bond = clamp((m.bond || 0) + (res.won ? rnd(0.6, 1.8) : rnd(-0.8, 0.4)), 0, 100);
+      if ((m.traits || []).indexOf("rookie") >= 0) m.skill = clamp(m.skill + rnd(0.2, 0.6), 25, 97);
+      if ((m.traits || []).indexOf("star") >= 0) m.skill = clamp(m.skill + rnd(0, 0.25), 25, 97);
+    });
     state.hype = clamp(state.hype + (res.won ? 1.2 : 0.3) + (res.me.rating - 1) * 8 + state.team.tier * 0.4, 0, 100);
 
     // rozwój z gry
@@ -2087,7 +2185,8 @@
       : (state.age <= 21 ? 1.2 : state.age <= 25 ? 1.0 : state.age <= 28 ? 0.65 : 0.35);
     // im wyżej, tym trudniej — ostatnie punkty kosztują sezony
     const room = Math.pow(clamp((100 - cur) / 100, 0, 1), 1.6);
-    const gearF = (owned("coach") ? 1.30 : 1) * (statId === "reflex" && owned("monitor") ? 1.20 : 1);
+    const gearF = (owned("coach") ? 1.30 : 1) * (statId === "reflex" && owned("monitor") ? 1.20 : 1)
+      * (teamHasTrait("mentor") ? 1.15 : 1);
     return state.talent * ageF * room * mult * 0.45 * gearF;
   }
 
@@ -2103,7 +2202,10 @@
     }
     if (a.stam) state.stamina = clamp(state.stamina + (a.stam < 0 ? a.stam * (archDef().staminaMul || 1) : a.stam), 0, 100);
     if (a.mental) state.mental = clamp(state.mental + a.mental, 0, 100);
-    if (a.chem) state.team.chem = clamp(state.team.chem + a.chem, 0, 100);
+    if (a.chem) {
+      state.team.chem = clamp(state.team.chem + a.chem, 0, 100);
+      state.team.mates.forEach(m => { m.bond = clamp((m.bond || 0) + a.chem * 0.4, 0, 100); });
+    }
     if (a.lead) state.lead = clamp(state.lead + growthVal(state.lead, a.lead), 1, 99);
     if (a.form) state.form = clamp(state.form + a.form, 0, 100);
     if (a.hype) state.hype = clamp(state.hype + a.hype * (0.6 + state.team.tier * 0.2), 0, 100);
@@ -2179,6 +2281,7 @@
     if (typeof state.captainTry !== "number") state.captainTry = 0;
     if (typeof state.transferTry !== "number") state.transferTry = 0;
     if (!state.career.recent) state.career.recent = [];
+    if (!state.career.timeline) state.career.timeline = [];
     if (typeof state.phase === "undefined") state.phase = null;
     if (!state.stage) state.stage = "pro";
     if (!state.ladder) state.ladder = { premier: 0, elo: 0, div: 0, divWins: 0, queue: "premier", matches: 0, mates: 0 };
@@ -2261,7 +2364,10 @@
     L.matches += 3;
     const after = faceitLevel(L.elo);
     addLog(TR("ladder.faceitLog", { w: w, l: l, elo: L.elo, lvl: after }), w >= l ? "good" : "bad");
-    if (after > before) addLog(TR("ladder.levelUp", { lvl: after }), "gold");
+    if (after > before) {
+      addLog(TR("ladder.levelUp", { lvl: after }), "gold");
+      if (after >= 9) chronicle(TR("chr.faceit", { lvl: after }), "gold");
+    }
     return { w: w, l: l, level: after };
   }
 
@@ -2279,6 +2385,7 @@
       L.divWins = 0;
       L.mates = clamp(L.mates + 4, 0, 30);
       addLog(TR("ladder.promo", { div: tx(ESL_DIVS[L.div].name) }), "gold");
+      chronicle(TR("chr.promo", { div: tx(ESL_DIVS[L.div].name) }), "gold");
     }
     return { w: w, l: l };
   }
@@ -2445,6 +2552,7 @@
     state.goal = makeGoal();
     state.nemesis = state.nemesis || pickNemesis();
     addLog(TR("ladder.turnedPro", { team: state.team.name }), "gold");
+    chronicle(TR("chr.firstContract", { team: state.team.name }), "gold");
   }
 
   // ---------- tydzień ----------
@@ -2565,6 +2673,7 @@
       }
       state.hype = clamp(state.hype + (ev.major ? 22 : 10), 0, 100);
       addLog(TR("log.champion", { event: ev.name }), "gold");
+      chronicle(TR(ev.major ? "chr.major" : "chr.trophy", { event: ev.name }), "gold");
       const evRatings = lines.map(l => l.rating);
       const avgR = evRatings.reduce((a, b) => a + b, 0) / evRatings.length;
       if (avgR >= 1.12) {
@@ -2756,7 +2865,8 @@
       state.goal = makeGoal();
       if (inLadder()) enterProCareer();
       state.hype = clamp(state.hype + 5, 0, 100);
-      addLog("Transfer: " + old + " → " + o.team + " (" + money(state.team.salary) + "/tydz.)", "gold");
+      addLog(TR("log.transferLine", { from: old, to: o.team, salary: money(state.team.salary) }), "gold");
+      chronicle(TR("chr.transfer", { team: o.team }), "info");
       const terms = [];
       if (ex.guaranteed) terms.push("gwarancja miejsca w składzie");
       if (ex.bonus) terms.push("bonus za trofea");
@@ -2805,6 +2915,32 @@
     return myScore < 60 ? 0 : pos;
   }
 
+  // Skład żyje własnym życiem między sezonami
+  function evolveSquad(rows) {
+    const used = state.team.mates.map(m => m.nick).concat([state.nick]);
+    const base = tier(state.team.tier).str;
+    state.team.mates.forEach((m, i) => {
+      m.age++;
+      m.seasons = (m.seasons || 0) + 1;
+      const rookie = (m.traits || []).indexOf("rookie") >= 0;
+      if (m.age <= 23) m.skill = clamp(m.skill + (rookie ? rnd(2, 5) : rnd(0.5, 2.5)), 25, 97);
+      else if (m.age >= 29) m.skill = clamp(m.skill - rnd(1, 3.5), 25, 97);
+      const leaveChance = m.age >= 31 ? 0.4 : m.skill > base + 6 ? 0.3 : 0.12;
+      if (Math.random() < leaveChance) {
+        const retiring = m.age >= 31;
+        const to = retiring ? "" : pickOrg(clamp(state.team.tier + 1, 0, 4));
+        rows.push([TR(retiring ? "squad.retired" : "squad.left", { nick: m.nick }), retiring ? TR("squad.age", { n: m.age }) : to]);
+        addLog(TR(retiring ? "squad.retiredLog" : "squad.leftLog", { nick: m.nick, team: to }), "info");
+        if ((m.bond || 0) > 60) state.mental = clamp(state.mental - 8, 0, 100);
+        const fresh = makeMate(base, used);
+        state.team.mates[i] = fresh;
+        state.team.chem = clamp(state.team.chem - 8, 0, 100);
+        rows.push([TR("squad.joined"), fresh.nick + " (" + tx(traitInfo(fresh.traits[0]).name) + ")"]);
+        addLog(TR("squad.joinedLog", { nick: fresh.nick }), "info");
+      }
+    });
+  }
+
   function endSeason() {
     const ss = state.seasonStats;
     const r = seasonRating();
@@ -2848,9 +2984,12 @@
       if (rank > 0 && nr > 0 && rank < nr) {
         state.nemesisBeaten++;
         addLog(TR("log.rivalPassed", { nick: state.nemesis.nick }), "gold");
+      chronicle(TR("chr.rival", { nick: state.nemesis.nick }), "gold");
         state.nemesis = null;
       }
     }
+
+    evolveSquad(rows);
 
     // reakcja drużyny
     let note = "";
@@ -2903,11 +3042,52 @@
 
     showModal(TR("season.end", { n: state.season - 1 }), note || TR("season.next", { age: state.age }),
       rows.map(x => '<div class="recap-line"><span>' + esc(x[0]) + '</span><b>' + esc(x[1]) + '</b></div>').join(""));
+    if (rank > 0) chronicle(TR("chr.rank", { n: rank }), rank <= 20 ? "gold" : "info");
+    modalAfterClose = () => { seasonGala(rank); modalAfterClose = () => { render(); save(); }; };
 
     if (state.age >= 34) {
       state.pendingRetire = true;
     }
     save();
+  }
+
+  // Gala: odsłonięcie rankingu i nagrody na koniec roku
+  function seasonGala(rank) {
+    const table = worldTable();
+    const top = table.slice(0, 10);
+    const mvp = table[0];
+    const rookieList = state.world.filter(r => r.age <= 20).sort((a, b) => b.rating - a.rating);
+    const rookie = rookieList[0];
+    const myRating = seasonRating();
+    const iAmMvp = mvp && mvp.me;
+    let html = '<h3 style="margin-bottom:6px">' + esc(TR("gala.top")) + "</h3>";
+    html += '<table class="rank-table"><tbody>' + top.map((r, i) =>
+      '<tr class="' + (r.me ? "me" : "") + '"><td class="rk">' + (i + 1) + "</td><td>" + esc(r.nick) +
+      '<div class="rk-team">' + esc(r.team) + "</div></td>" +
+      '<td class="rk-rat">' + r.rating.toFixed(2) + "</td></tr>").join("") + "</tbody></table>";
+    if (!top.some(r => r.me)) {
+      html += '<div class="recap-line"><span>' + esc(TR("gala.yourPlace")) + "</span><b>" +
+        (rank > 0 ? "#" + rank : TR("season.unranked")) + "</b></div>";
+    }
+    html += '<h3 style="margin:14px 0 6px">' + esc(TR("gala.awards")) + "</h3>";
+    html += '<div class="recap-line"><span>' + esc(TR("gala.mvp")) + "</span><b>" +
+      esc(mvp ? mvp.nick + " · " + mvp.rating.toFixed(2) : "—") + "</b></div>";
+    if (rookie) {
+      html += '<div class="recap-line"><span>' + esc(TR("gala.rookie")) + "</span><b>" +
+        esc(rookie.nick + " (" + rookie.age + ")") + "</b></div>";
+    }
+    const champ = sortedStandings()[0];
+    html += '<div class="recap-line"><span>' + esc(TR("gala.teamOfYear")) + "</span><b>" +
+      esc(champ ? champ.name : "—") + "</b></div>";
+    if (iAmMvp) {
+      state.career.mvps++;
+      chronicle(TR("gala.youMvp"), "gold");
+      html += '<div class="recap-line"><span>' + esc(TR("gala.yours")) + "</span><b>" + esc(TR("gala.youMvp")) + "</b></div>";
+    } else if (myRating >= 1.15) {
+      html += '<div class="recap-line"><span>' + esc(TR("gala.yours")) + "</span><b>" +
+        esc(TR("gala.evp", { r: myRating.toFixed(2) })) + "</b></div>";
+    }
+    showModal(TR("gala.title", { n: state.season - 1 }), TR("gala.sub"), html);
   }
 
   function checkAch() {
@@ -3263,6 +3443,7 @@
     state.s2 = newS2();
     state.goal2 = makeGoal2();
     addLog(TR("log.chapter2", { role: tx(def.name) }), "gold");
+    chronicle(TR("chr.chapter2", { role: tx(def.name) }), "gold");
     switchView("career");
     render(); save();
   }
@@ -3818,11 +3999,15 @@
       tier: tx(tier(state.team.tier).name), chem: Math.round(state.team.chem),
       years: state.team.contract, str: Math.round(teamStrength()) });
     const mates = [{ nick: state.nick, skill: Math.round(playerPower()), role: state.role, age: state.age, me: true }]
-      .concat(state.team.mates.map(m => ({ nick: m.nick, skill: Math.round(m.skill), role: m.role, age: m.age })));
+      .concat(state.team.mates.map(m => ({ nick: m.nick, skill: Math.round(m.skill), role: m.role, age: m.age,
+        traits: m.traits || [], bond: m.bond || 0 })));
     document.getElementById("mates-list").innerHTML = mates.map(m =>
       '<div class="mate-row' + (m.me ? " me" : "") + '"><div class="mate-av">' + icon("user") + "</div>" +
-      '<div class="mate-info"><div class="sb-name">' + esc(m.nick) + (m.me ? " (Ty)" : "") + "</div>" +
-      '<div class="sb-meta">' + esc(tx((ROLES.find(r => r.id === m.role) || ROLES[0]).name)) + " · " + m.age + " lat</div>" +
+      '<div class="mate-info"><div class="sb-name">' + esc(m.nick) + (m.me ? " " + esc(TR("team.you")) : "") + "</div>" +
+      '<div class="sb-meta">' + esc(tx((ROLES.find(r => r.id === m.role) || ROLES[0]).name)) + " · " + esc(TR("team.years", { n: m.age })) + "</div>" +
+      (m.me ? "" : '<div class="trait-row">' + (m.traits || []).map(t =>
+        '<span class="trait-chip" title="' + esc(tx(traitInfo(t).desc)) + '">' + esc(tx(traitInfo(t).name)) + "</span>").join("") +
+        '<span class="trait-chip bond">' + esc(TR("team.bond", { n: Math.round(m.bond || 0) })) + "</span></div>") +
       '<div class="bar-track" style="margin-top:5px"><div class="bar-fill" style="width:' + clamp(m.skill, 0, 100) +
       "%; background:" + barColor(m.skill) + '"></div></div></div>' +
       '<div class="stat-val">' + m.skill + "</div></div>").join("");
@@ -4028,6 +4213,12 @@
       html += '<h3 style="margin-top:14px">' + esc(TR("kv.seasons")) + "</h3>" + c.seasons.slice().reverse().map(s =>
         '<div class="map-line"><span>S' + s.season + " · " + esc(s.team) + "</span><span>" + s.rating.toFixed(2) +
         " · " + s.wins + "W" + (s.rank ? " · #" + s.rank : "") + "</span></div>").join("");
+    }
+    const tl = state.career.timeline || [];
+    if (tl.length) {
+      html += '<h3 style="margin-top:14px">' + esc(TR("chr.title")) + "</h3>" + tl.slice(0, 14).map(e =>
+        '<div class="map-line"><span>' + esc(e.text) + "</span><span>S" + e.s + " · " +
+        esc(TR("team.years", { n: e.age })) + "</span></div>").join("");
     }
     const hof = loadHof();
     if (hof.length) {
