@@ -263,6 +263,32 @@
     border-bottom: 1px solid var(--border); font-family: 'Inter', sans-serif; color: var(--text-dim); }
   .recap-line b { color: var(--text); font-family: 'Rajdhani', sans-serif; }
 
+  /* --- Wybory (decyzje meczowe i wydarzenia) --- */
+  .choice-opt { width: 100%; text-align: left; flex-direction: column; align-items: flex-start; gap: 3px;
+    text-transform: none; letter-spacing: normal; margin-bottom: 8px; padding: 12px 14px;
+    background: var(--bg-panel-2); border: 1px solid var(--border); }
+  .choice-opt b { font-family: 'Rajdhani', sans-serif; font-size: 0.92rem; text-transform: uppercase; }
+  .choice-opt span { font-size: 0.7rem; color: var(--text-dim); font-weight: 500; font-family: 'Inter', sans-serif; line-height: 1.35; }
+  .choice-opt .odds { font-size: 0.64rem; color: var(--gold); font-family: 'Inter', sans-serif; font-weight: 600; }
+
+  /* --- Sklep --- */
+  .shop-item { display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    background: var(--bg-panel); border: 1px solid var(--border); padding: 11px 13px; margin-bottom: 9px;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
+  .shop-item .si-name { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.88rem; text-transform: uppercase; }
+  .shop-item .si-desc { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; line-height: 1.35; }
+  .shop-item .si-upkeep { font-size: 0.64rem; color: var(--gold); margin-top: 3px; }
+  .shop-item button { flex-shrink: 0; padding: 9px 12px; font-size: 0.74rem; white-space: nowrap; }
+  .shop-item button.owned { background: rgba(41,255,176,0.12); border-color: var(--good); color: var(--good); }
+
+  /* --- Ranking świata --- */
+  .rank-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; font-family: 'Rajdhani', sans-serif; }
+  .rank-table td { padding: 5px 4px; border-bottom: 1px solid var(--border); font-weight: 600; }
+  .rank-table tr.me td { color: var(--accent); }
+  .rank-table .rk { width: 26px; color: var(--text-dim); }
+  .rank-table .rk-team { color: var(--text-dim); font-size: 0.72rem; }
+  .rank-table .rk-rat { text-align: right; width: 46px; }
+
   .hidden { display: none !important; }
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-thumb { background: var(--border-strong); }
@@ -376,9 +402,19 @@
           <h2><svg class="icon"><use href="#i-globe"></use></svg> Tabela ligi</h2>
           <table class="standings-table"><tbody id="standings-body"></tbody></table>
         </div>
+        <div class="glass panel">
+          <h2><svg class="icon"><use href="#i-chart"></use></svg> Top 20 zawodników świata</h2>
+          <p class="muted" style="margin-bottom:10px;">Ranking aktualizuje się po każdym sezonie. Liczy się rating, poziom drużyny, trofea i rozpoznawalność.</p>
+          <table class="rank-table"><tbody id="world-body"></tbody></table>
+        </div>
       </section>
 
       <section id="view-offers" class="view hidden">
+        <div class="glass panel">
+          <h2><svg class="icon"><use href="#i-coin"></use></svg> Inwestycje w karierę</h2>
+          <div id="shop-list"></div>
+          <div id="wallet-box" class="muted" style="margin-top:10px;"></div>
+        </div>
         <div class="glass panel">
           <h2><svg class="icon"><use href="#i-swap"></use></svg> Oferty transferowe</h2>
           <p class="muted" style="margin-bottom:12px;">Oferty pojawiają się, gdy grasz dobrze i masz rozpoznawalność. Wygasają po kilku tygodniach.</p>
@@ -415,7 +451,7 @@
       <button class="nav-btn active" data-view="career"><svg class="icon"><use href="#i-user"></use></svg><span>Kariera</span></button>
       <button class="nav-btn" data-view="train"><svg class="icon"><use href="#i-bolt"></use></svg><span>Trening</span></button>
       <button class="nav-btn" data-view="team"><svg class="icon"><use href="#i-users"></use></svg><span>Drużyna</span></button>
-      <button class="nav-btn" data-view="offers"><svg class="icon"><use href="#i-swap"></use></svg><span>Oferty</span><span class="dot hidden" id="offers-dot"></span></button>
+      <button class="nav-btn" data-view="offers"><svg class="icon"><use href="#i-swap"></use></svg><span>Rynek</span><span class="dot hidden" id="offers-dot"></span></button>
       <button class="nav-btn" data-view="profile"><svg class="icon"><use href="#i-medal"></use></svg><span>Profil</span></button>
     </nav>
   </div>
@@ -436,6 +472,15 @@
     </table>
     <div id="mo-extra" style="margin-top:12px;"></div>
     <button class="full primary" id="mo-close" style="margin-top:14px;">Dalej</button>
+  </div>
+</div>
+
+<!-- CHOICE -->
+<div id="choice-overlay" class="overlay hidden">
+  <div class="glass overlay-box" style="max-width:440px;">
+    <div class="ev-name" id="ch-title" style="text-align:center;"></div>
+    <p class="muted" id="ch-text" style="text-align:center; margin:8px 0 14px;"></p>
+    <div id="ch-options"></div>
   </div>
 </div>
 
@@ -509,6 +554,90 @@
     { id: "legend",     name: "Legenda 1.30+",    icon: "bolt",      test: s => s.career.seasons.some(x => x.rating >= 1.30 && x.matches >= 10) },
   ];
 
+  // Jednorazowe zakupy z trwałym efektem
+  const SHOP = [
+    { id: "gear",    name: "Sprzęt turniejowy",  cost: 14000,  upkeep: 0,    desc: "Własna myszka i klawiatura. +2 Aim od ręki." },
+    { id: "monitor", name: "Monitor 360 Hz",     cost: 26000,  upkeep: 0,    desc: "+2 Refleks od ręki, +20% skuteczności treningu refleksu." },
+    { id: "coach",   name: "Trener personalny",  cost: 70000,  upkeep: 1800, desc: "+30% zysków ze wszystkich treningów." },
+    { id: "analyst", name: "Analityk",           cost: 95000,  upkeep: 3000, desc: "Przygotowanie taktyczne: +3 do siły drużyny w meczach." },
+    { id: "psycho",  name: "Psycholog sportowy", cost: 45000,  upkeep: 1200, desc: "+3 psychiki co tydzień, o połowę mniejszy spadek po porażce." },
+    { id: "manager", name: "Menedżer",           cost: 80000,  upkeep: 2500, desc: "Dwa razy częstsze oferty transferowe i +15% do pensji." },
+    { id: "house",   name: "Własne mieszkanie",  cost: 220000, upkeep: 0,    desc: "+6 kondycji co tydzień. Spokojna głowa." },
+    { id: "physio",  name: "Fizjoterapeuta",     cost: 55000,  upkeep: 1500, desc: "Kontuzje trwają krócej i zdarzają się rzadziej." },
+  ];
+  const VACATION_COST = 30000;
+  const INVEST_CHUNK = 100000;
+
+  // Decyzje w trakcie meczu — modyfikują wynik i Twój rating
+  const DECISIONS = [
+    { id: "clutch", title: "Clutch 1v2", text: "Zostajesz sam przeciwko dwójce. Bomba podłożona, 32 sekundy.", opts: [
+      { label: "Graj na czas", desc: "Trzymasz pozycję i liczysz na błąd przeciwnika.", stat: "sense", team: 0.6, rating: 0.06 },
+      { label: "Szukaj fraga", desc: "Wchodzisz agresywnie. Va banque.", stat: "aim", team: 1.3, rating: 0.16 },
+      { label: "Zbierz info i zgiń", desc: "Ekipa będzie wiedzieć, gdzie stoją. Ty nie dożyjesz.", stat: "team", team: 0.5, rating: 0.02, safe: true },
+    ]},
+    { id: "force", title: "Decyzja ekonomiczna", text: "Przegrywacie 3:8. IGL pyta skład o zdanie: forsa czy eco?", opts: [
+      { label: "Force-buy", desc: "Ryzyko, ale przerwanie serii przeciwnika jest kluczowe.", stat: "sense", team: 1.2, rating: 0.08 },
+      { label: "Pełne eco", desc: "Odpuszczacie rundę, żeby mieć pełny zakup później.", stat: "team", team: 0.7, rating: 0.03, safe: true },
+      { label: "Półbuy z deaglem", desc: "Kompromis. Wchodzisz na pistoletach z pancerzem.", stat: "aim", team: 0.9, rating: 0.10 },
+    ]},
+    { id: "read", title: "Przeciwnik czyta wasze setupy", text: "Trzecia runda z rzędu, w której wiedzą, gdzie stoisz.", opts: [
+      { label: "Zmień pozycję", desc: "Improwizujesz wbrew ustaleniom taktycznym.", stat: "sense", team: 0.9, rating: 0.10 },
+      { label: "Zagraj to samo", desc: "Podwójny blef — zostajesz tam, gdzie się ciebie spodziewają.", stat: "reflex", team: 1.0, rating: 0.12 },
+      { label: "Powiedz IGL-owi", desc: "Zgłaszasz problem i czekasz na nowy plan.", stat: "team", team: 0.6, rating: 0.03, safe: true },
+    ]},
+    { id: "pistol", title: "Runda pistoletowa drugiej połowy", text: "Stan 6:6. Runda pistoletowa decyduje o rozpędzie.", opts: [
+      { label: "Agresywny rush", desc: "Pięciu na jedno wejście, bez utility.", stat: "reflex", team: 1.1, rating: 0.12 },
+      { label: "Rozgrywka na mapie", desc: "Rozchodzicie się i gracie na informacje.", stat: "sense", team: 0.8, rating: 0.07 },
+      { label: "Utility na wejście", desc: "Pełen zestaw flashy na jedno miejsce.", stat: "util", team: 1.0, rating: 0.06 },
+    ]},
+    { id: "tilt", title: "Kolega z zespołu pęka", text: "Po trzech przegranych rundach zaczyna krzyczeć na comms.", opts: [
+      { label: "Uspokój go", desc: "Bierzesz rolę lidera i porządkujesz komunikację.", stat: "team", team: 1.0, rating: 0.04 },
+      { label: "Wyłącz się z gadania", desc: "Skupiasz się wyłącznie na własnej grze.", stat: "aim", team: 0.3, rating: 0.14 },
+      { label: "Odbij tak samo", desc: "Emocje na maksa. Albo was to obudzi, albo dobije.", stat: "reflex", team: 1.2, rating: 0.10 },
+    ]},
+    { id: "matchpoint", title: "Piłka meczowa", text: "Runda za wygraną. Cała hala patrzy na Ciebie.", opts: [
+      { label: "Weź grę na siebie", desc: "Otwierasz rundę. Twój frag, Twoja odpowiedzialność.", stat: "aim", team: 1.2, rating: 0.18 },
+      { label: "Zagraj pod skład", desc: "Utility i trade — ekipa kończy robotę.", stat: "util", team: 1.0, rating: 0.05, safe: true },
+      { label: "Zwolnij tempo", desc: "Gracie na czas i wymuszacie błąd.", stat: "sense", team: 0.9, rating: 0.07 },
+    ]},
+  ];
+
+  // Wydarzenia poza serwerem
+  const LIFE = [
+    { id: "interview", title: "Wywiad po meczu", text: "Dziennikarz pyta wprost o formę Twojego składu.", opts: [
+      { label: "Chwal drużynę", desc: "Bezpiecznie. Chemia w składzie rośnie.", eff: () => { state.team.chem = clamp(state.team.chem + 6, 0, 100); state.hype = clamp(state.hype + 1, 0, 100); return "Skład docenia, że ich kryjesz."; } },
+      { label: "Powiedz prawdę", desc: "Głośny cytat. Media to podchwycą.", eff: () => { state.hype = clamp(state.hype + 8, 0, 100); state.team.chem = clamp(state.team.chem - 9, 0, 100); return "Cytat obiega internet. W szatni jest chłodno."; } },
+      { label: "Odmów komentarza", desc: "Święty spokój.", eff: () => { state.mental = clamp(state.mental + 4, 0, 100); return "Bez dramy. Wracasz do treningu."; } },
+    ]},
+    { id: "roleswap", title: "Propozycja zmiany roli", text: "Trener uważa, że sprawdzisz się lepiej na innej pozycji.", opts: [
+      { label: "Przyjmij nową rolę", desc: "Inne statystyki zaczną decydować o Twojej grze.", eff: () => {
+          const others = ROLES.filter(r => r.id !== state.role);
+          const nr = pick(others);
+          state.role = nr.id;
+          state.form = clamp(state.form - 12, 0, 100);
+          return "Od teraz grasz jako " + nr.name + ". Potrzebujesz czasu na aklimatyzację.";
+        } },
+      { label: "Zostań przy swoim", desc: "Znasz swoją rolę najlepiej.", eff: () => { state.team.chem = clamp(state.team.chem - 3, 0, 100); return "Trener przyjmuje to bez entuzjazmu."; } },
+    ]},
+    { id: "conflict", title: "Konflikt w składzie", text: "Dwóch kolegów kłóci się o role i czas antenowy.", opts: [
+      { label: "Weź stronę jednego", desc: "Zyskujesz sojusznika, tracisz drugiego.", eff: () => { state.team.chem = clamp(state.team.chem - 4, 0, 100); state.mental = clamp(state.mental + 2, 0, 100); return "Szatnia jest podzielona, ale sprawa się wyjaśniła."; } },
+      { label: "Mediuj", desc: "Próbujesz pogodzić obie strony.", eff: () => { state.team.chem = clamp(state.team.chem + 8, 0, 100); state.mental = clamp(state.mental - 5, 0, 100); return "Udało się ich pogodzić. Kosztowało Cię to nerwy."; } },
+      { label: "Nie mieszaj się", desc: "To nie Twój problem.", eff: () => { state.team.chem = clamp(state.team.chem - 6, 0, 100); return "Konflikt tli się dalej."; } },
+    ]},
+    { id: "sponsorgig", title: "Nagranie reklamowe", text: "Marka chce Cię na całodniowej sesji zdjęciowej.", opts: [
+      { label: "Bierz kasę", desc: "Konkretna wypłata kosztem dnia treningu.", eff: () => { const e = Math.round(6000 + state.hype * 400); state.money += e; state.career.earned += e; state.stamina = clamp(state.stamina - 12, 0, 100); state.hype = clamp(state.hype + 4, 0, 100); return "Zarabiasz " + money(e) + ", ale dzień z głowy."; } },
+      { label: "Odmów", desc: "Priorytetem jest gra.", eff: () => { state.form = clamp(state.form + 4, 0, 100); return "Zostajesz na serwerze. Forma rośnie."; } },
+    ]},
+    { id: "fpl", title: "Nocne FPL", text: "Koledzy ciągną Cię na serwery do 4 nad ranem.", opts: [
+      { label: "Graj do rana", desc: "Aim rośnie, kondycja leci na łeb.", eff: () => { state.stats.aim = clamp(state.stats.aim + growth("aim", 2.2), 1, 99); state.stamina = clamp(state.stamina - 20, 0, 100); return "Świetny aim, zero snu."; } },
+      { label: "Idź spać", desc: "Rutyna ponad wszystko.", eff: () => { state.stamina = clamp(state.stamina + 12, 0, 100); return "Wyspany. Nudne, ale skuteczne."; } },
+    ]},
+    { id: "hater", title: "Fala hejtu", text: "Po słabym meczu social media rozrywa Cię na strzępy.", opts: [
+      { label: "Wyłącz telefon", desc: "Odcinasz się od szumu.", eff: () => { state.mental = clamp(state.mental + 6, 0, 100); state.hype = clamp(state.hype - 3, 0, 100); return "Cisza pomaga. Hype trochę spada."; } },
+      { label: "Odpowiedz hejterom", desc: "Ryzykowne, ale zasięgi szaleją.", eff: () => { state.hype = clamp(state.hype + 9, 0, 100); state.mental = clamp(state.mental - 10, 0, 100); return "Twój post ma milion wyświetleń. Głowa boli."; } },
+    ]},
+  ];
+
   const ACTIONS = [
     { id: "aimlab",  name: "Trening aim",     icon: "crosshair", cost: 1, desc: "Deathmatch i aim maps. Rozwija Aim.",           stat: "aim",    gain: 2.4, stam: -12, mental: -2 },
     { id: "reflex",  name: "Prefire / ruch",  icon: "run",       cost: 1, desc: "Peeki, movement, timingi. Rozwija Refleks.",    stat: "reflex", gain: 2.4, stam: -12, mental: -2 },
@@ -524,6 +653,8 @@
   let state = null;
   let currentView = "career";
   let pendingRole = "awp";
+  let matchMods = { round: 0, rating: 0, notes: [] };
+  let choiceHandler = null;
 
   // ---------- utils ----------
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -603,7 +734,7 @@
       stamina: 90, mental: 80, form: 55,
       team: null, league: null, schedule: null,
       seasonStats: { matches: 0, wins: 0, kills: 0, deaths: 0, adr: 0, rating: 0, best: 0 },
-      offers: [], sponsors: [],
+      offers: [], sponsors: [], shop: {}, invest: 0, injury: 0, world: null,
       career: { matches: 0, wins: 0, kills: 0, deaths: 0, rating: 0, aces: 0, mvps: 0, earned: 0,
                 trophies: [], seasons: [], bestRank: 0, bestRating: 0 },
       ach: {}, log: [], rank: 0, retired: false,
@@ -613,8 +744,100 @@
     s.team.salary = 0;
     s.league = makeLeague();
     s.schedule = makeSchedule();
+    s.world = makeWorld();
     addLog("Zaczynasz karierę jako " + role().name + " w " + s.team.name + ".", "info");
     return s;
+  }
+
+  // ---------- świat: rywale i ranking ----------
+  function makeWorld() {
+    const used = [state.nick].concat(state.team ? state.team.mates.map(m => m.nick) : []);
+    const arr = [];
+    for (let i = 0; i < 44; i++) {
+      let n, guard = 0;
+      do { n = pick(NICK_POOL) + (Math.random() < 0.35 ? String(irnd(1, 99)) : ""); guard++; }
+      while (used.indexOf(n) >= 0 && guard < 40);
+      used.push(n);
+      arr.push({
+        nick: n, age: irnd(18, 29), tier: clamp(4 - Math.floor(i / 10), 0, 4),
+        rating: +(0.94 + rnd(0, 0.34)).toFixed(2), hype: irnd(30, 95),
+        trophies: Math.max(0, irnd(-2, 4)), team: pick(ORG_NAMES),
+      });
+    }
+    return arr;
+  }
+
+  function rankScore(tierId, rating, hype, trophies) {
+    return tierId * 18 + (rating - 1) * 200 + hype * 0.25 + trophies * 4;
+  }
+
+  function worldTable() {
+    if (!state.world) state.world = makeWorld();
+    const rows = state.world.map(r => ({
+      nick: r.nick, team: r.team, tier: r.tier, rating: r.rating,
+      score: rankScore(r.tier, r.rating, r.hype, r.trophies),
+    }));
+    const myRating = state.seasonStats.matches >= 4 ? seasonRating()
+      : (state.career.matches ? state.career.rating / state.career.matches : 0.9);
+    rows.push({
+      me: true, nick: state.nick, team: state.team.name, tier: state.team.tier, rating: +myRating.toFixed(2),
+      score: rankScore(state.team.tier, myRating, state.hype, state.career.trophies.length),
+    });
+    return rows.sort((a, b) => b.score - a.score);
+  }
+
+  function evolveWorld() {
+    if (!state.world) { state.world = makeWorld(); return; }
+    const used = state.world.map(r => r.nick).concat([state.nick]);
+    state.world.forEach(r => {
+      r.age++;
+      r.rating = +clamp(r.rating + rnd(-0.09, 0.09) + (r.age > 28 ? -0.03 : 0.01), 0.80, 1.45).toFixed(2);
+      r.hype = clamp(Math.round(r.hype + rnd(-8, 8) + (r.rating - 1.05) * 30), 5, 100);
+      if (Math.random() < 0.25) r.tier = clamp(r.tier + (r.rating > 1.12 ? 1 : -1), 0, 4);
+      if (Math.random() < 0.2) r.team = pick(ORG_NAMES);
+      if (r.rating > 1.15 && Math.random() < 0.3) r.trophies++;
+      if (r.age > 31 && Math.random() < 0.45) { // emerytura, wchodzi nowy talent
+        let n, guard = 0;
+        do { n = pick(NICK_POOL) + (Math.random() < 0.5 ? String(irnd(1, 99)) : ""); guard++; }
+        while (used.indexOf(n) >= 0 && guard < 40);
+        used.push(n);
+        r.nick = n; r.age = irnd(17, 20); r.tier = clamp(irnd(0, 3), 0, 4);
+        r.rating = +(0.95 + rnd(0, 0.25)).toFixed(2); r.hype = irnd(20, 60); r.trophies = 0; r.team = pick(ORG_NAMES);
+      }
+    });
+  }
+
+  // ---------- sklep ----------
+  function owned(id) { return !!(state.shop && state.shop[id]); }
+  function upkeepTotal() { return SHOP.reduce((a, it) => a + (owned(it.id) ? it.upkeep : 0), 0); }
+
+  function buyItem(id) {
+    const it = SHOP.find(x => x.id === id);
+    if (!it || owned(id) || state.money < it.cost) return;
+    state.money -= it.cost;
+    state.shop[id] = true;
+    if (id === "gear") state.stats.aim = clamp(state.stats.aim + 2, 1, 99);
+    if (id === "monitor") state.stats.reflex = clamp(state.stats.reflex + 2, 1, 99);
+    addLog("Zakup: " + it.name + " (" + money(it.cost) + ")", "info");
+    render(); save();
+  }
+
+  function buyVacation() {
+    if (state.money < VACATION_COST) return;
+    state.money -= VACATION_COST;
+    state.mental = clamp(state.mental + 35, 0, 100);
+    state.stamina = clamp(state.stamina + 25, 0, 100);
+    state.form = clamp(state.form - 4, 0, 100);
+    addLog("Wakacje: głowa odpoczęła.", "good");
+    render(); save();
+  }
+
+  function invest() {
+    if (state.money < INVEST_CHUNK) return;
+    state.money -= INVEST_CHUNK;
+    state.invest += INVEST_CHUNK;
+    addLog("Wpłata do portfela inwestycyjnego: " + money(INVEST_CHUNK), "info");
+    render(); save();
   }
 
   // ---------- siła / rating ----------
@@ -625,19 +848,20 @@
     return sum;
   }
   function condFactor() {
-    return 1 + (state.stamina - 70) * 0.0022 + (state.mental - 70) * 0.0018 + (state.form - 55) * 0.0016;
+    const inj = state.injury > 0 ? 0.10 : 0;
+    return 1 + (state.stamina - 70) * 0.0022 + (state.mental - 70) * 0.0018 + (state.form - 55) * 0.0016 - inj;
   }
   function playerPower() { return clamp(skillScore() * condFactor(), 10, 105); }
   function matesAvg() { return state.team.mates.reduce((a, m) => a + m.skill, 0) / state.team.mates.length; }
   function teamStrength() {
-    return matesAvg() * 0.72 + playerPower() * 0.28 + (state.team.chem - 50) * 0.09;
+    return matesAvg() * 0.72 + playerPower() * 0.28 + (state.team.chem - 50) * 0.09 + (owned("analyst") ? 3 : 0);
   }
 
   // ---------- symulacja meczu ----------
   function simMap(oppStr, mapName) {
     const my = teamStrength();
     const diff = my - oppStr;
-    const pRound = clamp(0.5 + diff * 0.013, 0.22, 0.78);
+    const pRound = clamp(0.5 + diff * 0.013 + matchMods.round * 0.011, 0.20, 0.80);
     let a = 0, b = 0;
     while (true) {
       if (Math.random() < pRound) a++; else b++;
@@ -660,7 +884,7 @@
     // rating gracza
     const rel = (playerPower() - oppStr) * 0.014;
     const roundShare = (a / rounds - 0.5) * 0.35;
-    let rating = clamp(1.0 + rel + roundShare + rnd(-0.22, 0.24), 0.35, 2.05);
+    let rating = clamp(1.0 + rel + roundShare + matchMods.rating + rnd(-0.22, 0.24), 0.35, 2.05);
     const kpr = clamp(0.60 + (rating - 1) * 0.42, 0.25, 1.25);
     const dpr = clamp(0.72 - (rating - 1) * 0.24, 0.35, 0.95);
     const kills = Math.max(1, Math.round(kpr * rounds));
@@ -716,7 +940,7 @@
 
     state.stamina = clamp(state.stamina - 6 * res.maps.length, 0, 100);
     state.form = clamp(state.form + (res.won ? 7 : -6) + (res.me.rating - 1) * 22, 0, 100);
-    state.mental = clamp(state.mental + (res.won ? 4 : -6), 0, 100);
+    state.mental = clamp(state.mental + (res.won ? 4 : (owned("psycho") ? -3 : -6)), 0, 100);
     state.team.chem = clamp(state.team.chem + (res.won ? 2 : -2), 0, 100);
     state.hype = clamp(state.hype + (res.won ? 1.2 : 0.3) + (res.me.rating - 1) * 8 + state.team.tier * 0.4, 0, 100);
 
@@ -737,7 +961,8 @@
     const ageF = state.age <= 21 ? 1.2 : state.age <= 25 ? 1.0 : state.age <= 28 ? 0.65 : 0.35;
     // im wyżej, tym trudniej — ostatnie punkty kosztują sezony
     const room = Math.pow(clamp((100 - cur) / 100, 0, 1), 1.6);
-    return state.talent * ageF * room * mult * 0.45;
+    const gearF = (owned("coach") ? 1.30 : 1) * (statId === "reflex" && owned("monitor") ? 1.20 : 1);
+    return state.talent * ageF * room * mult * 0.45 * gearF;
   }
 
   // ---------- akcje tygodnia ----------
@@ -767,10 +992,33 @@
 
   function nextWeek() {
     const ev = currentEvent();
-    if (ev.type === "league") playLeagueMatch(ev);
-    else if (ev.type === "event") playEvent(ev);
-    else if (ev.type === "playoff") playPlayoff();
-    else { advanceWeek(); render(); save(); }
+    const isMatch = ev.type === "league" || ev.type === "event" || ev.type === "playoff";
+    if (!isMatch) { advanceWeek(); render(); save(); return; }
+    if (state.injury >= 2 || state.mental <= 12) { missMatch(ev); return; }
+    runMatchDecision(() => {
+      if (ev.type === "league") playLeagueMatch(ev);
+      else if (ev.type === "event") playEvent(ev);
+      else playPlayoff();
+    });
+  }
+
+  // Kontuzja albo wypalenie — drużyna gra ze stand-inem
+  function missMatch(ev) {
+    const reason = state.injury > 0 ? "Kontuzja" : "Wypalenie";
+    const oppStr = ev.type === "league" ? state.league.teams[ev.opp].str : tier(state.team.tier).str + 3;
+    const won = Math.random() < clamp(0.5 + (matesAvg() - oppStr) * 0.02, 0.15, 0.8);
+    if (ev.type === "league") {
+      const me = state.league.teams[0], opp = state.league.teams[ev.opp];
+      const d = irnd(1, 8);
+      if (won) { me.w++; opp.l++; me.rd += d; opp.rd -= d; } else { me.l++; opp.w++; me.rd -= d; opp.rd += d; }
+      simRestOfLeague(ev.opp);
+    }
+    state.form = clamp(state.form - 5, 0, 100);
+    state.mental = clamp(state.mental + 6, 0, 100);
+    addLog(reason + ": opuszczasz mecz, zastępuje Cię stand-in (" + (won ? "wygrana" : "porażka") + ").", "bad");
+    showModal("Nie zagrasz w tym tygodniu", reason + ". Drużyna zagrała ze stand-inem i " +
+      (won ? "wygrała." : "przegrała."), "");
+    modalAfterClose = () => { advanceWeek(); render(); save(); };
   }
 
   function simRestOfLeague(skipIdx) {
@@ -872,9 +1120,21 @@
     state.money += state.team.salary;
     state.career.earned += state.team.salary;
     state.sponsors.forEach(sp => { state.money += sp.pay; state.career.earned += sp.pay; });
+    state.money -= upkeepTotal();
+    if (owned("psycho")) state.mental = clamp(state.mental + 3, 0, 100);
+    if (owned("house")) state.stamina = clamp(state.stamina + 6, 0, 100);
+    if (state.invest > 0) state.invest = Math.round(state.invest * 1.005);
     state.stamina = clamp(state.stamina + 9, 0, 100);
     state.mental = clamp(state.mental + 3, 0, 100);
     state.hype = clamp(state.hype - 1.2 - state.hype * 0.012, 0, 100);
+
+    if (state.injury > 0) {
+      state.injury--;
+      if (state.injury === 0) addLog("Kontuzja wyleczona — wracasz do składu.", "good");
+    } else if (state.stamina < 25 && Math.random() < (owned("physio") ? 0.03 : 0.07)) {
+      state.injury = owned("physio") ? 1 : irnd(1, 3);
+      addLog("Kontuzja nadgarstka. Pauza: " + state.injury + " tyg.", "bad");
+    }
     state.form = clamp(state.form + (state.form < 50 ? 2 : -1), 0, 100);
     state.energy = MAX_ENERGY;
 
@@ -885,7 +1145,8 @@
     checkAch();
 
     state.week++;
-    if (state.week > SEASON_LENGTH) endSeason();
+    if (state.week > SEASON_LENGTH) { endSeason(); return; }
+    if (Math.random() < 0.17) runLifeEvent(() => { render(); save(); });
   }
 
   // ---------- oferty / sponsorzy ----------
@@ -899,7 +1160,7 @@
   function maybeOffer(force) {
     const mv = marketValue();
     const targetTier = clamp(Math.floor(mv / 42), 0, 4);
-    const chance = force ? 1 : clamp((mv - 40) / 800, 0, 0.25);
+    const chance = force ? 1 : clamp((mv - 40) / 800, 0, 0.25) * (owned("manager") ? 2 : 1);
     if (Math.random() > chance) return;
     if (state.offers.length >= 3) return;
     // awans co najwyżej o jeden poziom naraz
@@ -910,7 +1171,7 @@
     if (team.name === state.team.name) return;
     const offer = {
       id: "o" + Date.now() + Math.floor(Math.random() * 999),
-      team: team.name, tier: t, salary: Math.round(tier(t).salary * rnd(0.85, 1.35) * (1 + state.hype / 260)),
+      team: team.name, tier: t, salary: Math.round(tier(t).salary * rnd(0.85, 1.35) * (1 + state.hype / 260) * (owned("manager") ? 1.15 : 1)),
       years: irnd(1, 3), strength: Math.round(team.mates.reduce((a, m) => a + m.skill, 0) / 4),
       mates: team.mates, chem: team.chem, ttl: irnd(3, 5),
       hot: t > state.team.tier,
@@ -948,10 +1209,10 @@
   }
 
   function worldRank() {
-    const r = seasonRating();
-    const score = (state.team.tier * 18) + (r - 1) * 200 + state.hype * 0.25 + state.career.trophies.length * 4;
-    if (score < 65) return 0;
-    return clamp(Math.round(175 - score), 1, 110);
+    const table = worldTable();
+    const pos = table.findIndex(t => t.me) + 1;
+    const myScore = table[pos - 1].score;
+    return myScore < 60 ? 0 : pos;
   }
 
   function endSeason() {
@@ -992,6 +1253,8 @@
       state.team.patience = 3;
       maybeOffer(true);
     }
+
+    evolveWorld();
 
     // starzenie
     state.age++;
@@ -1035,7 +1298,8 @@
     const c = state.career;
     const avg = c.matches ? c.rating / c.matches : 0;
     return Math.round(c.trophies.length * 120 + c.trophies.filter(t => t.major).length * 250 + c.mvps * 90 +
-      (c.bestRank > 0 ? Math.max(0, 130 - c.bestRank) * 6 : 0) + avg * 300 + c.wins * 3 + c.earned / 12000);
+      (c.bestRank > 0 ? Math.max(0, 130 - c.bestRank) * 6 : 0) + avg * 300 + c.wins * 3 +
+      (c.earned + (state.invest || 0)) / 12000);
   }
 
   function retire() {
@@ -1047,7 +1311,8 @@
       ["Średni rating kariery", avg], ["K/D", c.deaths ? (c.kills / c.deaths).toFixed(2) : "-"],
       ["Trofea", c.trophies.length + (c.trophies.some(t => t.major) ? " (w tym Major)" : "")],
       ["MVP eventów", c.mvps], ["Najwyższy ranking", c.bestRank > 0 ? "#" + c.bestRank : "brak"],
-      ["Zarobki", money(c.earned)], ["Punkty Hall of Fame", hofScore()],
+      ["Zarobki", money(c.earned)], ["Portfel inwestycyjny", money(state.invest || 0)],
+      ["Punkty Hall of Fame", hofScore()],
     ];
     const s = hofScore();
     const verdict = s > 1400 ? "GOAT. Twój nick zostaje na zawsze w historii sceny."
@@ -1059,6 +1324,64 @@
     save();
   }
 
+  // ---------- overlays: wybory ----------
+  // opts: [{ label, desc, odds }] ; cb(index)
+  function showChoice(title, text, opts, cb) {
+    document.getElementById("ch-title").textContent = title;
+    document.getElementById("ch-text").textContent = text;
+    document.getElementById("ch-options").innerHTML = opts.map((o, i) =>
+      '<button class="choice-opt" data-choice="' + i + '"><b>' + esc(o.label) + "</b>" +
+      "<span>" + esc(o.desc) + "</span>" +
+      (o.odds ? '<span class="odds">Szansa powodzenia: ' + o.odds + "%</span>" : "") + "</button>").join("");
+    choiceHandler = cb;
+    document.getElementById("choice-overlay").classList.remove("hidden");
+  }
+  function closeChoice() {
+    document.getElementById("choice-overlay").classList.add("hidden");
+    choiceHandler = null;
+  }
+
+  function decisionOdds(o) {
+    const base = 0.32 + (state.stats[o.stat] - 50) * 0.009 + (state.mental - 50) * 0.003 + (state.form - 50) * 0.002;
+    return clamp(o.safe ? base + 0.26 : base, 0.10, 0.92);
+  }
+
+  // Losuje decyzję meczową, po wyborze wywołuje done()
+  function runMatchDecision(done) {
+    matchMods = { round: 0, rating: 0, notes: [] };
+    const d = pick(DECISIONS);
+    const opts = d.opts.map(o => ({ label: o.label, desc: o.desc, odds: Math.round(decisionOdds(o) * 100) }));
+    showChoice(d.title, d.text, opts, i => {
+      const o = d.opts[i];
+      const ok = Math.random() < decisionOdds(o);
+      if (ok) {
+        matchMods.round += o.team;
+        matchMods.rating += o.rating;
+        matchMods.notes.push("✓ " + o.label + " — wyszło.");
+        state.mental = clamp(state.mental + 2, 0, 100);
+      } else {
+        matchMods.round -= o.team * 0.55;
+        matchMods.rating -= o.rating * 0.7;
+        matchMods.notes.push("✗ " + o.label + " — nie wypaliło.");
+        state.mental = clamp(state.mental - 2, 0, 100);
+      }
+      closeChoice();
+      done();
+    });
+  }
+
+  // Wydarzenie poza serwerem; po rozstrzygnięciu wywołuje done()
+  function runLifeEvent(done) {
+    const ev = pick(LIFE);
+    showChoice(ev.title, ev.text, ev.opts.map(o => ({ label: o.label, desc: o.desc })), i => {
+      const txt = ev.opts[i].eff();
+      addLog(ev.title + ": " + txt, "info");
+      closeChoice();
+      showModal(ev.title, txt, "");
+      modalAfterClose = done;
+    });
+  }
+
   // ---------- overlays ----------
   function showModal(title, text, bodyHtml) {
     document.getElementById("modal-title").textContent = title;
@@ -1068,6 +1391,7 @@
   }
 
   let matchAfterClose = null;
+  let modalAfterClose = null;
   function showMatch(title, res, oppName, multi) {
     document.getElementById("mo-title").textContent = title;
     const scoreEl = document.getElementById("mo-score");
@@ -1095,6 +1419,9 @@
 
     let extra = "";
     if (res.me.aces) extra += '<div class="tag gold">' + res.me.aces + "× ACE</div>";
+    if (matchMods.notes && matchMods.notes.length) {
+      extra += matchMods.notes.map(n => '<div class="map-line"><span>' + esc(n) + "</span></div>").join("");
+    }
     if (multi && multi.extra) extra += '<div class="muted" style="margin-top:8px;">' + esc(multi.extra) + "</div>";
     document.getElementById("mo-extra").innerHTML = extra;
 
@@ -1112,7 +1439,7 @@
     document.getElementById("hud-week").textContent = state.week + "/" + SEASON_LENGTH;
     document.getElementById("hud-season").textContent = state.season;
 
-    renderCareer(); renderTrain(); renderTeam(); renderOffers(); renderProfile();
+    renderCareer(); renderTrain(); renderTeam(); renderShop(); renderWorld(); renderOffers(); renderProfile();
     document.getElementById("offers-dot").classList.toggle("hidden", state.offers.length === 0);
   }
 
@@ -1129,6 +1456,7 @@
     if (state.form <= 30) tags.push('<span class="tag bad">Kryzys formy</span>');
     if (state.stamina <= 30) tags.push('<span class="tag bad">Przetrenowany</span>');
     if (state.mental <= 30) tags.push('<span class="tag bad">Wypalenie</span>');
+    if (state.injury > 0) tags.push('<span class="tag bad">Kontuzja: ' + state.injury + " tyg.</span>");
     document.getElementById("pc-tags").innerHTML = tags.join("");
 
     const ss = state.seasonStats;
@@ -1139,6 +1467,8 @@
       ["K/D sezon", ss.deaths ? (ss.kills / ss.deaths).toFixed(2) : "—"],
       ["ADR", ss.matches ? Math.round(ss.adr / ss.matches) : "—"],
       ["Trofea", state.career.trophies.length],
+      ["Utrzymanie", money(upkeepTotal())],
+      ["Portfel", money(state.invest || 0)],
     ].map(x => '<div class="kv"><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + "</div></div>").join("");
 
     const ev = currentEvent();
@@ -1208,6 +1538,46 @@
     document.getElementById("standings-body").innerHTML = sortedStandings().map((t, i) =>
       '<tr class="' + (t.me ? "me" : "") + '"><td class="st-rank">' + (i + 1) + "</td><td>" + esc(t.name) +
       '</td><td class="st-num">' + t.w + "-" + t.l + '</td><td class="st-num">' + (t.rd > 0 ? "+" : "") + t.rd + "</td></tr>").join("");
+  }
+
+  function renderShop() {
+    const items = SHOP.map(it => {
+      const has = owned(it.id);
+      return '<div class="shop-item"><div><div class="si-name">' + esc(it.name) + "</div>" +
+        '<div class="si-desc">' + esc(it.desc) + "</div>" +
+        (it.upkeep ? '<div class="si-upkeep">Utrzymanie: ' + money(it.upkeep) + "/tydz.</div>" : "") + "</div>" +
+        '<button class="' + (has ? "owned" : "") + '" data-buy="' + it.id + '"' +
+        (has || state.money < it.cost ? " disabled" : "") + ">" +
+        (has ? "Masz" : money(it.cost)) + "</button></div>";
+    }).join("");
+    const extras =
+      '<div class="shop-item"><div><div class="si-name">Wakacje</div>' +
+      '<div class="si-desc">+35 psychiki, +25 kondycji. Można powtarzać.</div></div>' +
+      '<button data-vacation="1"' + (state.money < VACATION_COST ? " disabled" : "") + ">" + money(VACATION_COST) + "</button></div>" +
+      '<div class="shop-item"><div><div class="si-name">Portfel inwestycyjny</div>' +
+      '<div class="si-desc">Rośnie 0,5% tygodniowo i liczy się do punktów Hall of Fame.</div></div>' +
+      '<button data-invest="1"' + (state.money < INVEST_CHUNK ? " disabled" : "") + ">Wpłać " + money(INVEST_CHUNK) + "</button></div>";
+    document.getElementById("shop-list").innerHTML = items + extras;
+    document.getElementById("wallet-box").textContent =
+      "Portfel inwestycyjny: " + money(state.invest || 0) + " · koszty utrzymania: " + money(upkeepTotal()) + "/tydz.";
+  }
+
+  function renderWorld() {
+    const table = worldTable().slice(0, 20);
+    const meIn = table.some(r => r.me);
+    let rows = table.map((r, i) =>
+      '<tr class="' + (r.me ? "me" : "") + '"><td class="rk">' + (i + 1) + "</td><td>" + esc(r.nick) +
+      '<div class="rk-team">' + esc(r.team) + " · " + esc(tier(r.tier).name) + '</div></td><td class="rk-rat">' +
+      r.rating.toFixed(2) + "</td></tr>").join("");
+    if (!meIn) {
+      const full = worldTable();
+      const pos = full.findIndex(x => x.me) + 1;
+      const me = full[pos - 1];
+      rows += '<tr class="me"><td class="rk">' + pos + "</td><td>" + esc(me.nick) +
+        '<div class="rk-team">' + esc(me.team) + " · " + esc(tier(me.tier).name) + '</div></td><td class="rk-rat">' +
+        me.rating.toFixed(2) + "</td></tr>";
+    }
+    document.getElementById("world-body").innerHTML = rows;
   }
 
   function renderOffers() {
@@ -1313,6 +1683,16 @@
     const b = e.target.closest("[data-act]");
     if (b) doAction(b.dataset.act);
   });
+  document.getElementById("ch-options").addEventListener("click", e => {
+    const b = e.target.closest("[data-choice]");
+    if (b && choiceHandler) { const f = choiceHandler; choiceHandler = null; f(parseInt(b.dataset.choice, 10)); }
+  });
+  document.getElementById("shop-list").addEventListener("click", e => {
+    const buy = e.target.closest("[data-buy]");
+    if (buy) return buyItem(buy.dataset.buy);
+    if (e.target.closest("[data-vacation]")) return buyVacation();
+    if (e.target.closest("[data-invest]")) return invest();
+  });
   document.getElementById("offers-list").addEventListener("click", e => {
     const a = e.target.closest("[data-accept]"), r = e.target.closest("[data-reject]");
     if (a) acceptOffer(a.dataset.accept);
@@ -1324,6 +1704,7 @@
   });
   document.getElementById("modal-close").addEventListener("click", () => {
     document.getElementById("modal-overlay").classList.add("hidden");
+    if (modalAfterClose) { const f = modalAfterClose; modalAfterClose = null; f(); return; }
     if (state && state.pendingRetire && !state.retired) {
       state.pendingRetire = false;
       retire();
@@ -1331,14 +1712,23 @@
     }
     render();
   });
-  document.getElementById("btn-newgame").addEventListener("click", newGame);
-  document.getElementById("btn-retire").addEventListener("click", () => { if (!state.retired) retire(); });
+  document.getElementById("btn-newgame").addEventListener("click", () => {
+    if (confirm("Na pewno zacząć nową karierę? Obecny postęp zostanie skasowany.")) newGame();
+  });
+  document.getElementById("btn-retire").addEventListener("click", () => {
+    if (state.retired) return;
+    if (confirm("Zakończyć karierę? Zobaczysz podsumowanie, ale nie wrócisz już do gry.")) retire();
+  });
 
   renderRolePicker();
   const saved = loadSave();
   if (saved && saved.nick && saved.team) {
     state = saved;
     if (!state.schedule) state.schedule = makeSchedule();
+    if (!state.shop) state.shop = {};
+    if (typeof state.invest !== "number") state.invest = 0;
+    if (typeof state.injury !== "number") state.injury = 0;
+    if (!state.world) state.world = makeWorld();
     document.getElementById("start-wrap").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
     switchView("career");
