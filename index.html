@@ -244,6 +244,9 @@
   /* --- Match overlay / scoreboard --- */
   .overlay { position: fixed; inset: 0; background: rgba(4,4,7,0.85); display: flex; align-items: center;
     justify-content: center; padding: 18px; z-index: 20; }
+  #choice-overlay { z-index: 22; }
+  #modal-overlay { z-index: 24; }
+  #save-overlay { z-index: 26; }
   .overlay-box { max-width: 470px; width: 100%; padding: 22px 20px; max-height: 88vh; overflow-y: auto; }
   .match-head { text-align: center; margin-bottom: 14px; }
   .match-score { font-size: 2.1rem; line-height: 1; margin: 6px 0 4px; }
@@ -288,6 +291,28 @@
   .rank-table .rk { width: 26px; color: var(--text-dim); }
   .rank-table .rk-team { color: var(--text-dim); font-size: 0.72rem; }
   .rank-table .rk-rat { text-align: right; width: 46px; }
+
+  #save-text { width: 100%; height: 150px; background: var(--bg-void); color: var(--text-dim);
+    border: 1px solid var(--border-strong); padding: 10px; font-family: monospace; font-size: 0.68rem; resize: vertical; }
+  .goal-box { background: var(--bg-void); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+    padding: 10px 12px; margin-bottom: 12px; }
+  .goal-box .g-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.8rem;
+    text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold); }
+  .goal-box .g-desc { font-size: 0.76rem; color: var(--text-dim); margin-top: 3px; }
+  .nem-box { background: var(--bg-void); border: 1px solid var(--danger); padding: 11px 13px; margin-bottom: 12px; }
+  .nem-box .n-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.82rem;
+    text-transform: uppercase; letter-spacing: 0.05em; color: #ff8098; }
+  .nem-box .n-desc { font-size: 0.76rem; color: var(--text-dim); margin-top: 3px; }
+
+  /* --- Mecz na żywo --- */
+  #lv-score { font-size: 2.4rem; text-align: center; margin: 6px 0 2px; font-family: 'Rajdhani', sans-serif; font-weight: 700; }
+  #lv-score .lead { color: var(--good); }
+  #lv-score .trail { color: var(--danger); }
+  #lv-feed { margin-top: 10px; max-height: 170px; overflow-y: auto; }
+  #lv-feed div { font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.78rem; padding: 5px 9px;
+    background: var(--bg-void); border-left: 2px solid var(--border-strong); margin-bottom: 4px; }
+  #lv-feed div.win { border-left-color: var(--good); }
+  #lv-feed div.loss { border-left-color: var(--danger); }
 
   .hidden { display: none !important; }
   ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -376,6 +401,8 @@
         <div class="glass panel">
           <h2><svg class="icon"><use href="#i-calendar"></use></svg> Ten tydzień</h2>
           <div id="week-card"></div>
+          <button class="full secondary hidden" id="btn-skip" style="margin-bottom:10px;"><svg class="icon"><use href="#i-arrow-right"></use></svg> Przewiń do najbliższego meczu</button>
+          <div id="goal-card"></div>
           <div id="week-hint" class="muted"></div>
         </div>
       </section>
@@ -383,6 +410,7 @@
       <section id="view-train" class="view hidden">
         <div class="glass panel">
           <h2><svg class="icon"><use href="#i-bolt"></use></svg> Plan tygodnia</h2>
+          <button class="full" id="btn-repeat-plan" style="margin-bottom:12px;"><svg class="icon"><use href="#i-swap"></use></svg> <span id="repeat-label">Powtórz zeszły plan</span></button>
           <p class="muted" style="margin-bottom:12px;">Każda akcja kosztuje energię. Energia odnawia się co tydzień, ale kondycja i psychika zostają — przetrenowanie zniszczy Ci formę.</p>
           <div class="action-grid" id="action-grid"></div>
         </div>
@@ -396,6 +424,7 @@
         <div class="glass panel">
           <h2><svg class="icon"><use href="#i-users"></use></svg> <span id="team-title"></span></h2>
           <div id="team-info" class="muted" style="margin-bottom:12px;"></div>
+          <div id="nemesis-box"></div>
           <div id="mates-list"></div>
         </div>
         <div class="glass panel">
@@ -438,7 +467,12 @@
         <div class="glass panel">
           <h2><svg class="icon"><use href="#i-doc"></use></svg> Dziennik</h2>
           <div id="log-feed"></div>
-          <div style="display:flex; gap:10px; margin-top:16px;">
+          <button class="full" id="btn-fast" style="margin-top:16px;"></button>
+          <div style="display:flex; gap:10px; margin-top:10px;">
+            <button class="secondary full" id="btn-export">Eksportuj zapis</button>
+            <button class="secondary full" id="btn-import">Wczytaj zapis</button>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:10px;">
             <button class="secondary full" id="btn-newgame">Nowa kariera</button>
             <button class="danger full" id="btn-retire"><svg class="icon"><use href="#i-flag"></use></svg> Zakończ karierę</button>
           </div>
@@ -457,6 +491,24 @@
   </div>
 </div>
 
+<!-- MECZ NA ŻYWO -->
+<div id="live-overlay" class="overlay hidden">
+  <div class="glass overlay-box">
+    <div style="text-align:center;">
+      <div class="ev-name" id="lv-title"></div>
+      <div class="match-sub" id="lv-map"></div>
+      <div id="lv-score"></div>
+      <div class="match-sub" id="lv-round"></div>
+    </div>
+    <div class="kv-grid" id="lv-stats"></div>
+    <div id="lv-feed"></div>
+    <div style="display:flex; gap:8px; margin-top:12px;">
+      <button class="secondary full" id="lv-speed">Przyspiesz</button>
+      <button class="full" id="lv-skip">Pomiń do wyniku</button>
+    </div>
+  </div>
+</div>
+
 <!-- MATCH RESULT -->
 <div id="match-overlay" class="overlay hidden">
   <div class="glass overlay-box">
@@ -472,6 +524,19 @@
     </table>
     <div id="mo-extra" style="margin-top:12px;"></div>
     <button class="full primary" id="mo-close" style="margin-top:14px;">Dalej</button>
+  </div>
+</div>
+
+<!-- SAVE / LOAD -->
+<div id="save-overlay" class="overlay hidden">
+  <div class="glass overlay-box" style="max-width:460px;">
+    <div class="ev-name" style="text-align:center;" id="save-title"></div>
+    <p class="muted" style="text-align:center; margin:8px 0 12px;" id="save-hint"></p>
+    <textarea id="save-text" spellcheck="false"></textarea>
+    <div style="display:flex; gap:8px; margin-top:12px;">
+      <button class="good full hidden" id="save-load-btn">Wczytaj</button>
+      <button class="secondary full" id="save-close">Zamknij</button>
+    </div>
   </div>
 </div>
 
@@ -550,6 +615,7 @@
     { id: "top20",      name: "Top 20 świata",    icon: "chart",     test: s => s.career.bestRank > 0 && s.career.bestRank <= 20 },
     { id: "top1",       name: "#1 na świecie",    icon: "crosshair", test: s => s.career.bestRank === 1 },
     { id: "rich",       name: "Milion na koncie", icon: "coin",      test: s => s.career.earned >= 1000000 },
+    { id: "nemesis",    name: "Rywal pokonany",   icon: "fire",      test: s => (s.nemesisBeaten || 0) >= 1 },
     { id: "veteran",    name: "Weteran (10 lat)", icon: "calendar",  test: s => s.season >= 10 },
     { id: "legend",     name: "Legenda 1.30+",    icon: "bolt",      test: s => s.career.seasons.some(x => x.rating >= 1.30 && x.matches >= 10) },
   ];
@@ -575,7 +641,7 @@
       { label: "Szukaj fraga", desc: "Wchodzisz agresywnie. Va banque.", stat: "aim", team: 1.3, rating: 0.16 },
       { label: "Zbierz info i zgiń", desc: "Ekipa będzie wiedzieć, gdzie stoją. Ty nie dożyjesz.", stat: "team", team: 0.5, rating: 0.02, safe: true },
     ]},
-    { id: "force", title: "Decyzja ekonomiczna", text: "Przegrywacie 3:8. IGL pyta skład o zdanie: forsa czy eco?", opts: [
+    { id: "force", title: "Decyzja ekonomiczna", text: "Ekonomia leży, przeciwnik ma pełny zakup. IGL pyta skład o zdanie.", opts: [
       { label: "Force-buy", desc: "Ryzyko, ale przerwanie serii przeciwnika jest kluczowe.", stat: "sense", team: 1.2, rating: 0.08 },
       { label: "Pełne eco", desc: "Odpuszczacie rundę, żeby mieć pełny zakup później.", stat: "team", team: 0.7, rating: 0.03, safe: true },
       { label: "Półbuy z deaglem", desc: "Kompromis. Wchodzisz na pistoletach z pancerzem.", stat: "aim", team: 0.9, rating: 0.10 },
@@ -585,7 +651,7 @@
       { label: "Zagraj to samo", desc: "Podwójny blef — zostajesz tam, gdzie się ciebie spodziewają.", stat: "reflex", team: 1.0, rating: 0.12 },
       { label: "Powiedz IGL-owi", desc: "Zgłaszasz problem i czekasz na nowy plan.", stat: "team", team: 0.6, rating: 0.03, safe: true },
     ]},
-    { id: "pistol", title: "Runda pistoletowa drugiej połowy", text: "Stan 6:6. Runda pistoletowa decyduje o rozpędzie.", opts: [
+    { id: "pistol", title: "Runda pistoletowa", text: "Runda otwarcia połowy — ustawia rozpęd na kolejne rundy.", opts: [
       { label: "Agresywny rush", desc: "Pięciu na jedno wejście, bez utility.", stat: "reflex", team: 1.1, rating: 0.12 },
       { label: "Rozgrywka na mapie", desc: "Rozchodzicie się i gracie na informacje.", stat: "sense", team: 0.8, rating: 0.07 },
       { label: "Utility na wejście", desc: "Pełen zestaw flashy na jedno miejsce.", stat: "util", team: 1.0, rating: 0.06 },
@@ -595,7 +661,7 @@
       { label: "Wyłącz się z gadania", desc: "Skupiasz się wyłącznie na własnej grze.", stat: "aim", team: 0.3, rating: 0.14 },
       { label: "Odbij tak samo", desc: "Emocje na maksa. Albo was to obudzi, albo dobije.", stat: "reflex", team: 1.2, rating: 0.10 },
     ]},
-    { id: "matchpoint", title: "Piłka meczowa", text: "Runda za wygraną. Cała hala patrzy na Ciebie.", opts: [
+    { id: "matchpoint", title: "Piłka meczowa", text: "Jedna strona ma piłkę meczową. Cała hala patrzy na Ciebie.", opts: [
       { label: "Weź grę na siebie", desc: "Otwierasz rundę. Twój frag, Twoja odpowiedzialność.", stat: "aim", team: 1.2, rating: 0.18 },
       { label: "Zagraj pod skład", desc: "Utility i trade — ekipa kończy robotę.", stat: "util", team: 1.0, rating: 0.05, safe: true },
       { label: "Zwolnij tempo", desc: "Gracie na czas i wymuszacie błąd.", stat: "sense", team: 0.9, rating: 0.07 },
@@ -708,6 +774,11 @@
       used.push(n);
       teams.push({ me: false, name: n, str: clamp(Math.round(base + rnd(-8, 9)), 30, 96), w: 0, l: 0, rd: 0 });
     }
+    if (state.nemesis) { // rywal trafia do Twojej ligi — zagracie dwa razy w sezonie
+      teams[1].name = state.nemesis.team;
+      teams[1].nem = true;
+      teams[1].str = clamp(teams[1].str + 4, 30, 96);
+    }
     return { teams: teams, played: 0 };
   }
 
@@ -738,6 +809,7 @@
       career: { matches: 0, wins: 0, kills: 0, deaths: 0, rating: 0, aces: 0, mvps: 0, earned: 0,
                 trophies: [], seasons: [], bestRank: 0, bestRating: 0 },
       ach: {}, log: [], rank: 0, retired: false,
+      weekPlan: [], lastPlan: [], extras: {}, goal: null, nemesis: null, nemesisBeaten: 0, fastMatches: false,
     };
     state = s;
     s.team = makeTeam(0, "Team " + nick.toUpperCase().slice(0, 6));
@@ -745,6 +817,9 @@
     s.league = makeLeague();
     s.schedule = makeSchedule();
     s.world = makeWorld();
+    s.nemesis = pickNemesis();
+    s.league = makeLeague();
+    s.goal = makeGoal();
     addLog("Zaczynasz karierę jako " + role().name + " w " + s.team.name + ".", "info");
     return s;
   }
@@ -765,6 +840,23 @@
       });
     }
     return arr;
+  }
+
+  function pickNemesis() {
+    if (!state.world) return null;
+    const table = worldTable();
+    const myPos = table.findIndex(t => t.me);
+    // rywal tuż przed Tobą w rankingu (albo ktoś z górnej połowy, jeśli jesteś na dole)
+    const target = table[Math.max(0, myPos - 1 - irnd(0, 2))];
+    if (!target || target.me) return null;
+    return { nick: target.nick, team: target.team, w: 0, l: 0 };
+  }
+
+  function nemesisRank() {
+    if (!state.nemesis) return 0;
+    const table = worldTable();
+    const i = table.findIndex(t => !t.me && t.nick === state.nemesis.nick);
+    return i < 0 ? 0 : i + 1;
   }
 
   function rankScore(tierId, rating, hype, trophies) {
@@ -805,6 +897,36 @@
         r.rating = +(0.95 + rnd(0, 0.25)).toFixed(2); r.hype = irnd(20, 60); r.trophies = 0; r.team = pick(ORG_NAMES);
       }
     });
+  }
+
+  // ---------- cel od zarządu ----------
+  function makeGoal() {
+    const t = state.team.tier;
+    const kind = pick(["rating", "playoff", "trophy", "wins"]);
+    const reward = Math.round((tier(t).salary * 6) + 8000);
+    if (kind === "rating") return { kind: kind, target: +(0.98 + t * 0.02).toFixed(2), reward: reward,
+      text: "Utrzymaj średni rating co najmniej " + (0.98 + t * 0.02).toFixed(2) + " w sezonie." };
+    if (kind === "playoff") return { kind: kind, target: 4, reward: reward, text: "Wejdź do playoffu ligi (top 4)." };
+    if (kind === "trophy") return { kind: kind, target: 1, reward: Math.round(reward * 1.6), text: "Wygraj dowolny turniej w tym sezonie." };
+    return { kind: kind, target: Math.max(5, 5 + t), reward: reward, text: "Wygraj co najmniej " + Math.max(5, 5 + t) + " meczów w sezonie." };
+  }
+
+  function goalProgress() {
+    const g = state.goal;
+    if (!g) return { done: false, label: "" };
+    if (g.kind === "rating") {
+      const r = seasonRating();
+      return { done: state.seasonStats.matches >= 6 && r >= g.target, label: r.toFixed(2) + " / " + g.target.toFixed(2) };
+    }
+    if (g.kind === "playoff") {
+      const pos = sortedStandings().findIndex(t => t.me) + 1;
+      return { done: pos > 0 && pos <= 4, label: pos + ". miejsce w tabeli" };
+    }
+    if (g.kind === "trophy") {
+      const n = state.career.trophies.filter(t => t.season === state.season).length;
+      return { done: n >= 1, label: n + " / 1" };
+    }
+    return { done: state.seasonStats.wins >= g.target, label: state.seasonStats.wins + " / " + g.target };
   }
 
   // ---------- sklep ----------
@@ -928,6 +1050,218 @@
     return { maps: maps, won: mw > ml, mapsWon: mw, mapsLost: ml, me: agg, mates: mates };
   }
 
+
+  // ---------- mecz na żywo ----------
+  const LIVE_SPEEDS = [620, 260, 90];
+  const SPEED_LABELS = ["Przyspiesz", "Szybko ×2", "Bardzo szybko"];
+  let live = null;
+  let liveSkipAll = false;
+
+  function buildSeries(maps) {
+    const agg = { kills: 0, deaths: 0, adr: 0, rating: 0, aces: 0 };
+    maps.forEach(m => {
+      agg.kills += m.me.kills; agg.deaths += m.me.deaths; agg.adr += m.me.adr;
+      agg.rating += m.me.rating; agg.aces += m.me.aces || 0;
+    });
+    agg.adr = Math.round(agg.adr / maps.length);
+    agg.rating = +(agg.rating / maps.length).toFixed(2);
+    const mates = state.team.mates.map((m, i) => {
+      let r = 0, k = 0, d = 0, ad = 0;
+      maps.forEach(mp => { r += mp.mates[i].rating; k += mp.mates[i].kills; d += mp.mates[i].deaths; ad += mp.mates[i].adr; });
+      return { nick: m.nick, rating: +(r / maps.length).toFixed(2), kills: k, deaths: d, adr: Math.round(ad / maps.length) };
+    });
+    let mw = 0, ml = 0;
+    maps.forEach(m => { if (m.won) mw++; else ml++; });
+    return { maps: maps, won: mw > ml, mapsWon: mw, mapsLost: ml, me: agg, mates: mates };
+  }
+
+  // Jedno wejście dla wszystkich meczów: szybka symulacja albo rozgrywka na żywo
+  function runSeries(oppStr, bo, title, oppName, cb) {
+    if (state.fastMatches) { cb(simSeries(oppStr, bo)); return; }
+    matchMods = { round: 0, rating: 0, notes: [] };
+    liveSeries(oppStr, bo, title, oppName, cb);
+  }
+
+  function liveSeries(oppStr, bo, title, oppName, cb) {
+    const need = Math.ceil(bo / 2);
+    const pool = MAPS.slice();
+    const maps = [];
+    let mw = 0, ml = 0, decisions = 0;
+    liveSkipAll = false;
+    function nextMap() {
+      if (mw >= need || ml >= need) { hideLive(); cb(buildSeries(maps)); return; }
+      const mapName = pool.length ? pool.splice(Math.floor(Math.random() * pool.length), 1)[0] : pick(MAPS);
+      liveMap(oppStr, mapName, title, oppName, maps.length + 1, bo, decisions, (m, usedDec) => {
+        decisions = usedDec;
+        maps.push(m);
+        if (m.won) mw++; else ml++;
+        nextMap();
+      });
+    }
+    nextMap();
+  }
+
+  function liveMap(oppStr, mapName, title, oppName, mapNo, bo, decisionsUsed, done) {
+    const adv = clamp(0.5 + (playerPower() - oppStr) * 0.012, 0.16, 0.88);
+    live = {
+      a: 0, b: 0, round: 0, k: 0, d: 0, dmg: 0, aces: 0, feed: [],
+      kpr: 0.42 + adv * 0.52, dieP: clamp(0.78 - (adv - 0.5) * 0.5, 0.34, 0.92),
+      mates: state.team.mates.map(m => {
+        const ms = clamp(0.5 + (m.skill - oppStr) * 0.012, 0.14, 0.9);
+        return { nick: m.nick, k: 0, d: 0, dmg: 0, kpr: 0.42 + ms * 0.52,
+                 dieP: clamp(0.78 - (ms - 0.5) * 0.5, 0.34, 0.92) };
+      }),
+      oppStr: oppStr, mapName: mapName, oppName: oppName, title: title, mapNo: mapNo, bo: bo,
+      speed: 0, timer: null, decisions: decisionsUsed, done: done, over: false,
+    };
+    if (liveSkipAll) { runInstant(); return; }
+    document.getElementById("live-overlay").classList.remove("hidden");
+    document.getElementById("lv-speed").textContent = SPEED_LABELS[0];
+    renderLive();
+    scheduleRound();
+  }
+
+  function scheduleRound() {
+    if (!live || live.over) return;
+    live.timer = setTimeout(() => stepRound(false), LIVE_SPEEDS[live.speed]);
+  }
+
+  function mapOver(L) {
+    if (L.a === 13 && L.b < 12) return true;
+    if (L.b === 13 && L.a < 12) return true;
+    if (L.a >= 13 && L.b >= 13 && Math.abs(L.a - L.b) >= 2) return true;
+    return L.a + L.b >= 42;
+  }
+
+  function stepRound(silent) {
+    const L = live;
+    if (!L || L.over) return;
+    L.round++;
+    let k = 0;
+    for (let i = 0; i < 5; i++) if (Math.random() < L.kpr / 5) k++;
+    if (k >= 3 && Math.random() < 0.09) { k = 5; L.aces++; }
+    const dmg = k * 80 + irnd(0, 46);
+    L.k += k;
+    if (Math.random() < L.dieP) L.d++;
+    L.dmg += dmg;
+    const p = clamp(0.5 + (teamStrength() - L.oppStr) * 0.013 + matchMods.round * 0.011 + (k - L.kpr) * 0.07, 0.14, 0.86);
+    const won = Math.random() < p;
+    if (won) L.a++; else L.b++;
+    L.mates.forEach(m => {
+      let mk = 0;
+      for (let i = 0; i < 5; i++) if (Math.random() < m.kpr / 5) mk++;
+      m.k += mk;
+      if (Math.random() < m.dieP) m.d++;
+      m.dmg += mk * 80 + irnd(0, 46);
+    });
+    L.feed.unshift({ won: won, text: "Runda " + L.round + " · " + L.a + ":" + L.b +
+      (k ? " · " + (k === 5 ? "ACE!" : k + " frag" + (k > 1 ? "i" : "")) : "") });
+    if (L.feed.length > 40) L.feed.length = 40;
+
+    if (mapOver(L)) { finishMap(); return; }
+    if (silent) return;
+    renderLive();
+    if (liveDecisionPoint(L)) { pauseForDecision(); return; }
+    scheduleRound();
+  }
+
+  function liveDecisionPoint(L) {
+    if (L.decisions >= 2) return false;
+    if (L.round === 1) return true;
+    if (L.round === 12) return true;
+    if (L.a === 12 || L.b === 12) return true;
+    return Math.abs(L.a - L.b) >= 5 && L.round % 6 === 0;
+  }
+
+  function decisionFor(L) {
+    let ids;
+    if (L.a === 12 || L.b === 12) ids = ["matchpoint"];
+    else if (L.round <= 1 || L.round === 12) ids = ["pistol"];
+    else if (L.b - L.a >= 5) ids = ["force", "tilt"];
+    else if (L.a - L.b >= 5) ids = ["read", "clutch"];
+    else ids = ["clutch", "read", "force"];
+    const poolD = DECISIONS.filter(d => ids.indexOf(d.id) >= 0);
+    return pick(poolD.length ? poolD : DECISIONS);
+  }
+
+  function pauseForDecision() {
+    const L = live;
+    L.decisions++;
+    clearTimeout(L.timer);
+    const d = decisionFor(L);
+    const opts = d.opts.map(o => ({ label: o.label, desc: o.desc, odds: Math.round(decisionOdds(o) * 100) }));
+    showChoice(d.title + " · " + L.a + ":" + L.b, d.text, opts, i => {
+      const o = d.opts[i];
+      const ok = Math.random() < decisionOdds(o);
+      if (ok) {
+        matchMods.round += o.team; matchMods.rating += o.rating;
+        matchMods.notes.push("✓ " + o.label);
+        state.mental = clamp(state.mental + 2, 0, 100);
+      } else {
+        matchMods.round -= o.team * 0.55; matchMods.rating -= o.rating * 0.7;
+        matchMods.notes.push("✗ " + o.label);
+        state.mental = clamp(state.mental - 2, 0, 100);
+      }
+      L.feed.unshift({ won: ok, text: (ok ? "✓ " : "✗ ") + o.label });
+      closeChoice();
+      if (live === L && !L.over) { renderLive(); scheduleRound(); }
+    });
+  }
+
+  function runInstant() {
+    const L = live;
+    let guard = 0;
+    while (live === L && !L.over && guard++ < 300) stepRound(true);
+  }
+
+  function skipLive() {
+    if (!live) return;
+    liveSkipAll = true;
+    clearTimeout(live.timer);
+    runInstant();
+  }
+
+  function finishMap() {
+    const L = live;
+    L.over = true;
+    clearTimeout(L.timer);
+    const rounds = Math.max(1, L.a + L.b);
+    const kpr = L.k / rounds, dpr = L.d / rounds, adr = L.dmg / rounds;
+    const rating = clamp(0.5 * (kpr / 0.68) + 0.3 * (adr / 78) + 0.2 * ((1 - dpr) / 0.26) + matchMods.rating, 0.30, 2.20);
+    const mates = L.mates.map(m => {
+      const mk = m.k / rounds, md = m.d / rounds, ma = m.dmg / rounds;
+      return { nick: m.nick, rating: +clamp(0.5 * (mk / 0.68) + 0.3 * (ma / 78) + 0.2 * ((1 - md) / 0.26), 0.30, 2.10).toFixed(2),
+               kills: m.k, deaths: m.d, adr: Math.round(ma) };
+    });
+    const res = {
+      map: L.mapName, a: L.a, b: L.b, won: L.a > L.b, rounds: rounds,
+      me: { rating: +rating.toFixed(2), kills: L.k, deaths: L.d, adr: Math.round(adr), aces: L.aces, ace: L.aces > 0 },
+      mates: mates,
+    };
+    const done = L.done, dec = L.decisions;
+    live = null;
+    done(res, dec);
+  }
+
+  function renderLive() {
+    const L = live;
+    if (!L) return;
+    document.getElementById("lv-title").textContent = L.title + (L.bo > 1 ? " · mapa " + L.mapNo : "");
+    document.getElementById("lv-map").textContent = L.mapName;
+    const cls = L.a > L.b ? "lead" : L.a < L.b ? "trail" : "";
+    document.getElementById("lv-score").innerHTML = '<span class="' + cls + '">' + L.a + " : " + L.b + "</span>";
+    document.getElementById("lv-round").textContent = "Runda " + (L.round + 1) + " · " +
+      (L.round < 12 ? "pierwsza połowa" : "druga połowa");
+    const r = Math.max(1, L.a + L.b);
+    document.getElementById("lv-stats").innerHTML = [
+      ["Fragi", L.k], ["Śmierci", L.d], ["ADR", Math.round(L.dmg / r)], ["K/D", (L.k / Math.max(1, L.d)).toFixed(2)],
+    ].map(x => '<div class="kv"><div class="k">' + x[0] + '</div><div class="v">' + x[1] + "</div></div>").join("");
+    document.getElementById("lv-feed").innerHTML = L.feed.slice(0, 10).map(f =>
+      '<div class="' + (f.won ? "win" : "loss") + '">' + esc(f.text) + "</div>").join("");
+  }
+
+  function hideLive() { document.getElementById("live-overlay").classList.add("hidden"); }
+
   function applyMatchResult(res, label) {
     const ss = state.seasonStats, c = state.career;
     ss.matches++; c.matches++;
@@ -979,12 +1313,75 @@
     if (a.chem) state.team.chem = clamp(state.team.chem + a.chem, 0, 100);
     if (a.form) state.form = clamp(state.form + a.form, 0, 100);
     if (a.hype) state.hype = clamp(state.hype + a.hype * (0.6 + state.team.tier * 0.2), 0, 100);
+    state.weekPlan.push(id);
     if (id === "stream") {
       const earn = Math.round(120 + state.hype * (14 + state.team.tier * 7) * rnd(0.7, 1.3));
       state.money += earn; state.career.earned += earn;
       addLog("Stream: +" + money(earn), "good");
     }
     render(); save();
+  }
+
+  // ---------- QoL: powtórz plan, przewiń tydzień, zapis ----------
+  function repeatPlan() {
+    if (!state.lastPlan || !state.lastPlan.length) return;
+    state.lastPlan.forEach(id => {
+      const a = ACTIONS.find(x => x.id === id);
+      if (a && state.energy >= a.cost) doAction(id);
+    });
+  }
+
+  function skipToMatch() {
+    let guard = 0;
+    while (currentEvent().type === "free" && guard++ < SEASON_LENGTH) {
+      advanceWeek();
+      if (!document.getElementById("choice-overlay").classList.contains("hidden")) break;
+      if (!document.getElementById("modal-overlay").classList.contains("hidden")) break;
+    }
+    render(); save();
+  }
+
+  function openSave(mode) {
+    const isLoad = mode === "load";
+    document.getElementById("save-title").textContent = isLoad ? "Wczytaj zapis" : "Eksport zapisu";
+    document.getElementById("save-hint").textContent = isLoad
+      ? "Wklej wcześniej skopiowany zapis i kliknij Wczytaj. Obecna kariera zostanie nadpisana."
+      : "Skopiuj całą zawartość pola i zachowaj ją w bezpiecznym miejscu.";
+    const ta = document.getElementById("save-text");
+    ta.value = isLoad ? "" : JSON.stringify(state);
+    ta.readOnly = !isLoad;
+    document.getElementById("save-load-btn").classList.toggle("hidden", !isLoad);
+    document.getElementById("save-overlay").classList.remove("hidden");
+    if (!isLoad) { try { ta.select(); } catch (e) { /* ignore */ } }
+  }
+
+  function importSave() {
+    const raw = document.getElementById("save-text").value.trim();
+    let data = null;
+    try { data = JSON.parse(raw); } catch (e) { data = null; }
+    if (!data || !data.nick || !data.team) { alert("To nie wygląda na poprawny zapis kariery."); return; }
+    state = data;
+    migrate();
+    document.getElementById("save-overlay").classList.add("hidden");
+    document.getElementById("start-wrap").classList.add("hidden");
+    document.getElementById("game-screen").classList.remove("hidden");
+    switchView("career");
+    render(); save();
+  }
+
+  function migrate() {
+    if (!state.schedule) state.schedule = makeSchedule();
+    if (!state.shop) state.shop = {};
+    if (typeof state.invest !== "number") state.invest = 0;
+    if (typeof state.injury !== "number") state.injury = 0;
+    if (!state.world) state.world = makeWorld();
+    if (!state.weekPlan) state.weekPlan = [];
+    if (!state.lastPlan) state.lastPlan = [];
+    if (!state.extras) state.extras = {};
+    if (typeof state.nemesisBeaten !== "number") state.nemesisBeaten = 0;
+    if (!state.nemesis) state.nemesis = pickNemesis();
+    if (!state.goal) state.goal = makeGoal();
+    if (typeof state.fastMatches !== "boolean") state.fastMatches = false;
   }
 
   // ---------- tydzień ----------
@@ -995,11 +1392,14 @@
     const isMatch = ev.type === "league" || ev.type === "event" || ev.type === "playoff";
     if (!isMatch) { advanceWeek(); render(); save(); return; }
     if (state.injury >= 2 || state.mental <= 12) { missMatch(ev); return; }
-    runMatchDecision(() => {
+    const dispatch = () => {
       if (ev.type === "league") playLeagueMatch(ev);
       else if (ev.type === "event") playEvent(ev);
       else playPlayoff();
-    });
+    };
+    // w trybie szybkim decyzja zapada przed meczem, na żywo — w trakcie rozgrywki
+    if (state.fastMatches) runMatchDecision(dispatch);
+    else dispatch();
   }
 
   // Kontuzja albo wypalenie — drużyna gra ze stand-inem
@@ -1014,7 +1414,8 @@
       simRestOfLeague(ev.opp);
     }
     state.form = clamp(state.form - 5, 0, 100);
-    state.mental = clamp(state.mental + 6, 0, 100);
+    state.mental = clamp(Math.max(state.mental + 15, 35), 0, 100);
+    state.stamina = clamp(state.stamina + 12, 0, 100);
     addLog(reason + ": opuszczasz mecz, zastępuje Cię stand-in (" + (won ? "wygrana" : "porażka") + ").", "bad");
     showModal("Nie zagrasz w tym tygodniu", reason + ". Drużyna zagrała ze stand-inem i " +
       (won ? "wygrała." : "przegrała."), "");
@@ -1035,7 +1436,7 @@
 
   function playLeagueMatch(ev) {
     const opp = state.league.teams[ev.opp];
-    const res = simSeries(opp.str, 1);
+    runSeries(opp.str, 1, "Liga · " + state.team.name + " vs " + opp.name, opp.name, res => {
     applyMatchResult(res, "Liga vs " + opp.name);
     const me = state.league.teams[0];
     me.str = Math.round(teamStrength());
@@ -1043,7 +1444,21 @@
     if (res.won) { me.w++; opp.l++; me.rd += m0.a - m0.b; opp.rd -= m0.a - m0.b; }
     else { me.l++; opp.w++; me.rd -= m0.b - m0.a; opp.rd += m0.b - m0.a; }
     simRestOfLeague(ev.opp);
-    showMatch("Liga · " + state.team.name + " vs " + opp.name, res, opp.name, null);
+    if (opp.nem && state.nemesis) {
+      if (res.won) {
+        state.nemesis.w++;
+        state.hype = clamp(state.hype + 3, 0, 100);
+        state.mental = clamp(state.mental + 4, 0, 100);
+        addLog("Pojedynek z rywalem (" + state.nemesis.nick + "): wygrany!", "gold");
+      } else {
+        state.nemesis.l++;
+        state.mental = clamp(state.mental - 4, 0, 100);
+        addLog("Pojedynek z rywalem (" + state.nemesis.nick + "): przegrany.", "bad");
+      }
+    }
+    showMatch("Liga · " + state.team.name + " vs " + opp.name +
+      (opp.nem && state.nemesis ? " (rywal: " + state.nemesis.nick + ")" : ""), res, opp.name, null);
+    });
   }
 
   function playEvent(ev) {
@@ -1053,15 +1468,22 @@
       : [{ n: "Ćwierćfinał", bo: 1, opp: base - 3 }, { n: "Półfinał", bo: 3, opp: base + 1 }, { n: "Finał", bo: 3, opp: base + 4 }];
     const lines = [];
     let all = null, stageIdx = 0, out = false;
-    for (; stageIdx < stages.length; stageIdx++) {
+
+    function runStage() {
       const st = stages[stageIdx];
-      const res = simSeries(st.opp + rnd(-3, 3), st.bo);
       const oppName = pick(ORG_NAMES);
-      applyMatchResult(res, ev.name + " · " + st.n);
-      lines.push({ label: st.n + " vs " + oppName, score: res.mapsWon + "-" + res.mapsLost, won: res.won, rating: res.me.rating });
-      all = res;
-      if (!res.won) { out = true; break; }
+      runSeries(st.opp + rnd(-3, 3), st.bo, ev.name + " · " + st.n + " vs " + oppName, oppName, res => {
+        applyMatchResult(res, ev.name + " · " + st.n);
+        lines.push({ label: st.n + " vs " + oppName, score: res.mapsWon + "-" + res.mapsLost, won: res.won, rating: res.me.rating });
+        all = res;
+        if (!res.won) { out = true; finishEvent(); return; }
+        stageIdx++;
+        if (stageIdx >= stages.length) { finishEvent(); return; }
+        runStage();
+      });
     }
+
+    function finishEvent() {
     const placeIdx = out ? stageIdx : stages.length;
     const won = !out;
     const prizeMul = [0.12, 0.3, 0.65, 1][clamp(placeIdx, 0, 3)] * (won ? 1.6 : 1);
@@ -1070,6 +1492,11 @@
     let extra = "Nagroda: " + money(prize);
     if (won) {
       state.career.trophies.push({ name: ev.name, season: state.season, major: !!ev.major });
+      if (state.extras && state.extras.bonus) {
+        const bn = Math.round(tier(state.team.tier).prize * 0.4);
+        state.money += bn; state.career.earned += bn;
+        addLog("Bonus kontraktowy za trofeum: " + money(bn), "gold");
+      }
       state.hype = clamp(state.hype + (ev.major ? 22 : 10), 0, 100);
       addLog("MISTRZOSTWO: " + ev.name + "!", "gold");
       const evRatings = lines.map(l => l.rating);
@@ -1084,6 +1511,9 @@
       addLog(ev.name + ": odpadasz na etapie „" + stages[stageIdx].n + "”", "info");
     }
     showMatch(ev.name + (won ? " · MISTRZ" : ""), all, "", { lines: lines, extra: extra, champion: won });
+    }
+
+    runStage();
   }
 
   function playPlayoff() {
@@ -1095,24 +1525,34 @@
       return;
     }
     const oppStr = tier(state.team.tier).str + 4;
-    const semi = simSeries(oppStr, 3);
-    applyMatchResult(semi, "Półfinał ligi");
-    const lines = [{ label: "Półfinał", score: semi.mapsWon + "-" + semi.mapsLost, won: semi.won, rating: semi.me.rating }];
-    let champ = false, last = semi;
-    if (semi.won) {
-      const fin = simSeries(oppStr + 4, 3);
-      applyMatchResult(fin, "Finał ligi");
-      lines.push({ label: "Finał", score: fin.mapsWon + "-" + fin.mapsLost, won: fin.won, rating: fin.me.rating });
-      champ = fin.won; last = fin;
-      if (champ) {
-        state.career.trophies.push({ name: "Mistrzostwo ligi S" + state.season, season: state.season, major: false });
-        state.hype = clamp(state.hype + 12, 0, 100);
-        addLog("Mistrzostwo ligi w sezonie " + state.season + "!", "gold");
+    runSeries(oppStr, 3, "Półfinał ligi", "", semi => {
+      applyMatchResult(semi, "Półfinał ligi");
+      const lines = [{ label: "Półfinał", score: semi.mapsWon + "-" + semi.mapsLost, won: semi.won, rating: semi.me.rating }];
+
+      function finish(champ, last) {
+        const prize = Math.round(tier(state.team.tier).prize * (champ ? 1.2 : semi.won ? 0.6 : 0.3));
+        state.money += prize; state.career.earned += prize;
+        showMatch("Playoff ligi" + (champ ? " · MISTRZ" : ""), last, "",
+          { lines: lines, extra: "Nagroda: " + money(prize), champion: champ });
       }
-    }
-    const prize = Math.round(tier(state.team.tier).prize * (champ ? 1.2 : semi.won ? 0.6 : 0.3));
-    state.money += prize; state.career.earned += prize;
-    showMatch("Playoff ligi" + (champ ? " · MISTRZ" : ""), last, "", { lines: lines, extra: "Nagroda: " + money(prize), champion: champ });
+
+      if (!semi.won) { finish(false, semi); return; }
+      runSeries(oppStr + 4, 3, "Finał ligi", "", fin => {
+        applyMatchResult(fin, "Finał ligi");
+        lines.push({ label: "Finał", score: fin.mapsWon + "-" + fin.mapsLost, won: fin.won, rating: fin.me.rating });
+        if (fin.won) {
+          state.career.trophies.push({ name: "Mistrzostwo ligi S" + state.season, season: state.season, major: false });
+          if (state.extras && state.extras.bonus) {
+            const bn = Math.round(tier(state.team.tier).prize * 0.4);
+            state.money += bn; state.career.earned += bn;
+            addLog("Bonus kontraktowy za trofeum: " + money(bn), "gold");
+          }
+          state.hype = clamp(state.hype + 12, 0, 100);
+          addLog("Mistrzostwo ligi w sezonie " + state.season + "!", "gold");
+        }
+        finish(fin.won, fin);
+      });
+    });
   }
 
   function advanceWeek() {
@@ -1144,6 +1584,8 @@
     maybeSponsor();
     checkAch();
 
+    if (state.weekPlan && state.weekPlan.length) state.lastPlan = state.weekPlan.slice();
+    state.weekPlan = [];
     state.week++;
     if (state.week > SEASON_LENGTH) { endSeason(); return; }
     if (Math.random() < 0.17) runLifeEvent(() => { render(); save(); });
@@ -1160,7 +1602,7 @@
   function maybeOffer(force) {
     const mv = marketValue();
     const targetTier = clamp(Math.floor(mv / 42), 0, 4);
-    const chance = force ? 1 : clamp((mv - 40) / 800, 0, 0.25) * (owned("manager") ? 2 : 1);
+    const chance = force ? 1 : clamp((mv - 40) / 800, 0, 0.25) * (owned("manager") ? 2 : 1) * (state.extras && state.extras.lowBuyout ? 1.6 : 1);
     if (Math.random() > chance) return;
     if (state.offers.length >= 3) return;
     // awans co najwyżej o jeden poziom naraz
@@ -1179,16 +1621,96 @@
     state.offers.push(offer);
     addLog("Oferta od " + offer.team + " (" + tier(t).name + ")", "gold");
   }
+  const NEGOTIATION = [
+    { title: "Pensja", text: "Klub proponuje warunki finansowe. Ile chcesz ugrać?",
+      opts: [
+        { label: "Przyjmij propozycję", desc: "Bez negocjacji. Klub to doceni.", dem: 0, pay: 1.0 },
+        { label: "Poproś o +25%", desc: "Rozsądne żądanie przy dobrej formie.", dem: 2, pay: 1.25 },
+        { label: "Zażądaj +60%", desc: "Grasz va banque. Klub może się wycofać.", dem: 4, pay: 1.6 },
+      ] },
+    { title: "Pozycja w składzie", text: "Chcesz gwarancji, czy walczysz o miejsce?",
+      opts: [
+        { label: "Bez wymagań", desc: "Udowodnisz swoją wartość na serwerze.", dem: 0 },
+        { label: "Gwarancja miejsca", desc: "Nie wylecisz ze składu po jednym słabym sezonie.", dem: 2, guaranteed: true },
+        { label: "Gwarancja i wybór roli", desc: "Pełna kontrola nad swoją pozycją.", dem: 4, guaranteed: true, roleChoice: true },
+      ] },
+    { title: "Klauzule", text: "Ostatni element umowy.",
+      opts: [
+        { label: "Standardowa umowa", desc: "Bez dodatków, bez komplikacji.", dem: 0 },
+        { label: "Bonus za trofeum", desc: "Dodatkowa premia za każde wygrane trofeum.", dem: 2, bonus: true },
+        { label: "Niskie odstępne", desc: "Łatwiej Cię wykupić — inne kluby będą dzwonić częściej.", dem: 2, lowBuyout: true },
+      ] },
+  ];
+
   function acceptOffer(id) {
     const o = state.offers.find(x => x.id === id);
     if (!o) return;
-    const old = state.team.name;
-    state.team = { name: o.team, tier: o.tier, mates: o.mates, chem: o.chem, salary: o.salary, contract: o.years, patience: 3 };
-    state.offers = [];
-    state.league = makeLeague();
-    addLog("Transfer: " + old + " → " + o.team + " (" + money(o.salary) + "/tydz.)", "gold");
-    state.hype = clamp(state.hype + 5, 0, 100);
-    render(); save();
+    const picked = [];
+    let step = 0;
+    const tolerance = clamp(2 + (marketValue() - o.tier * 40) / 22, 0, 9);
+
+    function askNext() {
+      if (step >= NEGOTIATION.length) return finish();
+      const q = NEGOTIATION[step];
+      showChoice(q.title + " · " + o.team, q.text,
+        q.opts.map(x => ({ label: x.label, desc: x.desc, odds: null })), i => {
+          picked.push(q.opts[i]);
+          step++;
+          closeChoice();
+          askNext();
+        });
+    }
+
+    function finish() {
+      const dem = picked.reduce((a, x) => a + x.dem, 0);
+      const risk = clamp((dem - tolerance) * 0.17, 0, 0.75);
+      if (Math.random() < risk) {
+        state.offers = state.offers.filter(x => x.id !== o.id);
+        addLog(o.team + " wycofuje ofertę — Twoje żądania były zbyt wysokie.", "bad");
+        state.mental = clamp(state.mental - 6, 0, 100);
+        showModal("Negocjacje zerwane", o.team + " kończy rozmowy. Przeceniłeś swoją pozycję.", "");
+        render(); save();
+        return;
+      }
+      const payMul = picked.reduce((a, x) => a * (x.pay || 1), 1);
+      const ex = {
+        guaranteed: picked.some(x => x.guaranteed),
+        roleChoice: picked.some(x => x.roleChoice),
+        bonus: picked.some(x => x.bonus),
+        lowBuyout: picked.some(x => x.lowBuyout),
+      };
+      const old = state.team.name;
+      state.team = { name: o.team, tier: o.tier, mates: o.mates, chem: o.chem,
+        salary: Math.round(o.salary * payMul), contract: o.years, patience: ex.guaranteed ? 5 : 3 };
+      state.extras = ex;
+      state.offers = [];
+      state.nemesis = state.nemesis || pickNemesis();
+      state.league = makeLeague();
+      state.goal = makeGoal();
+      state.hype = clamp(state.hype + 5, 0, 100);
+      addLog("Transfer: " + old + " → " + o.team + " (" + money(state.team.salary) + "/tydz.)", "gold");
+      const terms = [];
+      if (ex.guaranteed) terms.push("gwarancja miejsca w składzie");
+      if (ex.bonus) terms.push("bonus za trofea");
+      if (ex.lowBuyout) terms.push("niskie odstępne");
+      showModal("Kontrakt podpisany", o.team + " · " + money(state.team.salary) + "/tydz. · " + o.years + " sez.",
+        (terms.length ? '<div class="recap-line"><span>Wynegocjowane</span><b>' + esc(terms.join(", ")) + "</b></div>" : "") +
+        '<div class="recap-line"><span>Cel od zarządu</span><b>' + esc(state.goal.text) + "</b></div>");
+      if (ex.roleChoice) {
+        modalAfterClose = () => {
+          showChoice("Wybór roli", "Masz w kontrakcie prawo wyboru pozycji w składzie.",
+            ROLES.map(r => ({ label: r.name, desc: r.desc })), i => {
+              state.role = ROLES[i].id;
+              closeChoice();
+              addLog("Nowa rola w " + state.team.name + ": " + ROLES[i].name, "info");
+              render(); save();
+            });
+        };
+      }
+      render(); save();
+    }
+
+    askNext();
   }
   function rejectOffer(id) {
     state.offers = state.offers.filter(x => x.id !== id);
@@ -1233,6 +1755,35 @@
     rows.push(["K/D", ss.deaths ? (ss.kills / ss.deaths).toFixed(2) : "-"]);
     rows.push(["Ranking świata", rank > 0 ? "#" + rank : "poza rankingiem"]);
 
+    // cel od zarządu
+    const gp = goalProgress();
+    if (state.goal) {
+      rows.push(["Cel zarządu", state.goal.text]);
+      if (gp.done) {
+        state.money += state.goal.reward; state.career.earned += state.goal.reward;
+        state.team.patience = Math.min(5, state.team.patience + 1);
+        state.hype = clamp(state.hype + 4, 0, 100);
+        rows.push(["Wynik celu", "OSIĄGNIĘTY · " + money(state.goal.reward)]);
+        addLog("Cel od zarządu osiągnięty: +" + money(state.goal.reward), "gold");
+      } else {
+        state.team.patience--;
+        rows.push(["Wynik celu", "niezrealizowany (" + gp.label + ")"]);
+        addLog("Cel od zarządu niezrealizowany.", "bad");
+      }
+    }
+
+    // rywalizacja z nemesis
+    if (state.nemesis) {
+      const nr = nemesisRank();
+      rows.push(["Rywal " + state.nemesis.nick, (nr ? "#" + nr : "poza rankingiem") +
+        " · bilans " + state.nemesis.w + "-" + state.nemesis.l]);
+      if (rank > 0 && nr > 0 && rank < nr) {
+        state.nemesisBeaten++;
+        addLog("Wyprzedziłeś rywala " + state.nemesis.nick + " w rankingu świata!", "gold");
+        state.nemesis = null;
+      }
+    }
+
     // reakcja drużyny
     let note = "";
     const expected = 1.0 + (state.team.tier - 2) * 0.02;
@@ -1272,8 +1823,10 @@
     state.week = 1;
     state.energy = MAX_ENERGY;
     state.seasonStats = { matches: 0, wins: 0, kills: 0, deaths: 0, adr: 0, rating: 0, best: 0 };
+    if (!state.nemesis) state.nemesis = pickNemesis();
     state.league = makeLeague();
     state.schedule = makeSchedule();
+    state.goal = makeGoal();
     checkAch();
 
     showModal("Koniec sezonu " + (state.season - 1), note || "Nowy sezon startuje. Masz " + state.age + " lat.",
@@ -1492,6 +2045,12 @@
       box.innerHTML = '<div class="ev-card rest"><div class="ev-name">Tydzień bez meczu</div>' +
         '<div class="ev-sub">Czas na trening, stream albo regenerację.</div></div>';
     }
+    const g = state.goal ? goalProgress() : null;
+    document.getElementById("goal-card").innerHTML = state.goal
+      ? '<div class="goal-box"><div class="g-title">Cel od zarządu' + (g.done ? " · wykonany" : "") + "</div>" +
+        '<div class="g-desc">' + esc(state.goal.text) + " — " + esc(g.label) + " · nagroda " + money(state.goal.reward) + "</div></div>"
+      : "";
+    document.getElementById("btn-skip").classList.toggle("hidden", currentEvent().type !== "free");
     document.getElementById("week-hint").textContent = state.energy > 0
       ? "Masz jeszcze " + state.energy + " pkt energii — wykorzystaj je w zakładce Trening."
       : "Energia wyczerpana. Kliknij „Dalej”, żeby rozegrać tydzień.";
@@ -1499,6 +2058,12 @@
   }
 
   function renderTrain() {
+    const rp = document.getElementById("btn-repeat-plan");
+    const plan = (state.lastPlan || []).map(id => (ACTIONS.find(a => a.id === id) || {}).name).filter(Boolean);
+    rp.disabled = !plan.length || state.energy <= 0;
+    document.getElementById("repeat-label").textContent = plan.length
+      ? "Powtórz plan: " + plan.join(", ")
+      : "Powtórz zeszły plan (brak zapisanego)";
     document.getElementById("action-grid").innerHTML = ACTIONS.map(a =>
       '<button class="act" data-act="' + a.id + '"' + (state.energy < a.cost ? " disabled" : "") + '>' +
         '<span class="a-title">' + icon(a.icon) + esc(a.name) + "</span>" +
@@ -1522,6 +2087,12 @@
 
   function renderTeam() {
     document.getElementById("team-title").textContent = state.team.name;
+    const nemHtml = state.nemesis
+      ? '<div class="nem-box"><div class="n-title">Rywal kariery: ' + esc(state.nemesis.nick) + "</div>" +
+        '<div class="n-desc">' + esc(state.nemesis.team) + " · ranking " + (nemesisRank() ? "#" + nemesisRank() : "poza top") +
+        " · bilans starć " + state.nemesis.w + "-" + state.nemesis.l + "</div></div>"
+      : "";
+    document.getElementById("nemesis-box").innerHTML = nemHtml;
     document.getElementById("team-info").innerHTML =
       esc(tier(state.team.tier).name) + " · chemia składu " + Math.round(state.team.chem) + "% · kontrakt: " +
       state.team.contract + " sez. · siła drużyny " + Math.round(teamStrength());
@@ -1537,6 +2108,7 @@
 
     document.getElementById("standings-body").innerHTML = sortedStandings().map((t, i) =>
       '<tr class="' + (t.me ? "me" : "") + '"><td class="st-rank">' + (i + 1) + "</td><td>" + esc(t.name) +
+      (t.nem ? ' <span class="tag bad" style="margin-left:4px">RYWAL</span>' : "") +
       '</td><td class="st-num">' + t.w + "-" + t.l + '</td><td class="st-num">' + (t.rd > 0 ? "+" : "") + t.rd + "</td></tr>").join("");
   }
 
@@ -1603,6 +2175,9 @@
   }
 
   function renderProfile() {
+    document.getElementById("btn-fast").textContent = state.fastMatches
+      ? "Mecze: tryb szybki (bez rozgrywki na żywo)"
+      : "Mecze: na żywo, runda po rundzie";
     document.getElementById("ach-grid").innerHTML = ACHIEVEMENTS.map(a =>
       '<div class="ach' + (state.ach[a.id] ? "" : " locked") + '">' + icon(a.icon) +
       '<div class="ach-name">' + esc(a.name) + "</div></div>").join("");
@@ -1712,6 +2287,24 @@
     }
     render();
   });
+  document.getElementById("btn-fast").addEventListener("click", () => {
+    state.fastMatches = !state.fastMatches;
+    render(); save();
+  });
+  document.getElementById("lv-speed").addEventListener("click", () => {
+    if (!live) return;
+    live.speed = (live.speed + 1) % LIVE_SPEEDS.length;
+    document.getElementById("lv-speed").textContent = SPEED_LABELS[live.speed];
+  });
+  document.getElementById("lv-skip").addEventListener("click", skipLive);
+  document.getElementById("btn-repeat-plan").addEventListener("click", repeatPlan);
+  document.getElementById("btn-skip").addEventListener("click", skipToMatch);
+  document.getElementById("btn-export").addEventListener("click", () => openSave("export"));
+  document.getElementById("btn-import").addEventListener("click", () => openSave("load"));
+  document.getElementById("save-close").addEventListener("click", () => {
+    document.getElementById("save-overlay").classList.add("hidden");
+  });
+  document.getElementById("save-load-btn").addEventListener("click", importSave);
   document.getElementById("btn-newgame").addEventListener("click", () => {
     if (confirm("Na pewno zacząć nową karierę? Obecny postęp zostanie skasowany.")) newGame();
   });
@@ -1724,11 +2317,7 @@
   const saved = loadSave();
   if (saved && saved.nick && saved.team) {
     state = saved;
-    if (!state.schedule) state.schedule = makeSchedule();
-    if (!state.shop) state.shop = {};
-    if (typeof state.invest !== "number") state.invest = 0;
-    if (typeof state.injury !== "number") state.injury = 0;
-    if (!state.world) state.world = makeWorld();
+    migrate();
     document.getElementById("start-wrap").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
     switchView("career");
