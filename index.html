@@ -488,14 +488,14 @@
       </section>
 
       <section id="view-team" class="view hidden">
-        <div class="glass panel">
+        <div class="glass panel" id="team-panel">
           <h2><svg class="icon"><use href="#i-users"></use></svg> <span id="team-title"></span></h2>
           <div id="team-info" class="muted" style="margin-bottom:12px;"></div>
           <div id="nemesis-box"></div>
           <div id="influence-box"></div>
           <div id="mates-list"></div>
         </div>
-        <div class="glass panel">
+        <div class="glass panel" id="league-panel">
           <h2><svg class="icon"><use href="#i-globe"></use></svg> <span data-i18n="team.table">Tabela ligi</span></h2>
           <table class="standings-table"><tbody id="standings-body"></tbody></table>
         </div>
@@ -832,6 +832,25 @@
     "tag.trophies": ["Trofea: {n}", "Trophies: {n}"],
     "tag.rival": ["RYWAL", "RIVAL"],
     "goal.title": ["Cel od zarządu", "Board goal"],
+    "g2.playoff": ["Wprowadź drużynę do playoffu ligi.", "Take the team into the league playoff."],
+    "g2.wins": ["Wygraj co najmniej {n} meczów ligowych.", "Win at least {n} league matches."],
+    "g2.trophy": ["Zdobądź trofeum w tym sezonie.", "Win a trophy this season."],
+    "g2.strength": ["Podnieś siłę składu o {n} punktów.", "Raise the squad's strength by {n} points."],
+    "g2.audience": ["Dobij do {n}k widowni.", "Reach an audience of {n}k."],
+    "g2.earn": ["Zarób {n} w tym sezonie.", "Earn {n} this season."],
+    "g2.collabs": ["Zrób {n} kolaboracji z innymi twórcami.", "Do {n} collaborations with other creators."],
+    "p2.channel": ["własny kanał", "own channel"],
+    "p2.leaguePos": ["Miejsce w lidze", "League position"],
+    "p2.trophies": ["Trofea w tym rozdziale", "Trophies this chapter"],
+    "p2.rankStaff": ["Ranking sztabowców", "Staff ranking"],
+    "p2.rankChannels": ["Top kanałów sceny", "Top channels in the scene"],
+    "p2.fired": ["Dwa sezony bez celu — organizacja dziękuje za współpracę. Nowy pracodawca: {team}.",
+      "Two seasons without hitting the goal — the organisation lets you go. New employer: {team}."],
+    "p2.audienceDrop": ["Dwa słabe sezony z rzędu — algorytm przestał Cię podbijać, widownia mocno spadła.",
+      "Two weak seasons in a row — the algorithm stopped pushing you and the audience dropped hard."],
+    "p2.hired": ["Dobry sezon otwiera drzwi: przechodzisz do {team} ({tier}).",
+      "A good season opens doors: you move to {team} ({tier})."],
+    "log.chapter2": ["Nowy rozdział: zaczynasz jako {role}.", "A new chapter: you start out as a {role}."],
     "goal.rating": ["Utrzymaj średni rating co najmniej {n} w sezonie.", "Keep a season rating of at least {n}."],
     "goal.playoff": ["Wejdź do playoffu ligi (top 4).", "Reach the league playoff (top 4)."],
     "goal.trophy": ["Wygraj dowolny turniej w tym sezonie.", "Win any tournament this season."],
@@ -1990,6 +2009,10 @@
     if (typeof state.rep !== "number") state.rep = 0;
     if (typeof state.audience !== "number") state.audience = 0;
     if (typeof state.trophies2 !== "number") state.trophies2 = 0;
+    if (typeof state.strikes !== "number") state.strikes = 0;
+    if (state.phase && !state.s2) state.s2 = newS2();
+    if (state.phase && !state.goal2) state.goal2 = makeGoal2();
+    if (state.phase && !state.staffWorld) state.staffWorld = makeStaffWorld();
   }
 
   // ---------- tydzień ----------
@@ -2591,6 +2614,11 @@
       "<p>Zarabiasz z pensji, nagród turniejowych, streamów i sponsorów. Wydajesz w zakładce Rynek: sprzęt i monitor " +
       "podbijają statystyki, trener przyspiesza treningi, analityk wzmacnia drużynę w meczach, menedżer zwiększa liczbę ofert. " +
       "Część z nich ma tygodniowe koszty utrzymania. Portfel inwestycyjny rośnie sam i liczy się do Hall of Fame.</p>" },
+    { h: "Drugi rozdział", body:
+      "<p>Po zakończeniu kariery zawodniczej wybierasz rolę: <b>trener</b> (warsztat podnosi siłę drużyny), " +
+      "<b>analityk</b> (przygotowanie zmniejsza losowość) albo <b>streamer</b> (bez meczów, za to z widownią).</p>" +
+      "<p>Każda rola ma własny cel na sezon i własny ranking. Dwa sezony z rzędu bez realizacji celu kończą się " +
+      "rozstaniem z organizacją albo zapaścią zasięgów; dobry sezon otwiera drzwi do mocniejszego klubu.</p>" },
     { h: "Ranking i koniec kariery", body:
       "<p>Pozycja w rankingu świata zależy od ratingu sezonu, poziomu drużyny, trofeów i rozpoznawalności — liczona jest " +
       "względem 44 rywali AI, którzy rozwijają się równolegle. Po 27. roku życia aim i refleks zaczynają spadać, " +
@@ -2622,6 +2650,11 @@
       "<p>You earn from salary, prize money, streams and sponsors. You spend in the Market tab: gear and a monitor " +
       "raise stats, a coach speeds up training, an analyst strengthens the team in matches, a manager brings more offers. " +
       "Some of them carry weekly upkeep. The investment wallet grows on its own and counts toward the Hall of Fame.</p>" },
+    { h: "The second chapter", body:
+      "<p>After your playing days you pick a role: <b>coach</b> (your craft raises the team's strength), " +
+      "<b>analyst</b> (preparation cuts variance) or <b>streamer</b> (no matches, but an audience).</p>" +
+      "<p>Each role has its own season goal and its own ranking. Two seasons in a row without meeting the goal " +
+      "end the job or crash your reach; a good season opens the door to a stronger club.</p>" },
     { h: "Ranking and the end of a career", body:
       "<p>Your world ranking depends on season rating, team level, trophies and fame — measured against 44 AI rivals " +
       "who develop alongside you. From 27 your aim and reflex start to decline while game sense keeps growing. " +
@@ -2644,7 +2677,7 @@
         { id: "tactics", name: ["Sesja taktyczna", "Tactical session"], icon: "brain", cost: 1, craft: 2.2, chem: 3, desc: ["Nowe setupy i executy. Rozwija warsztat.", "New setups and executes. Builds your craft."] },
         { id: "drill",   name: ["Trening składu", "Squad drills"], icon: "crosshair", cost: 1, mates: 0.9, desc: ["Podnosisz umiejętności zawodników.", "You raise the players' skills."] },
         { id: "talk",    name: ["Rozmowy 1 na 1", "One-on-one talks"], icon: "users", cost: 1, chem: 7, rep: 1, desc: ["Chemia w szatni rośnie.", "Locker-room chemistry grows."] },
-        { id: "scout",   name: ["Skauting", "Scouting"], icon: "search", cost: 1, rep: 3, money: 4000, desc: ["Konsultacje dla klubu i kontakty w scenie.", "Club consulting and contacts across the scene."] },
+        { id: "scout",   name: ["Skauting", "Scouting"], icon: "search", cost: 1, rep: 3, money: 3200, desc: ["Konsultacje dla klubu i kontakty w scenie.", "Club consulting and contacts across the scene."] },
       ],
     },
     analyst: {
@@ -2654,7 +2687,7 @@
       actions: [
         { id: "model",  name: ["Model przeciwnika", "Opponent model"], icon: "chart", cost: 1, craft: 2.4, desc: ["Rozbierasz rywali na czynniki pierwsze.", "You take rivals apart piece by piece."] },
         { id: "report", name: ["Raport dla sztabu", "Report for the staff"], icon: "doc", cost: 1, craft: 1.0, mates: 0.5, desc: ["Skład gra pewniej dzięki przygotowaniu.", "The lineup plays with more certainty."] },
-        { id: "consult",name: ["Zlecenie z zewnątrz", "Outside contract"], icon: "coin", cost: 1, money: 9000, rep: 2, desc: ["Analiza dla innej organizacji.", "Analysis for another organisation."] },
+        { id: "consult",name: ["Zlecenie z zewnątrz", "Outside contract"], icon: "coin", cost: 1, money: 5500, rep: 2, desc: ["Analiza dla innej organizacji.", "Analysis for another organisation."] },
         { id: "study",  name: ["Konferencja i nauka", "Conference and study"], icon: "globe", cost: 1, craft: 1.6, rep: 3, desc: ["Podnosisz warsztat i rozpoznawalność.", "Raises your craft and your name."] },
       ],
     },
@@ -2674,6 +2707,105 @@
   function phaseDef() { return PHASES[state.phase] || null; }
   function inPhase2() { return !!state.phase; }
 
+  // Cele sezonowe drugiego rozdziału — każda rola ma własne
+  const PHASE_GOALS = {
+    coach:    ["playoff", "wins", "trophy"],
+    analyst:  ["strength", "wins", "trophy"],
+    streamer: ["audience", "earn", "collabs"],
+  };
+
+  function makeGoal2() {
+    const kind = pick(PHASE_GOALS[state.phase] || ["wins"]);
+    const t = state.team ? state.team.tier : 0;
+    const base = Math.round(9000 + t * 6000 + state.craft * 300);
+    if (kind === "playoff")  return { kind: kind, target: 4, reward: base };
+    if (kind === "wins")     return { kind: kind, target: 5 + t, reward: base };
+    if (kind === "trophy")   return { kind: kind, target: 1, reward: Math.round(base * 1.7) };
+    if (kind === "strength") return { kind: kind, target: 4, reward: base };
+    if (kind === "audience") return { kind: kind, target: Math.round(state.audience * 1.4 + 25), reward: base };
+    if (kind === "earn")     return { kind: kind, target: Math.round(60000 + state.audience * 900), reward: base };
+    return { kind: "collabs", target: 6, reward: base };
+  }
+
+  function goal2Text(g) {
+    if (!g) return "";
+    if (g.kind === "playoff")  return TR("g2.playoff");
+    if (g.kind === "wins")     return TR("g2.wins", { n: g.target });
+    if (g.kind === "trophy")   return TR("g2.trophy");
+    if (g.kind === "strength") return TR("g2.strength", { n: g.target });
+    if (g.kind === "audience") return TR("g2.audience", { n: g.target });
+    if (g.kind === "earn")     return TR("g2.earn", { n: money(g.target) });
+    return TR("g2.collabs", { n: g.target });
+  }
+
+  function goal2Progress() {
+    const g = state.goal2, s2 = state.s2;
+    if (!g || !s2) return { done: false, label: "" };
+    if (g.kind === "playoff") {
+      const pos = sortedStandings().findIndex(t => t.me) + 1;
+      return { done: s2.matches >= 4 && pos > 0 && pos <= 4, label: TR("goal.pos", { n: pos }) };
+    }
+    if (g.kind === "wins")     return { done: s2.wins >= g.target, label: s2.wins + " / " + g.target };
+    if (g.kind === "trophy")   return { done: s2.trophies >= 1, label: s2.trophies + " / 1" };
+    if (g.kind === "strength") {
+      const d = Math.round(staffTeamStrength() - s2.startStr);
+      return { done: d >= g.target, label: (d > 0 ? "+" : "") + d + " / +" + g.target };
+    }
+    if (g.kind === "audience") return { done: state.audience >= g.target, label: state.audience + " / " + g.target + "k" };
+    if (g.kind === "earn")     return { done: s2.earned >= g.target, label: money(s2.earned) };
+    return { done: s2.collabs >= g.target, label: s2.collabs + " / " + g.target };
+  }
+
+  function newS2() {
+    return { wins: 0, matches: 0, trophies: 0, collabs: 0, earned: 0,
+             startStr: state.team ? Math.round(staffTeamStrength()) : 0 };
+  }
+
+  // Ranking drugiego rozdziału: sztabowcy albo kanały
+  function makeStaffWorld() {
+    const used = [state.nick];
+    const arr = [];
+    for (let i = 0; i < 15; i++) {
+      let n, guard = 0;
+      do { n = pick(NICK_POOL) + (Math.random() < 0.4 ? String(irnd(1, 99)) : ""); guard++; }
+      while (used.indexOf(n) >= 0 && guard < 40);
+      used.push(n);
+      arr.push({ nick: n, craft: irnd(30, 88), rep: irnd(25, 95), trophies: Math.max(0, irnd(-2, 5)),
+                 tier: clamp(4 - Math.floor(i / 4), 0, 4), team: pick(ORG_NAMES),
+                 audience: irnd(20, 900) });
+    }
+    return arr;
+  }
+
+  function staffScore(craft, rep, trophies, tierId) { return craft + rep * 0.35 + trophies * 9 + tierId * 7; }
+
+  function staffTable() {
+    if (!state.staffWorld) state.staffWorld = makeStaffWorld();
+    const streamer = state.phase === "streamer";
+    const rows = state.staffWorld.map(r => ({
+      nick: r.nick, team: streamer ? TR("p2.channel") : r.team, tier: r.tier,
+      score: streamer ? r.audience : staffScore(r.craft, r.rep, r.trophies, r.tier),
+      shown: streamer ? r.audience + "k" : Math.round(staffScore(r.craft, r.rep, r.trophies, r.tier)),
+    }));
+    const myScore = streamer ? state.audience
+      : staffScore(state.craft, state.rep, state.career.trophies.length, state.team ? state.team.tier : 0);
+    rows.push({ me: true, nick: state.nick, team: streamer ? TR("p2.channel") : state.team.name,
+      tier: state.team ? state.team.tier : 0, score: myScore,
+      shown: streamer ? state.audience + "k" : Math.round(myScore) });
+    return rows.sort((a, b) => b.score - a.score);
+  }
+
+  function evolveStaffWorld() {
+    if (!state.staffWorld) { state.staffWorld = makeStaffWorld(); return; }
+    state.staffWorld.forEach(r => {
+      r.craft = clamp(Math.round(r.craft + rnd(-3, 4)), 20, 95);
+      r.rep = clamp(Math.round(r.rep + rnd(-6, 6)), 5, 100);
+      r.audience = Math.max(10, Math.round(r.audience * rnd(0.9, 1.18)));
+      if (Math.random() < 0.25) r.tier = clamp(r.tier + (r.craft > 65 ? 1 : -1), 0, 4);
+      if (Math.random() < 0.2) { r.trophies++; r.team = pick(ORG_NAMES); }
+    });
+  }
+
   function startSecondCareer(kind) {
     const def = PHASES[kind];
     state.phase = kind;
@@ -2685,6 +2817,8 @@
     state.week = 1;
     state.phaseStart = state.season;
     state.trophies2 = 0;
+    state.strikes = 0;
+    state.staffWorld = makeStaffWorld();
     if (def.hasTeam) {
       const t = clamp(Math.round(hofScore() / 400), 0, 4);
       state.team = makeTeam(t);
@@ -2692,7 +2826,9 @@
       state.league = makeLeague();
       state.schedule = makeSchedule();
     }
-    addLog("Nowy rozdział: zaczynasz jako " + tx(def.name) + ".", "gold");
+    state.s2 = newS2();
+    state.goal2 = makeGoal2();
+    addLog(TR("log.chapter2", { role: tx(def.name) }), "gold");
     switchView("career");
     render(); save();
   }
@@ -2703,17 +2839,22 @@
     if (!a || state.energy < a.cost) return;
     state.energy -= a.cost;
     if (a.craft) state.craft = clamp(state.craft + growthVal(state.craft, a.craft), 1, 99);
-    if (a.rep) state.rep = clamp(state.rep + a.rep, 0, 100);
+    if (a.rep) state.rep = clamp(state.rep + a.rep * (1 - state.rep / 105), 0, 100);
     if (a.chem && state.team) state.team.chem = clamp(state.team.chem + a.chem, 0, 100);
     if (a.mates && state.team) {
       state.team.mates.forEach(m => { m.skill = clamp(m.skill + a.mates * (0.5 + state.craft / 140), 25, 97); });
     }
-    if (a.audience) state.audience = Math.round(state.audience + a.audience * (0.6 + state.rep / 90));
+    if (a.audience) {
+      // malejący zwrot: im większa widownia, tym trudniej o kolejnych widzów
+      const room = clamp(1 - state.audience / 900, 0.12, 1);
+      state.audience = Math.round(state.audience + a.audience * (0.6 + state.rep / 90) * room);
+      if (id === "collab") state.s2.collabs++;
+    }
     if (a.mental) state.mental = clamp(state.mental + a.mental, 0, 100);
-    if (a.money) { const m2 = Math.round(a.money * (0.7 + state.rep / 70)); state.money += m2; state.career.earned += m2; }
+    if (a.money) { const m2 = Math.round(a.money * (0.7 + state.rep / 160)); state.money += m2; state.career.earned += m2; state.s2.earned += m2; }
     if (id === "stream2") {
-      const earn = Math.round(400 + state.audience * 55 * rnd(0.8, 1.25));
-      state.money += earn; state.career.earned += earn;
+      const earn = Math.round(300 + state.audience * 18 * rnd(0.8, 1.25));
+      state.money += earn; state.career.earned += earn; state.s2.earned += earn;
       addLog("Stream: +" + money(earn) + " (widownia " + state.audience + "k)", "good");
     }
     render(); save();
@@ -2733,7 +2874,10 @@
       const d = irnd(2, 11);
       if (won) { me.w++; opp.l++; me.rd += d; opp.rd -= d; } else { me.l++; opp.w++; me.rd -= d; opp.rd += d; }
       simRestOfLeague(ev.opp);
-      addLog("Liga vs " + opp.name + ": " + (won ? "wygrana" : "porażka"), won ? "good" : "bad");
+      state.s2.matches++;
+      if (won) state.s2.wins++;
+      addLog(TR(won ? "log.matchWin" : "log.matchLoss",
+        { label: "Liga vs " + opp.name, w: won ? 1 : 0, l: won ? 0 : 1, r: "—" }), won ? "good" : "bad");
       showModal("Mecz ligowy", state.team.name + " vs " + opp.name + " — " + (won ? "wygrana" : "porażka") + ".",
         '<div class="recap-line"><span>Twój wkład</span><b>' + esc(tx(def.craftName)) + " " + Math.round(state.craft) + "</b></div>" +
         '<div class="recap-line"><span>Siła drużyny</span><b>' + Math.round(staffTeamStrength()) + "</b></div>");
@@ -2746,7 +2890,7 @@
     let wins = 0;
     const base = tier(state.team.tier).str + (ev.major ? 6 : 2);
     for (let i = 0; i < rounds; i++) {
-      if (!simStaffMatch(base + i * 3)) break;
+      if (!simStaffMatch(base + 3 + i * 6)) break;
       wins++;
     }
     const champ = wins === rounds;
@@ -2755,6 +2899,7 @@
     state.money += prize; state.career.earned += prize;
     if (champ) {
       state.trophies2++;
+      state.s2.trophies++;
       state.career.trophies.push({ name: label + " (jako " + tx(def.name).toLowerCase() + ")", season: state.season, major: !!ev.major });
       state.rep = clamp(state.rep + 10, 0, 100);
       addLog("Trofeum jako " + tx(def.name).toLowerCase() + ": " + label, "gold");
@@ -2778,9 +2923,10 @@
     state.money += state.team && def.hasTeam ? state.team.salary : 0;
     if (def.hasTeam) state.career.earned += state.team.salary;
     if (state.phase === "streamer") {
-      const passive = Math.round(state.audience * 12);
-      state.money += passive; state.career.earned += passive;
-      state.audience = Math.max(0, Math.round(state.audience * 0.985)); // widownia odpływa bez treści
+      // przychód pasywny rośnie wolniej niż widownia
+      const passive = Math.round(Math.pow(state.audience, 0.9) * 8);
+      state.money += passive; state.career.earned += passive; state.s2.earned += passive;
+      state.audience = Math.max(0, Math.round(state.audience * 0.98)); // widownia odpływa bez treści
     }
     state.money -= upkeepTotal();
     state.mental = clamp(state.mental + 4, 0, 100);
@@ -2803,16 +2949,70 @@
     ];
     if (def.hasTeam) {
       const pos = sortedStandings().findIndex(t => t.me) + 1;
-      rows.push(["Drużyna", state.team.name + " (" + tx(tier(state.team.tier).name) + ")"]);
-      rows.push(["Miejsce w lidze", pos + "."]);
+      rows.push([TR("season.team"), state.team.name + " (" + tx(tier(state.team.tier).name) + ")"]);
+      rows.push([TR("p2.leaguePos"), pos + "."]);
+    } else {
+      rows.push([TR("kv.audience"), state.audience + "k"]);
+    }
+    rows.push([TR("p2.trophies"), state.trophies2]);
+
+    // cel sezonowy
+    const gp = goal2Progress();
+    if (state.goal2) {
+      rows.push([TR("goal.title"), goal2Text(state.goal2)]);
+      if (gp.done) {
+        state.money += state.goal2.reward;
+        state.career.earned += state.goal2.reward;
+        state.rep = clamp(state.rep + 8, 0, 100);
+        state.strikes = 0;
+        rows.push([TR("season.goalResult"), TR("season.goalDone", { amount: money(state.goal2.reward) })]);
+        addLog(TR("log.goalDone", { amount: money(state.goal2.reward) }), "gold");
+      } else {
+        state.strikes = (state.strikes || 0) + 1;
+        state.rep = clamp(state.rep - 5, 0, 100);
+        rows.push([TR("season.goalResult"), TR("season.goalFail", { progress: gp.label })]);
+        addLog(TR("log.goalFail"), "bad");
+      }
+    }
+
+    // dwa nieudane sezony z rzędu kończą się rozstaniem
+    let note2 = "";
+    if (state.strikes >= 2) {
+      state.strikes = 0;
+      if (def.hasTeam) {
+        const nt = clamp(state.team.tier - 1, 0, 4);
+        state.team = makeTeam(nt);
+        state.team.salary = Math.max(3000, Math.round(tier(nt).salary * 0.55));
+        note2 = TR("p2.fired", { team: state.team.name });
+        addLog(note2, "bad");
+      } else {
+        state.audience = Math.round(state.audience * 0.65);
+        note2 = TR("p2.audienceDrop");
+        addLog(note2, "bad");
+      }
+    } else if (gp.done && def.hasTeam && Math.random() < 0.45) {
+      // dobry sezon otwiera drzwi do mocniejszej organizacji
+      const up = clamp(state.team.tier + 1, 0, 4);
+      if (up !== state.team.tier) {
+        const nt = makeTeam(up);
+        nt.salary = Math.max(4000, Math.round(tier(up).salary * 0.6));
+        state.team = nt;
+        note2 = TR("p2.hired", { team: nt.name, tier: tx(tier(up).name) });
+        addLog(note2, "gold");
+      }
+    }
+
+    if (def.hasTeam) {
       state.league = makeLeague();
       state.schedule = makeSchedule();
-    } else {
-      rows.push(["Widownia", state.audience + "k"]);
     }
-    rows.push(["Trofea w tym rozdziale", state.trophies2]);
+    evolveStaffWorld();
+    const spos = staffTable().findIndex(r => r.me) + 1;
+    rows.push([TR(state.phase === "streamer" ? "p2.rankChannels" : "p2.rankStaff"), "#" + spos]);
+    state.s2 = newS2();
+    state.goal2 = makeGoal2();
     checkAch();
-    showModal(TR("season.end", { n: state.season - 1 }), TR("season.next2", { age: state.age }),
+    showModal(TR("season.end", { n: state.season - 1 }), note2 || TR("season.next2", { age: state.age }),
       rows.map(x => '<div class="recap-line"><span>' + esc(x[0]) + "</span><b>" + esc(x[1]) + "</b></div>").join(""));
     save();
   }
@@ -3061,7 +3261,12 @@
       box.innerHTML = '<div class="ev-card rest"><div class="ev-name">Tydzień bez meczu</div>' +
         '<div class="ev-sub">Czas na pracę ze składem.</div></div>';
     }
-    document.getElementById("goal-card").innerHTML = "";
+    const g2 = state.goal2 ? goal2Progress() : null;
+    document.getElementById("goal-card").innerHTML = state.goal2
+      ? '<div class="goal-box"><div class="g-title">' + esc(TR(g2.done ? "goal.done" : "goal.title")) + "</div>" +
+        '<div class="g-desc">' + esc(TR("goal.line", { text: goal2Text(state.goal2), progress: g2.label,
+          reward: money(state.goal2.reward) })) + "</div></div>"
+      : "";
     document.getElementById("btn-skip").classList.add("hidden");
     document.getElementById("week-hint").textContent = state.energy > 0
       ? "Zostało " + state.energy + " pkt energii — rozplanuj tydzień w zakładce Trening."
@@ -3117,6 +3322,10 @@
   }
 
   function renderTeam() {
+    const noTeam = inPhase2() && !phaseDef().hasTeam;
+    document.getElementById("team-panel").classList.toggle("hidden", noTeam);
+    document.getElementById("league-panel").classList.toggle("hidden", noTeam);
+    if (noTeam) return;
     document.getElementById("team-title").textContent = state.team.name;
     const nemHtml = state.nemesis && !inPhase2()
       ? '<div class="nem-box"><div class="n-title">' + esc(TR("nem.title", { nick: state.nemesis.nick })) + "</div>" +
@@ -3167,6 +3376,7 @@
   }
 
   function renderWorld() {
+    if (inPhase2()) { renderStaffRanking(); return; }
     const table = worldTable().slice(0, 20);
     const meIn = table.some(r => r.me);
     let rows = table.map((r, i) =>
@@ -3182,6 +3392,24 @@
         me.rating.toFixed(2) + "</td></tr>";
     }
     document.getElementById("world-body").innerHTML = rows;
+  }
+
+  function renderStaffRanking() {
+    const full = staffTable();
+    const top = full.slice(0, 10);
+    const meIn = top.some(r => r.me);
+    let rows = top.map((r, i) =>
+      '<tr class="' + (r.me ? "me" : "") + '"><td class="rk">' + (i + 1) + "</td><td>" + esc(r.nick) +
+      '<div class="rk-team">' + esc(r.team) + '</div></td><td class="rk-rat">' + esc(r.shown) + "</td></tr>").join("");
+    if (!meIn) {
+      const pos = full.findIndex(r => r.me) + 1;
+      const me = full[pos - 1];
+      rows += '<tr class="me"><td class="rk">' + pos + "</td><td>" + esc(me.nick) +
+        '<div class="rk-team">' + esc(me.team) + '</div></td><td class="rk-rat">' + esc(me.shown) + "</td></tr>";
+    }
+    document.getElementById("world-body").innerHTML = rows;
+    const h = document.querySelector("#view-team .glass:last-child h2 span[data-i18n]");
+    if (h) h.textContent = TR(state.phase === "streamer" ? "p2.rankChannels" : "p2.rankStaff");
   }
 
   function renderOffers() {

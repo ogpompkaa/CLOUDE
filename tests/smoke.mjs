@@ -148,6 +148,28 @@ if (c.seasons.length >= 2) {
 }
 check('karta gracza wyrenderowana', (await page.$$('#player-card .pcard')).length === 1);
 
+// drugi rozdział: emerytura i rola trenera
+await page.click('.nav-btn[data-view="profile"]');
+await safeClick('#btn-retire');
+await safeClick('#modal-close');
+await page.waitForSelector('#choice-overlay:not(.hidden)', { timeout: 5000 }).catch(() => {});
+const chapterOffered = await page.isVisible('#choice-overlay:not(.hidden)');
+if (chapterOffered) {
+  await safeClick('[data-choice="0"]');            // trener
+  await page.waitForTimeout(400);
+  for (let i = 0; i < 3; i++) {
+    await safeClick('.nav-btn[data-view="career"]');
+    await safeClick('#cta-next');
+    await drainOverlays();
+  }
+}
+const st2 = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+check('emerytura proponuje drugi rozdział', chapterOffered);
+check('drugi rozdział startuje', st2.phase === 'coach', st2.phase || 'brak');
+check('drugi rozdział ma cel sezonowy', !!(st2.goal2 && st2.goal2.kind), st2.goal2 && st2.goal2.kind);
+check('ranking sztabu istnieje', Array.isArray(st2.staffWorld) && st2.staffWorld.length >= 10,
+  (st2.staffWorld || []).length + ' sztabowców');
+
 await browser.close();
 
 console.log('\nPodsumowanie: ' + (fail.length ? fail.length + ' niepowodzeń' : 'wszystko przeszło') +

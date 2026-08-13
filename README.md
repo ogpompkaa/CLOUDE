@@ -62,6 +62,13 @@ Możesz zostać **trenerem** (Twój warsztat podnosi siłę drużyny w meczach),
 która rośnie od contentu i odpływa, gdy nic nie wrzucasz). Drugi rozdział ma własne akcje
 tygodniowe, własne trofea i toczy się w tym samym kalendarzu.
 
+Każda rola dostaje **własny cel na sezon**: trener wprowadza zespół do playoffu albo dowozi
+trofeum, analityk ma podnieść siłę składu, streamer — dobić do konkretnej widowni, zarobku
+albo liczby kolaboracji. Zrealizowany cel to premia i rozpoznawalność; **dwa nieudane sezony
+z rzędu kończą się rozstaniem** z organizacją (albo zapaścią zasięgów u streamera), a dobry
+sezon otwiera drzwi do mocniejszego klubu. Zakładka Drużyna pokazuje ranking sztabowców
+lub top kanałów sceny — w zależności od tego, którą drogę wybrałeś.
+
 Definitywne zakończenie kariery zapisuje ją w lokalnym **Hall of Fame** — galerii wszystkich
 Twoich zawodników z punktacją liczoną z trofeów, rankingu, ratingu i zarobków. Kolejne kariery
 dopisują się do listy, więc można je porównywać.
