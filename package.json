@@ -1,0 +1,12 @@
+{
+  "name": "kariera-pro-playera",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Symulator kariery zawodnika CS2 w jednym pliku HTML",
+  "scripts": {
+    "test": "node tests/smoke.mjs 2"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.1"
+  }
+}

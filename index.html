@@ -330,6 +330,29 @@
   #lv-feed div.win { border-left-color: var(--good); }
   #lv-feed div.loss { border-left-color: var(--danger); }
 
+  /* --- Karta gracza / wykres / historia --- */
+  .pcard { display: flex; align-items: center; gap: 14px; background: var(--bg-void);
+    border: 1px solid var(--border); padding: 14px; }
+  .pcard .pc-big { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 2.1rem; line-height: 1; color: var(--accent); }
+  .pcard .pc-lbl { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-dim); margin-top: 2px; }
+  .chart-wrap { background: var(--bg-void); border: 1px solid var(--border); padding: 10px 8px 6px; }
+  .chart-wrap svg { display: block; width: 100%; height: auto; }
+  .chart-axis { fill: var(--text-faint); font-size: 8px; font-family: 'Inter', sans-serif; }
+  .chart-ref { stroke: var(--text-faint); stroke-width: 1; stroke-dasharray: 3 3; }
+  .chart-line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart-dot { fill: var(--accent); stroke: var(--bg-void); stroke-width: 2; }
+  .chart-hit { fill: transparent; cursor: pointer; }
+  .chart-last { fill: var(--text); font-size: 10px; font-family: 'Rajdhani', sans-serif; font-weight: 700; }
+
+  .match-row { display: flex; align-items: center; gap: 9px; padding: 7px 10px; background: var(--bg-panel);
+    border: 1px solid var(--border); margin-bottom: 5px; font-size: 0.76rem; }
+  .match-row .mr-res { font-family: 'Rajdhani', sans-serif; font-weight: 700; width: 18px; }
+  .match-row .mr-res.w { color: var(--good); } .match-row .mr-res.l { color: var(--danger); }
+  .match-row .mr-label { flex: 1; min-width: 0; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .match-row .mr-rating { font-family: 'Rajdhani', sans-serif; font-weight: 700; }
+
+  .infl-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 10px; }
+
   .hidden { display: none !important; }
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-thumb { background: var(--border-strong); }
@@ -441,6 +464,7 @@
           <h2><svg class="icon"><use href="#i-users"></use></svg> <span id="team-title"></span></h2>
           <div id="team-info" class="muted" style="margin-bottom:12px;"></div>
           <div id="nemesis-box"></div>
+          <div id="influence-box"></div>
           <div id="mates-list"></div>
         </div>
         <div class="glass panel">
@@ -472,6 +496,14 @@
       </section>
 
       <section id="view-profile" class="view hidden">
+        <div class="glass panel">
+          <h2><svg class="icon"><use href="#i-user"></use></svg> Karta zawodnika</h2>
+          <div id="player-card"></div>
+          <h3 style="margin-top:18px;">Rating w kolejnych sezonach</h3>
+          <div id="rating-chart"></div>
+          <h3 style="margin-top:18px;">Ostatnie mecze</h3>
+          <div id="recent-matches"></div>
+        </div>
         <div class="glass panel">
           <h2><svg class="icon"><use href="#i-medal"></use></svg> Osiągnięcia</h2>
           <div id="ach-grid"></div>
@@ -728,6 +760,7 @@
     { id: "scrim",   name: "Scrim z ekipą",   icon: "users",     cost: 2, desc: "Teamplay +, chemia w składzie +, forma +.",     stat: "team",   gain: 2.2, stam: -16, mental: -2, chem: 5, form: 8 },
     { id: "stream",  name: "Stream",          icon: "cam",       cost: 1, desc: "Kasa i rozpoznawalność, ale kosztuje siły.",    stam: -10, mental: -1, hype: 3 },
     { id: "media",   name: "Media i social",  icon: "globe",     cost: 1, desc: "Wywiady, clipy, PR. Mocno podbija hype.",       stam: -5, hype: 7, mental: 1 },
+    { id: "talks",   name: "Rozmowy w składzie", icon: "users", cost: 1, desc: "Budujesz pozycję lidera. Przywództwo i chemia w górę.", stam: -6, chem: 4, lead: 2.4 },
     { id: "rest",    name: "Odpoczynek",      icon: "bed",       cost: 1, desc: "Regeneracja kondycji i psychiki.",              stam: 26, mental: 12 },
     { id: "gym",     name: "Siłownia / psycholog", icon: "heart",cost: 1, desc: "Podnosi maks. kondycję i psychikę.",            stam: 8, mental: 16 },
   ];
@@ -823,9 +856,10 @@
       seasonStats: { matches: 0, wins: 0, kills: 0, deaths: 0, adr: 0, rating: 0, best: 0 },
       offers: [], sponsors: [], shop: {}, invest: 0, injury: 0, world: null,
       career: { matches: 0, wins: 0, kills: 0, deaths: 0, rating: 0, aces: 0, mvps: 0, earned: 0,
-                trophies: [], seasons: [], bestRank: 0, bestRating: 0 },
+                trophies: [], seasons: [], bestRank: 0, bestRating: 0, recent: [] },
       ach: {}, log: [], rank: 0, retired: false,
       weekPlan: [], lastPlan: [], extras: {}, goal: null, nemesis: null, nemesisBeaten: 0, fastMatches: false,
+      lead: 18, captain: false, captainTry: 0, transferTry: 0,
     };
     state = s;
     s.team = makeTeam(0, "Team " + nick.toUpperCase().slice(0, 6));
@@ -915,6 +949,74 @@
     });
   }
 
+  // ---------- wpływ na skład ----------
+  function influenceScore() {
+    const form = state.seasonStats.matches >= 3 ? seasonRating()
+      : (state.career.matches ? state.career.rating / state.career.matches : 1);
+    return clamp(state.lead * 0.5 + marketValue() * 0.22 + (state.team.chem - 50) * 0.25 +
+      (state.captain ? 12 : 0) + (form - 1) * 40, 0, 100);
+  }
+
+  function tryCaptain() {
+    if (state.captain || state.energy < 1) return;
+    if (state.captainTry === state.season) { showModal("Za wcześnie", "W tym sezonie już rozmawiałeś o roli kapitana. Spróbuj po przerwie.", ""); return; }
+    state.captainTry = state.season;
+    state.energy--;
+    const p = clamp(influenceScore() / 130 + 0.08, 0.08, 0.85);
+    if (Math.random() < p) {
+      state.captain = true;
+      state.team.chem = clamp(state.team.chem + 6, 0, 100);
+      state.lead = clamp(state.lead + 4, 1, 99);
+      addLog("Zostajesz kapitanem " + state.team.name + ".", "gold");
+      showModal("Nowy kapitan", "Skład wybrał Ciebie na lidera zespołu. Chemia rośnie szybciej, a drużyna gra pewniej.", "");
+    } else {
+      state.team.chem = clamp(state.team.chem - 5, 0, 100);
+      state.mental = clamp(state.mental - 4, 0, 100);
+      addLog("Nieudana próba przejęcia roli kapitana.", "bad");
+      showModal("Odmowa", "Skład uznał, że nie masz jeszcze pozycji, by prowadzić zespół.", "");
+    }
+    render(); save();
+  }
+
+  function requestTransfer() {
+    if (state.energy < 2) return;
+    if (state.transferTry === state.season) { showModal("Za wcześnie", "Zarząd rozpatruje jedną Twoją prośbę transferową na sezon.", ""); return; }
+    const p = clamp(influenceScore() / 120, 0.05, 0.9);
+    if (Math.random() > p) {
+      state.transferTry = state.season;
+      state.energy -= 2;
+      state.mental = clamp(state.mental - 3, 0, 100);
+      addLog("Zarząd odrzucił Twoją prośbę o transfer.", "bad");
+      showModal("Zarząd odmawia", "Nie masz jeszcze na tyle mocnej pozycji, żeby układać skład.", "");
+      render(); save();
+      return;
+    }
+    // trzech kandydatów mocniejszych od przeciętnej Twojego składu
+    const base = tier(state.team.tier).str + 3;
+    const used = state.team.mates.map(m => m.nick).concat([state.nick]);
+    const cands = [0, 1, 2].map(() => makeMate(base + rnd(0, 6), used));
+    showChoice("Kogo ściągamy?", "Zarząd zgodził się na jeden transfer. Wskaż zawodnika.",
+      cands.map(c => ({ label: c.nick, desc: (ROLES.find(r => r.id === c.role) || ROLES[0]).name + " · " + c.age + " lat · siła " + c.skill })),
+      ci => {
+        closeChoice();
+        const inc = cands[ci];
+        showChoice("Kto odchodzi?", "Skład ma pięć miejsc. Kogo zastąpi " + inc.nick + "?",
+          state.team.mates.map(m => ({ label: m.nick, desc: (ROLES.find(r => r.id === m.role) || ROLES[0]).name + " · siła " + Math.round(m.skill) })),
+          oi => {
+            closeChoice();
+            const outp = state.team.mates[oi];
+            state.team.mates[oi] = inc;
+            state.team.chem = clamp(state.team.chem - 12, 0, 100);
+            state.transferTry = state.season;
+            state.energy -= 2;
+            addLog("Transfer na Twoją prośbę: " + outp.nick + " → " + inc.nick, "gold");
+            showModal("Skład zmieniony", inc.nick + " dołącza w miejsce " + outp.nick +
+              ". Nowa chemia wymaga czasu — zagrajcie scrimy.", "");
+            render(); save();
+          });
+      });
+  }
+
   // ---------- cel od zarządu ----------
   function makeGoal() {
     const t = state.team.tier;
@@ -993,7 +1095,7 @@
   function playerPower() { return clamp(skillScore() * condFactor(), 10, 105); }
   function matesAvg() { return state.team.mates.reduce((a, m) => a + m.skill, 0) / state.team.mates.length; }
   function teamStrength() {
-    return matesAvg() * 0.72 + playerPower() * 0.28 + (state.team.chem - 50) * 0.09 + (owned("analyst") ? 3 : 0);
+    return matesAvg() * 0.72 + playerPower() * 0.28 + (state.team.chem - 50) * 0.09 + (owned("analyst") ? 3 : 0) + (state.captain ? 2 : 0) + (state.lead - 30) * 0.03;
   }
 
   // ---------- symulacja meczu ----------
@@ -1303,8 +1405,18 @@
     // koledzy też rosną/spadają
     state.team.mates.forEach(m => { m.skill = clamp(m.skill + rnd(-0.4, 0.7), 25, 97); });
 
+    state.career.recent.unshift({ s: state.season, w: state.week, label: label, won: res.won,
+      score: res.mapsWon + "-" + res.mapsLost, rating: res.me.rating });
+    if (state.career.recent.length > 20) state.career.recent.length = 20;
     addLog(label + ": " + (res.won ? "wygrana" : "porażka") + " " + res.mapsWon + "-" + res.mapsLost +
       " (rating " + res.me.rating.toFixed(2) + ")", res.won ? "good" : "bad");
+  }
+
+  // wspólna krzywa rozwoju dla wartości spoza tabeli statystyk (np. przywództwo)
+  function growthVal(cur, mult) {
+    const ageF = state.age <= 21 ? 1.2 : state.age <= 25 ? 1.0 : state.age <= 28 ? 0.8 : 0.6;
+    const room = Math.pow(clamp((100 - cur) / 100, 0, 1), 1.5);
+    return state.talent * ageF * room * mult * 0.45;
   }
 
   function growth(statId, mult) {
@@ -1328,6 +1440,7 @@
     if (a.stam) state.stamina = clamp(state.stamina + a.stam, 0, 100);
     if (a.mental) state.mental = clamp(state.mental + a.mental, 0, 100);
     if (a.chem) state.team.chem = clamp(state.team.chem + a.chem, 0, 100);
+    if (a.lead) state.lead = clamp(state.lead + growthVal(state.lead, a.lead), 1, 99);
     if (a.form) state.form = clamp(state.form + a.form, 0, 100);
     if (a.hype) state.hype = clamp(state.hype + a.hype * (0.6 + state.team.tier * 0.2), 0, 100);
     state.weekPlan.push(id);
@@ -1399,6 +1512,11 @@
     if (!state.nemesis) state.nemesis = pickNemesis();
     if (!state.goal) state.goal = makeGoal();
     if (typeof state.fastMatches !== "boolean") state.fastMatches = false;
+    if (typeof state.lead !== "number") state.lead = 18;
+    if (typeof state.captain !== "boolean") state.captain = false;
+    if (typeof state.captainTry !== "number") state.captainTry = 0;
+    if (typeof state.transferTry !== "number") state.transferTry = 0;
+    if (!state.career.recent) state.career.recent = [];
   }
 
   // ---------- tydzień ----------
@@ -1578,6 +1696,7 @@
     state.career.earned += state.team.salary;
     state.sponsors.forEach(sp => { state.money += sp.pay; state.career.earned += sp.pay; });
     state.money -= upkeepTotal();
+    if (state.captain) state.team.chem = clamp(state.team.chem + 2, 0, 100);
     if (owned("psycho")) state.mental = clamp(state.mental + 3, 0, 100);
     if (owned("house")) state.stamina = clamp(state.stamina + 6, 0, 100);
     if (state.invest > 0) state.invest = Math.round(state.invest * 1.005);
@@ -2009,7 +2128,8 @@
     document.getElementById("hud-week").textContent = state.week + "/" + SEASON_LENGTH;
     document.getElementById("hud-season").textContent = state.season;
 
-    renderCareer(); renderTrain(); renderTeam(); renderShop(); renderWorld(); renderOffers(); renderProfile();
+    renderCareer(); renderTrain(); renderTeam(); renderInfluence(); renderShop(); renderWorld(); renderOffers();
+    renderPlayerCard(); renderRatingChart(); renderRecent(); renderProfile();
     document.getElementById("offers-dot").classList.toggle("hidden", state.offers.length === 0);
   }
 
@@ -2191,6 +2311,90 @@
       : '<p class="muted">Sponsorzy pojawią się przy wyższym hype (media, streamy, wygrane turnieje).</p>';
   }
 
+  // ---------- karta gracza, wykres i historia ----------
+  function renderPlayerCard() {
+    const c = state.career;
+    const avg = c.matches ? (c.rating / c.matches) : 0;
+    document.getElementById("player-card").innerHTML =
+      '<div class="pcard"><div class="pc-avatar">' + icon("user") + "</div>" +
+      '<div style="flex:1; min-width:0"><div class="pc-nick">' + esc(state.nick) + "</div>" +
+      '<div class="pc-sub">' + esc(role().name) + (state.captain ? " · kapitan" : "") + " · " + state.age + " lat · " +
+      esc(state.team.name) + " (" + esc(tier(state.team.tier).name) + ")</div></div>" +
+      '<div style="text-align:right"><div class="pc-big">' + (c.matches ? avg.toFixed(2) : "—") + "</div>" +
+      '<div class="pc-lbl">Rating kariery</div></div></div>' +
+      '<div class="kv-grid">' + [
+        ["Sezony", c.seasons.length], ["Mecze", c.matches],
+        ["Najlepszy sezon", c.bestRating ? c.bestRating.toFixed(2) : "—"],
+        ["Ranking", c.bestRank ? "#" + c.bestRank : "—"],
+        ["Trofea", c.trophies.length], ["Punkty HOF", hofScore()],
+      ].map(x => '<div class="kv"><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + "</div></div>").join("") +
+      "</div>";
+  }
+
+  // Pojedyncza seria zmian w czasie: linia + linia odniesienia 1.00, bez legendy
+  function renderRatingChart() {
+    const box = document.getElementById("rating-chart");
+    const seasons = state.career.seasons;
+    if (seasons.length < 2) {
+      box.innerHTML = '<p class="muted">Wykres pojawi się po drugim ukończonym sezonie.</p>';
+      return;
+    }
+    const W = 320, H = 118, padL = 26, padR = 14, padT = 12, padB = 18;
+    const vals = seasons.map(s2 => s2.rating);
+    const lo = Math.min(0.90, Math.min.apply(null, vals) - 0.06);
+    const hi = Math.max(1.10, Math.max.apply(null, vals) + 0.06);
+    const x = i => padL + (seasons.length === 1 ? 0 : i * (W - padL - padR) / (seasons.length - 1));
+    const y = v => padT + (hi - v) / (hi - lo) * (H - padT - padB);
+    const pts = seasons.map((s2, i) => x(i).toFixed(1) + "," + y(s2.rating).toFixed(1)).join(" ");
+    const lastIdx = seasons.length - 1;
+
+    let svg = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Średni rating w kolejnych sezonach">';
+    svg += '<line class="chart-ref" x1="' + padL + '" y1="' + y(1).toFixed(1) + '" x2="' + (W - padR) + '" y2="' + y(1).toFixed(1) + '"/>';
+    svg += '<text class="chart-axis" x="2" y="' + (y(1) + 3).toFixed(1) + '">1.00</text>';
+    svg += '<text class="chart-axis" x="2" y="' + (padT + 3) + '">' + hi.toFixed(2) + "</text>";
+    svg += '<text class="chart-axis" x="2" y="' + (H - padB + 3) + '">' + lo.toFixed(2) + "</text>";
+    svg += '<polyline class="chart-line" points="' + pts + '"/>';
+    seasons.forEach((s2, i) => {
+      svg += '<circle class="chart-dot" cx="' + x(i).toFixed(1) + '" cy="' + y(s2.rating).toFixed(1) + '" r="3.2"/>';
+      svg += '<circle class="chart-hit" cx="' + x(i).toFixed(1) + '" cy="' + y(s2.rating).toFixed(1) + '" r="11">' +
+        "<title>Sezon " + s2.season + " · " + esc(s2.team) + " · rating " + s2.rating.toFixed(2) +
+        (s2.rank ? " · #" + s2.rank : "") + "</title></circle>";
+    });
+    svg += '<text class="chart-axis" x="' + padL + '" y="' + (H - 4) + '">S' + seasons[0].season + "</text>";
+    svg += '<text class="chart-axis" text-anchor="end" x="' + (W - padR) + '" y="' + (H - 4) + '">S' + seasons[lastIdx].season + "</text>";
+    svg += '<text class="chart-last" text-anchor="end" x="' + (W - padR) + '" y="' + (y(seasons[lastIdx].rating) - 8).toFixed(1) + '">' +
+      seasons[lastIdx].rating.toFixed(2) + "</text>";
+    svg += "</svg>";
+    box.innerHTML = '<div class="chart-wrap">' + svg + "</div>";
+  }
+
+  function renderRecent() {
+    const list = state.career.recent || [];
+    document.getElementById("recent-matches").innerHTML = list.length
+      ? list.slice(0, 10).map(m =>
+          '<div class="match-row"><span class="mr-res ' + (m.won ? "w" : "l") + '">' + (m.won ? "W" : "P") + "</span>" +
+          '<span class="mr-label">' + esc(m.label) + "</span>" +
+          '<span class="muted">' + esc(m.score) + "</span>" +
+          '<span class="mr-rating">' + m.rating.toFixed(2) + "</span></div>").join("")
+      : '<p class="muted">Brak rozegranych meczów.</p>';
+  }
+
+  function renderInfluence() {
+    const sc = Math.round(influenceScore());
+    document.getElementById("influence-box").innerHTML =
+      '<div class="goal-box" style="border-left-color: var(--accent);">' +
+      '<div class="g-title" style="color:var(--accent)">Twoja pozycja w zespole' + (state.captain ? " · kapitan" : "") + "</div>" +
+      '<div class="g-desc">Przywództwo ' + Math.round(state.lead) + " · wpływ " + sc + "%" +
+      (state.captain ? " · prowadzisz zespół" : " · nie jesteś jeszcze kapitanem") + "</div>" +
+      '<div class="bar-track" style="margin-top:8px"><div class="bar-fill" style="width:' + sc + "%; background:" + barColor(sc) + '"></div></div>' +
+      '<div class="infl-actions">' +
+      (state.captain ? "" : '<button class="act" data-captain="1"' + (state.energy < 1 ? " disabled" : "") +
+        '><span class="a-title">' + icon("star") + ' Walcz o kapitana</span><span class="a-cost">Energia: 1 · raz na sezon</span></button>') +
+      '<button class="act" data-transfer="1"' + (state.energy < 2 ? " disabled" : "") +
+      '><span class="a-title">' + icon("swap") + ' Poproś o transfer</span><span class="a-cost">Energia: 2 · raz na sezon</span></button>' +
+      "</div></div>";
+  }
+
   function renderProfile() {
     document.getElementById("btn-fast").textContent = state.fastMatches
       ? "Mecze: tryb szybki (bez rozgrywki na żywo)"
@@ -2303,6 +2507,10 @@
       return;
     }
     render();
+  });
+  document.getElementById("influence-box").addEventListener("click", e => {
+    if (e.target.closest("[data-captain]")) return tryCaptain();
+    if (e.target.closest("[data-transfer]")) return requestTransfer();
   });
   document.getElementById("btn-fast").addEventListener("click", () => {
     state.fastMatches = !state.fastMatches;
