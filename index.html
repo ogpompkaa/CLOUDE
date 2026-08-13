@@ -968,6 +968,11 @@
     "live.round": ["Runda {n} · {half}", "Round {n} · {half}"],
     "live.half1": ["pierwsza połowa", "first half"],
     "live.half2": ["druga połowa", "second half"],
+    "live.halfScore": ["1. połowa {a}:{b} ({side})", "first half {a}:{b} ({side})"],
+    "buy.eco": ["eco", "eco"],
+    "buy.force": ["force buy", "force buy"],
+    "buy.pistol": ["pistolety", "pistol round"],
+    "maps.title": ["Mapy", "Maps"],
     "live.map": ["mapa {n}", "map {n}"],
     "live.roundLine": ["Runda {n} · {a}:{b}", "Round {n} · {a}:{b}"],
     "live.ace": ["ACE!", "ACE!"],
@@ -988,6 +993,58 @@
     "chr.chapter2": ["Nowy rozdział: {role}", "A new chapter: {role}"],
     "chr.rank": ["Ranking świata: #{n}", "World ranking: #{n}"],
     "chr.title": ["Kronika kariery", "Career chronicle"],
+    "chr.roleChange": ["Zmiana roli: {role}", "Role change: {role}"],
+    "chr.former": ["Rewanż na byłym klubie ({team})", "Revenge over a former club ({team})"],
+    "chr.moved": ["Przeprowadzka na scenę: {region}", "Moved to the {region} scene"],
+    "region.moved": ["Przenosisz się na scenę {region}. Potrzebujesz czasu na aklimatyzację.",
+      "You move to the {region} scene. You need time to settle in."],
+    "region.settled": ["Aklimatyzacja zakończona — czujesz się na miejscu.", "You have settled in — this feels like home now."],
+    "region.abroad": ["Scena: {region}", "Scene: {region}"],
+    "region.adapting": ["Aklimatyzacja: {n} tyg.", "Settling in: {n} wk"],
+    "offer.abroad": ["inny region", "different region"],
+    "squad.benchedLog": ["{nick} wypada ze składu.", "{nick} is dropped from the lineup."],
+    "drama.formerWin": ["Wygrana z byłym klubem ({team}). Smakuje wyjątkowo.",
+      "A win over your former club ({team}). That one tastes different."],
+    "drama.formerLoss": ["Porażka z byłym klubem ({team}). Boli podwójnie.",
+      "A loss to your former club ({team}). That one hurts twice."],
+    "drama.star.title": ["{nick} dostaje ofertę", "{nick} has an offer"],
+    "drama.star.text": ["{team} chce ściągnąć {nick}. Skład patrzy, co zrobisz.",
+      "{team} want to sign {nick}. The lineup is watching what you do."],
+    "drama.star.keep": ["Przekonaj go, żeby został", "Talk him into staying"],
+    "drama.star.keepDesc": ["Twoja pozycja w zespole decyduje, czy posłucha.", "Your standing decides whether he listens."],
+    "drama.star.stayed": ["{nick} zostaje. Szatnia widzi, kto tu trzyma zespół.",
+      "{nick} stays. The locker room sees who holds this team together."],
+    "drama.star.left": ["{nick} i tak odchodzi do {team}.", "{nick} leaves for {team} anyway."],
+    "drama.star.let": ["Nie zatrzymuj", "Let him go"],
+    "drama.star.letDesc": ["Klub dzieli się odstępnym, skład trzeba poskładać na nowo.",
+      "The club shares the fee, but the lineup needs rebuilding."],
+    "drama.star.letOut": ["{nick} przechodzi do {team}. Na konto wpada część odstępnego.",
+      "{nick} joins {team}. Part of the fee lands in your account."],
+    "drama.rift.title": ["Pęknięcie w szatni", "A rift in the locker room"],
+    "drama.rift.text": ["{nick} znowu wybucha na comms. Reszta ma dość.",
+      "{nick} blew up on comms again. The rest have had enough."],
+    "drama.rift.confront": ["Rozmowa w cztery oczy", "Talk to him one on one"],
+    "drama.rift.confrontDesc": ["Bierzesz to na siebie. Wymaga autorytetu.", "You take it on yourself. It takes authority."],
+    "drama.rift.fixed": ["{nick} bierze się w garść. Atmosfera wraca.", "{nick} pulls himself together. The mood recovers."],
+    "drama.rift.worse": ["{nick} zamyka się w sobie. Jest gorzej niż było.", "{nick} shuts down. It is worse than before."],
+    "drama.rift.bench": ["Wypchnij go ze składu", "Push him out of the lineup"],
+    "drama.rift.benchDesc": ["Radykalnie. Potrzebujesz realnego wpływu w zespole.",
+      "Drastic. You need real influence in the team."],
+    "drama.rift.noPower": ["Zarząd nie traktuje Twojej opinii poważnie.", "The board does not take your opinion seriously."],
+    "drama.rift.benched": ["{nick} wypada ze składu. Chemia płaci rachunek.", "{nick} is dropped. Chemistry pays the bill."],
+    "drama.rift.ignore": ["Nie mieszaj się", "Stay out of it"],
+    "drama.rift.ignoreDesc": ["Może samo przyschnie.", "Maybe it blows over."],
+    "drama.rift.ignored": ["Problem zostaje w szatni i toczy zespół.", "The problem stays and eats the team."],
+    "drama.role.title": ["Prośba o zmianę roli", "A request to switch role"],
+    "drama.role.text": ["Sztab ściąga nowego zawodnika i prosi, żebyś przeszedł na {role}.",
+      "The staff are signing someone new and ask you to move to {role}."],
+    "drama.role.yes": ["Zgadzam się", "Agree"],
+    "drama.role.yesDesc": ["Dla dobra składu, kosztem własnej formy.", "For the good of the lineup, at the cost of your form."],
+    "drama.role.changed": ["Od teraz grasz jako {role}.", "You now play as {role}."],
+    "drama.role.no": ["Odmawiam", "Refuse"],
+    "drama.role.noDesc": ["Znasz swoją wartość. Zarząd to zapamięta.", "You know your worth. The board will remember."],
+    "drama.role.refused": ["Zostajesz przy swojej roli. W biurze mina zrzedła.",
+      "You keep your role. The front office is not thrilled."],
     "gala.title": ["Gala końca sezonu {n}", "Season {n} awards night"],
     "gala.sub": ["Scena podsumowuje rok.", "The scene sums up the year."],
     "gala.top": ["Top 10 świata", "World top 10"],
@@ -1205,7 +1262,13 @@
     ua: "cis", ru: "cis", us: "na", ca: "na", br: "sa", au: "oce",
   };
 
-  function myRegion() { return COUNTRY_REGION[state.country] || "eu"; }
+  function homeRegion() { return COUNTRY_REGION[state.country] || "eu"; }
+  // po transferze liczy się region klubu, nie kraj urodzenia
+  function myRegion() {
+    if (state.stage === "pro" && state.team && state.team.name) return orgRegion(state.team.name);
+    return homeRegion();
+  }
+  function abroad() { return myRegion() !== homeRegion(); }
   function regionName(id) { const r = REGIONS.find(x => x.id === id); return r ? tx(r.name) : id; }
   function orgsForTier(t) {
     const near = ORGS.filter(o => Math.abs(o.t - t) <= 1);
@@ -1536,6 +1599,7 @@
       weekPlan: [], lastPlan: [], extras: {}, goal: null, nemesis: null, nemesisBeaten: 0, fastMatches: false,
       lead: 18 + ((ARCHETYPES.find(a => a.id === archId) || {}).lead || 0), captain: false, captainTry: 0, transferTry: 0,
       phase: null, craft: 0, rep: 0, audience: 0, trophies2: 0, tutorialDone: false,
+      adapt: 0, formerTeams: [], maps: {},
     };
     state = s;
     s.team = makeTeam(0, "Team " + nick.toUpperCase().slice(0, 6));
@@ -1821,7 +1885,8 @@
   }
   function condFactor() {
     const inj = state.injury > 0 ? 0.10 : 0;
-    return 1 + (state.stamina - 70) * 0.0022 + (state.mental - 70) * 0.0018 + (state.form - 55) * 0.0016 - inj;
+    const adapt = state.adapt > 0 ? 0.05 : 0;
+    return 1 - adapt + (state.stamina - 70) * 0.0022 + (state.mental - 70) * 0.0018 + (state.form - 55) * 0.0016 - inj;
   }
   function playerPower() { return clamp(skillScore() * condFactor(), 10, 105); }
   function matesAvg() { return state.team.mates.reduce((a, m) => a + m.skill, 0) / state.team.mates.length; }
@@ -1970,6 +2035,7 @@
       }),
       oppStr: oppStr, mapName: mapName, oppName: oppName, title: title, mapNo: mapNo, bo: bo,
       speed: 0, timer: null, decisions: decisionsUsed, done: done, over: false,
+      side: Math.random() < 0.5 ? "CT" : "T", half1: null, money: 4, buy: "full", streak: 0,
     };
     if (liveSkipAll) { runInstant(); return; }
     document.getElementById("live-overlay").classList.remove("hidden");
@@ -1994,6 +2060,18 @@
     const L = live;
     if (!L || L.over) return;
     L.round++;
+    // zmiana stron po dwunastej rundzie
+    if (L.round === 13) {
+      L.half1 = { a: L.a, b: L.b, side: L.side };
+      L.side = L.side === "CT" ? "T" : "CT";
+      L.money = 4; L.buy = "full"; L.streak = 0;
+    }
+    // ekonomia: po przegranych rundach nie stać Was na pełny zakup
+    if (L.round === 1 || L.round === 13) L.buy = "pistol";
+    else if (L.money >= 4) L.buy = "full";
+    else if (L.money >= 2) L.buy = "force";
+    else L.buy = "eco";
+    const buyMod = L.buy === "full" ? 0 : L.buy === "force" ? -0.06 : L.buy === "eco" ? -0.16 : 0;
     let k = 0;
     for (let i = 0; i < 5; i++) if (Math.random() < L.kpr / 5) k++;
     if (k >= 3 && Math.random() < 0.09) { k = 5; L.aces++; }
@@ -2001,9 +2079,13 @@
     L.k += k;
     if (Math.random() < L.dieP) L.d++;
     L.dmg += dmg;
-    const p = clamp(0.5 + (teamStrength() - L.oppStr) * 0.013 + matchMods.round * 0.011 + (k - L.kpr) * 0.07, 0.14, 0.86);
+    const p = clamp(0.5 + (teamStrength() - L.oppStr) * 0.013 + matchMods.round * 0.011 +
+      (k - L.kpr) * 0.07 + buyMod + (L.side === "CT" ? 0.02 : -0.02), 0.10, 0.88);
     const won = Math.random() < p;
     if (won) L.a++; else L.b++;
+    // pieniądze na kolejną rundę
+    L.streak = won ? Math.max(0, L.streak) + 1 : Math.min(0, L.streak) - 1;
+    L.money = clamp(won ? L.money + (L.buy === "eco" ? 3 : 2) : L.money - (L.buy === "full" ? 3 : 1), 0, 6);
     L.mates.forEach(m => {
       let mk = 0;
       for (let i = 0; i < 5; i++) if (Math.random() < m.kpr / 5) mk++;
@@ -2012,6 +2094,8 @@
       m.dmg += mk * 80 + irnd(0, 46);
     });
     let line = TR("live.roundLine", { n: L.round, a: L.a, b: L.b });
+    if (L.buy === "eco" || L.buy === "force") line += " · " + TR("buy." + L.buy);
+    else if (L.round === 1 || L.round === 13) line += " · " + TR("buy.pistol");
     if (k === 5) line += " · " + TR("live.ace");
     else if (k >= 3) line += " · " + TR("hl.multi", { n: k, spot: pick(SPOTS) });
     else if (k > 0) line += " · " + TR("live.frags", { n: k, word: fragWord(k) });
@@ -2100,8 +2184,13 @@
       return { nick: m.nick, rating: +clamp(0.5 * (mk / 0.68) + 0.3 * (ma / 78) + 0.2 * ((1 - md) / 0.32), 0.30, 2.10).toFixed(2),
                kills: m.k, deaths: m.d, adr: Math.round(ma) };
     });
+    if (!state.maps) state.maps = {};
+    const ms = state.maps[L.mapName] || { w: 0, l: 0, r: 0, n: 0 };
+    ms.n++; ms.r += rating;
+    if (L.a > L.b) ms.w++; else ms.l++;
+    state.maps[L.mapName] = ms;
     const res = {
-      map: L.mapName, a: L.a, b: L.b, won: L.a > L.b, rounds: rounds,
+      map: L.mapName, a: L.a, b: L.b, won: L.a > L.b, rounds: rounds, half1: L.half1, side: L.side,
       me: { rating: +rating.toFixed(2), kills: L.k, deaths: L.d, adr: Math.round(adr), aces: L.aces, ace: L.aces > 0 },
       mates: mates,
     };
@@ -2118,7 +2207,8 @@
     const cls = L.a > L.b ? "lead" : L.a < L.b ? "trail" : "";
     document.getElementById("lv-score").innerHTML = '<span class="' + cls + '">' + L.a + " : " + L.b + "</span>";
     document.getElementById("lv-round").textContent =
-      TR("live.round", { n: L.round + 1, half: TR(L.round < 12 ? "live.half1" : "live.half2") });
+      TR("live.round", { n: L.round + 1, half: TR(L.round < 12 ? "live.half1" : "live.half2") }) +
+      " · " + L.side + (L.half1 ? " · " + TR("live.halfScore", { a: L.half1.a, b: L.half1.b, side: L.half1.side }) : "");
     const r = Math.max(1, L.a + L.b);
     document.getElementById("lv-stats").innerHTML = [
       [TR("kv.frags"), L.k], [TR("kv.deaths"), L.d], ["ADR", Math.round(L.dmg / r)], ["K/D", (L.k / Math.max(1, L.d)).toFixed(2)],
@@ -2268,6 +2358,8 @@
     if (!state.shop) state.shop = {};
     if (typeof state.invest !== "number") state.invest = 0;
     if (typeof state.injury !== "number") state.injury = 0;
+    if (typeof state.adapt !== "number") state.adapt = 0;
+    if (!state.formerTeams) state.formerTeams = [];
     if (!state.world) state.world = makeWorld();
     if (!state.weekPlan) state.weekPlan = [];
     if (!state.lastPlan) state.lastPlan = [];
@@ -2555,6 +2647,129 @@
     chronicle(TR("chr.firstContract", { team: state.team.name }), "gold");
   }
 
+  // ---------- drama w składzie ----------
+  // Wydarzenia warunkowe: odpalają się tylko wtedy, gdy skład faktycznie do nich pasuje
+  const DRAMA = [
+    {
+      id: "starOffer",
+      when: () => state.team.mates.some(m => m.skill > tier(state.team.tier).str + 5),
+      build: () => {
+        const star = state.team.mates.slice().sort((a, b) => b.skill - a.skill)[0];
+        const to = pickOrg(clamp(state.team.tier + 1, 0, 4));
+        return {
+          title: TR("drama.star.title", { nick: star.nick }),
+          text: TR("drama.star.text", { nick: star.nick, team: to }),
+          opts: [
+            { label: TR("drama.star.keep"), desc: TR("drama.star.keepDesc"),
+              eff: () => {
+                const p = clamp(0.25 + state.lead * 0.006 + (star.bond || 0) * 0.004 + (state.captain ? 0.15 : 0), 0.1, 0.9);
+                if (Math.random() < p) {
+                  star.bond = clamp((star.bond || 0) + 15, 0, 100);
+                  state.team.chem = clamp(state.team.chem + 6, 0, 100);
+                  return TR("drama.star.stayed", { nick: star.nick });
+                }
+                replaceMate(star, to);
+                return TR("drama.star.left", { nick: star.nick, team: to });
+              } },
+            { label: TR("drama.star.let"), desc: TR("drama.star.letDesc"),
+              eff: () => {
+                replaceMate(star, to);
+                state.money += 15000; state.career.earned += 15000;
+                return TR("drama.star.letOut", { nick: star.nick, team: to });
+              } },
+          ],
+        };
+      },
+    },
+    {
+      id: "tiltRift",
+      when: () => teamHasTrait("tilter") && state.team.chem < 65,
+      build: () => {
+        const t = state.team.mates.find(m => (m.traits || []).indexOf("tilter") >= 0);
+        return {
+          title: TR("drama.rift.title"),
+          text: TR("drama.rift.text", { nick: t.nick }),
+          opts: [
+            { label: TR("drama.rift.confront"), desc: TR("drama.rift.confrontDesc"),
+              eff: () => {
+                if (Math.random() < clamp(0.3 + state.lead * 0.007, 0.15, 0.85)) {
+                  state.team.chem = clamp(state.team.chem + 12, 0, 100);
+                  return TR("drama.rift.fixed", { nick: t.nick });
+                }
+                t.bond = clamp((t.bond || 0) - 20, 0, 100);
+                state.team.chem = clamp(state.team.chem - 6, 0, 100);
+                return TR("drama.rift.worse", { nick: t.nick });
+              } },
+            { label: TR("drama.rift.bench"), desc: TR("drama.rift.benchDesc"),
+              eff: () => {
+                if (influenceScore() < 40) return TR("drama.rift.noPower");
+                replaceMate(t, "");
+                return TR("drama.rift.benched", { nick: t.nick });
+              } },
+            { label: TR("drama.rift.ignore"), desc: TR("drama.rift.ignoreDesc"),
+              eff: () => { state.team.chem = clamp(state.team.chem - 8, 0, 100); return TR("drama.rift.ignored"); } },
+          ],
+        };
+      },
+    },
+    {
+      id: "roleAsk",
+      when: () => state.team.tier >= 2,
+      build: () => {
+        const others = ROLES.filter(r => r.id !== state.role);
+        const nr = pick(others);
+        return {
+          title: TR("drama.role.title"),
+          text: TR("drama.role.text", { role: tx(nr.name) }),
+          opts: [
+            { label: TR("drama.role.yes"), desc: TR("drama.role.yesDesc"),
+              eff: () => {
+                state.role = nr.id;
+                state.form = clamp(state.form - 10, 0, 100);
+                state.team.chem = clamp(state.team.chem + 8, 0, 100);
+                chronicle(TR("chr.roleChange", { role: tx(nr.name) }), "info");
+                return TR("drama.role.changed", { role: tx(nr.name) });
+              } },
+            { label: TR("drama.role.no"), desc: TR("drama.role.noDesc"),
+              eff: () => {
+                state.team.patience = Math.max(1, state.team.patience - 1);
+                state.team.chem = clamp(state.team.chem - 5, 0, 100);
+                return TR("drama.role.refused");
+              } },
+          ],
+        };
+      },
+    },
+  ];
+
+  function replaceMate(mate, toTeam) {
+    const i = state.team.mates.indexOf(mate);
+    if (i < 0) return;
+    const used = state.team.mates.map(m => m.nick).concat([state.nick]);
+    state.team.mates[i] = makeMate(tier(state.team.tier).str, used);
+    state.team.chem = clamp(state.team.chem - 10, 0, 100);
+    if ((mate.bond || 0) > 60) state.mental = clamp(state.mental - 6, 0, 100);
+    addLog(toTeam ? TR("squad.leftLog", { nick: mate.nick, team: toTeam })
+                  : TR("squad.benchedLog", { nick: mate.nick }), "info");
+  }
+
+  function maybeDrama(done) {
+    if (inLadder() || inPhase2()) { done(); return; }
+    const pool = DRAMA.filter(d => { try { return d.when(); } catch (e) { return false; } });
+    if (!pool.length || Math.random() > 0.12) { done(); return; }
+    const ev = pick(pool).build();
+    showChoice(ev.title, ev.text, ev.opts.map(o => ({ label: o.label, desc: o.desc })), i => {
+      const txt = ev.opts[i].eff();
+      addLog(ev.title + ": " + txt, "info");
+      closeChoice();
+      showModal(ev.title, txt, "");
+      modalAfterClose = done;
+    });
+  }
+
+  // Mecz z byłym klubem waży więcej
+  function isFormerClub(name) { return (state.formerTeams || []).indexOf(name) >= 0; }
+
   // ---------- tydzień ----------
   function currentEvent() { return state.schedule[state.week - 1]; }
 
@@ -2616,6 +2831,13 @@
     if (res.won) { me.w++; opp.l++; me.rd += m0.a - m0.b; opp.rd -= m0.a - m0.b; }
     else { me.l++; opp.w++; me.rd -= m0.b - m0.a; opp.rd += m0.b - m0.a; }
     simRestOfLeague(ev.opp);
+    if (isFormerClub(opp.name)) {
+      state.hype = clamp(state.hype + 3, 0, 100);
+      state.mental = clamp(state.mental + (res.won ? 8 : -6), 0, 100);
+      state.form = clamp(state.form + (res.won ? 6 : -3), 0, 100);
+      addLog(TR(res.won ? "drama.formerWin" : "drama.formerLoss", { team: opp.name }), res.won ? "gold" : "bad");
+      if (res.won) chronicle(TR("chr.former", { team: opp.name }), "gold");
+    }
     if (opp.nem && state.nemesis) {
       if (res.won) {
         state.nemesis.w++;
@@ -2743,6 +2965,11 @@
     state.stamina = clamp(state.stamina + 9, 0, 100);
     state.mental = clamp(state.mental + 3, 0, 100);
     state.hype = clamp(state.hype - 1.2 - state.hype * 0.012, 0, 100);
+    if (state.adapt > 0) {
+      state.adapt--;
+      state.form = clamp(state.form - 1.5, 0, 100);
+      if (state.adapt === 0) addLog(TR("region.settled"), "good");
+    }
 
     if (state.injury > 0) {
       state.injury--;
@@ -2764,7 +2991,8 @@
     state.weekPlan = [];
     state.week++;
     if (state.week > SEASON_LENGTH) { endSeason(); return; }
-    if (Math.random() < 0.17) runLifeEvent(() => { render(); save(); });
+    if (Math.random() < 0.17) { runLifeEvent(() => { render(); save(); }); return; }
+    maybeDrama(() => { render(); save(); });
   }
 
   // ---------- oferty / sponsorzy ----------
@@ -2856,6 +3084,8 @@
         lowBuyout: picked.some(x => x.lowBuyout),
       };
       const old = state.team.name;
+      if (!state.formerTeams) state.formerTeams = [];
+      if (state.formerTeams.indexOf(old) < 0) state.formerTeams.push(old);
       state.team = { name: o.team, tier: o.tier, mates: o.mates, chem: o.chem,
         salary: Math.round(o.salary * payMul), contract: o.years, patience: ex.guaranteed ? 5 : 3 };
       state.extras = ex;
@@ -2864,6 +3094,13 @@
       state.league = makeLeague();
       state.goal = makeGoal();
       if (inLadder()) enterProCareer();
+      const newRegion = orgRegion(o.team);
+      if (newRegion !== myRegion()) {
+        state.adapt = 8;                       // kilka tygodni aklimatyzacji
+        state.mental = clamp(state.mental - 6, 0, 100);
+        addLog(TR("region.moved", { region: regionName(newRegion) }), "info");
+        chronicle(TR("chr.moved", { region: regionName(newRegion) }), "info");
+      }
       state.hype = clamp(state.hype + 5, 0, 100);
       addLog(TR("log.transferLine", { from: old, to: o.team, salary: money(state.team.salary) }), "gold");
       chronicle(TR("chr.transfer", { team: o.team }), "info");
@@ -3228,6 +3465,13 @@
       "<p>Zarabiasz z pensji, nagród turniejowych, streamów i sponsorów. Wydajesz w zakładce Rynek: sprzęt i monitor " +
       "podbijają statystyki, trener przyspiesza treningi, analityk wzmacnia drużynę w meczach, menedżer zwiększa liczbę ofert. " +
       "Część z nich ma tygodniowe koszty utrzymania. Portfel inwestycyjny rośnie sam i liczy się do Hall of Fame.</p>" },
+    { h: "Drużyna, drama i regiony", body:
+      "<p>Koledzy mają charaktery i <b>relację</b> z Tobą, która rośnie od scrimów i wygranych. " +
+      "Mentor przyspiesza Twój rozwój, tilciarz pogłębia kryzysy, weteran stabilizuje zespół.</p>" +
+      "<p>Gwiazda składu może dostać ofertę — z odpowiednim autorytetem przekonasz ją, żeby została. " +
+      "Mecz przeciwko byłemu klubowi daje więcej formy i psychiki przy wygranej, a boli bardziej przy porażce.</p>" +
+      "<p>Oferty przychodzą też z innych regionów. Przeprowadzka kosztuje kilka tygodni aklimatyzacji " +
+      "(gorsza forma), ale zmienia ligę, rywali i ranking regionalny.</p>" },
     { h: "Drugi rozdział", body:
       "<p>Po zakończeniu kariery zawodniczej wybierasz rolę: <b>trener</b> (warsztat podnosi siłę drużyny), " +
       "<b>analityk</b> (przygotowanie zmniejsza losowość) albo <b>streamer</b> (bez meczów, za to z widownią).</p>" +
@@ -3264,6 +3508,13 @@
       "<p>You earn from salary, prize money, streams and sponsors. You spend in the Market tab: gear and a monitor " +
       "raise stats, a coach speeds up training, an analyst strengthens the team in matches, a manager brings more offers. " +
       "Some of them carry weekly upkeep. The investment wallet grows on its own and counts toward the Hall of Fame.</p>" },
+    { h: "Squad, drama and regions", body:
+      "<p>Teammates have traits and a <b>bond</b> with you that grows through scrims and wins. " +
+      "A mentor speeds up your development, a tilter deepens slumps, a veteran steadies the team.</p>" +
+      "<p>Your star can get an offer — with enough authority you can talk him into staying. " +
+      "A match against a former club gives more form and confidence when you win, and hurts more when you lose.</p>" +
+      "<p>Offers also come from other regions. Moving costs a few weeks of settling in (worse form), " +
+      "but changes your league, your opponents and your regional ranking.</p>" },
     { h: "The second chapter", body:
       "<p>After your playing days you pick a role: <b>coach</b> (your craft raises the team's strength), " +
       "<b>analyst</b> (preparation cuts variance) or <b>streamer</b> (no matches, but an audience).</p>" +
@@ -3728,8 +3979,10 @@
     const mapsHtml = multi
       ? multi.lines.map(l => '<div class="map-line"><span>' + esc(l.label) + '</span><span style="color:' +
           (l.won ? "var(--good)" : "var(--danger)") + '">' + l.score + " · " + l.rating.toFixed(2) + "</span></div>").join("")
-      : res.maps.map(m => '<div class="map-line"><span>' + m.map + '</span><span style="color:' +
-          (m.won ? "var(--good)" : "var(--danger)") + '">' + m.a + " : " + m.b + "</span></div>").join("");
+      : res.maps.map(m => '<div class="map-line"><span>' + m.map +
+          (m.half1 ? ' <span class="muted">(' + m.half1.a + ":" + m.half1.b + " " + m.half1.side + ")</span>" : "") +
+          '</span><span style="color:' + (m.won ? "var(--good)" : "var(--danger)") + '">' +
+          m.a + " : " + m.b + "</span></div>").join("");
     document.getElementById("mo-maps").innerHTML = mapsHtml;
 
     const rows = [{ nick: state.nick, me: true, kills: res.me.kills, deaths: res.me.deaths, adr: res.me.adr, rating: res.me.rating }]
@@ -3780,6 +4033,8 @@
     tags.push('<span class="tag acc">' + esc(tx(tier(state.team.tier).name)) + "</span>");
     tags.push('<span class="tag">' + esc(tx(archDef().name)) + "</span>");
     if (state.diff && state.diff !== "normal") tags.push('<span class="tag gold">' + esc(tx(diffDef().name)) + "</span>");
+    if (abroad()) tags.push('<span class="tag">' + esc(TR("region.abroad", { region: regionName(myRegion()) })) + "</span>");
+    if (state.adapt > 0) tags.push('<span class="tag bad">' + esc(TR("region.adapting", { n: state.adapt })) + "</span>");
     if (state.rank > 0) tags.push('<span class="tag gold">' + esc(TR("tag.rank", { n: state.rank })) + "</span>");
     if (state.form >= 75) tags.push('<span class="tag good">' + esc(TR("tag.form")) + "</span>");
     if (state.form <= 30) tags.push('<span class="tag bad">' + esc(TR("tag.slump")) + "</span>");
@@ -4086,6 +4341,8 @@
       list.innerHTML = state.offers.map(o =>
         '<div class="offer-card' + (o.hot ? " hot" : "") + '"><div class="offer-top"><div>' +
         '<div class="offer-team">' + esc(o.team) + "</div>" +
+        '<div class="offer-meta">' + esc(regionName(orgRegion(o.team))) +
+          (orgRegion(o.team) !== myRegion() ? " · " + esc(TR("offer.abroad")) : "") + "</div>" +
         '<div class="offer-meta">' + esc(TR("offer.contract", { tier: tx(tier(o.tier).name), str: o.strength, years: o.years })) + "</div>" +
         '<div class="offer-meta">' + esc(TR("offer.expires", { n: o.ttl })) + "</div></div>" +
         '<div style="text-align:right"><div class="offer-team" style="color:var(--good)">' + money(o.salary) + "</div>" +
@@ -4213,6 +4470,14 @@
       html += '<h3 style="margin-top:14px">' + esc(TR("kv.seasons")) + "</h3>" + c.seasons.slice().reverse().map(s =>
         '<div class="map-line"><span>S' + s.season + " · " + esc(s.team) + "</span><span>" + s.rating.toFixed(2) +
         " · " + s.wins + "W" + (s.rank ? " · #" + s.rank : "") + "</span></div>").join("");
+    }
+    const maps = state.maps || {};
+    const mapKeys = Object.keys(maps).filter(k => maps[k].n > 0);
+    if (mapKeys.length) {
+      mapKeys.sort((a, b) => (maps[b].r / maps[b].n) - (maps[a].r / maps[a].n));
+      html += '<h3 style="margin-top:14px">' + esc(TR("maps.title")) + "</h3>" + mapKeys.map(k =>
+        '<div class="map-line"><span>' + esc(k) + "</span><span>" + maps[k].w + "-" + maps[k].l +
+        " · " + (maps[k].r / maps[k].n).toFixed(2) + "</span></div>").join("");
     }
     const tl = state.career.timeline || [];
     if (tl.length) {

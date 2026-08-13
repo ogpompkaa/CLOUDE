@@ -47,6 +47,9 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
   więc przetrenowanie realnie psuje formę, a w skrajnym przypadku kończy się kontuzją
   albo wypaleniem i opuszczeniem meczu.
 - **Mecze** — rozgrywane runda po rundzie z widocznym wynikiem, Twoimi fragami i ADR.
+  Grasz na konkretnej stronie (CT/T), po dwunastej rundzie następuje zmiana, a wynik pierwszej
+  połowy zostaje na ekranie. Ekonomia działa: po przegranych rundach wchodzicie na eco albo
+  force buy, co realnie obniża szanse. Profil zbiera statystyki per mapa.
   W kluczowych momentach (runda pistoletowa, strata pięciu rund, piłka meczowa) podejmujesz
   decyzje, których szansa powodzenia zależy od Twoich statystyk, psychiki i formy.
   W zakładce Profil można przełączyć mecze na tryb błyskawiczny.
@@ -60,6 +63,12 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
   zarząd o transfery.
 - **Świat** — 44 rywali AI z własnymi drużynami i karierami, żywy ranking Top 20,
   oraz rywal kariery, który trafia do Twojej ligi i którego trzeba wyprzedzić.
+- **Drama** — gwiazda składu dostaje ofertę i możesz próbować ją zatrzymać, tilciarz rozbija
+  szatnię, sztab prosi o zmianę roli pod nowy transfer. Mecz z byłym klubem waży więcej:
+  wygrana podnosi formę i psychikę, porażka boli podwójnie.
+- **Regiony** — oferty przychodzą też z innych scen (Europa, WNP, obie Ameryki, Azja, Oceania).
+  Przeprowadzka oznacza kilka tygodni aklimatyzacji z gorszą formą, ale otwiera inne ligi
+  i inny ranking regionalny.
 - **Punkty rankingowe** — kafelek w karcie zawodnika; kliknięcie otwiera pełny ranking
   zawodników w Twoim regionie i na świecie, z Twoją pozycją pośrodku listy.
 - **Gala końca sezonu** — po podsumowaniu roku odsłaniane jest Top 10 świata, nagrody dla
