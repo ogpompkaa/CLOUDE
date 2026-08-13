@@ -14,7 +14,8 @@ Wszystkie zasoby, łącznie z krojami pisma, są wbudowane w plik, więc gra dzi
 Postęp zapisuje się automatycznie w `localStorage`; można go też wyeksportować jako tekst
 z zakładki Profil.
 
-Interfejs jest po polsku i zaprojektowany pod ekran telefonu, ale działa na każdej szerokości.
+Interfejs jest dostępny po polsku i po angielsku (przełącznik na ekranie startowym) i zaprojektowany
+pod ekran telefonu, ale działa na każdej szerokości.
 
 ## Jak się gra
 
@@ -40,6 +41,18 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
 
 Przy pierwszym uruchomieniu przeprowadza Cię krótki samouczek, a pełne wyjaśnienie statystyk
 i systemów jest zawsze pod przyciskiem **?** w pasku u góry.
+
+## Start kariery
+
+Na ekranie startowym wybierasz język (polski albo angielski), nick, kraj, rolę w składzie,
+**typ zawodnika** i poziom trudności.
+
+Typ zawodnika ustawia talent, statystyki startowe i to, jak kariera układa się w czasie:
+cudowne dziecko rośnie błyskawicznie, ale wcześniej traci refleks; grinder ma żelazną kondycję;
+późny rozkwit słabo startuje, za to rozwija się długo po dwudziestce i prawie nie traci z wiekiem;
+urodzony lider zaczyna z gotowym przywództwem kosztem czystej mechaniki.
+
+Poziom trudności zmienia tempo rozwoju, oczekiwania klubów i częstotliwość ofert.
 
 ## Drugi rozdział
 
@@ -75,6 +88,6 @@ Test uruchamia się też automatycznie w GitHub Actions przy każdym pushu
 
 | Plik | Zawartość |
 |---|---|
-| `index.html` | cała gra: style, ikony SVG, kroje w base64 i logika |
+| `index.html` | cała gra: style, ikony SVG, kroje w base64, słownik PL/EN i logika |
 | `tests/smoke.mjs` | smoke test w Playwrighcie |
 | `.github/workflows/smoke.yml` | uruchomienie testu w CI |
