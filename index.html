@@ -996,6 +996,11 @@
     "chr.roleChange": ["Zmiana roli: {role}", "Role change: {role}"],
     "chr.former": ["Rewanż na byłym klubie ({team})", "Revenge over a former club ({team})"],
     "chr.moved": ["Przeprowadzka na scenę: {region}", "Moved to the {region} scene"],
+    "chr.clubGrew": ["{team} awansuje na poziom {tier}", "{team} moves up to {tier}"],
+    "club.grew": ["Klub rośnie", "The club grows"],
+    "club.grewLog": ["{team} inwestuje po udanym sezonie — nowy poziom: {tier}.",
+      "{team} invests after a strong season — new level: {tier}."],
+    "league.title": ["Mistrzostwo ligi S{n}", "League title S{n}"],
     "region.moved": ["Przenosisz się na scenę {region}. Potrzebujesz czasu na aklimatyzację.",
       "You move to the {region} scene. You need time to settle in."],
     "region.settled": ["Aklimatyzacja zakończona — czujesz się na miejscu.", "You have settled in — this feels like home now."],
@@ -1651,8 +1656,15 @@
     return i < 0 ? 0 : i + 1;
   }
 
+  function trophyWeight(list) {
+    if (typeof list === "number") return list * 5;          // rywale AI: sama liczba
+    return (list || []).reduce((a, t) => a + (1 + (typeof t.tier === "number" ? t.tier : 2)) * (t.major ? 2.2 : 1), 0) * 2.2;
+  }
+
   function rankScore(tierId, rating, hype, trophies) {
-    return tierId * 18 + (rating - 1) * 200 + hype * 0.25 + trophies * 7;
+    // rating waży tyle, ile poziom rywali: 1.4 w słabej lidze to nie to samo, co 1.4 w topie
+    const weight = 0.35 + tierId * 0.17;
+    return tierId * 18 + (rating - 1) * 200 * weight + hype * 0.25 + trophyWeight(trophies);
   }
 
   function worldTable() {
@@ -1665,7 +1677,7 @@
       : (state.career.matches ? state.career.rating / state.career.matches : 0.9);
     rows.push({
       me: true, nick: state.nick, team: state.team.name, tier: state.team.tier, rating: +myRating.toFixed(2),
-      score: rankScore(state.team.tier, myRating, state.hype, state.career.trophies.length),
+      score: rankScore(state.team.tier, myRating, state.hype, state.career.trophies),
     });
     return rows.sort((a, b) => b.score - a.score);
   }
@@ -1684,7 +1696,7 @@
       me: true, nick: state.nick, team: state.team ? state.team.name : "-", region: myR,
       tier: state.team ? state.team.tier : 0, rating: +myRating.toFixed(2),
       pts: Math.round(rankScore(state.team ? state.team.tier : 0, myRating, state.hype,
-        state.career.trophies.length) * 10),
+        state.career.trophies) * 10),
     });
     const list = scope === "region" ? rows.filter(r => r.region === myR) : rows;
     return list.sort((a, b) => b.pts - a.pts);
@@ -2889,7 +2901,7 @@
     state.money += prize; state.career.earned += prize;
     let extra = TR("match.prize", { amount: money(prize) });
     if (won) {
-      state.career.trophies.push({ name: ev.name, season: state.season, major: !!ev.major });
+      state.career.trophies.push({ name: ev.name, season: state.season, major: !!ev.major, tier: state.team.tier });
       if (state.extras && state.extras.bonus) {
         const bn = Math.round(tier(state.team.tier).prize * 0.4);
         state.money += bn; state.career.earned += bn;
@@ -2940,7 +2952,7 @@
         applyMatchResult(fin, "Finał ligi");
         lines.push({ label: "Finał", score: fin.mapsWon + "-" + fin.mapsLost, won: fin.won, rating: fin.me.rating });
         if (fin.won) {
-          state.career.trophies.push({ name: "Mistrzostwo ligi S" + state.season, season: state.season, major: false });
+          state.career.trophies.push({ name: TR("league.title", { n: state.season }), season: state.season, major: false, tier: state.team.tier });
           if (state.extras && state.extras.bonus) {
             const bn = Math.round(tier(state.team.tier).prize * 0.4);
             state.money += bn; state.career.earned += bn;
@@ -3229,6 +3241,18 @@
       }
     }
 
+    // organizacja, która wygrywa z Tobą w składzie, pnie się wyżej
+    const wonSomething = state.career.trophies.some(t => t.season === state.season);
+    if (wonSomething && state.team.tier < 4 && Math.random() < 0.45) {
+      state.team.tier++;
+      const t2 = tier(state.team.tier);
+      state.team.salary = Math.round(t2.salary * rnd(0.85, 1.15));
+      state.team.mates.forEach(m => { m.skill = clamp(m.skill + rnd(3, 7), 25, 97); });
+      rows.push([TR("club.grew"), state.team.name + " → " + tx(t2.name)]);
+      addLog(TR("club.grewLog", { team: state.team.name, tier: tx(t2.name) }), "gold");
+      chronicle(TR("chr.clubGrew", { team: state.team.name, tier: tx(t2.name) }), "gold");
+    }
+
     evolveSquad(rows);
 
     // reakcja drużyny
@@ -3342,7 +3366,7 @@
   function hofScore() {
     const c = state.career;
     const avg = c.matches ? c.rating / c.matches : 0;
-    return Math.round(c.trophies.length * 120 + c.trophies.filter(t => t.major).length * 250 + c.mvps * 90 +
+    return Math.round(trophyWeight(c.trophies) * 26 + c.trophies.filter(t => t.major).length * 250 + c.mvps * 90 +
       (c.bestRank > 0 ? Math.max(0, 130 - c.bestRank) * 6 : 0) + avg * 300 + c.wins * 3 +
       Math.min(700, (c.earned + (state.invest || 0)) / 12000));
   }
@@ -3769,7 +3793,7 @@
     if (champ) {
       state.trophies2++;
       state.s2.trophies++;
-      state.career.trophies.push({ name: label + " (jako " + tx(def.name).toLowerCase() + ")", season: state.season, major: !!ev.major });
+      state.career.trophies.push({ name: label + " (" + tx(def.name).toLowerCase() + ")", season: state.season, major: !!ev.major, tier: state.team.tier });
       state.rep = clamp(state.rep + 10, 0, 100);
       addLog("Trofeum jako " + tx(def.name).toLowerCase() + ": " + label, "gold");
     }
