@@ -51,6 +51,10 @@ check('kariera zaczyna się jako nastolatek', start.age >= 12 && start.age <= 13
 check('start na drabince', start.stage === 'ladder', start.stage);
 check('CS Rating na starcie', start.ladder.premier > 1000 && start.ladder.premier < 12000, String(start.ladder.premier));
 
+// plan tygodnia jest ustawiony od startu i wykonuje się sam
+check('nowa kariera ma plan tygodnia', (start.plan || []).length > 0, (start.plan || []).join(', '));
+check('plan wykonał się bez klikania', start.energy === 0, 'energia ' + start.energy);
+
 // samouczek pokazuje się przy pierwszej karierze
 const tutorialShown = await page.isVisible('#tutorial-overlay:not(.hidden)');
 const tutorialSteps = tutorialShown ? await page.textContent('#tut-step') : '';
@@ -59,6 +63,14 @@ await safeClick('#tut-skip');
 await safeClick('#btn-help');
 const helpSections = await page.$$eval('#help-body .help-sec h4', e => e.length).catch(() => 0);
 await safeClick('#help-close');
+
+// preset przestawia plan jednym kliknięciem
+await safeClick('.nav-btn[data-view="train"]');
+const planBefore = await page.$$eval('.plan-slot', els => els.length);
+await safeClick('[data-preset="1"]');
+const afterPreset = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+check('preset przestawia plan', afterPreset.plan.join(',') !== (start.plan || []).join(','),
+  planBefore + ' slotów → ' + afterPreset.plan.join(','));
 
 const seen = { live: 0, choices: 0, missed: 0 };
 
@@ -155,6 +167,9 @@ check('K/D w rozsądnym zakresie', kd > 0.5 && kd < 2.0, kd.toFixed(2));
 check('historia meczów zapisana', (c.recent || []).length > 0, (c.recent || []).length + ' wpisów');
 check('ranking świata żyje', Array.isArray(st.world) && st.world.length > 20, (st.world || []).length + ' rywali');
 check('cel od zarządu istnieje', !!st.goal, st.goal && st.goal.kind);
+check('plan wykonuje się automatycznie co tydzień',
+  (st.log || []).some(l => /Plan tygodnia wykonany|Weekly plan done/.test(l.text)),
+  ((st.log || []).find(l => /Plan tygodnia/.test(l.text)) || {}).text || 'brak wpisu w logu');
 check('samouczek startuje przy nowej karierze', tutorialShown, tutorialSteps);
 check('ekran pomocy ma sekcje', helpSections >= 5, helpSections + ' sekcji');
 

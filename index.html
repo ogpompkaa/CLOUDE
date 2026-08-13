@@ -218,6 +218,28 @@
   .act .a-title .icon { color: var(--accent); }
   .act .a-desc { font-size: 0.66rem; color: var(--text-dim); font-weight: 500; font-family: 'Inter', sans-serif; line-height: 1.35; }
   .act .a-cost { font-size: 0.62rem; color: var(--gold); font-weight: 600; font-family: 'Inter', sans-serif; }
+  .act-wrap { display: flex; flex-direction: column; }
+  .act-wrap .act { flex: 1; }
+  .a-add { font-size: 0.62rem; font-weight: 700; font-family: 'Inter', sans-serif; color: var(--accent);
+    background: var(--bg-panel); border: 1px solid var(--border); border-top: 0; padding: 6px 8px;
+    text-transform: none; letter-spacing: normal; }
+  .a-add.off { color: var(--text-faint); }
+
+  /* --- Plan tygodnia --- */
+  .plan-slots { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .plan-slot { display: flex; align-items: center; gap: 5px; padding: 6px 9px; background: var(--bg-panel-2);
+    border: 1px solid var(--border-strong); font-size: 0.7rem; font-weight: 700; font-family: 'Inter', sans-serif;
+    color: var(--text); text-transform: none; letter-spacing: normal; }
+  .plan-slot .icon { color: var(--accent); width: 13px; height: 13px; }
+  .plan-slot .x { color: var(--text-faint); font-size: 0.8rem; line-height: 1; }
+  .plan-slot.free { border-style: dashed; border-color: var(--border); color: var(--text-faint); }
+  .plan-presets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .plan-presets button { font-size: 0.64rem; padding: 5px 10px; background: var(--bg-panel);
+    border: 1px solid var(--border); color: var(--text-dim); font-family: 'Inter', sans-serif; font-weight: 700; }
+  .plan-opts { display: flex; flex-direction: column; gap: 7px; margin-bottom: 11px; }
+  .plan-opt { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; color: var(--text-dim);
+    font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; }
+  .plan-opt input { width: 15px; height: 15px; accent-color: var(--accent); flex-shrink: 0; }
 
   /* --- Team / standings --- */
   .mate-row { display: flex; align-items: center; gap: 11px; padding: 9px 11px; background: var(--bg-panel);
@@ -484,7 +506,14 @@
       <section id="view-train" class="view hidden">
         <div class="glass panel">
           <h2><svg class="icon"><use href="#i-bolt"></use></svg> <span data-i18n="train.plan">Plan tygodnia</span></h2>
-          <button class="full" id="btn-repeat-plan" style="margin-bottom:12px;"><svg class="icon"><use href="#i-swap"></use></svg> <span id="repeat-label">Powtórz zeszły plan</span></button>
+          <p class="muted" data-i18n="train.planHint" style="margin-bottom:10px;">Plan wykonuje się sam na początku każdego tygodnia. Zmienisz go, kiedy chcesz — zostaje do odwołania.</p>
+          <div class="plan-slots" id="plan-slots"></div>
+          <div class="plan-presets" id="plan-presets"></div>
+          <div class="plan-opts">
+            <label class="plan-opt"><input type="checkbox" id="opt-auto"><span data-i18n="train.optAuto">Wykonuj plan automatycznie co tydzień</span></label>
+            <label class="plan-opt"><input type="checkbox" id="opt-smart"><span data-i18n="train.optSmart">Zamień trening na odpoczynek, gdy jestem wyczerpany</span></label>
+          </div>
+          <button class="full" id="btn-run-plan" style="margin-bottom:12px;"><svg class="icon"><use href="#i-swap"></use></svg> <span id="run-plan-label">Wykonaj plan teraz</span></button>
           <p class="muted" data-i18n="train.planInfo" style="margin-bottom:12px;">Każda akcja kosztuje energię. Energia odnawia się co tydzień, ale kondycja i psychika zostają — przetrenowanie zniszczy Ci formę.</p>
           <div class="action-grid" id="action-grid"></div>
         </div>
@@ -729,8 +758,24 @@
     "train.plan": ["Plan tygodnia", "Weekly plan"],
     "train.planInfo": ["Każda akcja kosztuje energię. Energia odnawia się co tydzień, ale kondycja i psychika zostają — przetrenowanie zniszczy Ci formę.",
       "Every action costs energy. Energy refills weekly, but stamina and mental health carry over — overtraining will wreck your form."],
-    "train.repeat": ["Powtórz plan: {list}", "Repeat plan: {list}"],
-    "train.repeatEmpty": ["Powtórz zeszły plan (brak zapisanego)", "Repeat last plan (nothing saved yet)"],
+    "train.optAuto": ["Wykonuj plan automatycznie co tydzień", "Run the plan automatically every week"],
+    "train.optSmart": ["Zamień trening na odpoczynek, gdy jestem wyczerpany",
+      "Swap training for rest when I am worn out"],
+    "train.runPlan": ["Wykonaj plan teraz ({n} pkt)", "Run the plan now ({n} energy)"],
+    "train.runPlanEmpty": ["Ustaw plan, klikając „+ do planu” przy akcji",
+      "Set a plan with the “+ to plan” button on an action"],
+    "train.slotFree": ["wolne", "free"],
+    "train.addToPlan": ["+ do planu", "+ to plan"],
+    "train.planFull": ["plan pełny", "plan full"],
+    "train.planHint": ["Plan wykonuje się sam na początku każdego tygodnia. Zmienisz go, kiedy chcesz — zostaje do odwołania.",
+      "The plan runs itself at the start of every week. Change it whenever you like — it sticks until you do."],
+    "preset.role": ["Pod rolę", "Role focus"],
+    "preset.balance": ["Zrównoważony", "Balanced"],
+    "preset.fame": ["Kasa i hype", "Money and hype"],
+    "preset.regen": ["Regeneracja", "Recovery"],
+    "preset.craft": ["Warsztat", "Craft"],
+    "preset.money": ["Zarobek", "Earnings"],
+    "log.autoPlan": ["Plan tygodnia wykonany: {list}.", "Weekly plan done: {list}."],
     "train.skills": ["Umiejętności", "Skills"],
     "train.energyCost": ["Energia: {n}", "Energy: {n}"],
     "stat.stamina": ["Kondycja", "Stamina"],
@@ -1468,6 +1513,7 @@
   let pendingDiff = "normal";
   let matchMods = { round: 0, rating: 0, notes: [] };
   let choiceHandler = null;
+  let bulkAction = false;         // seria akcji z planu: rysujemy dopiero na końcu
 
   // ---------- utils ----------
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -1601,7 +1647,7 @@
       career: { matches: 0, wins: 0, kills: 0, deaths: 0, rating: 0, aces: 0, mvps: 0, earned: 0,
                 trophies: [], seasons: [], bestRank: 0, bestRating: 0, recent: [], timeline: [] },
       ach: {}, log: [], rank: 0, retired: false,
-      weekPlan: [], lastPlan: [], extras: {}, goal: null, nemesis: null, nemesisBeaten: 0, fastMatches: false,
+      weekPlan: [], lastPlan: [], plan: [], plan2: [], autoPlan: true, smartRest: true, extras: {}, goal: null, nemesis: null, nemesisBeaten: 0, fastMatches: false,
       lead: 18 + ((ARCHETYPES.find(a => a.id === archId) || {}).lead || 0), captain: false, captainTry: 0, transferTry: 0,
       phase: null, craft: 0, rep: 0, audience: 0, trophies2: 0, tutorialDone: false,
       adapt: 0, formerTeams: [], maps: {},
@@ -1616,6 +1662,7 @@
     s.league = makeLeague();
     s.schedule = makeSchedule();
     s.goal = makeGoal();
+    s.plan = trimPlan(presets()[0].list);      // od pierwszego tygodnia gra się planem, nie klikaniem
     addLog(TR("log.start", { role: tx(role().name), team: s.team.name }), "info");
     return s;
   }
@@ -2319,17 +2366,109 @@
       state.money += earn; state.career.earned += earn;
       addLog(TR("log.stream", { amount: money(earn) }), "good");
     }
-    render(); save();
+    if (!bulkAction) { render(); save(); }
   }
 
-  // ---------- QoL: powtórz plan, przewiń tydzień, zapis ----------
-  function repeatPlan() {
-    if (!state.lastPlan || !state.lastPlan.length) return;
-    state.lastPlan.forEach(id => {
-      const a = ACTIONS.find(x => x.id === id);
-      if (a && state.energy >= a.cost) doAction(id);
-    });
+  // ---------- plan tygodnia ----------
+  // Plan ustawiasz raz, a on wykonuje się sam na początku każdego tygodnia.
+  // Zmiana obowiązuje od razu i zostaje do odwołania — bez klikania tych samych akcji w kółko.
+  function curActions() { return inPhase2() ? phaseDef().actions : ACTIONS; }
+  function actDef(id) { return curActions().find(a => a.id === id); }
+  function planKey() { return inPhase2() ? "plan2" : "plan"; }
+  function planList() {
+    const k = planKey();
+    if (!Array.isArray(state[k])) state[k] = [];
+    return state[k];
   }
+  function planCost(list) { return (list || []).reduce((s, id) => s + ((actDef(id) || {}).cost || 0), 0); }
+  function trimPlan(list) {
+    const out = [];
+    (list || []).forEach(id => {
+      const a = actDef(id);
+      if (a && planCost(out) + a.cost <= MAX_ENERGY) out.push(id);
+    });
+    return out;
+  }
+  function setPlan(list) {
+    state[planKey()] = trimPlan(list);
+    render(); save();
+  }
+  function addToPlan(id) {
+    const a = actDef(id);
+    if (!a || planCost(planList()) + a.cost > MAX_ENERGY) return;
+    setPlan(planList().concat([id]));
+  }
+  function removeFromPlan(i) {
+    const list = planList().slice();
+    list.splice(i, 1);
+    setPlan(list);
+  }
+
+  // Auto-regeneracja: gdy jesteś na oparach, najcięższa pozycja planu ustępuje odpoczynkowi
+  function effectivePlan() {
+    const list = planList().slice();
+    if (!state.smartRest || !list.length) return list;
+    if (state.stamina >= 32 && state.mental >= 32) return list;
+    const restId = inPhase2() ? (actDef("rest2") ? "rest2" : null)
+      : (state.mental < state.stamina ? "gym" : "rest");
+    if (!restId || list.indexOf(restId) >= 0) return list;
+    let worst = -1, drain = 0;
+    list.forEach((id, i) => {
+      const d = -((actDef(id) || {}).stam || 0);
+      if (d > drain) { drain = d; worst = i; }
+    });
+    if (worst < 0) worst = list.length - 1;
+    list[worst] = restId;
+    return trimPlan(list);
+  }
+
+  function runPlan(auto) {
+    const done = [];
+    bulkAction = true;
+    effectivePlan().forEach(id => {
+      const a = actDef(id);
+      if (!a || state.energy < a.cost) return;
+      done.push(tx(a.name));
+      if (inPhase2()) doAction2(id); else doAction(id);
+    });
+    bulkAction = false;
+    if (auto && done.length) addLog(TR("log.autoPlan", { list: done.join(", ") }), "info");
+    if (!auto) { render(); save(); }
+    return done.length;
+  }
+
+  // Wołane na starcie każdego tygodnia — po tym gracz ma tylko kliknąć „Dalej”
+  function autoTrain() {
+    if (!state || state.retired || !state.autoPlan) return;
+    if (!planList().length) return;
+    runPlan(true);
+  }
+
+  // Gotowce, żeby nie trzeba było składać planu od zera
+  function presets() {
+    if (inPhase2()) {
+      const acts = phaseDef().actions;
+      const byKey = k => (acts.find(a => a[k]) || acts[0]).id;
+      const craft = byKey("craft"), cash = acts.find(a => a.money) ? byKey("money") : byKey("audience");
+      const calm = (acts.find(a => a.mental) || acts[acts.length - 1]).id;
+      return [
+        { key: "preset.craft", list: [craft, craft, acts[1].id, acts[1].id] },
+        { key: "preset.balance", list: acts.map(a => a.id) },
+        { key: "preset.money", list: [cash, cash, craft, calm] },
+      ];
+    }
+    const w = role().w;
+    const order = STAT_DEFS.map(s => s.id).sort((a, b) => (w[b] || 0) - (w[a] || 0));
+    const byStat = id => (ACTIONS.find(a => a.stat === id) || {}).id;
+    return [
+      { key: "preset.role", list: [byStat(order[0]), byStat(order[1]), "scrim"].filter(Boolean) },
+      { key: "preset.balance", list: ["aimlab", "demo", "nades", "rest"] },
+      { key: "preset.fame", list: ["stream", "media", "aimlab", "rest"] },
+      { key: "preset.regen", list: ["rest", "gym", "demo", "talks"] },
+    ];
+  }
+
+  // ---------- QoL: przewiń tydzień, zapis ----------
 
   function skipToMatch() {
     let guard = 0;
@@ -2377,6 +2516,11 @@
     if (!state.world) state.world = makeWorld();
     if (!state.weekPlan) state.weekPlan = [];
     if (!state.lastPlan) state.lastPlan = [];
+    // stare zapisy: plan tygodnia zaczyna od tego, co gracz klikał ostatnio
+    if (!Array.isArray(state.plan)) state.plan = (state.lastPlan || []).slice(0, 4);
+    if (!Array.isArray(state.plan2)) state.plan2 = [];
+    if (typeof state.autoPlan !== "boolean") state.autoPlan = true;
+    if (typeof state.smartRest !== "boolean") state.smartRest = true;
     if (!state.extras) state.extras = {};
     if (typeof state.nemesisBeaten !== "number") state.nemesisBeaten = 0;
     if (!state.nemesis) state.nemesis = pickNemesis();
@@ -2648,6 +2792,7 @@
         '<div class="recap-line"><span>' + esc(TR("ladder.matches")) + "</span><b>" + L.matches + "</b></div>");
       save();
     }
+    autoTrain();
   }
 
   // Podpisanie pierwszego kontraktu kończy drabinkę i zaczyna karierę w organizacji
@@ -3005,6 +3150,7 @@
     state.weekPlan = [];
     state.week++;
     if (state.week > SEASON_LENGTH) { endSeason(); return; }
+    autoTrain();
     if (Math.random() < 0.17) { runLifeEvent(() => { render(); save(); }); return; }
     maybeDrama(() => { render(); save(); });
   }
@@ -3308,6 +3454,7 @@
     state.schedule = makeSchedule();
     state.goal = makeGoal();
     checkAch();
+    autoTrain();
 
     showModal(TR("season.end", { n: state.season - 1 }), note || TR("season.next", { age: state.age }),
       rows.map(x => '<div class="recap-line"><span>' + esc(x[0]) + '</span><b>' + esc(x[1]) + '</b></div>').join(""));
@@ -3433,9 +3580,9 @@
 
   // ---------- samouczek i pomoc ----------
   const TUTORIAL = [
-    { icon: "bolt", title: ["Tydzień ma 4 punkty energii", "A week gives you 4 energy"],
-      text: ["W zakładce Trening wydajesz energię na aim, refleks, analizę dem, utility, scrimy, streamy i regenerację. Kondycja i psychika nie odnawiają się w pełni co tydzień — jeśli będziesz tylko harować, złapiesz kontuzję albo się wypalisz.",
-             "In the Training tab you spend energy on aim, reflex, demo review, utility, scrims, streams and recovery. Stamina and mental health do not fully refill each week — grind non-stop and you will get injured or burn out."] },
+    { icon: "bolt", title: ["Ustaw plan, a on wykona się sam", "Set a plan and it runs itself"],
+      text: ["Tydzień ma 4 punkty energii. W zakładce Trening układasz z nich stały plan (albo bierzesz gotowca) — od tej pory wykonuje się automatycznie na starcie każdego tygodnia, więc klikasz tylko „Dalej”. Plan zmienisz w każdej chwili. Kondycja i psychika nie odnawiają się w pełni co tydzień, więc sam trening bez regeneracji kończy się kontuzją albo wypaleniem.",
+             "A week gives you 4 energy. In the Training tab you build a standing plan out of it (or pick a preset) — from then on it runs automatically at the start of every week, so all you click is “Next”. Change it whenever you like. Stamina and mental health do not fully refill each week, so training with no recovery ends in an injury or burnout."] },
     { icon: "crosshair", title: ["Twoja rola decyduje, co się liczy", "Your role decides what matters"],
       text: ["Każda rola waży statystyki inaczej: AWPer żyje z aimu, IGL z game sense'u, support z utility. W zakładce Trening statystyki kluczowe dla Twojej roli są podświetlone na niebiesko — to je rozwijaj najpierw.",
              "Every role weighs the stats differently: an AWPer lives on aim, an IGL on game sense, a support on utility. In the Training tab the stats that matter for your role are highlighted in blue — raise those first."] },
@@ -3481,6 +3628,14 @@
       "<li><b>Utility</b> — smoki, flashe, molotovy. Fundament gry supporta.</li>" +
       "<li><b>Teamplay</b> — tradey i współpraca. Podnosi skuteczność całego składu.</li>" +
       "<li><b>Przywództwo</b> — osobny atrybut spoza roli. Otwiera drogę do kapitana i próśb transferowych.</li></ul>" },
+    { h: "Plan tygodnia", body:
+      "<p>Zamiast klikać te same akcje co tydzień, układasz <b>stały plan</b> na 4 punkty energii — ręcznie przyciskiem " +
+      "„+ do planu” przy akcji albo jednym z gotowców (pod rolę, zrównoważony, kasa i hype, regeneracja).</p>" +
+      "<p>Przy włączonym <b>automacie</b> plan wykonuje się sam na starcie każdego tygodnia i wystarczy klikać „Dalej”. " +
+      "<b>Auto-regeneracja</b> podmienia najcięższy trening na odpoczynek, gdy kondycja albo psychika spadną poniżej 32 — " +
+      "dzięki temu plan nie zajedzie Cię do kontuzji.</p>" +
+      "<p>Plan zostaje do odwołania, więc zmieniasz go tylko wtedy, gdy chcesz coś zmienić. Energię, której plan nie zużył, " +
+      "możesz wydać ręcznie, a przyciskiem „Wykonaj plan teraz” odpalasz go poza kolejnością.</p>" },
     { h: "Kondycja, psychika, forma", body:
       "<p><b>Kondycja</b> spada od treningów i meczów. Poniżej 25 grozi kontuzją, a przy niskiej wartości trening daje o połowę mniej.</p>" +
       "<p><b>Psychika</b> spada po porażkach i od przemęczenia. Przy bardzo niskiej opuszczasz mecz z powodu wypalenia.</p>" +
@@ -3524,6 +3679,14 @@
       "<li><b>Utility</b> — smokes, flashes, molotovs. The support's foundation.</li>" +
       "<li><b>Teamplay</b> — trades and cooperation. Lifts the whole lineup.</li>" +
       "<li><b>Leadership</b> — a separate attribute outside your role. It opens the way to the captaincy and transfer requests.</li></ul>" },
+    { h: "The weekly plan", body:
+      "<p>Instead of clicking the same actions every week, you build a <b>standing plan</b> worth 4 energy — by hand with the " +
+      "“+ to plan” button on an action, or from a preset (role focus, balanced, money and hype, recovery).</p>" +
+      "<p>With <b>auto</b> on, the plan runs itself at the start of every week and all you do is hit “Next”. " +
+      "<b>Auto-recovery</b> swaps the heaviest session for rest whenever stamina or mental drops below 32, " +
+      "so the plan cannot grind you into an injury.</p>" +
+      "<p>The plan sticks until you change it. Energy the plan leaves unspent is still yours to use by hand, and " +
+      "“Run the plan now” fires it off out of turn.</p>" },
     { h: "Stamina, mental, form", body:
       "<p><b>Stamina</b> drops from training and matches. Below 25 you risk injury, and low stamina halves what training gives you.</p>" +
       "<p><b>Mental</b> drops after losses and from overwork. Very low and you miss a match to burnout.</p>" +
@@ -3755,7 +3918,7 @@
       state.money += earn; state.career.earned += earn; state.s2.earned += earn;
       addLog("Stream: +" + money(earn) + " (widownia " + state.audience + "k)", "good");
     }
-    render(); save();
+    if (!bulkAction) { render(); save(); }
   }
 
   // W drugim rozdziale drużyna gra sama — Ty tylko przygotowujesz ją do meczu
@@ -3831,7 +3994,8 @@
     state.energy = MAX_ENERGY;
     if (state.team) state.team.mates.forEach(m => { m.skill = clamp(m.skill + rnd(-0.3, 0.5), 25, 97); });
     state.week++;
-    if (state.week > SEASON_LENGTH) endSeason2();
+    if (state.week > SEASON_LENGTH) { endSeason2(); return; }
+    autoTrain();
   }
 
   function endSeason2() {
@@ -3910,6 +4074,7 @@
     state.s2 = newS2();
     state.goal2 = makeGoal2();
     checkAch();
+    autoTrain();
     showModal(TR("season.end", { n: state.season - 1 }), note2 || TR("season.next2", { age: state.age }),
       rows.map(x => '<div class="recap-line"><span>' + esc(x[0]) + "</span><b>" + esc(x[1]) + "</b></div>").join(""));
     save();
@@ -4218,19 +4383,51 @@
       : "";
     document.getElementById("btn-skip").classList.add("hidden");
     document.getElementById("week-hint").textContent = state.energy > 0
-      ? "Zostało " + state.energy + " pkt energii — rozplanuj tydzień w zakładce Trening."
-      : "Energia wyczerpana. Kliknij „Dalej”.";
+      ? TR("career.hint2", { n: state.energy }) : TR("career.hint2done");
     document.getElementById("cta-next").innerHTML = "Dalej " + icon("arrow-right");
+  }
+
+  // Kafelek akcji: kliknięcie = wykonaj teraz, „+ do planu” = dopisz do stałego planu
+  function actionCard(a) {
+    // plan da się układać nawet bez energii, więc „+ do planu” jest osobnym przyciskiem
+    const room = planCost(planList()) + a.cost <= MAX_ENERGY;
+    return '<div class="act-wrap">' +
+      '<button class="act" data-act="' + a.id + '"' + (state.energy < a.cost ? " disabled" : "") + ">" +
+      '<span class="a-title">' + icon(a.icon) + esc(tx(a.name)) + "</span>" +
+      '<span class="a-desc">' + esc(tx(a.desc)) + "</span>" +
+      '<span class="a-cost">' + esc(TR("train.energyCost", { n: a.cost })) + "</span></button>" +
+      '<button class="a-add' + (room ? "" : " off") + '" data-plan-add="' + a.id + '"' +
+      (room ? "" : ' disabled title="' + esc(TR("train.planFull")) + '"') + ">" +
+      esc(TR("train.addToPlan")) + "</button></div>";
+  }
+
+  function renderPlanBox() {
+    const list = planList();
+    const acts = curActions();
+    const slots = list.map((id, i) => {
+      const a = acts.find(x => x.id === id) || {};
+      return '<button class="plan-slot" data-plan-del="' + i + '">' + icon(a.icon || "bolt") +
+        esc(tx(a.name) || id) + (a.cost > 1 ? " ·" + a.cost : "") + '<span class="x">✕</span></button>';
+    });
+    for (let e = planCost(list); e < MAX_ENERGY; e++) {
+      slots.push('<span class="plan-slot free">' + esc(TR("train.slotFree")) + "</span>");
+    }
+    document.getElementById("plan-slots").innerHTML = slots.join("");
+    document.getElementById("plan-presets").innerHTML = presets().map((p, i) =>
+      '<button data-preset="' + i + '">' + esc(TR(p.key)) + "</button>").join("");
+    document.getElementById("opt-auto").checked = !!state.autoPlan;
+    document.getElementById("opt-smart").checked = !!state.smartRest;
+    const run = document.getElementById("btn-run-plan");
+    const cost = planCost(list);
+    run.disabled = !list.length || state.energy < 1;
+    document.getElementById("run-plan-label").textContent = list.length
+      ? TR("train.runPlan", { n: cost }) : TR("train.runPlanEmpty");
   }
 
   function renderTrain2() {
     const def = phaseDef();
-    document.getElementById("btn-repeat-plan").classList.add("hidden");
-    document.getElementById("action-grid").innerHTML = def.actions.map(a =>
-      '<button class="act" data-act="' + a.id + '"' + (state.energy < a.cost ? " disabled" : "") + ">" +
-      '<span class="a-title">' + icon(a.icon) + esc(tx(a.name)) + "</span>" +
-      '<span class="a-desc">' + esc(tx(a.desc)) + "</span>" +
-      '<span class="a-cost">Energia: ' + a.cost + "</span></button>").join("");
+    renderPlanBox();
+    document.getElementById("action-grid").innerHTML = def.actions.map(actionCard).join("");
     const rows = [[tx(def.craftName), state.craft], ["Rozpoznawalność", state.rep], ["Psychika", state.mental]];
     if (!def.hasTeam) rows.push(["Widownia (skala)", clamp(state.audience / 5, 0, 100)]);
     else rows.push(["Chemia składu", state.team.chem]);
@@ -4242,17 +4439,8 @@
 
   function renderTrain() {
     if (inPhase2()) { renderTrain2(); return; }
-    document.getElementById("btn-repeat-plan").classList.remove("hidden");
-    const rp = document.getElementById("btn-repeat-plan");
-    const plan = (state.lastPlan || []).map(id => tx((ACTIONS.find(a => a.id === id) || {}).name)).filter(Boolean);
-    rp.disabled = !plan.length || state.energy <= 0;
-    document.getElementById("repeat-label").textContent = plan.length
-      ? TR("train.repeat", { list: plan.join(", ") }) : TR("train.repeatEmpty");
-    document.getElementById("action-grid").innerHTML = ACTIONS.map(a =>
-      '<button class="act" data-act="' + a.id + '"' + (state.energy < a.cost ? " disabled" : "") + '>' +
-        '<span class="a-title">' + icon(a.icon) + esc(tx(a.name)) + "</span>" +
-        '<span class="a-desc">' + esc(tx(a.desc)) + "</span>" +
-        '<span class="a-cost">Energia: ' + a.cost + "</span></button>").join("");
+    renderPlanBox();
+    document.getElementById("action-grid").innerHTML = ACTIONS.map(actionCard).join("");
 
     const w = role().w;
     const rows = STAT_DEFS.map(sd => {
@@ -4569,6 +4757,7 @@
     document.getElementById("start-wrap").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
     switchView("career");
+    autoTrain();                               // pierwszy tydzień też idzie z planu
     render(); save();
     if (!state.tutorialDone) showTutorial();
   }
@@ -4611,10 +4800,29 @@
   });
   document.getElementById("cta-next").addEventListener("click", () => { if (!state.retired) nextWeek(); });
   document.getElementById("action-grid").addEventListener("click", e => {
+    const add = e.target.closest("[data-plan-add]");
+    if (add) { addToPlan(add.dataset.planAdd); return; }
     const b = e.target.closest("[data-act]");
     if (!b) return;
     if (inPhase2()) doAction2(b.dataset.act); else doAction(b.dataset.act);
   });
+  document.getElementById("plan-slots").addEventListener("click", e => {
+    const d = e.target.closest("[data-plan-del]");
+    if (d) removeFromPlan(parseInt(d.dataset.planDel, 10));
+  });
+  document.getElementById("plan-presets").addEventListener("click", e => {
+    const p = e.target.closest("[data-preset]");
+    if (p) setPlan(presets()[parseInt(p.dataset.preset, 10)].list);
+  });
+  document.getElementById("opt-auto").addEventListener("change", e => {
+    state.autoPlan = e.target.checked;
+    render(); save();
+  });
+  document.getElementById("opt-smart").addEventListener("change", e => {
+    state.smartRest = e.target.checked;
+    render(); save();
+  });
+  document.getElementById("btn-run-plan").addEventListener("click", () => runPlan(false));
   document.getElementById("ch-options").addEventListener("click", e => {
     const b = e.target.closest("[data-choice]");
     if (b && choiceHandler) { const f = choiceHandler; choiceHandler = null; f(parseInt(b.dataset.choice, 10)); }
@@ -4683,7 +4891,6 @@
   document.getElementById("help-close").addEventListener("click", () => {
     document.getElementById("help-overlay").classList.add("hidden");
   });
-  document.getElementById("btn-repeat-plan").addEventListener("click", repeatPlan);
   document.getElementById("btn-skip").addEventListener("click", skipToMatch);
   document.getElementById("btn-export").addEventListener("click", () => openSave("export"));
   document.getElementById("btn-import").addEventListener("click", () => openSave("load"));

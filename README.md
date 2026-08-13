@@ -42,6 +42,14 @@ Ameryka Płn. i Płd., Azja, Oceania), a Twój kraj wyznacza region, w którym s
 Sezon trwa 26 tygodni. Co tydzień masz **4 punkty energii** i kalendarz, w którym czekają
 mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
 
+- **Plan tygodnia** — energii nie wydaje się klikaniem tych samych akcji co tydzień.
+  Układasz **stały plan** na 4 punkty (ręcznie przyciskiem „+ do planu” albo gotowcem:
+  pod rolę, zrównoważony, kasa i hype, regeneracja), a on wykonuje się sam na starcie
+  każdego tygodnia — Ty klikasz tylko „Dalej”. Plan zmienisz w dowolnym momencie i zostaje
+  do odwołania. **Auto-regeneracja** podmienia najcięższy trening na odpoczynek, gdy kondycja
+  albo psychika spadną poniżej 32, więc plan nie zajedzie Cię do kontuzji. Automat da się
+  wyłączyć, a niewykorzystaną energię zawsze można wydać ręcznie. Drugi rozdział ma własny
+  plan i własne gotowce.
 - **Trening** — aim, refleks, game sense, utility, teamplay, rozmowy w składzie, stream,
   media, odpoczynek i regeneracja. Kondycja i psychika nie resetują się co tydzień,
   więc przetrenowanie realnie psuje formę, a w skrajnym przypadku kończy się kontuzją
