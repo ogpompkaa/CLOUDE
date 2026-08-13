@@ -1,11 +1,11 @@
 # Kariera Pro Playera
 
-Symulator kariery zawodnika CS2 w jednym pliku HTML. Zaczynasz jako nikomu nieznany gracz
-z FACEIT-a i próbujesz dojść na szczyt światowego rankingu — trenując, wygrywając mecze,
-negocjując kontrakty i budując pozycję w szatni.
+Symulator kariery zawodnika CS2 w jednym pliku HTML. Zaczynasz jako trzynastolatek grający
+Premier na własnym koncie i próbujesz dojść na szczyt światowego rankingu — przez FACEIT,
+ESEA i pierwszy kontrakt, aż po trofea, negocjacje i pozycję w szatni.
 
-Gra jest fanowskim projektem z fikcyjnymi drużynami, zawodnikami i turniejami.
-Nie jest powiązana z żadnym wydawcą ani realną organizacją esportową.
+Gra jest fanowskim projektem. Nazwy organizacji użyte są wyłącznie identyfikacyjnie;
+projekt nie jest powiązany z żadną z nich ani z wydawcą gry.
 
 ## Uruchomienie
 
@@ -16,6 +16,20 @@ z zakładki Profil.
 
 Interfejs jest dostępny po polsku i po angielsku (przełącznik na ekranie startowym) i zaprojektowany
 pod ekran telefonu, ale działa na każdej szerokości.
+
+## Droga na scenę
+
+Kariera zaczyna się w wieku **12–13 lat**, bez drużyny i bez kontraktu. Grasz otwarty
+matchmaking i pniesz się po realnej drabince:
+
+1. **CS2 Premier** — zbierasz CS Rating. Przy **15 000** lobby FACEIT przestają być stratą czasu.
+2. **FACEIT** — elo i poziomy 1–10. **Poziom 9 (1700 elo)** otwiera ligi ESEA.
+3. **ESEA / ESL** — Open, Main, Advanced i ESL Challenger League. Awans wymaga serii wygranych,
+   a od **Advanced** zaczynają dzwonić organizacje.
+
+Podpisanie pierwszego kontraktu kończy grind i uruchamia pełną karierę klubową opisaną niżej.
+W grze występuje **ponad 70 prawdziwych organizacji** podzielonych na regiony (Europa, WNP,
+Ameryka Płn. i Płd., Azja, Oceania), a Twój kraj wyznacza region, w którym startujesz.
 
 ## Jak się gra
 
@@ -36,6 +50,8 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
   wystarczającą pozycję w zespole. Przywództwo rośnie z rozmów w składzie.
 - **Świat** — 44 rywali AI z własnymi drużynami i karierami, żywy ranking Top 20,
   oraz rywal kariery, który trafia do Twojej ligi i którego trzeba wyprzedzić.
+- **Punkty rankingowe** — kafelek w karcie zawodnika; kliknięcie otwiera pełny ranking
+  zawodników w Twoim regionie i na świecie, z Twoją pozycją pośrodku listy.
 - **Pieniądze** — sprzęt, trener, analityk, psycholog, menedżer, fizjoterapeuta i mieszkanie,
   a do tego portfel inwestycyjny liczony do punktów Hall of Fame.
 

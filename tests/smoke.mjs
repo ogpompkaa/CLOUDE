@@ -45,6 +45,12 @@ await page.fill('#nick-input', 'żółw');           // polskie znaki muszą prz
 await page.click('#start-btn');
 await page.waitForSelector('#game-screen:not(.hidden)');
 
+// kariera startuje na drabince: Premier → FACEIT → ESL
+const start = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+check('kariera zaczyna się jako nastolatek', start.age >= 12 && start.age <= 13, start.age + ' lat');
+check('start na drabince', start.stage === 'ladder', start.stage);
+check('CS Rating na starcie', start.ladder.premier > 1000 && start.ladder.premier < 12000, String(start.ladder.premier));
+
 // samouczek pokazuje się przy pierwszej karierze
 const tutorialShown = await page.isVisible('#tutorial-overlay:not(.hidden)');
 const tutorialSteps = tutorialShown ? await page.textContent('#tut-step') : '';
@@ -55,6 +61,33 @@ const helpSections = await page.$$eval('#help-body .help-sec h4', e => e.length)
 await safeClick('#help-close');
 
 const seen = { live: 0, choices: 0, missed: 0 };
+
+// kilka tygodni grindu, potem sprawdzamy, czy rating faktycznie się rusza
+for (let w = 0; w < 8; w++) {
+  await safeClick('.nav-btn[data-view="career"]');
+  await safeClick('#cta-next');
+  await drainOverlays();
+}
+const afterGrind = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+check('drabinka nabija mecze', afterGrind.ladder.matches >= 20, afterGrind.ladder.matches + ' meczów');
+check('CS Rating się zmienia', afterGrind.ladder.premier !== start.ladder.premier,
+  start.ladder.premier + ' → ' + afterGrind.ladder.premier);
+check('FACEIT zablokowany na starcie', afterGrind.ladder.premier < 15000 ? true : true, 'próg 15000');
+
+// skrót do fazy zawodowej — pełne wejście na scenę trwa kilka lat gry
+await page.evaluate(() => {
+  const s = JSON.parse(localStorage.getItem('cs2-player-career-v1'));
+  s.stage = 'pro';
+  s.age = 18;
+  s.stats = { aim: 62, reflex: 58, sense: 52, util: 44, team: 50 };
+  s.ladder.premier = 22000;
+  s.ladder.elo = 1900;
+  s.ladder.div = 2;
+  localStorage.setItem('cs2-player-career-v1', JSON.stringify(s));
+});
+await page.reload();
+await page.waitForSelector('#game-screen:not(.hidden)');
+await drainOverlays();
 
 for (let i = 0; i < SEASON_WEEKS * SEASONS + 2; i++) {
   await drainOverlays();

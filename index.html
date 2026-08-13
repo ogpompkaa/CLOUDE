@@ -191,6 +191,8 @@
   .kv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; margin-top: 14px; }
   .kv { background: var(--bg-void); border: 1px solid var(--border); padding: 9px 11px; }
   .kv .k { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); }
+  .kv-click { cursor: pointer; border-color: var(--accent); }
+  .kv-click:hover { box-shadow: 0 0 14px -4px var(--accent); }
   .kv .v { font-size: 1rem; font-family: 'Rajdhani', sans-serif; font-weight: 700; margin-top: 2px; }
 
   /* --- Week / event card --- */
@@ -269,6 +271,7 @@
   #tutorial-overlay { z-index: 21; }
   #help-overlay { z-index: 27; }
   #choice-overlay { z-index: 22; }
+  #rank-overlay { z-index: 23; }
   #modal-overlay { z-index: 24; }
   #save-overlay { z-index: 26; }
   .overlay-box { max-width: 470px; width: 100%; padding: 22px 20px; max-height: 88vh; overflow-y: auto; }
@@ -414,7 +417,7 @@
     <div id="start-screen" class="glass">
       <h1><svg class="icon"><use href="#i-crosshair"></use></svg> <span data-i18n="app.title">Kariera Pro Playera</span></h1>
       <p class="subtitle" data-i18n="app.intro">Zaczynasz jako nikomu nieznany gracz z FACEIT-a. Trenuj aim, czytaj grę, wygrywaj mecze, zdobywaj oferty od coraz lepszych organizacji i zostań legendą sceny.</p>
-      <p class="disclaimer" data-i18n="app.disclaimer">Fanowski projekt z fikcyjnymi drużynami i turniejami. Niepowiązany z żadnym wydawcą ani realną organizacją.</p>
+      <p class="disclaimer" data-i18n="app.disclaimer">Fanowski projekt. Nazwy organizacji użyte wyłącznie identyfikacyjnie.</p>
       <label data-i18n="start.lang">Język / Language</label>
       <div class="role-grid" style="grid-template-columns:1fr 1fr;">
         <button class="role-opt sel" data-lang="pl"><b>Polski</b></button>
@@ -604,6 +607,20 @@
   </div>
 </div>
 
+<!-- RANKING GRACZY -->
+<div id="rank-overlay" class="overlay hidden">
+  <div class="glass overlay-box" style="max-width:470px;">
+    <div class="ev-name" style="text-align:center;" id="rank-title"></div>
+    <div class="match-sub" style="text-align:center;" id="rank-sub"></div>
+    <div style="display:flex; gap:8px; margin:12px 0;">
+      <button class="secondary full" id="rank-tab-region"></button>
+      <button class="secondary full" id="rank-tab-world"></button>
+    </div>
+    <table class="rank-table"><tbody id="rank-body"></tbody></table>
+    <button class="full primary" id="rank-close" data-i18n="help.close" style="margin-top:12px;">Zamknij</button>
+  </div>
+</div>
+
 <!-- SAMOUCZEK -->
 <div id="tutorial-overlay" class="overlay hidden">
   <div class="glass overlay-box" style="max-width:420px;">
@@ -676,8 +693,8 @@
     "app.title": ["Kariera Pro Playera", "Pro Player Career"],
     "app.intro": ["Zaczynasz jako nikomu nieznany gracz z FACEIT-a. Trenuj aim, czytaj grę, wygrywaj mecze, zdobywaj oferty od coraz lepszych organizacji i zostań legendą sceny.",
       "You start as an unknown FACEIT grinder. Train your aim, read the game, win matches, earn offers from better and better organisations and become a legend of the scene."],
-    "app.disclaimer": ["Fanowski projekt z fikcyjnymi drużynami i turniejami. Niepowiązany z żadnym wydawcą ani realną organizacją.",
-      "A fan project with fictional teams and tournaments. Not affiliated with any publisher or real organisation."],
+    "app.disclaimer": ["Fanowski projekt. Nazwy organizacji użyte wyłącznie identyfikacyjnie; gra nie jest powiązana z żadną z nich ani z wydawcą.",
+      "A fan project. Organisation names are used for identification only; the game is not affiliated with any of them or with the publisher."],
     "start.nick": ["Twój nick", "Your nickname"],
     "start.country": ["Kraj", "Country"],
     "start.role": ["Rola w składzie", "Role in the lineup"],
@@ -819,7 +836,35 @@
     "kv.matches2": ["Mecze", "Matches"],
     "kv.bestSeason": ["Najlepszy sezon", "Best season"],
     "kv.rank": ["Ranking", "Ranking"],
-    "kv.hof": ["Punkty HOF", "HOF points"],
+    "kv.hof": ["Punkty rankingowe", "Ranking points"],
+    "rank.title": ["Ranking zawodników", "Player ranking"],
+    "rank.sub": ["{scope} · Twoja pozycja: {pos} z {all}", "{scope} · your position: {pos} of {all}"],
+    "rank.world": ["Świat", "World"],
+    "rank.hint": ["Kliknij, aby zobaczyć pełny ranking", "Tap to see the full ranking"],
+    "ladder.stage": ["Droga na scenę", "The climb"],
+    "ladder.noTeam": ["bez drużyny", "no team"],
+    "ladder.locked": ["zablokowane", "locked"],
+    "ladder.matches": ["Rozegrane mecze", "Matches played"],
+    "ladder.play": ["Zagraj tydzień", "Play the week"],
+    "ladder.hint": ["Wybierz, gdzie grasz w tym tygodniu. Energię wydajesz na trening jak zwykle.",
+      "Pick where you queue this week. Energy goes on training as usual."],
+    "ladder.needPremier": ["Wymaga {n} CS Rating", "Requires {n} CS Rating"],
+    "ladder.needElo": ["Wymaga {n} elo na FACEIT", "Requires {n} FACEIT elo"],
+    "ladder.goalTitle": ["Następny krok", "Next step"],
+    "ladder.goalPremier": ["Dobij do {n} CS Rating, żeby wejść na FACEIT.", "Reach {n} CS Rating to move onto FACEIT."],
+    "ladder.goalFaceit": ["Wbij poziom 9 na FACEIT, żeby grać w ESEA.", "Hit FACEIT level 9 to play in ESEA."],
+    "ladder.goalEsl": ["Wygrywaj w ESEA — organizacje szukają graczy od Advanced wzwyż.",
+      "Win in ESEA — orgs scout from Advanced upwards."],
+    "ladder.premierLog": ["Premier: {w}W-{l}P · {delta} CS Rating (razem {rating})",
+      "Premier: {w}W-{l}L · {delta} CS Rating (now {rating})"],
+    "ladder.faceitLog": ["FACEIT: {w}W-{l}P · elo {elo} (poziom {lvl})", "FACEIT: {w}W-{l}L · elo {elo} (level {lvl})"],
+    "ladder.levelUp": ["Nowy poziom FACEIT: {lvl}!", "New FACEIT level: {lvl}!"],
+    "ladder.eslLog": ["{div}: {w}W-{l}P (wygranych w dywizji: {total})", "{div}: {w}W-{l}L (division wins: {total})"],
+    "ladder.promo": ["Awans do {div}!", "Promoted to {div}!"],
+    "ladder.scouted": ["{team} obserwuje Twoje mecze i wysyła ofertę.", "{team} has been watching you and sends an offer."],
+    "ladder.turnedPro": ["Podpisujesz pierwszy kontrakt z {team}. Koniec grindu, zaczyna się scena.",
+      "You sign your first contract with {team}. The grind is over, the scene begins."],
+    "ladder.yearSummary": ["Rok na drabince za Tobą. Masz {age} lat.", "Another year on the climb. You are {age}."],
     "kv.frags": ["Fragi", "Frags"],
     "kv.deaths": ["Śmierci", "Deaths"],
     "tag.chapter2": ["Drugi rozdział", "Second chapter"],
@@ -928,7 +973,7 @@
     "end.mvps": ["MVP eventów", "Event MVPs"],
     "end.bestRank": ["Najwyższy ranking", "Best ranking"],
     "end.none": ["brak", "none"],
-    "end.hof": ["Punkty Hall of Fame", "Hall of Fame points"],
+    "end.hof": ["Punkty rankingowe kariery", "Career ranking points"],
     "end.next": ["Co dalej po zawieszeniu myszki?", "What comes after hanging up the mouse?"],
     "end.nextInfo": ["Twoje nazwisko wciąż coś znaczy. Możesz zostać w scenie w innej roli.",
       "Your name still means something. You can stay in the scene in another role."],
@@ -1034,9 +1079,6 @@
     { name: ["Top 5 świata", "World top 5"], str: 88, salary: 60000, prize: 220000 },
   ];
 
-  const ORG_NAMES = ["Aurora", "Nordic Wolves", "Obsidian", "Neon Dynasty", "Vantage", "Solaris", "Voidwalkers",
-    "Ironclad", "Prism", "Wraith Co", "Frostbyte", "Zenith", "Rustline", "Kryptonic", "Meridian", "Halcyon",
-    "Blackout", "Tempest", "Cinder", "Nova Pact"];
   const NICK_POOL = ["kexy", "r3ll", "nyx", "byt3", "gh0st", "lumen", "fr0sty", "blaze", "orbit", "st4tic", "pix3l",
     "rogu", "shade", "vertx", "ciph", "drift", "flux", "halo", "ion", "jinx", "lynx", "n3x", "onyx", "quill", "raze",
     "tempo", "umbr", "volt", "wisp", "xen", "zed", "astra", "kalo", "mrq", "sn0w", "dexy", "vipr", "torn"];
@@ -1046,6 +1088,69 @@
     { name: "PulseGear", hype: 45, pay: 5200 }, { name: "VoltCola", hype: 60, pay: 9000 },
     { name: "ApexPeripherals", hype: 72, pay: 15000 }, { name: "NovaBank", hype: 85, pay: 28000 },
   ];
+
+  // Prawdziwe organizacje sceny CS2, z regionem i typowym poziomem (0-4)
+  const ORGS = [
+    { n: "Natus Vincere", r: "eu", t: 4 }, { n: "Team Vitality", r: "eu", t: 4 },
+    { n: "G2 Esports", r: "eu", t: 4 }, { n: "FaZe Clan", r: "eu", t: 4 },
+    { n: "MOUZ", r: "eu", t: 4 }, { n: "Team Spirit", r: "cis", t: 4 },
+    { n: "Team Falcons", r: "eu", t: 4 }, { n: "Team Liquid", r: "na", t: 3 },
+    { n: "Astralis", r: "eu", t: 3 }, { n: "fnatic", r: "eu", t: 3 },
+    { n: "Virtus.pro", r: "cis", t: 3 }, { n: "HEROIC", r: "eu", t: 3 },
+    { n: "Ninjas in Pyjamas", r: "eu", t: 3 }, { n: "ENCE", r: "eu", t: 3 },
+    { n: "BIG", r: "eu", t: 3 }, { n: "Eternal Fire", r: "eu", t: 3 },
+    { n: "Aurora Gaming", r: "eu", t: 3 }, { n: "GamerLegion", r: "eu", t: 3 },
+    { n: "3DMAX", r: "eu", t: 3 }, { n: "The MongolZ", r: "as", t: 4 },
+    { n: "FURIA Esports", r: "sa", t: 3 }, { n: "MIBR", r: "sa", t: 3 },
+    { n: "paiN Gaming", r: "sa", t: 3 }, { n: "Imperial Esports", r: "sa", t: 2 },
+    { n: "Complexity", r: "na", t: 2 }, { n: "NRG Esports", r: "na", t: 2 },
+    { n: "Cloud9", r: "cis", t: 2 }, { n: "BetBoom Team", r: "cis", t: 2 },
+    { n: "OG", r: "eu", t: 2 }, { n: "Monte", r: "eu", t: 2 },
+    { n: "B8", r: "cis", t: 2 }, { n: "Passion UA", r: "cis", t: 2 },
+    { n: "Nemiga Gaming", r: "cis", t: 2 }, { n: "forZe", r: "cis", t: 2 },
+    { n: "Apeks", r: "eu", t: 2 }, { n: "SAW", r: "eu", t: 2 },
+    { n: "Sangal Esports", r: "eu", t: 2 }, { n: "Iberian Soul", r: "eu", t: 2 },
+    { n: "9 Pandas", r: "cis", t: 2 }, { n: "Rare Atom", r: "as", t: 2 },
+    { n: "TYLOO", r: "as", t: 2 }, { n: "Lynn Vision", r: "as", t: 2 },
+    { n: "Chinggis Warriors", r: "as", t: 2 }, { n: "M80", r: "na", t: 2 },
+    { n: "Wildcard", r: "na", t: 2 }, { n: "FlyQuest", r: "oce", t: 2 },
+    { n: "9z Team", r: "sa", t: 2 }, { n: "Legacy", r: "sa", t: 2 },
+    { n: "Sharks Esports", r: "sa", t: 1 }, { n: "Fluxo", r: "sa", t: 1 },
+    { n: "RED Canids", r: "sa", t: 1 }, { n: "ODDIK", r: "sa", t: 1 },
+    { n: "Case Esports", r: "sa", t: 1 }, { n: "BESTIA", r: "sa", t: 1 },
+    { n: "Party Astronauts", r: "na", t: 1 }, { n: "Nouns", r: "na", t: 1 },
+    { n: "BOSS", r: "na", t: 1 }, { n: "Take Flyte", r: "na", t: 1 },
+    { n: "ECSTATIC", r: "eu", t: 1 }, { n: "Sashi Esport", r: "eu", t: 1 },
+    { n: "Preasy Esport", r: "eu", t: 1 }, { n: "Metizport", r: "eu", t: 1 },
+    { n: "Zero Tenacity", r: "eu", t: 1 }, { n: "Bad News Eagles", r: "eu", t: 1 },
+    { n: "Grayhound Gaming", r: "oce", t: 1 }, { n: "Rooster", r: "oce", t: 1 },
+    { n: "Insilio", r: "cis", t: 1 }, { n: "AMKAL", r: "cis", t: 1 },
+    { n: "Betera Esports", r: "cis", t: 1 }, { n: "Alliance", r: "eu", t: 1 },
+  ];
+
+  const REGIONS = [
+    { id: "eu",  name: ["Europa", "Europe"] },
+    { id: "cis", name: ["WNP", "CIS"] },
+    { id: "na",  name: ["Ameryka Płn.", "North America"] },
+    { id: "sa",  name: ["Ameryka Płd.", "South America"] },
+    { id: "as",  name: ["Azja", "Asia"] },
+    { id: "oce", name: ["Oceania", "Oceania"] },
+  ];
+
+  // kraj gracza wyznacza region, w którym startuje kariera
+  const COUNTRY_REGION = {
+    pl: "eu", se: "eu", dk: "eu", fr: "eu", de: "eu", fi: "eu", cz: "eu", es: "eu", tr: "eu",
+    ua: "cis", ru: "cis", us: "na", ca: "na", br: "sa", au: "oce",
+  };
+
+  function myRegion() { return COUNTRY_REGION[state.country] || "eu"; }
+  function regionName(id) { const r = REGIONS.find(x => x.id === id); return r ? tx(r.name) : id; }
+  function orgsForTier(t) {
+    const near = ORGS.filter(o => Math.abs(o.t - t) <= 1);
+    return near.length ? near : ORGS;
+  }
+  function pickOrg(t) { return pick(typeof t === "number" ? orgsForTier(t) : ORGS).n; }
+  function orgRegion(name) { const o = ORGS.find(x => x.n === name); return o ? o.r : "eu"; }
 
   const COUNTRIES = [
     { code: "pl", name: ["Polska", "Poland"] }, { code: "se", name: ["Szwecja", "Sweden"] }, { code: "dk", name: ["Dania", "Denmark"] },
@@ -1268,7 +1373,7 @@
     const t = tier(tierId);
     const used = [];
     return {
-      name: name || pick(ORG_NAMES),
+      name: name || pickOrg(tierId),
       tier: tierId,
       mates: [0, 1, 2, 3].map(() => makeMate(t.str, used)),
       chem: irnd(42, 62),
@@ -1284,7 +1389,8 @@
     const used = [state.team.name];
     for (let i = 0; i < 5; i++) {
       let n;
-      do { n = pick(ORG_NAMES); } while (used.indexOf(n) >= 0);
+      let guard2 = 0;
+      do { n = pickOrg(state.team ? state.team.tier : 0); guard2++; } while (used.indexOf(n) >= 0 && guard2 < 60);
       used.push(n);
       teams.push({ me: false, name: n, str: clamp(Math.round(base + rnd(-8, 9)), 30, 96), w: 0, l: 0, rd: 0 });
     }
@@ -1313,10 +1419,13 @@
   function defaultState(nick, roleId, archId, diffId, countryCode) {
     const arch = ARCHETYPES.find(a => a.id === archId) || ARCHETYPES[1];
     const diff = DIFFICULTIES.find(d => d.id === diffId) || DIFFICULTIES[1];
-    const baseStats = { aim: 42, reflex: 40, sense: 34, util: 32, team: 36 };
+    const baseStats = { aim: 30, reflex: 30, sense: 20, util: 16, team: 20 };
     Object.keys(arch.stats || {}).forEach(k => { baseStats[k] = clamp(baseStats[k] + arch.stats[k], 1, 99); });
     const s = {
-      nick: nick, role: roleId, age: 17, season: 1, week: 1, energy: MAX_ENERGY,
+      nick: nick, role: roleId, age: irnd(12, 13), season: 1, week: 1, energy: MAX_ENERGY,
+      stage: "ladder",
+      ladder: { premier: irnd(PREMIER_START[0], PREMIER_START[1]), elo: FACEIT_START, div: 0, divWins: 0,
+                queue: "premier", matches: 0, mates: 0 },
       arch: arch.id, diff: diff.id, country: countryCode || "pl",
       money: 1500, hype: 5,
       stats: baseStats,
@@ -1335,12 +1444,12 @@
     state = s;
     s.team = makeTeam(0, "Team " + nick.toUpperCase().slice(0, 6));
     s.team.salary = 0;
+    s.stage = "ladder";
     s.team.chem = clamp(s.team.chem + (arch.chem || 0), 0, 100);
-    s.league = makeLeague();
-    s.schedule = makeSchedule();
     s.world = makeWorld();
     s.nemesis = pickNemesis();
     s.league = makeLeague();
+    s.schedule = makeSchedule();
     s.goal = makeGoal();
     addLog(TR("log.start", { role: tx(role().name), team: s.team.name }), "info");
     return s;
@@ -1358,7 +1467,8 @@
       arr.push({
         nick: n, age: irnd(18, 29), tier: clamp(4 - Math.floor(i / 10), 0, 4),
         rating: +(0.94 + rnd(0, 0.34)).toFixed(2), hype: irnd(30, 95),
-        trophies: Math.max(0, irnd(-2, 4)), team: pick(ORG_NAMES),
+        trophies: Math.max(0, irnd(-2, 4)), team: pickOrg(clamp(4 - Math.floor(i / 10), 0, 4)),
+        region: pick(REGIONS).id,
       });
     }
     return arr;
@@ -1400,6 +1510,51 @@
     return rows.sort((a, b) => b.score - a.score);
   }
 
+  // Pełny ranking zawodników: region albo świat
+  function playerRanking(scope) {
+    if (!state.world) state.world = makeWorld();
+    const myR = myRegion();
+    const rows = state.world.map(r => ({
+      nick: r.nick, team: r.team, region: orgRegion(r.team), tier: r.tier, rating: r.rating,
+      pts: Math.round(rankScore(r.tier, r.rating, r.hype, r.trophies) * 10),
+    }));
+    const myRating = state.seasonStats.matches >= 4 ? seasonRating()
+      : (state.career.matches ? state.career.rating / state.career.matches : 0.9);
+    rows.push({
+      me: true, nick: state.nick, team: state.team ? state.team.name : "-", region: myR,
+      tier: state.team ? state.team.tier : 0, rating: +myRating.toFixed(2),
+      pts: Math.round(rankScore(state.team ? state.team.tier : 0, myRating, state.hype,
+        state.career.trophies.length) * 10),
+    });
+    const list = scope === "region" ? rows.filter(r => r.region === myR) : rows;
+    return list.sort((a, b) => b.pts - a.pts);
+  }
+
+  let rankScope = "world";
+
+  function showRanking(scope) {
+    rankScope = scope || rankScope;
+    const list = playerRanking(rankScope);
+    const pos = list.findIndex(r => r.me) + 1;
+    document.getElementById("rank-title").textContent = TR("rank.title");
+    document.getElementById("rank-sub").textContent = TR("rank.sub", {
+      scope: rankScope === "region" ? regionName(myRegion()) : TR("rank.world"),
+      pos: pos, all: list.length,
+    });
+    document.getElementById("rank-tab-region").textContent = regionName(myRegion());
+    document.getElementById("rank-tab-world").textContent = TR("rank.world");
+    document.getElementById("rank-tab-region").classList.toggle("primary", rankScope === "region");
+    document.getElementById("rank-tab-world").classList.toggle("primary", rankScope === "world");
+    // wokół Twojej pozycji, żeby zawsze było widać kontekst
+    const from = clamp(pos - 6, 0, Math.max(0, list.length - 12));
+    const shown = list.slice(from, from + 12);
+    document.getElementById("rank-body").innerHTML = shown.map((r, i) =>
+      '<tr class="' + (r.me ? "me" : "") + '"><td class="rk">' + (from + i + 1) + "</td><td>" + esc(r.nick) +
+      '<div class="rk-team">' + esc(r.team) + " · " + esc(regionName(r.region)) + '</div></td>' +
+      '<td class="rk-rat">' + r.pts + "</td></tr>").join("");
+    document.getElementById("rank-overlay").classList.remove("hidden");
+  }
+
   function evolveWorld() {
     if (!state.world) { state.world = makeWorld(); return; }
     const used = state.world.map(r => r.nick).concat([state.nick]);
@@ -1408,7 +1563,7 @@
       r.rating = +clamp(r.rating + rnd(-0.09, 0.09) + (r.age > 28 ? -0.03 : 0.01), 0.80, 1.45).toFixed(2);
       r.hype = clamp(Math.round(r.hype + rnd(-8, 8) + (r.rating - 1.05) * 30), 5, 100);
       if (Math.random() < 0.25) r.tier = clamp(r.tier + (r.rating > 1.12 ? 1 : -1), 0, 4);
-      if (Math.random() < 0.2) r.team = pick(ORG_NAMES);
+      if (Math.random() < 0.2) r.team = pickOrg(r.tier);
       if (r.rating > 1.15 && Math.random() < 0.3) r.trophies++;
       if (r.age > 31 && Math.random() < 0.45) { // emerytura, wchodzi nowy talent
         let n, guard = 0;
@@ -1416,7 +1571,7 @@
         while (used.indexOf(n) >= 0 && guard < 40);
         used.push(n);
         r.nick = n; r.age = irnd(17, 20); r.tier = clamp(irnd(0, 3), 0, 4);
-        r.rating = +(0.95 + rnd(0, 0.25)).toFixed(2); r.hype = irnd(20, 60); r.trophies = 0; r.team = pick(ORG_NAMES);
+        r.rating = +(0.95 + rnd(0, 0.25)).toFixed(2); r.hype = irnd(20, 60); r.trophies = 0; r.team = pickOrg(r.tier);
       }
     });
   }
@@ -2002,6 +2157,8 @@
     if (typeof state.transferTry !== "number") state.transferTry = 0;
     if (!state.career.recent) state.career.recent = [];
     if (typeof state.phase === "undefined") state.phase = null;
+    if (!state.stage) state.stage = "pro";
+    if (!state.ladder) state.ladder = { premier: 0, elo: 0, div: 0, divWins: 0, queue: "premier", matches: 0, mates: 0 };
     if (!state.arch) state.arch = "grinder";
     if (!state.diff) state.diff = "normal";
     if (!state.country) state.country = "pl";
@@ -2015,11 +2172,168 @@
     if (state.phase && !state.staffWorld) state.staffWorld = makeStaffWorld();
   }
 
+  // ---------- droga na scenę: Premier → FACEIT → ESL ----------
+  // Progi odwzorowują realną ścieżkę: CS Rating w Premier, elo i poziomy FACEIT, dywizje ESEA/ESL.
+  const PREMIER_START = [4000, 7000];
+  const FACEIT_GATE = 15000;      // CS Rating otwierający sensowną grę na FACEIT
+  const FACEIT_START = 800;
+  const ESL_GATE = 1700;          // elo FACEIT (poziom 9) otwierające ESEA/ESL
+  const FACEIT_LEVELS = [500, 750, 900, 1050, 1200, 1350, 1530, 1750, 2000];
+  const ESL_DIVS = [
+    { id: 0, name: ["ESEA Open", "ESEA Open"], str: 52, promo: 5 },
+    { id: 1, name: ["ESEA Main", "ESEA Main"], str: 60, promo: 6 },
+    { id: 2, name: ["ESEA Advanced", "ESEA Advanced"], str: 68, promo: 7 },
+    { id: 3, name: ["ESL Challenger League", "ESL Challenger League"], str: 75, promo: 8 },
+  ];
+
+  function faceitLevel(elo) {
+    let lvl = 1;
+    for (let i = 0; i < FACEIT_LEVELS.length; i++) if (elo > FACEIT_LEVELS[i]) lvl = i + 2;
+    return clamp(lvl, 1, 10);
+  }
+  function inLadder() { return state.stage === "ladder"; }
+  function faceitUnlocked() { return state.ladder.premier >= FACEIT_GATE; }
+  function eslUnlocked() { return state.ladder.elo >= ESL_GATE; }
+
+  const QUEUES = [
+    { id: "premier", name: ["CS2 Premier", "CS2 Premier"], icon: "crosshair",
+      desc: ["Otwarty matchmaking. Zbierz CS Rating, żeby ktokolwiek Cię zauważył.",
+             "Open matchmaking. Grind CS Rating until anyone notices you."] },
+    { id: "faceit", name: ["FACEIT", "FACEIT"], icon: "globe",
+      desc: ["Poważniejsze lobby i elo. Poziom 9-10 otwiera drzwi do ESEA.",
+             "Tougher lobbies and elo. Level 9-10 opens the door to ESEA."] },
+    { id: "esl", name: ["ESEA / ESL", "ESEA / ESL"], icon: "trophy",
+      desc: ["Ligi z prawdziwym składem. Stąd biorą Cię organizacje.",
+             "Real team leagues. This is where orgs find you."] },
+  ];
+
+  function ladderPower() {
+    // na drabince liczy się mechanika i głowa, teamplay dopiero w ESL
+    const st = state.stats;
+    return st.aim * 0.34 + st.reflex * 0.26 + st.sense * 0.22 + st.util * 0.08 + st.team * 0.10;
+  }
+
+  function playPremier() {
+    const L = state.ladder;
+    const opp = 28 + L.premier / 620;                       // lobby rośnie razem z ratingiem
+    const p = clamp(0.5 + (ladderPower() - opp) * 0.03, 0.15, 0.9);
+    let w = 0, l = 0;
+    for (let i = 0; i < 3; i++) { if (Math.random() < p) w++; else l++; }
+    const delta = Math.round((w - l) * irnd(180, 420) * (1 + L.premier / 40000));
+    L.premier = clamp(L.premier + delta, 1000, 35000);
+    L.matches += 3;
+    addLog(TR("ladder.premierLog", { w: w, l: l, delta: (delta > 0 ? "+" : "") + delta, rating: L.premier }),
+      delta >= 0 ? "good" : "bad");
+    return { w: w, l: l, delta: delta };
+  }
+
+  function playFaceit() {
+    const L = state.ladder;
+    const opp = 34 + L.elo / 58;
+    const p = clamp(0.5 + (ladderPower() - opp) * 0.03, 0.15, 0.9);
+    let w = 0, l = 0;
+    for (let i = 0; i < 3; i++) { if (Math.random() < p) w++; else l++; }
+    const before = faceitLevel(L.elo);
+    L.elo = clamp(L.elo + (w - l) * irnd(25, 38), 100, 3000);
+    L.matches += 3;
+    const after = faceitLevel(L.elo);
+    addLog(TR("ladder.faceitLog", { w: w, l: l, elo: L.elo, lvl: after }), w >= l ? "good" : "bad");
+    if (after > before) addLog(TR("ladder.levelUp", { lvl: after }), "gold");
+    return { w: w, l: l, level: after };
+  }
+
+  function playEsl() {
+    const L = state.ladder;
+    const div = ESL_DIVS[L.div];
+    const p = clamp(0.5 + (ladderPower() + L.mates - div.str) * 0.035, 0.12, 0.9);
+    let w = 0, l = 0;
+    for (let i = 0; i < 3; i++) { if (Math.random() < p) w++; else l++; }
+    L.divWins += w;
+    L.matches += 3;
+    addLog(TR("ladder.eslLog", { div: tx(div.name), w: w, l: l, total: L.divWins }), w >= l ? "good" : "bad");
+    if (L.divWins >= div.promo * 3 && L.div < ESL_DIVS.length - 1) {
+      L.div++;
+      L.divWins = 0;
+      L.mates = clamp(L.mates + 4, 0, 30);
+      addLog(TR("ladder.promo", { div: tx(ESL_DIVS[L.div].name) }), "gold");
+    }
+    return { w: w, l: l };
+  }
+
+  function ladderWeek() {
+    const q = state.ladder.queue;
+    if (q === "faceit" && !faceitUnlocked()) state.ladder.queue = "premier";
+    if (q === "esl" && !eslUnlocked()) state.ladder.queue = faceitUnlocked() ? "faceit" : "premier";
+    const res = state.ladder.queue === "esl" ? playEsl()
+      : state.ladder.queue === "faceit" ? playFaceit() : playPremier();
+    state.stamina = clamp(state.stamina - 7, 0, 100);
+    state.form = clamp(state.form + (res.w > res.l ? 5 : -4), 0, 100);
+    state.hype = clamp(state.hype + (state.ladder.queue === "esl" ? 0.8 : 0.2), 0, 100);
+    // rozwój z samej gry
+    ["aim", "reflex", "sense"].forEach(k => { state.stats[k] = clamp(state.stats[k] + growth(k, 0.6), 1, 99); });
+    maybeProOffer();
+    advanceLadderWeek();
+  }
+
+  // Organizacje zaczynają dzwonić dopiero z ESEA Advanced wzwyż
+  function maybeProOffer() {
+    const L = state.ladder;
+    if (L.div < 2 || state.offers.length) return;
+    const chance = clamp((L.div - 1) * 0.05 + (ladderPower() - 55) * 0.006, 0, 0.22);
+    if (Math.random() > chance) return;
+    const t = clamp(L.div - 1, 0, 2);
+    const team = makeTeam(t);
+    state.offers.push({
+      id: "o" + Date.now(), team: team.name, tier: t,
+      salary: Math.round(tier(t).salary * rnd(0.8, 1.1)), years: irnd(1, 3),
+      strength: Math.round(team.mates.reduce((a, m) => a + m.skill, 0) / 4),
+      mates: team.mates, chem: team.chem, ttl: irnd(3, 5), hot: true, fromLadder: true,
+    });
+    addLog(TR("ladder.scouted", { team: team.name }), "gold");
+  }
+
+  function advanceLadderWeek() {
+    state.money += 200;                       // drobne z turniejów online
+    state.stamina = clamp(state.stamina + 9, 0, 100);
+    state.mental = clamp(state.mental + 3, 0, 100);
+    state.energy = MAX_ENERGY;
+    if (state.weekPlan && state.weekPlan.length) state.lastPlan = state.weekPlan.slice();
+    state.weekPlan = [];
+    state.offers.forEach(o => o.ttl--);
+    state.offers = state.offers.filter(o => o.ttl > 0);
+    state.week++;
+    if (state.week > SEASON_LENGTH) {
+      state.week = 1;
+      state.season++;
+      state.age++;
+      evolveWorld();
+      checkAch();
+      const L = state.ladder;
+      showModal(TR("season.end", { n: state.season - 1 }), TR("ladder.yearSummary", { age: state.age }),
+        '<div class="recap-line"><span>CS Rating</span><b>' + L.premier + "</b></div>" +
+        '<div class="recap-line"><span>FACEIT</span><b>' + (faceitUnlocked() ? L.elo + " (lvl " + faceitLevel(L.elo) + ")" : "—") + "</b></div>" +
+        '<div class="recap-line"><span>ESEA / ESL</span><b>' + (eslUnlocked() ? tx(ESL_DIVS[L.div].name) : "—") + "</b></div>" +
+        '<div class="recap-line"><span>' + esc(TR("ladder.matches")) + "</span><b>" + L.matches + "</b></div>");
+      save();
+    }
+  }
+
+  // Podpisanie pierwszego kontraktu kończy drabinkę i zaczyna karierę w organizacji
+  function enterProCareer() {
+    state.stage = "pro";
+    state.league = makeLeague();
+    state.schedule = makeSchedule();
+    state.goal = makeGoal();
+    state.nemesis = state.nemesis || pickNemesis();
+    addLog(TR("ladder.turnedPro", { team: state.team.name }), "gold");
+  }
+
   // ---------- tydzień ----------
   function currentEvent() { return state.schedule[state.week - 1]; }
 
   function nextWeek() {
     if (inPhase2()) { nextWeek2(); return; }
+    if (inLadder()) { ladderWeek(); render(); save(); return; }
     const ev = currentEvent();
     const isMatch = ev.type === "league" || ev.type === "event" || ev.type === "playoff";
     if (!isMatch) { advanceWeek(); render(); save(); return; }
@@ -2104,7 +2418,7 @@
 
     function runStage() {
       const st = stages[stageIdx];
-      const oppName = pick(ORG_NAMES);
+      const oppName = pickOrg(state.team.tier);
       runSeries(st.opp + rnd(-3, 3), st.bo, ev.name + " · " + tx(st.n) + " vs " + oppName, oppName, res => {
         applyMatchResult(res, ev.name + " · " + tx(st.n));
         lines.push({ label: tx(st.n) + " vs " + oppName, score: res.mapsWon + "-" + res.mapsLost, won: res.won, rating: res.me.rating });
@@ -2321,6 +2635,7 @@
       state.nemesis = state.nemesis || pickNemesis();
       state.league = makeLeague();
       state.goal = makeGoal();
+      if (inLadder()) enterProCareer();
       state.hype = clamp(state.hype + 5, 0, 100);
       addLog("Transfer: " + old + " → " + o.team + " (" + money(state.team.salary) + "/tydz.)", "gold");
       const terms = [];
@@ -2771,7 +3086,7 @@
       while (used.indexOf(n) >= 0 && guard < 40);
       used.push(n);
       arr.push({ nick: n, craft: irnd(30, 88), rep: irnd(25, 95), trophies: Math.max(0, irnd(-2, 5)),
-                 tier: clamp(4 - Math.floor(i / 4), 0, 4), team: pick(ORG_NAMES),
+                 tier: clamp(4 - Math.floor(i / 4), 0, 4), team: pickOrg(clamp(4 - Math.floor(i / 4), 0, 4)),
                  audience: irnd(20, 900) });
     }
     return arr;
@@ -2802,7 +3117,7 @@
       r.rep = clamp(Math.round(r.rep + rnd(-6, 6)), 5, 100);
       r.audience = Math.max(10, Math.round(r.audience * rnd(0.9, 1.18)));
       if (Math.random() < 0.25) r.tier = clamp(r.tier + (r.craft > 65 ? 1 : -1), 0, 4);
-      if (Math.random() < 0.2) { r.trophies++; r.team = pick(ORG_NAMES); }
+      if (Math.random() < 0.2) { r.trophies++; r.team = pickOrg(r.tier); }
     });
   }
 
@@ -3153,6 +3468,7 @@
 
   function renderCareer() {
     if (inPhase2()) { renderCareer2(); return; }
+    if (inLadder()) { renderLadder(); return; }
     document.getElementById("pc-nick").textContent = state.nick;
     const ctry = tx((COUNTRIES.find(c => c.code === state.country) || {}).name) || "";
     document.getElementById("pc-sub").textContent = tx(role().name) + " · " + state.age + " lat · " +
@@ -3214,6 +3530,52 @@
       ? TR("career.hintEnergy", { n: state.energy }) : TR("career.hintDone");
     document.getElementById("cta-next").innerHTML =
       TR(currentEvent().type === "free" ? "hud.newweek" : "hud.play") + " " + icon("arrow-right");
+  }
+
+  function renderLadder() {
+    const L = state.ladder;
+    const lvl = faceitLevel(L.elo);
+    document.getElementById("pc-nick").textContent = state.nick;
+    const ctry = tx((COUNTRIES.find(c => c.code === state.country) || {}).name) || "";
+    document.getElementById("pc-sub").textContent = tx(role().name) + " · " + state.age + " lat · " +
+      (ctry ? ctry + " · " : "") + TR("ladder.noTeam");
+    document.getElementById("pc-rating").textContent = L.premier;
+    document.querySelector(".rating-lbl").textContent = "CS Rating";
+    const tags = ['<span class="tag acc">' + esc(TR("ladder.stage")) + "</span>",
+      '<span class="tag">' + esc(tx(archDef().name)) + "</span>"];
+    if (faceitUnlocked()) tags.push('<span class="tag good">FACEIT lvl ' + lvl + "</span>");
+    if (eslUnlocked()) tags.push('<span class="tag gold">' + esc(tx(ESL_DIVS[L.div].name)) + "</span>");
+    if (state.stamina <= 30) tags.push('<span class="tag bad">' + esc(TR("tag.overtrained")) + "</span>");
+    document.getElementById("pc-tags").innerHTML = tags.join("");
+    document.getElementById("pc-kv").innerHTML = [
+      ["CS Rating", L.premier + " / " + FACEIT_GATE],
+      ["FACEIT elo", faceitUnlocked() ? L.elo + " (lvl " + lvl + ")" : TR("ladder.locked")],
+      ["ESEA / ESL", eslUnlocked() ? tx(ESL_DIVS[L.div].name) : TR("ladder.locked")],
+      [TR("ladder.matches"), L.matches],
+      [TR("kv.hype"), Math.round(state.hype) + "%"],
+      [TR("stat.form"), Math.round(state.form)],
+    ].map(x => '<div class="kv"><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + "</div></div>").join("");
+
+    const box = document.getElementById("week-card");
+    box.innerHTML = QUEUES.map(q => {
+      const locked = (q.id === "faceit" && !faceitUnlocked()) || (q.id === "esl" && !eslUnlocked());
+      const sel = state.ladder.queue === q.id;
+      return '<button class="act" data-queue="' + q.id + '"' + (locked ? " disabled" : "") +
+        ' style="width:100%; margin-bottom:8px;' + (sel ? "border-color:var(--accent);" : "") + '">' +
+        '<span class="a-title">' + icon(q.icon) + esc(tx(q.name)) + (sel ? " ✓" : "") + "</span>" +
+        '<span class="a-desc">' + esc(tx(q.desc)) + "</span>" +
+        (locked ? '<span class="a-cost">' + esc(q.id === "faceit"
+            ? TR("ladder.needPremier", { n: FACEIT_GATE })
+            : TR("ladder.needElo", { n: ESL_GATE })) + "</span>" : "") + "</button>";
+    }).join("");
+
+    document.getElementById("goal-card").innerHTML =
+      '<div class="goal-box"><div class="g-title">' + esc(TR("ladder.goalTitle")) + "</div>" +
+      '<div class="g-desc">' + esc(eslUnlocked() ? TR("ladder.goalEsl")
+        : faceitUnlocked() ? TR("ladder.goalFaceit") : TR("ladder.goalPremier", { n: FACEIT_GATE })) + "</div></div>";
+    document.getElementById("btn-skip").classList.add("hidden");
+    document.getElementById("week-hint").textContent = TR("ladder.hint");
+    document.getElementById("cta-next").innerHTML = TR("ladder.play") + " " + icon("arrow-right");
   }
 
   function renderCareer2() {
@@ -3449,8 +3811,11 @@
         [TR("kv.seasons"), c.seasons.length], [TR("kv.matches2"), c.matches],
         [TR("kv.bestSeason"), c.bestRating ? c.bestRating.toFixed(2) : "—"],
         [TR("kv.rank"), c.bestRank ? "#" + c.bestRank : "—"],
-        [TR("kv.trophies"), c.trophies.length], [TR("kv.hof"), hofScore()],
+        [TR("kv.trophies"), c.trophies.length],
       ].map(x => '<div class="kv"><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + "</div></div>").join("") +
+      '<div class="kv kv-click" id="kv-points" title="' + esc(TR("rank.hint")) + '"><div class="k">' +
+      esc(TR("kv.hof")) + '</div><div class="v">' + hofScore() + '</div><div class="k" style="color:var(--accent)">' +
+      esc(TR("rank.hint")) + "</div></div>" +
       "</div>";
   }
 
@@ -3692,6 +4057,20 @@
     renderTutStep();
   });
   document.getElementById("tut-skip").addEventListener("click", endTutorial);
+  document.getElementById("player-card").addEventListener("click", e => {
+    if (e.target.closest("#kv-points")) showRanking(rankScope);
+  });
+  document.getElementById("rank-tab-region").addEventListener("click", () => showRanking("region"));
+  document.getElementById("rank-tab-world").addEventListener("click", () => showRanking("world"));
+  document.getElementById("rank-close").addEventListener("click", () => {
+    document.getElementById("rank-overlay").classList.add("hidden");
+  });
+  document.getElementById("week-card").addEventListener("click", e => {
+    const q = e.target.closest("[data-queue]");
+    if (!q || !state) return;
+    state.ladder.queue = q.dataset.queue;
+    render(); save();
+  });
   document.getElementById("btn-help").addEventListener("click", showHelp);
   document.getElementById("btn-help2").addEventListener("click", showHelp);
   document.getElementById("help-close").addEventListener("click", () => {
