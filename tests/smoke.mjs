@@ -40,6 +40,12 @@ const safeClick = async sel => {
   try { await page.click(sel, { timeout: 3000 }); return true; } catch { return false; }
 };
 
+// widoki dzielą się na podzakładki — test musi przełączyć się na właściwą sekcję
+const goto = async (view, sub) => {
+  await safeClick('.nav-btn[data-view="' + view + '"]');
+  if (sub) await safeClick('#sub-' + view + ' [data-sub="' + sub + '"]');
+};
+
 await page.goto('file://' + gamePath);
 const scenCount = await page.$$eval('[data-scen]', els => els.length).catch(() => 0);
 await page.fill('#nick-input', 'żółw');           // polskie znaki muszą przejść
@@ -69,7 +75,7 @@ const helpSections = await page.$$eval('#help-body .help-sec h4', e => e.length)
 await safeClick('#help-close');
 
 // preset przestawia plan jednym kliknięciem
-await safeClick('.nav-btn[data-view="train"]');
+await goto('train', 'plan');
 const planBefore = await page.$$eval('.plan-slot', els => els.length);
 await safeClick('[data-preset="1"]');
 const afterPreset = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
@@ -181,15 +187,16 @@ check('samouczek startuje przy nowej karierze', tutorialShown, tutorialSteps);
 check('ekran pomocy ma sekcje', helpSections >= 5, helpSections + ' sekcji');
 
 // scena: feed, ranking klubów
-await page.click('.nav-btn[data-view="scene"]');
+await goto('scene', 'feed');
 const newsRows = await page.$$eval('#news-list .entry', els => els.length).catch(() => 0);
+await goto('scene', 'clubs');
 const clubRows = await page.$$eval('#clubs-body tr', els => els.map(e => e.textContent)).catch(() => []);
 check('feed sceny żyje', newsRows >= 5, newsRows + ' wpisów');
 check('ranking klubów ma tabelę', clubRows.length >= 10, clubRows.length + ' wierszy');
 check('mój klub jest w rankingu', clubRows.some(r => r.includes(st.team.name)), st.team.name);
 
 // zdrowie: obciążenie i panel
-await page.click('.nav-btn[data-view="train"]');
+await goto('train', 'form');
 const healthTxt = await page.textContent('#health-box').catch(() => '');
 check('panel zdrowia pokazuje obciążenie', /Obciążenie/.test(healthTxt) && typeof st.burn === 'number',
   'burn ' + Math.round(st.burn || 0));
@@ -200,9 +207,10 @@ const hasMajor = (st.schedule || []).some(e => e.major);
 check('kalendarz ma RMR i Major', hasRmr && hasMajor, 'RMR ' + hasRmr + ', Major ' + hasMajor);
 
 // szatnia: rozmowa i rola
-await page.click('.nav-btn[data-view="team"]');
-const roleBox = await page.textContent('#role-box').catch(() => '');
-check('pasek roli w składzie', /Twoja rola/.test(roleBox), roleBox.replace(/\s+/g, ' ').slice(0, 60));
+await goto('team', 'squad');
+const roleBox = await page.textContent('#influence-box').catch(() => '');
+check('panel pozycji w składzie', /Twoja rola/.test(roleBox) && /Wpływ/.test(roleBox),
+  roleBox.replace(/\s+/g, ' ').slice(0, 70));
 const talkBtn = await page.$('[data-talk]:not([disabled])');
 if (talkBtn) {
   const bondBefore = await page.evaluate(() => (JSON.parse(localStorage.getItem('cs2-player-career-v1')).team.mates[0] || {}).bond);
@@ -217,16 +225,18 @@ if (talkBtn) {
 }
 
 // historia sceny i rekordy
-await page.click('.nav-btn[data-view="scene"]');
+await goto('scene', 'history');
 const histTxt = await page.textContent('#hist-body').catch(() => '');
 const recTxt = await page.textContent('#records-box').catch(() => '');
 check('archiwum sezonów się zapisuje', /#1/.test(histTxt), histTxt.replace(/\s+/g, ' ').slice(0, 60));
 check('rekordy kariery liczone', /Trofea|Trophies/.test(recTxt), recTxt.replace(/\s+/g, ' ').slice(0, 60));
 
 // rynek: sklep, portfel i sztab
-await page.click('.nav-btn[data-view="offers"]');
+await goto('offers', 'shop');
 const shopCount = await page.$$eval('#shop-list .shop-item', els => els.length).catch(() => 0);
+await goto('offers', 'funds');
 const fundCount = await page.$$eval('#fund-list .fund-row', els => els.length).catch(() => 0);
+await goto('offers', 'staff');
 const staffCands = await page.$$eval('#staff-market .shop-item', els => els.length).catch(() => 0);
 check('sklep ma pełną ofertę', shopCount >= 10, shopCount + ' pozycji');
 check('portfel ma trzy fundusze', fundCount === 3, fundCount + '');
@@ -239,11 +249,12 @@ await page.evaluate(() => {
 await page.reload();
 await page.waitForSelector('#game-screen:not(.hidden)');
 await drainOverlays();
-await page.click('.nav-btn[data-view="offers"]');
+await goto('offers', 'funds');
 await safeClick('[data-fund="deposit"]');
 const afterFund = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
 check('wpłata do funduszu działa', (afterFund.funds || {}).deposit > 0, JSON.stringify(afterFund.funds));
 // rozmowy ze sztabem: albo ktoś dołącza, albo odmawia — obie ścieżki muszą działać bez błędu
+await goto('offers', 'staff');
 let hires = 0, refusals = 0;
 for (let i = 0; i < 8; i++) {
   const free = await page.$$eval('[data-hire]:not([disabled])', els => els.length).catch(() => 0);
@@ -258,7 +269,7 @@ for (let i = 0; i < 8; i++) {
 check('rozmowy o sztab dają rozstrzygnięcie', hires + refusals > 0, hires + ' zatrudnień, ' + refusals + ' odmów');
 
 // wypożyczenie: prośba kończy się decyzją zarządu w obie strony
-await page.click('.nav-btn[data-view="team"]');
+await goto('team', 'squad');
 const loanBtn = await page.$('[data-loan]:not([disabled])');
 if (loanBtn) {
   await safeClick('[data-loan]');
@@ -267,7 +278,7 @@ if (loanBtn) {
 }
 const afterLoan = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
 // sponsorzy: agent i warunki umów
-await page.click('.nav-btn[data-view="offers"]');
+await goto('offers', 'deals');
 await safeClick('[data-agent]');
 const stAgent = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
 check('agent do zatrudnienia', typeof stAgent.agent === 'boolean', 'agent: ' + stAgent.agent);
@@ -278,7 +289,7 @@ check('prośba o wypożyczenie rozpatrzona', !!loanBtn && afterLoan.loanTry === 
   afterLoan.loan ? 'wypożyczony do ' + afterLoan.team.name : 'zarząd odmówił');
 
 // zapis i odczyt
-await page.click('.nav-btn[data-view="profile"]');
+await goto('profile', 'log');
 await page.click('#btn-export');
 const dump = await page.inputValue('#save-text');
 await page.click('#save-close');
@@ -290,7 +301,7 @@ const nickAfter = await page.textContent('#pc-nick');
 check('eksport i import zapisu', nickAfter.trim().toLowerCase() === 'żółw', nickAfter);
 
 // karta gracza i wykres
-await page.click('.nav-btn[data-view="profile"]');
+await goto('profile', 'card');
 const chartPoints = await page.$$eval('#rating-chart .chart-dot', els => els.length);
 if (c.seasons.length >= 2) {
   check('wykres ratingu ma punkty', chartPoints === c.seasons.length, chartPoints + ' punktów');
@@ -301,7 +312,7 @@ if (c.seasons.length >= 2) {
 check('karta gracza wyrenderowana', (await page.$$('#player-card .pcard')).length === 1);
 
 // drugi rozdział: emerytura i rola trenera
-await page.click('.nav-btn[data-view="profile"]');
+await goto('profile', 'log');
 await safeClick('#btn-retire');
 await safeClick('#modal-close');
 await page.waitForSelector('#choice-overlay:not(.hidden)', { timeout: 5000 }).catch(() => {});
@@ -323,7 +334,7 @@ check('ranking sztabu istnieje', Array.isArray(st2.staffWorld) && st2.staffWorld
   (st2.staffWorld || []).length + ' sztabowców');
 
 // definitywny koniec kariery pokazuje podsumowanie
-await page.click('.nav-btn[data-view="profile"]');
+await goto('profile', 'log');
 await safeClick('#btn-retire');
 await safeClick('#modal-close');
 await page.waitForSelector('#choice-overlay:not(.hidden)', { timeout: 4000 }).catch(() => {});

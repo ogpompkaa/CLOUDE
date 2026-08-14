@@ -15,7 +15,8 @@ Postęp zapisuje się automatycznie w `localStorage`; można go też wyeksportow
 z zakładki Profil.
 
 Interfejs jest dostępny po polsku i po angielsku (przełącznik na ekranie startowym) i zaprojektowany
-pod ekran telefonu, ale działa na każdej szerokości.
+pod ekran telefonu, ale działa na każdej szerokości. Każda zakładka dzieli się na **podzakładki**
+(np. Rynek na Sklep / Sztab / Portfel / Umowy), więc żaden widok nie jest dłuższy niż półtora ekranu.
 
 ## Droga na scenę
 

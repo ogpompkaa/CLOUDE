@@ -75,7 +75,10 @@
   h1 { font-size: 1.5rem; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.04em; }
   h2 { font-size: 1rem; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim);
        display: flex; align-items: center; gap: 7px; }
-  h3 { font-size: 0.8rem; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-dim); }
+  h3 { font-size: 0.8rem; margin: 18px 0 8px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-dim);
+       font-family: 'Rajdhani', sans-serif; font-weight: 700; }
+  .panel > h3:first-of-type, .overlay-box > h3:first-of-type { margin-top: 4px; }
+  .panel > .muted { margin-bottom: 12px; line-height: 1.5; }
   p { margin: 0; font-family: 'Inter', sans-serif; }
   .subtitle { color: var(--text-dim); margin: 0 0 16px; font-size: 0.9rem; line-height: 1.55; }
   .disclaimer { color: var(--text-faint); font-size: 0.72rem; margin: 0 0 18px; }
@@ -84,6 +87,7 @@
   .glass { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 2px;
     clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px)); }
   .panel { padding: 18px; margin: 0 16px 16px; }
+  .mt { margin-top: 12px; }
   .cut { clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
 
   .icon { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -0.15em; flex-shrink: 0; }
@@ -161,6 +165,15 @@
   .nav-btn.active .icon { filter: drop-shadow(0 0 6px var(--accent-glow)); }
   .nav-btn .dot { position: absolute; transform: translate(14px, -8px); width: 7px; height: 7px; background: var(--gold); border-radius: 50%; }
 
+  /* --- Podzakładki widoku --- */
+  .subnav { display: flex; gap: 4px; margin-bottom: 12px; background: var(--bg-panel); border: 1px solid var(--border);
+    padding: 4px; overflow-x: auto; scrollbar-width: none; }
+  .subnav::-webkit-scrollbar { display: none; }
+  .sub-btn { flex: 1 0 auto; background: none; border: 0; color: var(--text-dim); font-family: 'Rajdhani', sans-serif;
+    font-weight: 700; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 8px 12px;
+    clip-path: none; white-space: nowrap; }
+  .sub-btn.active { background: var(--bg-panel-2); color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+
   /* --- Player card --- */
   .pc-head { display: flex; align-items: center; gap: 14px; }
   .pc-avatar { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
@@ -234,8 +247,7 @@
   .plan-slot .x { color: var(--text-faint); font-size: 0.8rem; line-height: 1; }
   .plan-slot.free { border-style: dashed; border-color: var(--border); color: var(--text-faint); }
   .plan-presets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-  .plan-presets button { font-size: 0.64rem; padding: 5px 10px; background: var(--bg-panel);
-    border: 1px solid var(--border); color: var(--text-dim); font-family: 'Inter', sans-serif; font-weight: 700; }
+  .plan-presets button { font-size: 0.66rem; padding: 6px 11px; }
   .plan-opts { display: flex; flex-direction: column; gap: 7px; margin-bottom: 11px; }
   .plan-opt { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; color: var(--text-dim);
     font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; }
@@ -311,8 +323,10 @@
   .match-score { font-size: 2.1rem; line-height: 1; margin: 6px 0 4px; }
   .match-score .win { color: var(--good); } .match-score .loss { color: var(--danger); }
   .match-sub { font-size: 0.75rem; color: var(--text-dim); }
-  .map-line { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 5px 8px;
-    background: var(--bg-void); border: 1px solid var(--border); margin-bottom: 5px; font-family: 'Rajdhani', sans-serif; font-weight: 600; }
+  .map-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 0.78rem;
+    padding: 7px 11px; background: var(--bg-void); border: 1px solid var(--border); margin-bottom: 6px;
+    font-family: 'Rajdhani', sans-serif; font-weight: 600; }
+  .map-line > span:last-child { color: var(--text-dim); text-align: right; flex-shrink: 0; }
   .sb-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-top: 8px; font-family: 'Rajdhani', sans-serif; }
   .sb-table th { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em;
     padding: 4px; text-align: right; font-family: 'Inter', sans-serif; }
@@ -337,17 +351,22 @@
   .shop-item { display: flex; justify-content: space-between; align-items: center; gap: 10px;
     background: var(--bg-panel); border: 1px solid var(--border); padding: 11px 13px; margin-bottom: 9px;
     clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
+  .shop-item > div:first-child { min-width: 0; }
   .shop-item .si-name { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.88rem; text-transform: uppercase; }
   .shop-item .si-desc { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; line-height: 1.35; }
   .shop-item .si-upkeep { font-size: 0.64rem; color: var(--gold); margin-top: 3px; }
-  .shop-item button { flex-shrink: 0; padding: 9px 12px; font-size: 0.74rem; white-space: nowrap; }
+  .shop-item button, .si-btns button, .mate-acts button, .plan-presets button {
+    flex-shrink: 0; padding: 8px 12px; font-size: 0.72rem; white-space: nowrap;
+    font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+    background: var(--bg-panel-2); border: 1px solid var(--border-strong); color: var(--text); }
+  .shop-item button:disabled, .si-btns button:disabled, .mate-acts button:disabled { color: var(--text-faint); border-color: var(--border); }
   .shop-item button.owned { background: rgba(41,255,176,0.12); border-color: var(--good); color: var(--good); }
-  .shop-item .si-btns { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
-  .si-vision { font-size: 0.66rem; color: var(--text-dim); font-style: italic; margin-top: 4px; line-height: 1.35; }
-  .si-vision.fits { color: var(--good); font-style: normal; }
+  .shop-item .si-btns { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; align-items: stretch; }
+  .si-vision { font-size: 0.66rem; margin-top: 4px; line-height: 1.35; font-family: 'Inter', sans-serif; }
+  .si-vision.fits { color: var(--good); }
   .si-vision.warn { color: var(--danger); }
   .si-q { display: flex; align-items: center; gap: 7px; margin-top: 5px; }
-  .si-q .bar-track { flex: 1; max-width: 120px; }
+  .si-q .bar-track { flex: 1; max-width: 90px; height: 5px; }
   .si-q .q-val { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.74rem; }
   .fund-row .si-btns button { font-size: 0.68rem; padding: 7px 10px; }
 
@@ -362,15 +381,16 @@
 
   #save-text { width: 100%; height: 150px; background: var(--bg-void); color: var(--text-dim);
     border: 1px solid var(--border-strong); padding: 10px; font-family: monospace; font-size: 0.68rem; resize: vertical; }
-  .goal-box { background: var(--bg-void); border: 1px solid var(--border); border-left: 3px solid var(--gold);
-    padding: 10px 12px; margin-bottom: 12px; }
-  .goal-box .g-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.8rem;
+  .goal-box { background: var(--bg-panel); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+    padding: 12px 13px; margin-bottom: 12px; }
+  .goal-box .g-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.86rem;
     text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold); }
   .goal-box .g-desc { font-size: 0.76rem; color: var(--text-dim); margin-top: 3px; }
-  .nem-box { background: var(--bg-void); border: 1px solid var(--danger); padding: 11px 13px; margin-bottom: 12px; }
-  .nem-box .n-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.82rem;
-    text-transform: uppercase; letter-spacing: 0.05em; color: #ff8098; }
-  .nem-box .n-desc { font-size: 0.76rem; color: var(--text-dim); margin-top: 3px; }
+  .nem-box { background: var(--bg-panel); border: 1px solid var(--border); border-left: 3px solid var(--danger);
+    padding: 12px 13px; margin-bottom: 12px; }
+  .nem-box .n-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.86rem;
+    text-transform: uppercase; letter-spacing: 0.03em; color: #ff8098; }
+  .nem-box .n-desc { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; font-family: 'Inter', sans-serif; }
 
   /* --- Mecz na żywo --- */
   #lv-score { font-size: 2.4rem; text-align: center; margin: 6px 0 2px; font-family: 'Rajdhani', sans-serif; font-weight: 700; }
@@ -404,9 +424,20 @@
   .match-row .mr-rating { font-family: 'Rajdhani', sans-serif; font-weight: 700; }
 
   .mate-acts { display: flex; gap: 6px; margin-top: 7px; }
-  .mate-acts button { font-size: 0.62rem; padding: 4px 9px; background: var(--bg-panel-2);
-    border: 1px solid var(--border); color: var(--text-dim); font-family: 'Inter', sans-serif; font-weight: 700;
-    text-transform: none; letter-spacing: normal; }
+  .mate-acts button { font-size: 0.66rem; padding: 5px 10px; }
+  .pos-box { background: var(--bg-panel); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    padding: 12px 13px; margin-bottom: 12px; }
+  .pos-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .pos-role { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.86rem; text-transform: uppercase;
+    letter-spacing: 0.03em; color: var(--accent); }
+  .pos-cap { font-size: 0.66rem; color: var(--text-dim); font-family: 'Inter', sans-serif; }
+  .pos-note { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; line-height: 1.4; font-family: 'Inter', sans-serif; }
+  .pos-note.warn { color: var(--danger); }
+  .pos-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .pos-actions button { flex: 1 1 auto; padding: 8px 10px; font-size: 0.68rem; font-family: 'Rajdhani', sans-serif;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; background: var(--bg-panel-2);
+    border: 1px solid var(--border-strong); color: var(--text); }
+  .pos-actions button:disabled { color: var(--text-faint); border-color: var(--border); }
   .infl-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 10px; }
 
   .help-sec { margin-bottom: 14px; }
@@ -525,9 +556,10 @@
       </section>
 
       <section id="view-train" class="view hidden">
-        <div class="glass panel">
+        <div class="subnav" id="sub-train"><button class="sub-btn active" data-sub="plan"><span data-i18n="sub.plan">Plan</span></button><button class="sub-btn" data-sub="form"><span data-i18n="sub.form">Forma</span></button></div>
+        <div class="glass panel" data-panel="plan">
           <h2><svg class="icon"><use href="#i-bolt"></use></svg> <span data-i18n="train.plan">Plan tygodnia</span></h2>
-          <p class="muted" data-i18n="train.planHint" style="margin-bottom:10px;">Plan wykonuje się sam na początku każdego tygodnia. Zmienisz go, kiedy chcesz — zostaje do odwołania.</p>
+          <p class="muted" data-i18n="train.planHint">Plan wykonuje się sam na początku każdego tygodnia. Zmienisz go, kiedy chcesz — zostaje do odwołania.</p>
           <div class="plan-slots" id="plan-slots"></div>
           <div class="plan-presets" id="plan-presets"></div>
           <div class="plan-opts">
@@ -535,112 +567,115 @@
             <label class="plan-opt"><input type="checkbox" id="opt-smart"><span data-i18n="train.optSmart">Zamień trening na odpoczynek, gdy jestem wyczerpany</span></label>
           </div>
           <button class="full" id="btn-run-plan" style="margin-bottom:12px;"><svg class="icon"><use href="#i-swap"></use></svg> <span id="run-plan-label">Wykonaj plan teraz</span></button>
-          <p class="muted" data-i18n="train.planInfo" style="margin-bottom:12px;">Każda akcja kosztuje energię. Energia odnawia się co tydzień, ale kondycja i psychika zostają — przetrenowanie zniszczy Ci formę.</p>
+          <p class="muted" data-i18n="train.planInfo">Każda akcja kosztuje energię. Energia odnawia się co tydzień, ale kondycja i psychika zostają — przetrenowanie zniszczy Ci formę.</p>
           <div class="action-grid" id="action-grid"></div>
         </div>
-        <div class="glass panel">
+        <div class="glass panel" data-panel="form">
           <h2><svg class="icon"><use href="#i-chart"></use></svg> <span data-i18n="train.skills">Umiejętności</span></h2>
           <div class="stat-list" id="stat-list"></div>
         </div>
-        <div class="glass panel" id="health-panel">
+        <div class="glass panel" id="health-panel" data-panel="form">
           <h2><svg class="icon"><use href="#i-heart"></use></svg> <span data-i18n="health.title">Zdrowie</span></h2>
-          <p class="muted" data-i18n="health.info" style="margin-bottom:12px;">Obciążenie rośnie od treningów i meczów, spada od odpoczynku, psychologa i spokojnego mieszkania. Przy maksimum organizm sam robi sobie przerwę.</p>
+          <p class="muted" data-i18n="health.info">Obciążenie rośnie od treningów i meczów, spada od odpoczynku, psychologa i spokojnego mieszkania. Przy maksimum organizm sam robi sobie przerwę.</p>
           <div id="health-box"></div>
         </div>
       </section>
 
       <section id="view-team" class="view hidden">
-        <div class="glass panel" id="team-panel">
+        <div class="subnav" id="sub-team"><button class="sub-btn active" data-sub="squad"><span data-i18n="sub.squad">Skład</span></button><button class="sub-btn" data-sub="league"><span data-i18n="sub.league">Liga</span></button></div>
+        <div class="glass panel" id="team-panel" data-panel="squad">
           <h2><svg class="icon"><use href="#i-users"></use></svg> <span id="team-title"></span></h2>
           <div id="team-info" class="muted" style="margin-bottom:12px;"></div>
           <div id="nemesis-box"></div>
-          <div id="role-box"></div>
           <div id="influence-box"></div>
           <div id="mates-list"></div>
         </div>
-        <div class="glass panel" id="league-panel">
+        <div class="glass panel" id="league-panel" data-panel="league">
           <h2><svg class="icon"><use href="#i-globe"></use></svg> <span data-i18n="team.table">Tabela ligi</span></h2>
           <table class="standings-table"><tbody id="standings-body"></tbody></table>
         </div>
       </section>
 
       <section id="view-scene" class="view hidden">
-        <div class="glass panel">
+        <div class="subnav" id="sub-scene"><button class="sub-btn active" data-sub="feed"><span data-i18n="sub.feed">Newsy</span></button><button class="sub-btn" data-sub="players"><span data-i18n="sub.players">Gracze</span></button><button class="sub-btn" data-sub="clubs"><span data-i18n="sub.clubs">Kluby</span></button><button class="sub-btn" data-sub="history"><span data-i18n="sub.history">Historia</span></button></div>
+        <div class="glass panel" data-panel="feed">
           <h2><svg class="icon"><use href="#i-globe"></use></svg> <span data-i18n="scene.news">Ze sceny</span></h2>
-          <p class="muted" data-i18n="scene.newsInfo" style="margin-bottom:12px;">Transfery, wyniki i ruchy w rankingu z całego świata — także te, które dotyczą Ciebie.</p>
+          <p class="muted" data-i18n="scene.newsInfo">Transfery, wyniki i ruchy w rankingu z całego świata — także te, które dotyczą Ciebie.</p>
           <div id="news-list"></div>
         </div>
-        <div class="glass panel">
+        <div class="glass panel" data-panel="players">
           <h2><svg class="icon"><use href="#i-chart"></use></svg> <span data-i18n="team.top20">Top 20 zawodników świata</span></h2>
-          <p class="muted" data-i18n="team.top20info" style="margin-bottom:10px;">Ranking aktualizuje się po każdym sezonie. Liczy się rating, poziom drużyny, trofea i rozpoznawalność.</p>
+          <p class="muted" data-i18n="team.top20info">Ranking aktualizuje się po każdym sezonie. Liczy się rating, poziom drużyny, trofea i rozpoznawalność.</p>
           <table class="rank-table"><tbody id="world-body"></tbody></table>
         </div>
-        <div class="glass panel">
+        <div class="glass panel" data-panel="history">
           <h2><svg class="icon"><use href="#i-doc"></use></svg> <span data-i18n="hist.title">Historia sceny</span></h2>
-          <p class="muted" data-i18n="hist.info" style="margin-bottom:10px;">Kto rządził światem w kolejnych sezonach i gdzie w tym byłeś Ty.</p>
+          <p class="muted" data-i18n="hist.info">Kto rządził światem w kolejnych sezonach i gdzie w tym byłeś Ty.</p>
           <table class="standings-table"><tbody id="hist-body"></tbody></table>
-          <h3 style="margin-top:16px;" data-i18n="hist.records">Rekordy kariery</h3>
+          <h3 data-i18n="hist.records">Rekordy kariery</h3>
           <div id="records-box"></div>
         </div>
-        <div class="glass panel" id="clubs-panel">
+        <div class="glass panel" id="clubs-panel" data-panel="clubs">
           <h2><svg class="icon"><use href="#i-medal"></use></svg> <span data-i18n="scene.clubs">Ranking organizacji</span></h2>
-          <p class="muted" data-i18n="scene.clubsInfo" style="margin-bottom:10px;">Kluby budują składy, wygrywają turnieje i spadają. Twoja organizacja jest podświetlona.</p>
+          <p class="muted" data-i18n="scene.clubsInfo">Kluby budują składy, wygrywają turnieje i spadają. Twoja organizacja jest podświetlona.</p>
           <table class="rank-table"><tbody id="clubs-body"></tbody></table>
         </div>
       </section>
 
       <section id="view-offers" class="view hidden">
-        <div class="glass panel">
+        <div class="subnav" id="sub-offers"><button class="sub-btn active" data-sub="shop"><span data-i18n="sub.shop">Sklep</span></button><button class="sub-btn" data-sub="staff"><span data-i18n="sub.staff">Sztab</span></button><button class="sub-btn" data-sub="funds"><span data-i18n="sub.funds">Portfel</span></button><button class="sub-btn" data-sub="deals"><span data-i18n="sub.deals">Umowy</span></button></div>
+        <div class="glass panel" data-panel="shop">
           <h2><svg class="icon"><use href="#i-coin"></use></svg> <span data-i18n="market.shop">Inwestycje w karierę</span></h2>
           <div id="shop-list"></div>
-          <div id="wallet-box" class="muted" style="margin-top:10px;"></div>
+          <div id="wallet-box" class="muted mt"></div>
         </div>
-        <div class="glass panel">
+        <div class="glass panel" data-panel="funds">
           <h2><svg class="icon"><use href="#i-coin"></use></svg> <span data-i18n="market.funds">Portfel inwestycyjny</span></h2>
-          <p class="muted" data-i18n="market.fundsInfo" style="margin-bottom:12px;">Odsetki naliczają się co tydzień. Im wyższy zwrot, tym większe ryzyko — krypto potrafi zjeść wpłatę.</p>
+          <p class="muted" data-i18n="market.fundsInfo">Odsetki naliczają się co tydzień. Im wyższy zwrot, tym większe ryzyko — krypto potrafi zjeść wpłatę.</p>
           <div id="fund-list"></div>
-          <div id="fund-summary" class="muted" style="margin-top:10px;"></div>
+          <div id="fund-summary" class="muted mt"></div>
         </div>
-        <div class="glass panel" id="staff-panel">
+        <div class="glass panel" id="staff-panel" data-panel="staff">
           <h2><svg class="icon"><use href="#i-users"></use></svg> <span data-i18n="market.staff">Twój sztab</span></h2>
-          <p class="muted" data-i18n="market.staffInfo" style="margin-bottom:12px;">Fachowcy pracują dla Ciebie prywatnie, nie dla klubu. Każdy ma swoją jakość, stawkę i wizję współpracy — jeśli nie pasujesz do jego planu, odmówi.</p>
+          <p class="muted" data-i18n="market.staffInfo">Fachowcy pracują dla Ciebie prywatnie, nie dla klubu. Każdy ma swoją jakość, stawkę i wizję współpracy — jeśli nie pasujesz do jego planu, odmówi.</p>
           <div id="staff-hired"></div>
-          <h3 style="margin-top:16px;" data-i18n="market.staffMarket">Dostępni kandydaci</h3>
+          <h3 data-i18n="market.staffMarket">Dostępni kandydaci</h3>
           <div id="staff-market"></div>
-          <button class="full" id="btn-scout-staff" style="margin-top:10px;"><svg class="icon"><use href="#i-search"></use></svg> <span id="scout-label">Poszukaj nowych kandydatów</span></button>
+          <button class="full mt" id="btn-scout-staff"><svg class="icon"><use href="#i-search"></use></svg> <span id="scout-label">Poszukaj nowych kandydatów</span></button>
         </div>
-        <div class="glass panel">
+        <div class="glass panel" data-panel="deals">
           <h2><svg class="icon"><use href="#i-swap"></use></svg> <span data-i18n="market.offers">Oferty transferowe</span></h2>
-          <p class="muted" data-i18n="market.offersInfo" style="margin-bottom:12px;">Oferty pojawiają się, gdy grasz dobrze i masz rozpoznawalność. Wygasają po kilku tygodniach.</p>
+          <p class="muted" data-i18n="market.offersInfo">Przychodzą za wyniki i hype. Wygasają po kilku tygodniach.</p>
           <div id="offers-list"></div>
         </div>
-        <div class="glass panel">
+        <div class="glass panel" data-panel="deals">
           <h2><svg class="icon"><use href="#i-briefcase"></use></svg> <span data-i18n="market.sponsors">Sponsorzy</span></h2>
           <div id="sponsors-list"></div>
         </div>
       </section>
 
       <section id="view-profile" class="view hidden">
-        <div class="glass panel">
+        <div class="subnav" id="sub-profile"><button class="sub-btn active" data-sub="card"><span data-i18n="sub.card">Karta</span></button><button class="sub-btn" data-sub="stats"><span data-i18n="sub.stats">Statystyki</span></button><button class="sub-btn" data-sub="log"><span data-i18n="sub.log">Dziennik</span></button></div>
+        <div class="glass panel" data-panel="card">
           <h2><svg class="icon"><use href="#i-user"></use></svg> <span data-i18n="profile.card">Karta zawodnika</span></h2>
           <div id="player-card"></div>
-          <h3 style="margin-top:18px;" data-i18n="profile.chart">Rating w kolejnych sezonach</h3>
+          <h3 data-i18n="profile.chart">Rating w kolejnych sezonach</h3>
           <div id="rating-chart"></div>
-          <h3 style="margin-top:18px;" data-i18n="profile.recent">Ostatnie mecze</h3>
+          <h3 data-i18n="profile.recent">Ostatnie mecze</h3>
           <div id="recent-matches"></div>
         </div>
-        <div class="glass panel">
+        <div class="glass panel" data-panel="stats">
           <h2><svg class="icon"><use href="#i-medal"></use></svg> <span data-i18n="profile.ach">Osiągnięcia</span></h2>
           <div id="ach-grid"></div>
         </div>
-        <div class="glass panel">
+        <div class="glass panel" data-panel="stats">
           <h2><svg class="icon"><use href="#i-trophy"></use></svg> <span data-i18n="profile.stats">Statystyki kariery</span></h2>
           <div id="career-stats"></div>
         </div>
-        <div class="glass panel">
+        <div class="glass panel" data-panel="log">
           <h2><svg class="icon"><use href="#i-doc"></use></svg> <span data-i18n="profile.log">Dziennik</span></h2>
           <div id="log-feed"></div>
-          <button class="full" id="btn-help2" style="margin-top:16px;"><svg class="icon"><use href="#i-doc"></use></svg> <span data-i18n="profile.help">Jak grać — pomoc i słownik pojęć</span></button>
+          <button class="full mt" id="btn-help2"><svg class="icon"><use href="#i-doc"></use></svg> <span data-i18n="profile.help">Jak grać — pomoc i słownik pojęć</span></button>
           <button class="full" id="btn-fast" style="margin-top:10px;"></button>
           <div style="display:flex; gap:10px; margin-top:10px;">
             <button class="secondary full" id="btn-export" data-i18n="profile.export">Eksportuj zapis</button>
@@ -769,9 +804,9 @@
     <h2 style="justify-content:center; color:var(--gold); font-size:1.25rem;" id="lg-title"></h2>
     <p class="muted" style="text-align:center;" id="lg-verdict"></p>
     <div class="kv-grid" id="lg-stats" style="margin-top:14px;"></div>
-    <h3 style="margin-top:18px;" data-i18n="lg.moments">Momenty kariery</h3>
+    <h3 data-i18n="lg.moments">Momenty kariery</h3>
     <div id="lg-timeline"></div>
-    <h3 style="margin-top:16px;" data-i18n="lg.place">Miejsce w historii sceny</h3>
+    <h3 data-i18n="lg.place">Miejsce w historii sceny</h3>
     <div id="lg-place"></div>
     <button class="full primary" id="lg-close" style="margin-top:16px;">OK</button>
   </div>
@@ -820,12 +855,25 @@
     "nav.train": ["Trening", "Training"],
     "nav.team": ["Drużyna", "Team"],
     "nav.scene": ["Scena", "Scene"],
+    "sub.plan": ["Plan", "Plan"],
+    "sub.form": ["Forma", "Shape"],
+    "sub.squad": ["Skład", "Squad"],
+    "sub.league": ["Liga", "League"],
+    "sub.feed": ["Newsy", "News"],
+    "sub.players": ["Gracze", "Players"],
+    "sub.clubs": ["Kluby", "Clubs"],
+    "sub.history": ["Historia", "History"],
+    "sub.shop": ["Sklep", "Shop"],
+    "sub.staff": ["Sztab", "Staff"],
+    "sub.funds": ["Portfel", "Wallet"],
+    "sub.deals": ["Umowy", "Deals"],
+    "sub.card": ["Karta", "Card"],
+    "sub.stats": ["Statystyki", "Stats"],
+    "sub.log": ["Dziennik", "Log"],
     "scene.news": ["Ze sceny", "From the scene"],
-    "scene.newsInfo": ["Transfery, wyniki i ruchy w rankingu z całego świata — także te, które dotyczą Ciebie.",
-      "Transfers, results and ranking moves from around the world — including the ones about you."],
+    "scene.newsInfo": ["Transfery, wyniki i ruchy w rankingu z całego świata.", "Transfers, results and ranking moves from around the world."],
     "scene.clubs": ["Ranking organizacji", "Organisation ranking"],
-    "scene.clubsInfo": ["Kluby budują składy, wygrywają turnieje i spadają. Twoja organizacja jest podświetlona.",
-      "Clubs build rosters, win trophies and fall away. Your organisation is highlighted."],
+    "scene.clubsInfo": ["Twoja organizacja jest podświetlona.", "Your organisation is highlighted."],
     "scene.empty": ["Cisza na scenie. Zagraj kilka tygodni.", "The scene is quiet. Play a few weeks."],
     "news.transfer": ["{nick} zmienia barwy: {from} → {to}.", "{nick} switches colours: {from} → {to}."],
     "news.win": ["{team} wygrywa {event}.", "{team} takes {event}."],
@@ -866,8 +914,8 @@
     "train.slotFree": ["wolne", "free"],
     "train.addToPlan": ["+ do planu", "+ to plan"],
     "train.planFull": ["plan pełny", "plan full"],
-    "train.planHint": ["Plan wykonuje się sam na początku każdego tygodnia. Zmienisz go, kiedy chcesz — zostaje do odwołania.",
-      "The plan runs itself at the start of every week. Change it whenever you like — it sticks until you do."],
+    "train.planHint": ["Wykonuje się sam na starcie tygodnia i zostaje do odwołania.",
+      "It runs itself at the start of the week and sticks until you change it."],
     "preset.role": ["Pod rolę", "Role focus"],
     "preset.balance": ["Zrównoważony", "Balanced"],
     "preset.fame": ["Kasa i hype", "Money and hype"],
@@ -885,8 +933,8 @@
     "stat.audience": ["Widownia (skala)", "Audience (scale)"],
     "team.table": ["Tabela ligi", "League table"],
     "team.top20": ["Top 20 zawodników świata", "World top 20 players"],
-    "team.top20info": ["Ranking aktualizuje się po każdym sezonie. Liczy się rating, poziom drużyny, trofea i rozpoznawalność.",
-      "The ranking updates after every season. Rating, team level, trophies and fame all count."],
+    "team.top20info": ["Liczy się rating, poziom drużyny, trofea i rozpoznawalność.",
+      "Rating, team level, trophies and fame all count."],
     "team.info": ["{tier} · chemia składu {chem}% · kontrakt: {years} sez. · siła drużyny {str}",
       "{tier} · chemistry {chem}% · contract: {years} seasons · team strength {str}"],
     "team.you": ["(Ty)", "(You)"],
@@ -901,8 +949,8 @@
     "team.years": ["{n} lat", "age {n}"],
     "market.shop": ["Inwestycje w karierę", "Career investments"],
     "market.offers": ["Oferty transferowe", "Transfer offers"],
-    "market.offersInfo": ["Oferty pojawiają się, gdy grasz dobrze i masz rozpoznawalność. Wygasają po kilku tygodniach.",
-      "Offers show up when you play well and have a name. They expire after a few weeks."],
+    "market.offersInfo": ["Przychodzą za wyniki i hype. Wygasają po kilku tygodniach.",
+      "They follow results and hype. They expire after a few weeks."],
     "market.noOffers": ["Brak ofert. Graj lepiej niż oczekuje Twój tier i buduj hype — telefon zadzwoni.",
       "No offers. Play above your tier and build hype — the phone will ring."],
     "market.sponsors": ["Sponsorzy", "Sponsors"],
@@ -1011,8 +1059,7 @@
     "lg.eraNone": ["scena bez wyraźnego króla", "a scene with no clear king"],
     "lg.hofPlace": ["Miejsce w Hall of Fame", "Hall of Fame position"],
     "hist.title": ["Historia sceny", "Scene history"],
-    "hist.info": ["Kto rządził światem w kolejnych sezonach i gdzie w tym byłeś Ty.",
-      "Who ruled the world season by season — and where you stood in it."],
+    "hist.info": ["Kto rządził światem i gdzie w tym byłeś Ty.", "Who ruled the world — and where you stood."],
     "hist.empty": ["Historia zacznie się po pierwszym sezonie.", "History starts after your first season."],
     "hist.no1": ["#1 świata: {nick}", "World #1: {nick}"],
     "hist.line": ["Najmocniejsza organizacja: {club} · Major: {major}",
@@ -1072,8 +1119,8 @@
     "log.roleChange": ["Zmiana roli w składzie: {role}.", "Role change: {role}."],
     "chr.roleChange": ["Przekwalifikowanie na rolę: {role}.", "Switched role: {role}."],
     "health.title": ["Zdrowie", "Health"],
-    "health.info": ["Obciążenie rośnie od treningów i meczów, spada od odpoczynku, psychologa i spokojnego mieszkania. Przy maksimum organizm sam robi sobie przerwę.",
-      "Load builds from training and matches and falls with rest, a psychologist and a calm home. At the top your body takes the break for you."],
+    "health.info": ["Rośnie od pracy, spada od regeneracji. Na maksimum organizm sam bierze przerwę.",
+      "It builds from work and falls with recovery. At the top your body takes the break for you."],
     "health.load": ["Obciążenie", "Load"],
     "health.burnLow": ["świeży", "fresh"],
     "health.burnMid": ["zmęczony", "worn"],
@@ -1249,6 +1296,9 @@
     "infl.line": ["Przywództwo {lead} · wpływ {score}%", "Leadership {lead} · influence {score}%"],
     "infl.isCap": [" · prowadzisz zespół", " · you lead the team"],
     "infl.notCap": [" · nie jesteś jeszcze kapitanem", " · not captain yet"],
+    "infl.isCapShort": ["jesteś kapitanem", "you are the captain"],
+    "infl.notCapShort": ["nie jesteś kapitanem", "not the captain"],
+    "infl.short": ["Wpływ", "Influence"],
     "infl.captainBtn": ["Walcz o kapitana", "Fight for the captaincy"],
     "infl.captainCost": ["Raz na sezon", "Once a season"],
     "infl.transferBtn": ["Poproś o transfer", "Request a transfer"],
@@ -1270,8 +1320,7 @@
     "shop.walletLine": ["Portfel inwestycyjny: {wallet} · koszty utrzymania: {upkeep}/tydz.",
       "Investment wallet: {wallet} · upkeep: {upkeep}/wk"],
     "market.funds": ["Portfel inwestycyjny", "Investment portfolio"],
-    "market.fundsInfo": ["Odsetki naliczają się co tydzień. Im wyższy zwrot, tym większe ryzyko — krypto potrafi zjeść wpłatę.",
-      "Interest accrues weekly. The higher the return, the higher the risk — crypto can eat your deposit."],
+    "market.fundsInfo": ["Odsetki co tydzień. Wyższy zwrot to większe ryzyko.", "Interest weekly. Higher returns, higher risk."],
     "fund.balance": ["Ulokowane: {amount}", "Invested: {amount}"],
     "fund.withdraw": ["Wypłać", "Withdraw"],
     "fund.summary": ["Razem w portfelu: {total} · zmiana w tym tygodniu: {change}",
@@ -1283,8 +1332,8 @@
       "Team bootcamp — the squad comes back tight and charged up."],
     // rynek sztabu
     "market.staff": ["Twój sztab", "Your staff"],
-    "market.staffInfo": ["Fachowcy pracują dla Ciebie prywatnie, nie dla klubu. Każdy ma swoją jakość, stawkę i wizję współpracy — jeśli nie pasujesz do jego planu, odmówi.",
-      "These people work for you privately, not for the club. Each has a quality level, a rate and a vision of the job — if you do not fit their plan, they turn you down."],
+    "market.staffInfo": ["Pracują prywatnie dla Ciebie. Każdy ma klasę, stawkę i wizję współpracy — może odmówić.",
+      "They work for you privately. Each has a quality level, a rate and a vision of the job — and can say no."],
     "market.staffMarket": ["Dostępni kandydaci", "Available candidates"],
     "staff.none": ["Nikogo jeszcze nie zatrudniłeś.", "You have not hired anyone yet."],
     "staff.quality": ["Klasa", "Quality"],
@@ -1298,7 +1347,7 @@
       "A higher rate ({amount}/wk) improves your odds a lot."],
     "staff.taken": ["Masz już", "Already have"],
     "staff.fire": ["Zwolnij", "Dismiss"],
-    "staff.scout": ["Poszukaj nowych kandydatów ({amount})", "Scout new candidates ({amount})"],
+    "staff.scout": ["Szukaj kandydatów · {amount}", "Scout candidates · {amount}"],
     "staff.fitsOk": ["✓ pasujesz do tej wizji", "✓ you fit this vision"],
     "staff.fitsNo": ["✗ nie pasujesz — spodziewaj się odmowy", "✗ you do not fit — expect a no"],
     "staff.vision": ["Jego wizja", "Their vision"],
@@ -6082,8 +6131,8 @@
 
   function renderHealth() {
     const panel = document.getElementById("health-panel");
-    panel.classList.toggle("hidden", inPhase2());
-    if (inPhase2()) return;
+    if (inPhase2()) { panel.classList.add("hidden"); return; }
+    panel.classList.toggle("hidden", subView.train !== "form");
     const b = Math.round(state.burn || 0);
     let html = '<div class="stat-row"><div class="stat-name">' + esc(TR("health.load")) + " · " + esc(burnLabel()) + "</div>" +
       '<div class="bar-track"><div class="bar-fill" style="width:' + b + "%; background:" + barColor(100 - b) + '"></div></div>' +
@@ -6102,8 +6151,8 @@
 
   function renderTeam() {
     const noTeam = inPhase2() && !phaseDef().hasTeam;
-    document.getElementById("team-panel").classList.toggle("hidden", noTeam);
-    document.getElementById("league-panel").classList.toggle("hidden", noTeam);
+    document.getElementById("team-panel").classList.toggle("hidden", noTeam || subView.team !== "squad");
+    document.getElementById("league-panel").classList.toggle("hidden", noTeam || subView.team !== "league");
     if (noTeam) return;
     document.getElementById("team-title").textContent = state.team.name;
     const nemHtml = state.nemesis && !inPhase2()
@@ -6116,14 +6165,6 @@
       tier: tx(tier(state.team.tier).name), chem: Math.round(state.team.chem),
       years: state.team.contract, str: Math.round(teamStrength()) });
     const rival = inPhase2() ? null : roleRival();
-    document.getElementById("role-box").innerHTML = inPhase2() ? "" :
-      '<div class="goal-box" style="border-left-color:' + (rival ? "var(--danger)" : "var(--border-strong)") + '">' +
-      '<div class="g-title">' + esc(TR("role.boxTitle", { role: tx(role().name) })) + "</div>" +
-      '<div class="g-desc">' + esc(rival ? TR("role.pressure", { nick: rival.nick, skill: Math.round(rival.skill) })
-        : TR("role.safe")) + "</div>" +
-      '<div class="infl-actions"><button class="act" data-rolechange="1"' +
-      (state.roleChange === state.season ? " disabled" : "") + '><span class="a-title">' + icon("swap") + " " +
-      esc(TR("role.changeBtn")) + '</span><span class="a-desc">' + esc(TR("role.changeCost")) + "</span></button></div></div>";
     const mates = [{ nick: state.nick, skill: Math.round(playerPower()), role: state.role, age: state.age, me: true }]
       .concat(state.team.mates.map(m => ({ nick: m.nick, skill: Math.round(m.skill), role: m.role, age: m.age,
         traits: m.traits || [], bond: m.bond || 0 })));
@@ -6205,8 +6246,10 @@
   function renderStaff() {
     // w drugim rozdziale sam jesteś sztabem — rynek fachowców znika
     const panel = document.getElementById("staff-panel");
-    panel.classList.toggle("hidden", inPhase2());
-    if (inPhase2()) return;
+    const navStaff = document.querySelector('#sub-offers [data-sub="staff"]');
+    if (navStaff) navStaff.classList.toggle("hidden", inPhase2());
+    if (inPhase2()) { panel.classList.add("hidden"); return; }
+    panel.classList.toggle("hidden", subView.offers !== "staff");
     const hired = Object.keys(state.staff || {});
     document.getElementById("staff-hired").innerHTML = hired.length
       ? hired.map(k => staffRow(k, state.staff[k])).join("")
@@ -6224,9 +6267,8 @@
         " · " + esc(TR("staff.feeShort", { amount: money(c.fee) })) + "</div>" +
         '<div class="si-q"><span class="q-val">' + esc(TR("staff.quality")) + " " + c.q + "</span>" +
         '<div class="bar-track"><div class="bar-fill" style="width:' + c.q + "%; background:" + barColor(c.q) + '"></div></div></div>' +
-        '<div class="si-vision">„' + esc(tx(vis.text)) + '"</div>' +
-        '<div class="si-vision ' + (fits ? "fits" : "warn") + '">' +
-        esc(TR(fits ? "staff.fitsOk" : "staff.fitsNo")) + "</div></div>" +
+        '<div class="si-vision ' + (fits ? "fits" : "warn") + '">' + (fits ? "✓ " : "✗ ") +
+        esc(tx(vis.text)) + "</div></div>" +
         '<div class="si-btns">' +
         '<button data-hire="' + i + '"' + (have || state.money < c.fee ? " disabled" : "") + ">" +
         esc(TR(have ? "staff.taken" : "staff.hire")) + "</button>" +
@@ -6422,25 +6464,28 @@
   }
 
   function renderInfluence() {
-    if (inPhase2()) { document.getElementById("influence-box").innerHTML = ""; return; }
+    const box = document.getElementById("influence-box");
+    if (inPhase2()) { box.innerHTML = ""; return; }
     const sc = Math.round(influenceScore());
-    document.getElementById("influence-box").innerHTML =
-      '<div class="goal-box" style="border-left-color: var(--accent);">' +
-      '<div class="g-title" style="color:var(--accent)">' + esc(TR(state.captain ? "infl.titleCap" : "infl.title")) + "</div>" +
-      '<div class="g-desc">' + esc(TR("infl.line", { lead: Math.round(state.lead), score: sc })) +
-      esc(TR(state.captain ? "infl.isCap" : "infl.notCap")) + "</div>" +
-      '<div class="bar-track" style="margin-top:8px"><div class="bar-fill" style="width:' + sc + "%; background:" + barColor(sc) + '"></div></div>' +
-      '<div class="infl-actions">' +
-      (state.captain ? "" : '<button class="act" data-captain="1"' + (state.captainTry === state.season ? " disabled" : "") +
-        '><span class="a-title">' + icon("star") + " " + esc(TR("infl.captainBtn")) + '</span><span class="a-cost">' + esc(TR("infl.captainCost")) + "</span></button>") +
-      '<button class="act" data-transfer="1"' + (state.transferTry === state.season ? " disabled" : "") +
-      '><span class="a-title">' + icon("swap") + " " + esc(TR("infl.transferBtn")) + '</span><span class="a-cost">' + esc(TR("infl.transferCost")) + "</span></button>" +
-      (state.loan ? "" : '<button class="act" data-loan="1"' + (state.loanTry === state.season ? " disabled" : "") +
-        '><span class="a-title">' + icon("briefcase") + " " + esc(TR("infl.loanBtn")) + '</span><span class="a-desc">' +
-        esc(TR("infl.loanDesc")) + '</span><span class="a-cost">' + esc(TR("infl.transferCost")) + "</span></button>") +
+    const rival = roleRival();
+    const btn = (attr, disabled, label) =>
+      '<button data-' + attr + '="1"' + (disabled ? " disabled" : "") + ">" + esc(label) + "</button>";
+    box.innerHTML =
+      '<div class="pos-box">' +
+      '<div class="pos-head"><span class="pos-role">' + esc(TR("role.boxTitle", { role: tx(role().name) })) + "</span>" +
+      '<span class="pos-cap">' + esc(TR(state.captain ? "infl.isCapShort" : "infl.notCapShort")) + "</span></div>" +
+      '<div class="pos-note' + (rival ? " warn" : "") + '">' +
+      esc(rival ? TR("role.pressure", { nick: rival.nick, skill: Math.round(rival.skill) }) : TR("role.safe")) + "</div>" +
+      '<div class="stat-row" style="margin-top:8px"><div class="stat-name">' + esc(TR("infl.short")) + "</div>" +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + sc + "%; background:" + barColor(sc) + '"></div></div>' +
+      '<div class="stat-val">' + sc + "</div></div>" +
+      '<div class="pos-actions">' +
+      btn("rolechange", state.roleChange === state.season, TR("role.changeBtn")) +
+      (state.captain ? "" : btn("captain", state.captainTry === state.season, TR("infl.captainBtn"))) +
+      btn("transfer", state.transferTry === state.season, TR("infl.transferBtn")) +
+      (state.loan ? "" : btn("loan", state.loanTry === state.season, TR("infl.loanBtn"))) +
       "</div>" +
-      (state.loan ? '<div class="g-desc" style="margin-top:9px">' +
-        esc(TR("loan.active", { team: state.loan.name })) + "</div>" : "") +
+      (state.loan ? '<div class="pos-note">' + esc(TR("loan.active", { team: state.loan.name })) + "</div>" : "") +
       "</div>";
   }
 
@@ -6498,11 +6543,33 @@
       "<span><b style=\"color:var(--text-faint); font-size:0.72rem\">" + esc(l.t) + "</b> " + esc(l.text) + "</span></div>").join("");
   }
 
+  // Podzakładki: rozrośnięte widoki dzielą się na sekcje zamiast jednej długiej rolki
+  const SUB_DEFAULT = { train: "plan", team: "squad", scene: "feed", offers: "shop", profile: "card" };
+  let subView = Object.assign({}, SUB_DEFAULT);
+
+  function applySubs(view) {
+    const nav = document.getElementById("sub-" + view);
+    if (!nav) return;
+    const cur = subView[view] || SUB_DEFAULT[view];
+    nav.querySelectorAll(".sub-btn").forEach(b => b.classList.toggle("active", b.dataset.sub === cur));
+    document.querySelectorAll("#view-" + view + " [data-panel]").forEach(el => {
+      el.classList.toggle("hidden", el.dataset.panel !== cur);
+    });
+  }
+  function setSub(view, sub) {
+    subView[view] = sub;
+    applySubs(view);
+    render();
+    window.scrollTo(0, 0);
+  }
+
   function switchView(name) {
     currentView = name;
     document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
     document.getElementById("view-" + name).classList.remove("hidden");
     document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.view === name));
+    applySubs(name);
+    window.scrollTo(0, 0);
   }
 
   // ---------- boot / wiring ----------
@@ -6582,6 +6649,12 @@
   document.getElementById("start-btn").addEventListener("click", startGame);
   document.getElementById("nick-input").addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
 
+  document.querySelectorAll(".subnav").forEach(nav => {
+    nav.addEventListener("click", e => {
+      const b = e.target.closest(".sub-btn");
+      if (b) setSub(nav.id.replace("sub-", ""), b.dataset.sub);
+    });
+  });
   document.getElementById("bottom-nav").addEventListener("click", e => {
     const b = e.target.closest(".nav-btn");
     if (b) switchView(b.dataset.view);
@@ -6671,13 +6744,11 @@
     if (t) return talkTo(t.dataset.talk);
     if (e.target.closest("[data-rolefight]")) return fightForRole();
   });
-  document.getElementById("role-box").addEventListener("click", e => {
-    if (e.target.closest("[data-rolechange]")) return changeRole();
-  });
   document.getElementById("influence-box").addEventListener("click", e => {
     if (e.target.closest("[data-captain]")) return tryCaptain();
     if (e.target.closest("[data-transfer]")) return requestTransfer();
     if (e.target.closest("[data-loan]")) return requestLoan();
+    if (e.target.closest("[data-rolechange]")) return changeRole();
   });
   document.getElementById("btn-fast").addEventListener("click", () => {
     state.fastMatches = !state.fastMatches;
