@@ -336,6 +336,14 @@
   .shop-item .si-upkeep { font-size: 0.64rem; color: var(--gold); margin-top: 3px; }
   .shop-item button { flex-shrink: 0; padding: 9px 12px; font-size: 0.74rem; white-space: nowrap; }
   .shop-item button.owned { background: rgba(41,255,176,0.12); border-color: var(--good); color: var(--good); }
+  .shop-item .si-btns { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
+  .si-vision { font-size: 0.66rem; color: var(--text-dim); font-style: italic; margin-top: 4px; line-height: 1.35; }
+  .si-vision.fits { color: var(--good); font-style: normal; }
+  .si-vision.warn { color: var(--danger); }
+  .si-q { display: flex; align-items: center; gap: 7px; margin-top: 5px; }
+  .si-q .bar-track { flex: 1; max-width: 120px; }
+  .si-q .q-val { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.74rem; }
+  .fund-row .si-btns button { font-size: 0.68rem; padding: 7px 10px; }
 
   /* --- Ranking świata --- */
   .rank-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; font-family: 'Rajdhani', sans-serif; }
@@ -343,6 +351,7 @@
   .rank-table tr.me td { color: var(--accent); }
   .rank-table .rk { width: 26px; color: var(--text-dim); }
   .rank-table .rk-team { color: var(--text-dim); font-size: 0.72rem; }
+  .rank-table tr.rk-gap td { text-align: center; color: var(--text-faint); letter-spacing: 0.3em; padding: 2px 4px; }
   .rank-table .rk-rat { text-align: right; width: 46px; }
 
   #save-text { width: 100%; height: 150px; background: var(--bg-void); color: var(--text-dim);
@@ -547,6 +556,20 @@
           <h2><svg class="icon"><use href="#i-coin"></use></svg> <span data-i18n="market.shop">Inwestycje w karierę</span></h2>
           <div id="shop-list"></div>
           <div id="wallet-box" class="muted" style="margin-top:10px;"></div>
+        </div>
+        <div class="glass panel">
+          <h2><svg class="icon"><use href="#i-coin"></use></svg> <span data-i18n="market.funds">Portfel inwestycyjny</span></h2>
+          <p class="muted" data-i18n="market.fundsInfo" style="margin-bottom:12px;">Odsetki naliczają się co tydzień. Im wyższy zwrot, tym większe ryzyko — krypto potrafi zjeść wpłatę.</p>
+          <div id="fund-list"></div>
+          <div id="fund-summary" class="muted" style="margin-top:10px;"></div>
+        </div>
+        <div class="glass panel" id="staff-panel">
+          <h2><svg class="icon"><use href="#i-users"></use></svg> <span data-i18n="market.staff">Twój sztab</span></h2>
+          <p class="muted" data-i18n="market.staffInfo" style="margin-bottom:12px;">Fachowcy pracują dla Ciebie prywatnie, nie dla klubu. Każdy ma swoją jakość, stawkę i wizję współpracy — jeśli nie pasujesz do jego planu, odmówi.</p>
+          <div id="staff-hired"></div>
+          <h3 style="margin-top:16px;" data-i18n="market.staffMarket">Dostępni kandydaci</h3>
+          <div id="staff-market"></div>
+          <button class="full" id="btn-scout-staff" style="margin-top:10px;"><svg class="icon"><use href="#i-search"></use></svg> <span id="scout-label">Poszukaj nowych kandydatów</span></button>
         </div>
         <div class="glass panel">
           <h2><svg class="icon"><use href="#i-swap"></use></svg> <span data-i18n="market.offers">Oferty transferowe</span></h2>
@@ -853,7 +876,7 @@
     "log.stream": ["Stream: +{amount}", "Stream: +{amount}"],
     "log.bought": ["Zakup: {item} ({amount})", "Bought: {item} ({amount})"],
     "log.vacation": ["Wakacje: głowa odpoczęła.", "Holiday: your head is clear again."],
-    "log.deposit": ["Wpłata do portfela inwestycyjnego: {amount}", "Deposited into the investment wallet: {amount}"],
+    "log.deposit": ["Wpłata do funduszu {fund}: {amount}", "Deposited into {fund}: {amount}"],
     "log.sponsor": ["Nowy sponsor: {name}", "New sponsor: {name}"],
     "log.dropped": ["Wypadasz ze składu {team}. Nowy klub: {next}", "You lose your spot at {team}. New club: {next}"],
     "week.matchday": ["Mecz ligowy", "League match"],
@@ -989,9 +1012,9 @@
     "infl.isCap": [" · prowadzisz zespół", " · you lead the team"],
     "infl.notCap": [" · nie jesteś jeszcze kapitanem", " · not captain yet"],
     "infl.captainBtn": ["Walcz o kapitana", "Fight for the captaincy"],
-    "infl.captainCost": ["Energia: 1 · raz na sezon", "Energy: 1 · once a season"],
+    "infl.captainCost": ["Raz na sezon", "Once a season"],
     "infl.transferBtn": ["Poproś o transfer", "Request a transfer"],
-    "infl.transferCost": ["Energia: 2 · raz na sezon", "Energy: 2 · once a season"],
+    "infl.transferCost": ["Raz na sezon", "Once a season"],
     "nem.title": ["Rywal kariery: {nick}", "Career rival: {nick}"],
     "nem.line": ["{team} · ranking {rank} · bilans starć {w}-{l}", "{team} · ranking {rank} · head to head {w}-{l}"],
     "nem.norank": ["poza top", "unranked"],
@@ -1001,10 +1024,94 @@
     "shop.walletDesc": ["Rośnie 0,5% tygodniowo i liczy się do punktów Hall of Fame.",
       "Grows 0.5% per week and counts toward your Hall of Fame score."],
     "shop.deposit": ["Wpłać {amount}", "Deposit {amount}"],
+    "shop.bootcamp": ["Bootcamp z drużyną", "Team bootcamp"],
+    "shop.bootcampDesc": ["Tydzień pod jednym dachem: +9 chemii, +7 formy, kosztem kondycji.",
+      "A week under one roof: +9 chemistry, +7 form, at the cost of stamina."],
     "shop.owned": ["Masz", "Owned"],
     "shop.upkeep": ["Utrzymanie: {amount}/tydz.", "Upkeep: {amount}/wk"],
     "shop.walletLine": ["Portfel inwestycyjny: {wallet} · koszty utrzymania: {upkeep}/tydz.",
       "Investment wallet: {wallet} · upkeep: {upkeep}/wk"],
+    "market.funds": ["Portfel inwestycyjny", "Investment portfolio"],
+    "market.fundsInfo": ["Odsetki naliczają się co tydzień. Im wyższy zwrot, tym większe ryzyko — krypto potrafi zjeść wpłatę.",
+      "Interest accrues weekly. The higher the return, the higher the risk — crypto can eat your deposit."],
+    "fund.balance": ["Ulokowane: {amount}", "Invested: {amount}"],
+    "fund.withdraw": ["Wypłać", "Withdraw"],
+    "fund.summary": ["Razem w portfelu: {total} · zmiana w tym tygodniu: {change}",
+      "Portfolio total: {total} · change this week: {change}"],
+    "log.withdraw": ["Wypłata z funduszu {fund}: {amount}", "Withdrawn from {fund}: {amount}"],
+    "log.fundUp": ["Portfel inwestycyjny rośnie: +{amount}", "The portfolio is up: +{amount}"],
+    "log.fundDown": ["Portfel inwestycyjny traci: -{amount}", "The portfolio is down: -{amount}"],
+    "log.bootcamp": ["Bootcamp z drużyną — skład wraca zgrany i naładowany.",
+      "Team bootcamp — the squad comes back tight and charged up."],
+    // rynek sztabu
+    "market.staff": ["Twój sztab", "Your staff"],
+    "market.staffInfo": ["Fachowcy pracują dla Ciebie prywatnie, nie dla klubu. Każdy ma swoją jakość, stawkę i wizję współpracy — jeśli nie pasujesz do jego planu, odmówi.",
+      "These people work for you privately, not for the club. Each has a quality level, a rate and a vision of the job — if you do not fit their plan, they turn you down."],
+    "market.staffMarket": ["Dostępni kandydaci", "Available candidates"],
+    "staff.none": ["Nikogo jeszcze nie zatrudniłeś.", "You have not hired anyone yet."],
+    "staff.quality": ["Klasa", "Quality"],
+    "staff.wage": ["Pensja", "Wage"],
+    "staff.wagePer": ["{amount}/tydz.", "{amount}/wk"],
+    "staff.fee": ["Wpisowe", "Signing fee"],
+    "staff.feeShort": ["wpisowe {amount}", "fee {amount}"],
+    "staff.hire": ["Zatrudnij", "Hire"],
+    "staff.boost": ["Dołóż 35%", "Offer 35% more"],
+    "staff.boostHint": ["Wyższa stawka ({amount}/tydz.) mocno zwiększa szansę na zgodę.",
+      "A higher rate ({amount}/wk) improves your odds a lot."],
+    "staff.taken": ["Masz już", "Already have"],
+    "staff.fire": ["Zwolnij", "Dismiss"],
+    "staff.scout": ["Poszukaj nowych kandydatów ({amount})", "Scout new candidates ({amount})"],
+    "staff.fitsOk": ["✓ pasujesz do tej wizji", "✓ you fit this vision"],
+    "staff.fitsNo": ["✗ nie pasujesz — spodziewaj się odmowy", "✗ you do not fit — expect a no"],
+    "staff.vision": ["Jego wizja", "Their vision"],
+    "staff.verdict": ["Werdykt", "Verdict"],
+    "staff.yesTitle": ["Umowa podpisana", "Deal signed"],
+    "staff.yes": ["{name} wchodzi do Twojego sztabu jako {role}.", "{name} joins your staff as your {role}."],
+    "staff.noTitle": ["Odmowa", "Turned down"],
+    "staff.no": ["{name} dziękuje za rozmowę i odmawia.", "{name} thanks you for the meeting and says no."],
+    "staff.mismatch": ["Wasze wizje współpracy się rozmijają.", "Your visions of the job do not line up."],
+    "staff.tooBig": ["Ma w tej chwili ciekawsze propozycje.", "They have more interesting offers right now."],
+    "staff.busyTitle": ["Już kogoś masz", "Position filled"],
+    "staff.busy": ["Na stanowisku {role} już ktoś u Ciebie pracuje. Najpierw go zwolnij.",
+      "Someone already works for you as your {role}. Dismiss them first."],
+    "staff.againTitle": ["Za wcześnie", "Too soon"],
+    "staff.again": ["Rozmawialiście w tym tygodniu. Wróć do tematu za tydzień.",
+      "You spoke this week. Come back to it next week."],
+    "staff.confirmFire": ["Zwolnić {name}? Odprawa kosztuje {amount}.", "Dismiss {name}? Severance costs {amount}."],
+    "log.staffYes": ["{name} dołącza do sztabu jako {role}.", "{name} joins the staff as {role}."],
+    "log.staffNo": ["{name} odmawia współpracy ({role}).", "{name} turns down the job ({role})."],
+    "log.staffFired": ["{name} ({role}) kończy współpracę.", "{name} ({role}) is let go."],
+    "log.staffScout": ["Rozeszła się wieść — na rynku pojawili się nowi kandydaci.",
+      "Word got around — new candidates showed up on the market."],
+    "chr.staff": ["Do sztabu dołącza {role}: {name}.", "{role} joins the staff: {name}."],
+    // wypożyczenia
+    "infl.loanBtn": ["Poproś o wypożyczenie", "Ask for a loan move"],
+    "infl.loanDesc": ["Sezon w innym klubie, z powrotem po roku.", "A season at another club, back after a year."],
+    "loan.earlyTitle": ["Za wcześnie", "Too soon"],
+    "loan.early": ["Zarząd rozpatruje jedną prośbę o wypożyczenie na sezon.",
+      "The board handles one loan request per season."],
+    "loan.noTitle": ["Zarząd odmawia", "The board says no"],
+    "loan.no": ["{team} nie zamierza Cię nikomu oddawać w tym sezonie.",
+      "{team} has no intention of letting you go this season."],
+    "loan.pickTitle": ["Kto Cię bierze?", "Who takes you?"],
+    "loan.pick": ["Zarząd zgadza się na sezon wypożyczenia. Wybierz klub — wrócisz po sezonie, chyba że Cię wykupią.",
+      "The board agrees to a season on loan. Pick a club — you return after the season unless they buy you out."],
+    "loan.cancel": ["Jednak zostaję", "Never mind, I stay"],
+    "loan.cancelDesc": ["Zamykasz temat na ten sezon.", "You drop the subject for this season."],
+    "loan.yesTitle": ["Wypożyczenie", "Loan move"],
+    "loan.yes": ["Grasz sezon w {team}. {from} czeka na Twój powrót.",
+      "You play the season at {team}. {from} waits for you to come back."],
+    "loan.active": ["Wypożyczenie z {team} — wracasz po sezonie.", "On loan from {team} — you return after the season."],
+    "loan.rowEnd": ["Wypożyczenie", "Loan"],
+    "loan.returned": ["powrót do {team}", "back to {team}"],
+    "loan.bought": ["{team} wykupuje kontrakt", "{team} buys out the contract"],
+    "log.loanNo": ["Zarząd odrzucił prośbę o wypożyczenie.", "The board turned down your loan request."],
+    "log.loanYes": ["Wypożyczenie do {team} (z {from}).", "Loaned to {team} (from {from})."],
+    "log.loanBack": ["Koniec wypożyczenia — wracasz do {team}.", "The loan is over — you return to {team}."],
+    "log.loanBought": ["{team} wykupuje Cię na stałe.", "{team} signs you permanently."],
+    "log.loanCut": ["Transfer przerywa wypożyczenie z {team}.", "The transfer ends your loan from {team}."],
+    "chr.loan": ["Wypożyczenie do {team}.", "Loan move to {team}."],
+    "chr.loanBought": ["{team} wykupuje kontrakt po wypożyczeniu.", "{team} buys the contract after the loan."],
     "offer.contract": ["{tier} · siła składu {str} · kontrakt {years} sez.", "{tier} · squad strength {str} · contract {years} seasons"],
     "offer.expires": ["Wygasa za {n} tyg.", "Expires in {n} weeks"],
     "offer.weekly": ["tygodniowo", "per week"],
@@ -1251,6 +1358,26 @@
   const NICK_POOL = ["kexy", "r3ll", "nyx", "byt3", "gh0st", "lumen", "fr0sty", "blaze", "orbit", "st4tic", "pix3l",
     "rogu", "shade", "vertx", "ciph", "drift", "flux", "halo", "ion", "jinx", "lynx", "n3x", "onyx", "quill", "raze",
     "tempo", "umbr", "volt", "wisp", "xen", "zed", "astra", "kalo", "mrq", "sn0w", "dexy", "vipr", "torn"];
+  // Nicki z kolorytem regionalnym — scena WNP brzmi inaczej niż brazylijska czy azjatycka
+  const NICK_REGION = {
+    eu: ["kaspa", "lukk", "nord", "fjord", "viggo", "milo", "tobi", "jori", "marek", "kuba", "radek", "zdenek",
+      "ferran", "matis", "sven", "olli", "roope", "tam", "bene", "cris", "dario", "krystof", "wojt", "seba"],
+    cis: ["zov", "sput", "molot", "vint", "kvas", "sneg", "zima", "orel", "tsar", "kolt", "grom", "burya", "iskra",
+      "volk", "medv", "sokol", "step", "kray", "veter", "sibir", "ural", "amur", "kama", "strel", "vityaz", "buran",
+      "gorod", "leshy", "rusal", "yarko", "svar", "perun", "koval", "zarya", "tundr", "morok", "vesna", "kray7"],
+    na: ["duke", "raven", "boomer", "tex", "dallas", "brooke", "hopp", "cobalt", "maple", "juno", "ranger", "chip",
+      "stack", "dash", "cliff", "harbor", "denver", "kodi", "wren", "banks"],
+    sa: ["tuca", "bala", "gato", "raio", "onca", "pampa", "mate", "chico", "lobo", "selva", "tupi", "curu", "brasa",
+      "ipe", "cacau", "vento", "rio", "morro", "cuia", "jaca"],
+    as: ["kaze", "ryu", "hoshi", "yuki", "tenko", "shen", "long", "jian", "han", "mina", "suho", "bora", "daan",
+      "nami", "kiro", "hana", "taro", "renn", "quan", "sora"],
+    oce: ["reef", "dingo", "kanga", "bondi", "surf", "kiwi", "tui", "moa", "koala", "gale", "wombat", "perth",
+      "otago", "huka", "coral"],
+  };
+  // ile procent sceny mieszka w którym regionie i jak wysoko sięga tamtejszy sufit
+  const REGION_SHARE = [["eu", 0.30], ["cis", 0.22], ["na", 0.14], ["sa", 0.13], ["as", 0.13], ["oce", 0.08]];
+  const REGION_CAP = { eu: 4, cis: 4, na: 4, sa: 3, as: 3, oce: 2 };
+  const WORLD_SIZE = 180;
   const MAPS = ["Mirage", "Inferno", "Nuke", "Ancient", "Anubis", "Dust II", "Train", "Overpass"];
   const SPONSOR_POOL = [
     { name: "NitroFuel", hype: 20, pay: 1200 }, { name: "ByteWear", hype: 35, pay: 3000 },
@@ -1325,6 +1452,13 @@
     return near.length ? near : ORGS;
   }
   function pickOrg(t) { return pick(typeof t === "number" ? orgsForTier(t) : ORGS).n; }
+  // klub z konkretnego regionu — dzięki temu ranking regionalny się zgadza z barwami klubowymi
+  function pickOrgIn(reg, t) {
+    const local = ORGS.filter(o => o.r === reg);
+    if (!local.length) return pickOrg(t);
+    const near = local.filter(o => Math.abs(o.t - t) <= 1);
+    return pick(near.length ? near : local).n;
+  }
   function orgRegion(name) { const o = ORGS.find(x => x.n === name); return o ? o.r : "eu"; }
 
   const COUNTRIES = [
@@ -1373,18 +1507,80 @@
   ];
 
   // Jednorazowe zakupy z trwałym efektem
+  // Sklep to rzeczy. Ludzie (trener, fizjo, media) mają własny rynek — patrz STAFF_ROLES.
   const SHOP = [
-    { id: "gear",    name: ["Sprzęt turniejowy", "Tournament gear"],  cost: 14000,  upkeep: 0,    desc: ["Własna myszka i klawiatura. +2 Aim od ręki.", "Your own mouse and keyboard. +2 Aim right away."] },
-    { id: "monitor", name: ["Monitor 360 Hz", "360 Hz monitor"],     cost: 26000,  upkeep: 0,    desc: ["+2 Refleks od ręki, +20% skuteczności treningu refleksu.", "+2 Reflex right away, +20% reflex trainingiciency."] },
-    { id: "coach",   name: ["Trener personalny", "Personal coach"],  cost: 70000,  upkeep: 1800, desc: ["+30% zysków ze wszystkich treningów.", "+30% gains from every training action."] },
-    { id: "analyst", name: ["Analityk", "Analyst"],           cost: 95000,  upkeep: 3000, desc: ["Przygotowanie taktyczne: +3 do siły drużyny w meczach.", "Tactical prep: +3 team strength in matches."] },
-    { id: "psycho",  name: ["Psycholog sportowy", "Sports psychologist"], cost: 45000,  upkeep: 1200, desc: ["+3 psychiki co tydzień, o połowę mniejszy spadek po porażce.", "+3 mental per week, half the drop after a loss."] },
-    { id: "manager", name: ["Menedżer", "Manager"],           cost: 80000,  upkeep: 2500, desc: ["Dwa razy częstsze oferty transferowe i +15% do pensji.", "Twice as many transfer offers and +15% salary."] },
-    { id: "house",   name: ["Własne mieszkanie", "Your own place"],  cost: 220000, upkeep: 0,    desc: ["+6 kondycji co tydzień. Spokojna głowa.", "+6 stamina per week. A calm head."] },
-    { id: "physio",  name: ["Fizjoterapeuta", "Physiotherapist"],     cost: 55000,  upkeep: 1500, desc: ["Kontuzje trwają krócej i zdarzają się rzadziej.", "Injuries are shorter and rarer."] },
+    { id: "gear",    name: ["Sprzęt turniejowy", "Tournament gear"], cost: 14000,  upkeep: 0,   desc: ["Własna myszka i klawiatura. +2 Aim od ręki.", "Your own mouse and keyboard. +2 Aim right away."] },
+    { id: "monitor", name: ["Monitor 360 Hz", "360 Hz monitor"],     cost: 26000,  upkeep: 0,   desc: ["+2 Refleks od ręki, +20% skuteczności treningu refleksu.", "+2 Reflex right away, +20% reflex training efficiency."] },
+    { id: "chair",   name: ["Fotel i biurko", "Chair and desk"],     cost: 9000,   upkeep: 0,   desc: ["Porządne stanowisko. +3 kondycji co tydzień.", "A proper setup. +3 stamina per week."] },
+    { id: "net",     name: ["Łącze 1 Gb/s", "1 Gb/s connection"],    cost: 7000,   upkeep: 200, desc: ["Zero lagów na scrimach. +10% skuteczności treningu aim.", "No lag in scrims. +10% aim training efficiency."] },
+    { id: "nutri",   name: ["Dietetyk i catering", "Nutrition plan"], cost: 34000, upkeep: 900, desc: ["Treningi męczą o 15% mniej, +2 kondycji co tydzień.", "Training drains 15% less, +2 stamina per week."] },
+    { id: "lang",    name: ["Kurs językowy", "Language course"],     cost: 22000,  upkeep: 0,   desc: ["Aklimatyzacja po przeprowadzce trwa o połowę krócej.", "Settling into a new region takes half as long."] },
+    { id: "studio",  name: ["Studio streamowe", "Streaming studio"], cost: 60000,  upkeep: 700, desc: ["+40% zarobku ze streamów i mocniejszy hype z mediów.", "+40% stream income and stronger hype from media."] },
+    { id: "house",   name: ["Własne mieszkanie", "Your own place"],  cost: 220000, upkeep: 0,   desc: ["+6 kondycji co tydzień. Spokojna głowa.", "+6 stamina per week. A calm head."] },
+    { id: "gaming",  name: ["Prywatna sala treningowa", "Private practice room"], cost: 320000, upkeep: 2400,
+      desc: ["Serwer, ściana taktyczna i cisza. +12% do każdego treningu.", "Server, tactics wall and quiet. +12% from every training action."] },
   ];
   const VACATION_COST = 30000;
-  const INVEST_CHUNK = 100000;
+  const BOOTCAMP_COST = 48000;
+  const STAFF_SCOUT_COST = 6000;
+
+  // Portfel: bezpieczna lokata, fundusz indeksowy i coś, co potrafi zjeść połowę wpłaty
+  const FUNDS = [
+    { id: "deposit", name: ["Lokata", "Savings"], icon: "coin", chunk: 50000, rate: 0.0035, risk: 0,
+      desc: ["Pewne, nudne 0,35% tygodniowo.", "Safe, boring 0.35% a week."] },
+    { id: "index", name: ["Fundusz indeksowy", "Index fund"], icon: "chart", chunk: 100000, rate: 0.008, risk: 0.022,
+      desc: ["Średnio 0,8% tygodniowo, ale bywają gorsze miesiące.", "Around 0.8% a week, with bad months mixed in."] },
+    { id: "crypto", name: ["Krypto", "Crypto"], icon: "bolt", chunk: 25000, rate: 0.013, risk: 0.085,
+      desc: ["Potrafi podwoić i potrafi wyzerować. Twoja decyzja.", "It can double and it can wipe out. Your call."] },
+  ];
+
+  // ---------- rynek sztabu ----------
+  // Ludzie, których zatrudniasz prywatnie. Każdy ma jakość, stawkę i własną wizję współpracy —
+  // i może odmówić, jeśli jego wizja nie pasuje do tego, gdzie jesteś w karierze.
+  const STAFF_ROLES = [
+    { id: "coach",   name: ["Trener personalny", "Personal coach"], icon: "brain", fee: 1.6, pay: 1800,
+      desc: ["Prowadzi Twój trening indywidualny. Im lepszy, tym szybciej rosną statystyki.",
+             "Runs your individual training. The better they are, the faster your stats grow."] },
+    { id: "analyst", name: ["Analityk", "Analyst"], icon: "chart", fee: 1.9, pay: 2600,
+      desc: ["Przygotowanie taktyczne pod rywali. Podnosi siłę drużyny w meczach.",
+             "Tactical prep against your opponents. Raises team strength in matches."] },
+    { id: "psycho",  name: ["Psycholog sportowy", "Sports psychologist"], icon: "heart", fee: 1.2, pay: 1500,
+      desc: ["Trzyma głowę w ryzach: psychika rośnie co tydzień, porażki bolą mniej.",
+             "Keeps your head straight: mental grows weekly and losses hurt less."] },
+    { id: "physio",  name: ["Fizjoterapeuta", "Physiotherapist"], icon: "run", fee: 1.1, pay: 1400,
+      desc: ["Kontuzje rzadsze i krótsze, lepsza regeneracja po meczach.",
+             "Injuries rarer and shorter, better recovery after matches."] },
+    { id: "manager", name: ["Menedżer", "Manager"], icon: "briefcase", fee: 1.7, pay: 2300,
+      desc: ["Dzwoni do klubów za Ciebie: częstsze oferty i wyższe pensje.",
+             "Works the phones for you: more offers and better salaries."] },
+    { id: "media",   name: ["Menedżer mediów", "Media manager"], icon: "cam", fee: 1.3, pay: 1600,
+      desc: ["Prowadzi Twoje kanały i PR. Hype rośnie szybciej, sponsorzy płacą więcej.",
+             "Runs your channels and PR. Hype grows faster and sponsors pay more."] },
+  ];
+
+  // Wizja współpracy — warunek, który kandydat stawia, zanim w ogóle usiądzie do rozmowy
+  const VISIONS = [
+    { id: "ambition", text: ["Pracuję tylko z kimś, kto realnie celuje w top.", "I only work with someone genuinely aiming for the top."],
+      test: () => state.team.tier >= 2 || state.hype >= 55 },
+    { id: "young", text: ["Wolę budować kogoś młodego, od zera.", "I would rather build someone young, from scratch."],
+      test: () => state.age <= 23 },
+    { id: "proven", text: ["Interesują mnie zawodnicy z dorobkiem, nie obietnicami.", "I am interested in players with a record, not promises."],
+      test: () => state.career.trophies.length >= 1 || careerRating() >= 1.03 },
+    { id: "stable", text: ["Nie wchodzę do projektu, który zmienia klub co sezon.", "I do not join a project that changes clubs every season."],
+      test: () => (state.career.timeline || []).filter(t => t.kind === "transfer").length <= 3 },
+    { id: "pro", text: ["Nie pracuję z kimś, kto nie ma jeszcze kontraktu.", "I do not work with someone without a contract yet."],
+      test: () => state.stage === "pro" },
+    { id: "healthy", text: ["Muszę widzieć, że dbasz o formę, a nie tylko grasz.", "I need to see you look after your shape, not just play."],
+      test: () => state.stamina >= 45 && state.mental >= 45 },
+    { id: "home", text: ["Nie przeprowadzam się za pracą.", "I do not relocate for work."],
+      test: () => !abroad() },
+  ];
+
+  const STAFF_NAMES = ["Kowalski", "Nowak", "Larsen", "Bergman", "Moreau", "Petrov", "Volkov", "Sokolov", "Haas",
+    "Vogel", "Ferreira", "Almeida", "Costa", "Novak", "Dvorak", "Kaminski", "Wisniewski", "Lindqvist", "Ahonen",
+    "Virtanen", "Bakker", "de Vries", "Ünal", "Demir", "Kim", "Park", "Tanaka", "Watanabe", "Miller", "Brooks",
+    "Ferrari", "Rossi", "Garcia", "Ruiz", "Murphy", "O'Neill", "Schmidt", "Weber", "Horvat", "Marek"];
+  const STAFF_FIRST = ["A.", "B.", "D.", "E.", "F.", "G.", "H.", "I.", "J.", "K.", "L.", "M.", "N.", "O.", "P.", "R.", "S.", "T."];
 
   // Decyzje w trakcie meczu — modyfikują wynik i Twój rating
   const DECISIONS = [
@@ -1647,7 +1843,8 @@
       career: { matches: 0, wins: 0, kills: 0, deaths: 0, rating: 0, aces: 0, mvps: 0, earned: 0,
                 trophies: [], seasons: [], bestRank: 0, bestRating: 0, recent: [], timeline: [] },
       ach: {}, log: [], rank: 0, retired: false,
-      weekPlan: [], lastPlan: [], plan: [], plan2: [], autoPlan: true, smartRest: true, extras: {}, goal: null, nemesis: null, nemesisBeaten: 0, fastMatches: false,
+      weekPlan: [], lastPlan: [], plan: [], plan2: [], autoPlan: true, smartRest: true, extras: {}, goal: null,
+      staff: {}, staffMarket: [], funds: { deposit: 0, index: 0, crypto: 0 }, fundLast: 0, loan: null, loanTry: 0, nemesis: null, nemesisBeaten: 0, fastMatches: false,
       lead: 18 + ((ARCHETYPES.find(a => a.id === archId) || {}).lead || 0), captain: false, captainTry: 0, transferTry: 0,
       phase: null, craft: 0, rep: 0, audience: 0, trophies2: 0, tutorialDone: false,
       adapt: 0, formerTeams: [], maps: {},
@@ -1668,21 +1865,41 @@
   }
 
   // ---------- świat: rywale i ranking ----------
+  function regionNick(reg, used) {
+    const pool = (NICK_REGION[reg] || []).concat(NICK_POOL);
+    let n, guard = 0;
+    do { n = pick(pool) + (Math.random() < 0.4 ? String(irnd(1, 99)) : ""); guard++; }
+    while (used.indexOf(n) >= 0 && guard < 80);
+    used.push(n);
+    return n;
+  }
+
+  // Piramida: na topie garstka, na dole tłum grający o wszystko
+  function rollTier(reg) {
+    const r = Math.random();
+    const t = r < 0.04 ? 4 : r < 0.13 ? 3 : r < 0.33 ? 2 : r < 0.63 ? 1 : 0;
+    return clamp(t, 0, REGION_CAP[reg] === undefined ? 4 : REGION_CAP[reg]);
+  }
+
+  function makeAiPlayer(reg, used) {
+    const t = rollTier(reg);
+    return {
+      nick: regionNick(reg, used), age: irnd(17, 30), tier: t, region: reg,
+      rating: +clamp(0.90 + t * 0.045 + rnd(-0.06, 0.09), 0.80, 1.32).toFixed(2),
+      hype: clamp(irnd(10, 35) + t * 15, 5, 100),
+      trophies: t >= 3 ? irnd(0, 5) : t >= 2 ? irnd(0, 2) : 0,
+      team: pickOrgIn(reg, t),
+    };
+  }
+
+  // Cała scena, nie tylko czołówka: kilkaset zawodników rozsianych po regionach
   function makeWorld() {
     const used = [state.nick].concat(state.team ? state.team.mates.map(m => m.nick) : []);
     const arr = [];
-    for (let i = 0; i < 44; i++) {
-      let n, guard = 0;
-      do { n = pick(NICK_POOL) + (Math.random() < 0.35 ? String(irnd(1, 99)) : ""); guard++; }
-      while (used.indexOf(n) >= 0 && guard < 40);
-      used.push(n);
-      arr.push({
-        nick: n, age: irnd(18, 29), tier: clamp(4 - Math.floor(i / 10), 0, 4),
-        rating: +(0.94 + rnd(0, 0.34)).toFixed(2), hype: irnd(30, 95),
-        trophies: Math.max(0, irnd(-2, 4)), team: pickOrg(clamp(4 - Math.floor(i / 10), 0, 4)),
-        region: pick(REGIONS).id,
-      });
-    }
+    REGION_SHARE.forEach(rs => {
+      const n = Math.round(WORLD_SIZE * rs[1]);
+      for (let i = 0; i < n; i++) arr.push(makeAiPlayer(rs[0], used));
+    });
     return arr;
   }
 
@@ -1714,6 +1931,9 @@
     return tierId * 18 + (rating - 1) * 200 * weight + hype * 0.25 + trophyWeight(trophies);
   }
 
+  // punkty rankingowe: ta sama skala co score, ale bez ujemnych wartości na dole tabeli
+  function rankPoints(score) { return Math.max(0, Math.round(score * 10) + 150); }
+
   function worldTable() {
     if (!state.world) state.world = makeWorld();
     const rows = state.world.map(r => ({
@@ -1734,16 +1954,16 @@
     if (!state.world) state.world = makeWorld();
     const myR = myRegion();
     const rows = state.world.map(r => ({
-      nick: r.nick, team: r.team, region: orgRegion(r.team), tier: r.tier, rating: r.rating,
-      pts: Math.round(rankScore(r.tier, r.rating, r.hype, r.trophies) * 10),
+      nick: r.nick, team: r.team, region: r.region || orgRegion(r.team), tier: r.tier, rating: r.rating,
+      pts: rankPoints(rankScore(r.tier, r.rating, r.hype, r.trophies)),
     }));
     const myRating = state.seasonStats.matches >= 4 ? seasonRating()
       : (state.career.matches ? state.career.rating / state.career.matches : 0.9);
     rows.push({
       me: true, nick: state.nick, team: state.team ? state.team.name : "-", region: myR,
       tier: state.team ? state.team.tier : 0, rating: +myRating.toFixed(2),
-      pts: Math.round(rankScore(state.team ? state.team.tier : 0, myRating, state.hype,
-        state.career.trophies) * 10),
+      pts: rankPoints(rankScore(state.team ? state.team.tier : 0, myRating, state.hype,
+        state.career.trophies)),
     });
     const list = scope === "region" ? rows.filter(r => r.region === myR) : rows;
     return list.sort((a, b) => b.pts - a.pts);
@@ -1764,13 +1984,20 @@
     document.getElementById("rank-tab-world").textContent = TR("rank.world");
     document.getElementById("rank-tab-region").classList.toggle("primary", rankScope === "region");
     document.getElementById("rank-tab-world").classList.toggle("primary", rankScope === "world");
-    // wokół Twojej pozycji, żeby zawsze było widać kontekst
-    const from = clamp(pos - 6, 0, Math.max(0, list.length - 12));
-    const shown = list.slice(from, from + 12);
-    document.getElementById("rank-body").innerHTML = shown.map((r, i) =>
-      '<tr class="' + (r.me ? "me" : "") + '"><td class="rk">' + (from + i + 1) + "</td><td>" + esc(r.nick) +
-      '<div class="rk-team">' + esc(r.team) + " · " + esc(regionName(r.region)) + '</div></td>' +
-      '<td class="rk-rat">' + r.pts + "</td></tr>").join("");
+    // czołówka sceny, a pod nią okno wokół Twojej pozycji — przy kilkuset zawodnikach jedno bez drugiego nic nie mówi
+    const row = (r, i) => '<tr class="' + (r.me ? "me" : "") + '"><td class="rk">' + (i + 1) + "</td><td>" +
+      esc(r.nick) + '<div class="rk-team">' + esc(r.team) + " · " + esc(regionName(r.region)) + "</div></td>" +
+      '<td class="rk-rat">' + r.pts + "</td></tr>";
+    const top = list.slice(0, 10).map((r, i) => row(r, i));
+    let html = top.join("");
+    if (pos > 13) {
+      const from = clamp(pos - 4, 10, Math.max(10, list.length - 8));
+      html += '<tr class="rk-gap"><td colspan="3">···</td></tr>' +
+        list.slice(from, from + 8).map((r, i) => row(r, from + i)).join("");
+    } else {
+      html += list.slice(10, 18).map((r, i) => row(r, 10 + i)).join("");
+    }
+    document.getElementById("rank-body").innerHTML = html;
     document.getElementById("rank-overlay").classList.remove("hidden");
   }
 
@@ -1783,16 +2010,22 @@
       const drift = rnd(-0.09, 0.09) + (r.age > 28 ? -0.03 : 0.01) + (1.05 - r.rating) * 0.12;
       r.rating = +clamp(r.rating + drift, 0.80, 1.32).toFixed(2);
       r.hype = clamp(Math.round(r.hype + rnd(-8, 8) + (r.rating - 1.05) * 30), 5, 100);
-      if (Math.random() < 0.25) r.tier = clamp(r.tier + (r.rating > 1.12 ? 1 : -1), 0, 4);
-      if (Math.random() < 0.2) r.team = pickOrg(r.tier);
+      if (!r.region) r.region = orgRegion(r.team);
+      const cap = REGION_CAP[r.region] === undefined ? 4 : REGION_CAP[r.region];
+      if (Math.random() < 0.25) r.tier = clamp(r.tier + (r.rating > 1.12 ? 1 : -1), 0, cap);
+      // transfer bywa też wyjazdem na inną scenę, ale rzadko
+      if (Math.random() < 0.2) {
+        if (Math.random() < 0.12) r.region = pick(REGIONS).id;
+        r.team = pickOrgIn(r.region, r.tier);
+      }
       if (r.rating > 1.15 && Math.random() < 0.3) r.trophies++;
-      if (r.age > 31 && Math.random() < 0.45) { // emerytura, wchodzi nowy talent
-        let n, guard = 0;
-        do { n = pick(NICK_POOL) + (Math.random() < 0.5 ? String(irnd(1, 99)) : ""); guard++; }
-        while (used.indexOf(n) >= 0 && guard < 40);
-        used.push(n);
-        r.nick = n; r.age = irnd(17, 20); r.tier = clamp(irnd(0, 3), 0, 4);
-        r.rating = +(0.95 + rnd(0, 0.25)).toFixed(2); r.hype = irnd(20, 60); r.trophies = 0; r.team = pickOrg(r.tier);
+      if (r.age > 31 && Math.random() < 0.45) {      // emerytura, wchodzi nowy talent z tej samej sceny
+        const fresh = makeAiPlayer(r.region, used);
+        fresh.age = irnd(17, 20);
+        fresh.tier = clamp(Math.min(fresh.tier, 3), 0, cap);
+        fresh.trophies = 0;
+        fresh.hype = irnd(15, 50);
+        Object.keys(fresh).forEach(k => { r[k] = fresh[k]; });
       }
     });
   }
@@ -1806,10 +2039,9 @@
   }
 
   function tryCaptain() {
-    if (state.captain || state.energy < 1) return;
+    if (state.captain) return;
     if (state.captainTry === state.season) { showModal("Za wcześnie", "W tym sezonie już rozmawiałeś o roli kapitana. Spróbuj po przerwie.", ""); return; }
     state.captainTry = state.season;
-    state.energy--;
     const p = clamp(influenceScore() / 130 + 0.08, 0.08, 0.85);
     if (Math.random() < p) {
       state.captain = true;
@@ -1826,13 +2058,100 @@
     render(); save();
   }
 
+  // ---------- wypożyczenie ----------
+  // Kluby chętniej wypuszczają zawodnika, który siedzi w cieniu składu — gwiazdy nikt nie oddaje
+  function loanChance() {
+    const gap = matesAvg() - playerPower();      // ujemny = jesteś mocniejszy od kolegów
+    return clamp(0.3 + gap / 45 + (24 - state.age) / 55 + (state.team.tier - 1) * 0.05
+      - (state.captain ? 0.25 : 0), 0.05, 0.9);
+  }
+
+  function requestLoan() {
+    if (inLadder() || state.loan) return;
+    if (state.loanTry === state.season) { showModal(TR("loan.earlyTitle"), TR("loan.early"), ""); return; }
+    state.loanTry = state.season;
+    if (Math.random() > loanChance()) {
+      state.mental = clamp(state.mental - 3, 0, 100);
+      addLog(TR("log.loanNo"), "bad");
+      showModal(TR("loan.noTitle"), TR("loan.no", { team: state.team.name }), "");
+      render(); save();
+      return;
+    }
+    // kluby, które realnie wzięłyby Cię na sezon: niżej albo równo, głównie z Twojego regionu
+    const myReg = myRegion();
+    const wantTier = clamp(state.team.tier - 1, 0, 4);
+    const pool = ORGS.filter(o => o.n !== state.team.name && Math.abs(o.t - wantTier) <= 1);
+    const local = pool.filter(o => o.r === myReg);
+    const cands = [];
+    while (cands.length < 3 && pool.length) {
+      const from = cands.length < 2 && local.length ? local : pool;
+      const org = pick(from);
+      if (!cands.some(c => c.n === org.n)) cands.push(org);
+      if (cands.length >= Math.min(3, pool.length)) break;
+    }
+    showChoice(TR("loan.pickTitle"), TR("loan.pick"),
+      cands.map(o => ({ label: o.n, desc: tx(tier(o.t).name) + " · " + regionName(o.r) })).concat(
+        [{ label: TR("loan.cancel"), desc: TR("loan.cancelDesc") }]),
+      ci => {
+        closeChoice();
+        if (ci >= cands.length) { render(); save(); return; }
+        goOnLoan(cands[ci]);
+      });
+  }
+
+  function goOnLoan(org) {
+    const parent = JSON.parse(JSON.stringify(state.team));
+    const t = clamp(org.t, 0, 4);
+    const team = makeTeam(t, org.n);
+    team.salary = Math.round(Math.max(state.team.salary * 0.6, tier(t).salary * 0.7));
+    team.contract = 1;
+    state.loan = { parent: parent, name: parent.name, until: state.season, salary: state.team.salary };
+    state.team = team;
+    state.captain = false;
+    state.goal = makeGoal();
+    state.league = makeLeague();
+    state.schedule = makeSchedule();
+    const newRegion = orgRegion(org.n);
+    if (newRegion !== myRegion()) state.adapt = owned("lang") ? 3 : 6;
+    addLog(TR("log.loanYes", { team: org.n, from: parent.name }), "gold");
+    chronicle(TR("chr.loan", { team: org.n }), "info");
+    showModal(TR("loan.yesTitle"), TR("loan.yes", { team: org.n, from: parent.name }),
+      '<div class="recap-line"><span>' + esc(TR("season.team")) + "</span><b>" + esc(org.n) + " (" + esc(tx(tier(t).name)) + ")</b></div>" +
+      '<div class="recap-line"><span>' + esc(TR("kv.salary")) + "</span><b>" + money(team.salary) + "</b></div>");
+    render(); save();
+  }
+
+  // Koniec sezonu na wypożyczeniu: albo wykup, albo powrót do macierzystego klubu
+  function resolveLoan(rows) {
+    if (!state.loan) return;
+    const r = seasonRating();
+    const host = state.team;
+    const parent = state.loan.parent;
+    const buyout = r >= 1.05 && Math.random() < 0.55;
+    if (buyout) {
+      host.contract = irnd(2, 3);
+      host.salary = Math.round(Math.max(host.salary, state.loan.salary) * rnd(1.1, 1.35));
+      state.loan = null;
+      rows.push([TR("loan.rowEnd"), TR("loan.bought", { team: host.name })]);
+      addLog(TR("log.loanBought", { team: host.name }), "gold");
+      chronicle(TR("chr.loanBought", { team: host.name }), "gold");
+      return;
+    }
+    state.team = parent;
+    state.team.salary = state.loan.salary;
+    state.team.contract = Math.max(1, parent.contract);
+    state.loan = null;
+    state.league = makeLeague();
+    state.schedule = makeSchedule();
+    rows.push([TR("loan.rowEnd"), TR("loan.returned", { team: parent.name })]);
+    addLog(TR("log.loanBack", { team: parent.name }), "info");
+  }
+
   function requestTransfer() {
-    if (state.energy < 2) return;
     if (state.transferTry === state.season) { showModal("Za wcześnie", "Zarząd rozpatruje jedną Twoją prośbę transferową na sezon.", ""); return; }
     const p = clamp(influenceScore() / 120, 0.05, 0.9);
     if (Math.random() > p) {
       state.transferTry = state.season;
-      state.energy -= 2;
       state.mental = clamp(state.mental - 3, 0, 100);
       addLog("Zarząd odrzucił Twoją prośbę o transfer.", "bad");
       showModal("Zarząd odmawia", "Nie masz jeszcze na tyle mocnej pozycji, żeby układać skład.", "");
@@ -1856,7 +2175,6 @@
             state.team.mates[oi] = inc;
             state.team.chem = clamp(state.team.chem - 12, 0, 100);
             state.transferTry = state.season;
-            state.energy -= 2;
             addLog("Transfer na Twoją prośbę: " + outp.nick + " → " + inc.nick, "gold");
             showModal("Skład zmieniony", inc.nick + " dołącza w miejsce " + outp.nick +
               ". Nowa chemia wymaga czasu — zagrajcie scrimy.", "");
@@ -1905,8 +2223,22 @@
   }
 
   // ---------- sklep ----------
-  function owned(id) { return !!(state.shop && state.shop[id]); }
-  function upkeepTotal() { return SHOP.reduce((a, it) => a + (owned(it.id) ? it.upkeep : 0), 0); }
+  function owned(id) { return !!(state.shop && state.shop[id]) || !!(state.staff && state.staff[id]); }
+  // jakość sztabu 0-100; stare zapisy miały sztab kupowany w sklepie — liczymy go jako solidnego fachowca
+  function staffQ(id) {
+    if (state.staff && state.staff[id]) return state.staff[id].q;
+    return (state.shop && state.shop[id]) ? 70 : 0;
+  }
+  function staffPayTotal() {
+    const s = state.staff || {};
+    return Object.keys(s).reduce((a, k) => a + (s[k].pay || 0), 0);
+  }
+  function upkeepTotal() {
+    return SHOP.reduce((a, it) => a + (state.shop && state.shop[it.id] ? it.upkeep : 0), 0) + staffPayTotal();
+  }
+  function careerRating() {
+    return state.career.matches ? state.career.rating / state.career.matches : 0.95;
+  }
 
   function buyItem(id) {
     const it = SHOP.find(x => x.id === id);
@@ -1929,11 +2261,148 @@
     render(); save();
   }
 
-  function invest() {
-    if (state.money < INVEST_CHUNK) return;
-    state.money -= INVEST_CHUNK;
-    state.invest += INVEST_CHUNK;
-    addLog(TR("log.deposit", { amount: money(INVEST_CHUNK) }), "info");
+  function buyBootcamp() {
+    if (state.money < BOOTCAMP_COST || inLadder()) return;
+    state.money -= BOOTCAMP_COST;
+    state.team.chem = clamp(state.team.chem + 9, 0, 100);
+    state.team.mates.forEach(m => { m.bond = clamp((m.bond || 0) + 6, 0, 100); });
+    state.form = clamp(state.form + 7, 0, 100);
+    state.stamina = clamp(state.stamina - 10, 0, 100);
+    addLog(TR("log.bootcamp"), "good");
+    render(); save();
+  }
+
+  // ---------- portfel inwestycyjny ----------
+  // Trzy fundusze o różnym ryzyku. Odsetki naliczają się co tydzień, wypłata jest natychmiastowa.
+  function funds() {
+    if (!state.funds) state.funds = { deposit: 0, index: 0, crypto: 0 };
+    return state.funds;
+  }
+  function investIn(id) {
+    const f = FUNDS.find(x => x.id === id);
+    if (!f || state.money < f.chunk) return;
+    state.money -= f.chunk;
+    funds()[id] += f.chunk;
+    state.invest = fundTotal();
+    addLog(TR("log.deposit", { amount: money(f.chunk), fund: tx(f.name) }), "info");
+    render(); save();
+  }
+  function withdraw(id) {
+    const bal = Math.round(funds()[id] || 0);
+    if (bal <= 0) return;
+    funds()[id] = 0;
+    state.money += bal;
+    state.invest = fundTotal();
+    addLog(TR("log.withdraw", { amount: money(bal), fund: tx((FUNDS.find(x => x.id === id) || {}).name) }), "good");
+    render(); save();
+  }
+  function fundTotal() {
+    const f = funds();
+    return Math.round(FUNDS.reduce((a, x) => a + (f[x.id] || 0), 0));
+  }
+  function tickFunds() {
+    const f = funds();
+    let change = 0;
+    FUNDS.forEach(x => {
+      if (!f[x.id]) return;
+      const r = x.rate + rnd(-x.risk, x.risk);
+      const before = f[x.id];
+      f[x.id] = Math.max(0, f[x.id] * (1 + r));
+      change += f[x.id] - before;
+    });
+    state.invest = fundTotal();
+    state.fundLast = Math.round(change);
+    // krach albo hossa warte wzmianki w logu
+    if (Math.abs(change) > 12000) addLog(TR(change > 0 ? "log.fundUp" : "log.fundDown", { amount: money(Math.abs(change)) }), change > 0 ? "good" : "bad");
+  }
+
+  // ---------- rynek sztabu ----------
+  // Jak atrakcyjnym projektem jesteś dla fachowca: poziom klubu, nazwisko, wyniki, dorobek
+  function staffStanding() {
+    const t = state.team ? state.team.tier : 0;
+    return clamp(t * 12 + state.hype * 0.32 + (careerRating() - 0.95) * 130
+      + state.career.trophies.length * 2.5 + (state.stage === "pro" ? 8 : 0), 0, 100);
+  }
+
+  function makeCandidate(roleId) {
+    const def = STAFF_ROLES.find(r => r.id === roleId) || STAFF_ROLES[0];
+    const q = irnd(25, 95);
+    const pay = Math.round(def.pay * (0.45 + q / 55) * rnd(0.9, 1.15));
+    return { id: roleId, name: pick(STAFF_FIRST) + " " + pick(STAFF_NAMES), q: q, pay: pay,
+      fee: Math.round(pay * def.fee * 12), vision: pick(VISIONS).id, asked: 0 };
+  }
+
+  function refreshStaffMarket() {
+    const roles = STAFF_ROLES.slice().sort(() => Math.random() - 0.5);
+    state.staffMarket = roles.slice(0, 5).map(r => makeCandidate(r.id));
+    // czasem trafia się ktoś z zupełnie innej półki
+    if (Math.random() < 0.3) state.staffMarket.push(makeCandidate(pick(STAFF_ROLES).id));
+  }
+
+  function scoutStaff() {
+    if (state.money < STAFF_SCOUT_COST) return;
+    state.money -= STAFF_SCOUT_COST;
+    refreshStaffMarket();
+    addLog(TR("log.staffScout"), "info");
+    render(); save();
+  }
+
+  function visionOf(id) { return VISIONS.find(v => v.id === id) || VISIONS[0]; }
+
+  function hireStaff(idx, boost) {
+    const c = (state.staffMarket || [])[idx];
+    if (!c) return;
+    const def = STAFF_ROLES.find(r => r.id === c.id);
+    const pay = boost ? Math.round(c.pay * 1.35) : c.pay;
+    if (state.staff && state.staff[c.id]) {
+      showModal(TR("staff.busyTitle"), TR("staff.busy", { role: tx(def.name) }), "");
+      return;
+    }
+    if (state.money < c.fee) return;
+    const stamp = state.season * 100 + state.week;
+    if (c.asked === stamp) { showModal(TR("staff.againTitle"), TR("staff.again"), ""); return; }
+    c.asked = stamp;
+
+    const vis = visionOf(c.vision);
+    const fits = vis.test();
+    let p = clamp(0.28 + (staffStanding() - c.q) / 70, 0.05, 0.92);
+    if (!fits) p *= 0.22;                       // wizja się nie zgadza — rozmowa kończy się szybko
+    if (boost) p = clamp(p + 0.18, 0, 0.95);
+    if (state.money > c.fee * 3) p += 0.05;
+
+    if (Math.random() > p) {
+      state.mental = clamp(state.mental - 2, 0, 100);
+      addLog(TR("log.staffNo", { name: c.name, role: tx(def.name) }), "bad");
+      showModal(TR("staff.noTitle"), TR("staff.no", { name: c.name }),
+        '<div class="recap-line"><span>' + esc(TR("staff.vision")) + "</span><b>" + esc(tx(vis.text)) + "</b></div>" +
+        '<div class="recap-line"><span>' + esc(TR("staff.verdict")) + "</span><b>" +
+        esc(TR(fits ? "staff.tooBig" : "staff.mismatch")) + "</b></div>");
+      render(); save();
+      return;
+    }
+
+    state.money -= c.fee;
+    if (!state.staff) state.staff = {};
+    state.staff[c.id] = { name: c.name, q: c.q, pay: pay, vision: c.vision, since: state.season };
+    state.staffMarket.splice(idx, 1);
+    addLog(TR("log.staffYes", { name: c.name, role: tx(def.name) }), "gold");
+    chronicle(TR("chr.staff", { role: tx(def.name), name: c.name }), "info");
+    showModal(TR("staff.yesTitle"), TR("staff.yes", { name: c.name, role: tx(def.name).toLowerCase() }),
+      '<div class="recap-line"><span>' + esc(TR("staff.quality")) + "</span><b>" + c.q + "</b></div>" +
+      '<div class="recap-line"><span>' + esc(TR("staff.wage")) + "</span><b>" + money(pay) + "</b></div>" +
+      '<div class="recap-line"><span>' + esc(TR("staff.fee")) + "</span><b>" + money(c.fee) + "</b></div>");
+    render(); save();
+  }
+
+  function dismissStaff(id) {
+    const s = state.staff && state.staff[id];
+    if (!s) return;
+    const def = STAFF_ROLES.find(r => r.id === id);
+    const severance = s.pay * 4;
+    if (!confirm(TR("staff.confirmFire", { name: s.name, amount: money(severance) }))) return;
+    state.money -= severance;
+    delete state.staff[id];
+    addLog(TR("log.staffFired", { name: s.name, role: tx(def.name) }), "info");
     render(); save();
   }
 
@@ -1952,7 +2421,7 @@
   function playerPower() { return clamp(skillScore() * condFactor(), 10, 105); }
   function matesAvg() { return state.team.mates.reduce((a, m) => a + m.skill, 0) / state.team.mates.length; }
   function teamStrength() {
-    return matesAvg() * 0.72 + playerPower() * 0.28 + (state.team.chem - 50) * 0.09 + (owned("analyst") ? 3 : 0) + (state.captain ? 2 : 0) + (state.lead - 30) * 0.03
+    return matesAvg() * 0.72 + playerPower() * 0.28 + (state.team.chem - 50) * 0.09 + staffQ("analyst") / 22 + (state.captain ? 2 : 0) + (state.lead - 30) * 0.03
       + (teamHasTrait("veteran") ? 1.5 : 0) + (teamHasTrait("igl") ? 1 : 0) + bestBond() * 0.03;
   }
 
@@ -2292,7 +2761,7 @@
 
     state.stamina = clamp(state.stamina - 6 * res.maps.length, 0, 100);
     state.form = clamp(state.form + (res.won ? 7 : -6) + (res.me.rating - 1) * 22, 0, 100);
-    state.mental = clamp(state.mental + (res.won ? 4 : (owned("psycho") ? -3 : -6)), 0, 100);
+    state.mental = clamp(state.mental + (res.won ? 4 : -6 + Math.min(3.5, staffQ("psycho") / 27)), 0, 100);
     const tilt = teamHasTrait("tilter") ? 2 : 0;
     const joke = teamHasTrait("joker") ? 1 : 0;
     state.team.chem = clamp(state.team.chem + (res.won ? 2 + joke : -2 - tilt), 0, 100);
@@ -2336,7 +2805,9 @@
       : (state.age <= 21 ? 1.2 : state.age <= 25 ? 1.0 : state.age <= 28 ? 0.65 : 0.35);
     // im wyżej, tym trudniej — ostatnie punkty kosztują sezony
     const room = Math.pow(clamp((100 - cur) / 100, 0, 1), 1.42);
-    const gearF = (owned("coach") ? 1.30 : 1) * (statId === "reflex" && owned("monitor") ? 1.20 : 1)
+    // trener skaluje się jakością: przeciętny daje kilkanaście procent, klasowy grubo więcej
+    const gearF = (1 + staffQ("coach") / 260) * (statId === "reflex" && owned("monitor") ? 1.20 : 1)
+      * (statId === "aim" && owned("net") ? 1.10 : 1) * (owned("gaming") ? 1.12 : 1)
       * (teamHasTrait("mentor") ? 1.15 : 1);
     return state.talent * ageF * room * mult * 0.45 * gearF;
   }
@@ -2351,7 +2822,7 @@
       const g = growth(a.stat, a.gain * spanMul * (state.stamina < 30 ? 0.45 : 1));
       state.stats[a.stat] = clamp(state.stats[a.stat] + g, 1, 99);
     }
-    if (a.stam) state.stamina = clamp(state.stamina + (a.stam < 0 ? a.stam * (archDef().staminaMul || 1) : a.stam), 0, 100);
+    if (a.stam) state.stamina = clamp(state.stamina + (a.stam < 0 ? a.stam * (archDef().staminaMul || 1) * (owned("nutri") ? 0.85 : 1) : a.stam), 0, 100);
     if (a.mental) state.mental = clamp(state.mental + a.mental, 0, 100);
     if (a.chem) {
       state.team.chem = clamp(state.team.chem + a.chem, 0, 100);
@@ -2359,10 +2830,10 @@
     }
     if (a.lead) state.lead = clamp(state.lead + growthVal(state.lead, a.lead), 1, 99);
     if (a.form) state.form = clamp(state.form + a.form, 0, 100);
-    if (a.hype) state.hype = clamp(state.hype + a.hype * (0.6 + state.team.tier * 0.2), 0, 100);
+    if (a.hype) state.hype = clamp(state.hype + a.hype * (0.6 + state.team.tier * 0.2) * (1 + staffQ("media") / 130), 0, 100);
     state.weekPlan.push(id);
     if (id === "stream") {
-      const earn = Math.round(120 + state.hype * (14 + state.team.tier * 7) * rnd(0.7, 1.3));
+      const earn = Math.round((120 + state.hype * (14 + state.team.tier * 7) * rnd(0.7, 1.3)) * (owned("studio") ? 1.4 : 1));
       state.money += earn; state.career.earned += earn;
       addLog(TR("log.stream", { amount: money(earn) }), "good");
     }
@@ -2514,6 +2985,15 @@
     if (typeof state.adapt !== "number") state.adapt = 0;
     if (!state.formerTeams) state.formerTeams = [];
     if (!state.world) state.world = makeWorld();
+    // stare zapisy miały 44 rywali i losowe regiony — scena rośnie do pełnego rozmiaru
+    if (state.world.length < WORLD_SIZE * 0.8) {
+      const used = state.world.map(r => r.nick).concat([state.nick]);
+      state.world.forEach(r => { if (!r.region) r.region = orgRegion(r.team); });
+      REGION_SHARE.forEach(rs => {
+        const have = state.world.filter(r => (r.region || "eu") === rs[0]).length;
+        for (let i = have; i < Math.round(WORLD_SIZE * rs[1]); i++) state.world.push(makeAiPlayer(rs[0], used));
+      });
+    }
     if (!state.weekPlan) state.weekPlan = [];
     if (!state.lastPlan) state.lastPlan = [];
     // stare zapisy: plan tygodnia zaczyna od tego, co gracz klikał ostatnio
@@ -2521,6 +3001,15 @@
     if (!Array.isArray(state.plan2)) state.plan2 = [];
     if (typeof state.autoPlan !== "boolean") state.autoPlan = true;
     if (typeof state.smartRest !== "boolean") state.smartRest = true;
+    if (!state.staff) state.staff = {};
+    if (!Array.isArray(state.staffMarket)) state.staffMarket = [];
+    if (!state.funds) {
+      // stary portfel wchodzi w całości na lokatę
+      state.funds = { deposit: state.invest || 0, index: 0, crypto: 0 };
+      state.fundLast = 0;
+    }
+    if (typeof state.loanTry !== "number") state.loanTry = 0;
+    if (state.loan === undefined) state.loan = null;
     if (!state.extras) state.extras = {};
     if (typeof state.nemesisBeaten !== "number") state.nemesisBeaten = 0;
     if (!state.nemesis) state.nemesis = pickNemesis();
@@ -3118,9 +3607,13 @@
     state.sponsors.forEach(sp => { state.money += sp.pay; state.career.earned += sp.pay; });
     state.money -= upkeepTotal();
     if (state.captain) state.team.chem = clamp(state.team.chem + 2, 0, 100);
-    if (owned("psycho")) state.mental = clamp(state.mental + 3, 0, 100);
+    if (staffQ("psycho")) state.mental = clamp(state.mental + 1.5 + staffQ("psycho") / 40, 0, 100);
     if (owned("house")) state.stamina = clamp(state.stamina + 6, 0, 100);
-    if (state.invest > 0) state.invest = Math.round(state.invest * 1.005);
+    if (owned("chair")) state.stamina = clamp(state.stamina + 3, 0, 100);
+    if (owned("nutri")) state.stamina = clamp(state.stamina + 2, 0, 100);
+    if (staffQ("physio")) state.stamina = clamp(state.stamina + 1 + staffQ("physio") / 45, 0, 100);
+    if (staffQ("media")) state.hype = clamp(state.hype + staffQ("media") / 55, 0, 100);
+    tickFunds();
     state.stamina = clamp(state.stamina + 9, 0, 100);
     state.mental = clamp(state.mental + 3, 0, 100);
     state.hype = clamp(state.hype - 1.2 - state.hype * 0.012, 0, 100);
@@ -3133,8 +3626,8 @@
     if (state.injury > 0) {
       state.injury--;
       if (state.injury === 0) addLog(TR("log.healed"), "good");
-    } else if (state.stamina < 25 && Math.random() < (owned("physio") ? 0.03 : 0.07)) {
-      state.injury = owned("physio") ? 1 : irnd(1, 3);
+    } else if (state.stamina < 25 && Math.random() < 0.07 * (1 - staffQ("physio") / 140)) {
+      state.injury = staffQ("physio") > 60 ? 1 : irnd(1, 3);
       addLog(TR("log.injury", { n: state.injury }), "bad");
     }
     state.form = clamp(state.form + (state.form < 50 ? 2 : -1), 0, 100);
@@ -3166,7 +3659,7 @@
   function maybeOffer(force) {
     const mv = marketValue();
     const targetTier = clamp(Math.floor(mv / 34), 0, 4);
-    const chance = force ? 1 : clamp((mv - 35) / 550, 0, 0.32) * (owned("manager") ? 2 : 1) * (state.extras && state.extras.lowBuyout ? 1.6 : 1) * diffDef().offerMul;
+    const chance = force ? 1 : clamp((mv - 35) / 550, 0, 0.32) * (1 + staffQ("manager") / 60) * (state.extras && state.extras.lowBuyout ? 1.6 : 1) * diffDef().offerMul;
     if (Math.random() > chance) return;
     if (state.offers.length >= 3) return;
     // awans co najwyżej o jeden poziom naraz
@@ -3182,7 +3675,7 @@
     if (team.name === state.team.name) return;
     const offer = {
       id: "o" + Date.now() + Math.floor(Math.random() * 999),
-      team: team.name, tier: t, salary: Math.round(tier(t).salary * rnd(0.85, 1.35) * (1 + state.hype / 260) * (owned("manager") ? 1.15 : 1)),
+      team: team.name, tier: t, salary: Math.round(tier(t).salary * rnd(0.85, 1.35) * (1 + state.hype / 260) * (1 + staffQ("manager") / 450)),
       years: irnd(1, 3), strength: Math.round(team.mates.reduce((a, m) => a + m.skill, 0) / 4),
       mates: team.mates, chem: team.chem, ttl: irnd(3, 5),
       hot: t > state.team.tier,
@@ -3250,6 +3743,10 @@
       };
       const old = state.team.name;
       const oldRegion = myRegion();
+      if (state.loan) {                          // transfer w trakcie wypożyczenia = wykup z macierzystego klubu
+        addLog(TR("log.loanCut", { team: state.loan.name }), "info");
+        state.loan = null;
+      }
       if (!state.formerTeams) state.formerTeams = [];
       if (state.formerTeams.indexOf(old) < 0) state.formerTeams.push(old);
       state.team = { name: o.team, tier: o.tier, mates: o.mates, chem: o.chem,
@@ -3262,7 +3759,7 @@
       if (inLadder()) enterProCareer();
       const newRegion = orgRegion(o.team);
       if (newRegion !== oldRegion) {
-        state.adapt = 8;                       // kilka tygodni aklimatyzacji
+        state.adapt = owned("lang") ? 4 : 8;   // kilka tygodni aklimatyzacji, kurs językowy skraca je o połowę
         state.mental = clamp(state.mental - 6, 0, 100);
         addLog(TR("region.moved", { region: regionName(newRegion) }), "info");
         chronicle(TR("chr.moved", { region: regionName(newRegion) }), "info");
@@ -3302,7 +3799,7 @@
     const avail = SPONSOR_POOL.filter(s => state.hype >= s.hype && !state.sponsors.some(x => x.name === s.name));
     if (!avail.length || Math.random() > 0.18) return;
     const s = avail[0];
-    state.sponsors.push({ name: s.name, pay: Math.round(s.pay * rnd(0.9, 1.2)) });
+    state.sponsors.push({ name: s.name, pay: Math.round(s.pay * rnd(0.9, 1.2) * (1 + staffQ("media") / 200)) });
     addLog(TR("log.sponsor", { name: s.name }), "good");
   }
 
@@ -3405,12 +3902,14 @@
     }
 
     evolveSquad(rows);
+    const wasLoan = !!state.loan;
+    resolveLoan(rows);
 
-    // reakcja drużyny
+    // reakcja drużyny — z wypożyczenia się nie wylatuje, z niego się wraca
     let note = "";
     const rel = playerPower() - matesAvg();
     const expected = 0.93 + clamp(rel * 0.005, -0.05, 0.09) + diffDef().expected;
-    if (ss.matches >= 6 && r < expected - 0.12) {
+    if (!wasLoan && ss.matches >= 6 && r < expected - 0.12) {
       state.team.patience--;
       if (state.team.patience <= 0) {
         const newTier = clamp(state.team.tier - 1, 0, 4);
@@ -3453,6 +3952,7 @@
     state.league = makeLeague();
     state.schedule = makeSchedule();
     state.goal = makeGoal();
+    refreshStaffMarket();                        // co roku na rynku są inni ludzie
     checkAch();
     autoTrain();
 
@@ -3648,10 +4148,27 @@
       "Wykonany daje premię i cierpliwość klubu, niewykonany zbliża Cię do wylotu ze składu.</p>" +
       "<p>Gwarancja miejsca w kontrakcie chroni przed benchowaniem, bonus za trofeum dopłaca do wygranych turniejów, " +
       "a niskie odstępne sprawia, że inne kluby dzwonią częściej.</p>" },
-    { h: "Pieniądze", body:
-      "<p>Zarabiasz z pensji, nagród turniejowych, streamów i sponsorów. Wydajesz w zakładce Rynek: sprzęt i monitor " +
-      "podbijają statystyki, trener przyspiesza treningi, analityk wzmacnia drużynę w meczach, menedżer zwiększa liczbę ofert. " +
-      "Część z nich ma tygodniowe koszty utrzymania. Portfel inwestycyjny rośnie sam i liczy się do Hall of Fame.</p>" },
+    { h: "Pieniądze i portfel", body:
+      "<p>Zarabiasz z pensji, nagród turniejowych, streamów i sponsorów. W zakładce Rynek kupujesz rzeczy: sprzęt, monitor, " +
+      "fotel, łącze, catering, kurs językowy, studio streamowe, mieszkanie i własną salę treningową. Część z nich ma tygodniowe " +
+      "koszty utrzymania.</p>" +
+      "<p><b>Portfel inwestycyjny</b> ma trzy fundusze: lokata (0,35% tygodniowo, bez ryzyka), fundusz indeksowy " +
+      "(ok. 0,8% ze zmiennością) i krypto (ok. 1,3%, ale potrafi wyzerować wpłatę). Odsetki naliczają się co tydzień, " +
+      "wypłata jest natychmiastowa, a stan portfela liczy się do punktów Hall of Fame.</p>" },
+    { h: "Sztab", body:
+      "<p>Trener, analityk, psycholog, fizjoterapeuta, menedżer i menedżer mediów pracują dla <b>Ciebie</b>, nie dla klubu. " +
+      "Każdy kandydat ma <b>klasę</b> (0-100), tygodniową stawkę i wpisowe — im lepszy, tym mocniejszy efekt: trener przyspiesza " +
+      "treningi, analityk podnosi siłę drużyny, psycholog trzyma psychikę, fizjo skraca kontuzje, menedżer przynosi oferty " +
+      "i wyższe pensje, a menedżer mediów rozkręca hype i sponsorów.</p>" +
+      "<p>Każdy ma też <b>wizję współpracy</b> — jeden pracuje tylko z kimś, kto celuje w top, inny woli młodego zawodnika, " +
+      "jeszcze inny nie rusza się za granicę. Jeśli nie pasujesz do jego planu, odmówi, choćbyś miał pieniądze. " +
+      "Możesz dołożyć 35% do stawki, żeby przekonać wahającego się, poszukać nowych kandydatów albo zwolnić kogoś za odprawę.</p>" },
+    { h: "Wypożyczenie", body:
+      "<p>W zakładce Drużyna możesz poprosić zarząd o <b>wypożyczenie</b> na sezon. Kluby chętniej wypuszczają zawodnika, " +
+      "który siedzi w cieniu mocniejszego składu — gwiazdy i kapitana nikt nie oddaje.</p>" +
+      "<p>Na wypożyczeniu grasz w innym klubie (zwykle o poziom niżej) za niższą pensję, ale z realną minutą na serwerze. " +
+      "Po sezonie wracasz do macierzystego klubu — chyba że rating wyjdzie na 1.05 albo wyżej, wtedy klub goszczący " +
+      "może Cię wykupić na stałe. Z wypożyczenia nie wylatuje się ze składu, więc to bezpieczny sposób na przeczekanie słabszego roku.</p>" },
     { h: "Drużyna, drama i regiony", body:
       "<p>Koledzy mają charaktery i <b>relację</b> z Tobą, która rośnie od scrimów i wygranych. " +
       "Mentor przyspiesza Twój rozwój, tilciarz pogłębia kryzysy, weteran stabilizuje zespół.</p>" +
@@ -3699,10 +4216,27 @@
       "Meeting it pays a bonus and buys patience; missing it moves you closer to losing your spot.</p>" +
       "<p>A guaranteed spot protects you from being benched, a trophy bonus tops up tournament wins, " +
       "and a low buyout makes other clubs call more often.</p>" },
-    { h: "Money", body:
-      "<p>You earn from salary, prize money, streams and sponsors. You spend in the Market tab: gear and a monitor " +
-      "raise stats, a coach speeds up training, an analyst strengthens the team in matches, a manager brings more offers. " +
-      "Some of them carry weekly upkeep. The investment wallet grows on its own and counts toward the Hall of Fame.</p>" },
+    { h: "Money and the portfolio", body:
+      "<p>You earn from salary, prize money, streams and sponsors. The Market tab sells things: gear, a monitor, a chair, " +
+      "a fast connection, catering, a language course, a streaming studio, your own place and a private practice room. " +
+      "Some carry weekly upkeep.</p>" +
+      "<p>The <b>investment portfolio</b> has three funds: savings (0.35% a week, no risk), an index fund (around 0.8% with " +
+      "swings) and crypto (around 1.3% and capable of wiping out your deposit). Interest accrues weekly, withdrawal is instant, " +
+      "and the balance counts toward your Hall of Fame score.</p>" },
+    { h: "Your staff", body:
+      "<p>A coach, analyst, psychologist, physio, manager and media manager work for <b>you</b>, not for the club. " +
+      "Every candidate has a <b>quality</b> rating (0-100), a weekly rate and a signing fee — the better they are, the stronger " +
+      "the effect: a coach speeds up training, an analyst raises team strength, a psychologist protects your mental, a physio " +
+      "shortens injuries, a manager brings offers and better salaries, a media manager drives hype and sponsors.</p>" +
+      "<p>Each also has a <b>vision of the job</b> — one only works with someone aiming for the top, another prefers a young " +
+      "player, another will not relocate. If you do not fit their plan they turn you down, money or no money. You can add 35% " +
+      "to the rate to sway someone on the fence, scout for new candidates, or dismiss someone against a severance payment.</p>" },
+    { h: "Loan moves", body:
+      "<p>In the Team tab you can ask the board for a <b>loan move</b> for a season. Clubs let go of a player who sits in the " +
+      "shadow of a stronger lineup far more readily — nobody loans out their star or their captain.</p>" +
+      "<p>On loan you play at another club (usually one tier down) for a smaller salary but with real server time. After the " +
+      "season you go back to your parent club — unless your rating lands at 1.05 or above, in which case the host club can sign " +
+      "you permanently. You cannot be cut while on loan, so it is a safe way to ride out a weaker year.</p>" },
     { h: "Squad, drama and regions", body:
       "<p>Teammates have traits and a <b>bond</b> with you that grows through scrims and wins. " +
       "A mentor speeds up your development, a tilter deepens slumps, a veteran steadies the team.</p>" +
@@ -4211,7 +4745,7 @@
     document.getElementById("hud-week").textContent = state.week + "/" + SEASON_LENGTH;
     document.getElementById("hud-season").textContent = state.season;
 
-    renderCareer(); renderTrain(); renderTeam(); renderInfluence(); renderShop(); renderWorld(); renderOffers();
+    renderCareer(); renderTrain(); renderTeam(); renderInfluence(); renderShop(); renderStaff(); renderWorld(); renderOffers();
     renderPlayerCard(); renderRatingChart(); renderRecent(); renderProfile();
     document.getElementById("offers-dot").classList.toggle("hidden", state.offers.length === 0);
   }
@@ -4507,13 +5041,77 @@
       '<div class="shop-item"><div><div class="si-name">' + esc(TR("shop.vacation")) + "</div>" +
       '<div class="si-desc">' + esc(TR("shop.vacationDesc")) + "</div></div>" +
       '<button data-vacation="1"' + (state.money < VACATION_COST ? " disabled" : "") + ">" + money(VACATION_COST) + "</button></div>" +
-      '<div class="shop-item"><div><div class="si-name">' + esc(TR("shop.wallet")) + "</div>" +
-      '<div class="si-desc">' + esc(TR("shop.walletDesc")) + "</div></div>" +
-      '<button data-invest="1"' + (state.money < INVEST_CHUNK ? " disabled" : "") + ">" +
-      esc(TR("shop.deposit", { amount: money(INVEST_CHUNK) })) + "</button></div>";
+      (inLadder() ? "" :
+        '<div class="shop-item"><div><div class="si-name">' + esc(TR("shop.bootcamp")) + "</div>" +
+        '<div class="si-desc">' + esc(TR("shop.bootcampDesc")) + "</div></div>" +
+        '<button data-bootcamp="1"' + (state.money < BOOTCAMP_COST ? " disabled" : "") + ">" + money(BOOTCAMP_COST) + "</button></div>");
     document.getElementById("shop-list").innerHTML = items + extras;
+    renderFunds();
     document.getElementById("wallet-box").textContent =
-      TR("shop.walletLine", { wallet: money(state.invest || 0), upkeep: money(upkeepTotal()) });
+      TR("shop.walletLine", { wallet: money(fundTotal()), upkeep: money(upkeepTotal()) });
+  }
+
+  // Portfel: trzy fundusze o różnym ryzyku, wpłata i wypłata na miejscu
+  function renderFunds() {
+    const f = funds();
+    const last = state.fundLast || 0;
+    document.getElementById("fund-list").innerHTML = FUNDS.map(x =>
+      '<div class="shop-item fund-row"><div><div class="si-name">' + icon(x.icon) + " " + esc(tx(x.name)) + "</div>" +
+      '<div class="si-desc">' + esc(tx(x.desc)) + "</div>" +
+      '<div class="si-upkeep">' + esc(TR("fund.balance", { amount: money(Math.round(f[x.id] || 0)) })) + "</div></div>" +
+      '<div class="si-btns">' +
+      '<button data-fund="' + x.id + '"' + (state.money < x.chunk ? " disabled" : "") + ">+" + money(x.chunk) + "</button>" +
+      '<button data-fund-out="' + x.id + '"' + (!(f[x.id] > 0) ? " disabled" : "") + ">" + esc(TR("fund.withdraw")) + "</button>" +
+      "</div></div>").join("");
+    document.getElementById("fund-summary").textContent = TR("fund.summary", {
+      total: money(fundTotal()),
+      change: (last >= 0 ? "+" : "") + money(last),
+    });
+  }
+
+  function staffRow(id, s) {
+    const def = STAFF_ROLES.find(r => r.id === id);
+    return '<div class="shop-item"><div><div class="si-name">' + icon(def.icon) + " " + esc(tx(def.name)) + "</div>" +
+      '<div class="si-desc">' + esc(s.name) + " · " + esc(tx(def.desc)) + "</div>" +
+      '<div class="si-q"><span class="q-val">' + esc(TR("staff.quality")) + " " + s.q + "</span>" +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + s.q + "%; background:" + barColor(s.q) + '"></div></div></div>' +
+      '<div class="si-upkeep">' + esc(TR("staff.wagePer", { amount: money(s.pay) })) + "</div></div>" +
+      '<div class="si-btns"><button data-fire="' + id + '">' + esc(TR("staff.fire")) + "</button></div></div>";
+  }
+
+  function renderStaff() {
+    // w drugim rozdziale sam jesteś sztabem — rynek fachowców znika
+    const panel = document.getElementById("staff-panel");
+    panel.classList.toggle("hidden", inPhase2());
+    if (inPhase2()) return;
+    const hired = Object.keys(state.staff || {});
+    document.getElementById("staff-hired").innerHTML = hired.length
+      ? hired.map(k => staffRow(k, state.staff[k])).join("")
+      : '<p class="muted">' + esc(TR("staff.none")) + "</p>";
+    if (!state.staffMarket || !state.staffMarket.length) refreshStaffMarket();
+    document.getElementById("staff-market").innerHTML = state.staffMarket.map((c, i) => {
+      const def = STAFF_ROLES.find(r => r.id === c.id);
+      const vis = visionOf(c.vision);
+      const fits = vis.test();
+      const have = !!(state.staff && state.staff[c.id]);
+      const boostPay = Math.round(c.pay * 1.35);
+      return '<div class="shop-item"><div><div class="si-name">' + icon(def.icon) + " " + esc(tx(def.name)) + "</div>" +
+        '<div class="si-desc">' + esc(c.name) + " · " + esc(TR("staff.wagePer", { amount: money(c.pay) })) +
+        " · " + esc(TR("staff.feeShort", { amount: money(c.fee) })) + "</div>" +
+        '<div class="si-q"><span class="q-val">' + esc(TR("staff.quality")) + " " + c.q + "</span>" +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + c.q + "%; background:" + barColor(c.q) + '"></div></div></div>' +
+        '<div class="si-vision">„' + esc(tx(vis.text)) + '"</div>' +
+        '<div class="si-vision ' + (fits ? "fits" : "warn") + '">' +
+        esc(TR(fits ? "staff.fitsOk" : "staff.fitsNo")) + "</div></div>" +
+        '<div class="si-btns">' +
+        '<button data-hire="' + i + '"' + (have || state.money < c.fee ? " disabled" : "") + ">" +
+        esc(TR(have ? "staff.taken" : "staff.hire")) + "</button>" +
+        (have ? "" : '<button data-hire-boost="' + i + '"' + (state.money < c.fee ? " disabled" : "") +
+          ' title="' + esc(TR("staff.boostHint", { amount: money(boostPay) })) + '">' + esc(TR("staff.boost")) + "</button>") +
+        "</div></div>";
+    }).join("");
+    document.getElementById("btn-scout-staff").disabled = state.money < STAFF_SCOUT_COST;
+    document.getElementById("scout-label").textContent = TR("staff.scout", { amount: money(STAFF_SCOUT_COST) });
   }
 
   function renderWorld() {
@@ -4658,11 +5256,17 @@
       esc(TR(state.captain ? "infl.isCap" : "infl.notCap")) + "</div>" +
       '<div class="bar-track" style="margin-top:8px"><div class="bar-fill" style="width:' + sc + "%; background:" + barColor(sc) + '"></div></div>' +
       '<div class="infl-actions">' +
-      (state.captain ? "" : '<button class="act" data-captain="1"' + (state.energy < 1 ? " disabled" : "") +
+      (state.captain ? "" : '<button class="act" data-captain="1"' + (state.captainTry === state.season ? " disabled" : "") +
         '><span class="a-title">' + icon("star") + " " + esc(TR("infl.captainBtn")) + '</span><span class="a-cost">' + esc(TR("infl.captainCost")) + "</span></button>") +
-      '<button class="act" data-transfer="1"' + (state.energy < 2 ? " disabled" : "") +
+      '<button class="act" data-transfer="1"' + (state.transferTry === state.season ? " disabled" : "") +
       '><span class="a-title">' + icon("swap") + " " + esc(TR("infl.transferBtn")) + '</span><span class="a-cost">' + esc(TR("infl.transferCost")) + "</span></button>" +
-      "</div></div>";
+      (state.loan ? "" : '<button class="act" data-loan="1"' + (state.loanTry === state.season ? " disabled" : "") +
+        '><span class="a-title">' + icon("briefcase") + " " + esc(TR("infl.loanBtn")) + '</span><span class="a-desc">' +
+        esc(TR("infl.loanDesc")) + '</span><span class="a-cost">' + esc(TR("infl.transferCost")) + "</span></button>") +
+      "</div>" +
+      (state.loan ? '<div class="g-desc" style="margin-top:9px">' +
+        esc(TR("loan.active", { team: state.loan.name })) + "</div>" : "") +
+      "</div>";
   }
 
   function renderProfile() {
@@ -4831,8 +5435,23 @@
     const buy = e.target.closest("[data-buy]");
     if (buy) return buyItem(buy.dataset.buy);
     if (e.target.closest("[data-vacation]")) return buyVacation();
-    if (e.target.closest("[data-invest]")) return invest();
+    if (e.target.closest("[data-bootcamp]")) return buyBootcamp();
   });
+  document.getElementById("fund-list").addEventListener("click", e => {
+    const put = e.target.closest("[data-fund]"), out = e.target.closest("[data-fund-out]");
+    if (put) return investIn(put.dataset.fund);
+    if (out) return withdraw(out.dataset.fundOut);
+  });
+  document.getElementById("staff-hired").addEventListener("click", e => {
+    const f = e.target.closest("[data-fire]");
+    if (f) dismissStaff(f.dataset.fire);
+  });
+  document.getElementById("staff-market").addEventListener("click", e => {
+    const h = e.target.closest("[data-hire]"), b = e.target.closest("[data-hire-boost]");
+    if (b) return hireStaff(parseInt(b.dataset.hireBoost, 10), true);
+    if (h) return hireStaff(parseInt(h.dataset.hire, 10), false);
+  });
+  document.getElementById("btn-scout-staff").addEventListener("click", scoutStaff);
   document.getElementById("offers-list").addEventListener("click", e => {
     const a = e.target.closest("[data-accept]"), r = e.target.closest("[data-reject]");
     if (a) acceptOffer(a.dataset.accept);
@@ -4855,6 +5474,7 @@
   document.getElementById("influence-box").addEventListener("click", e => {
     if (e.target.closest("[data-captain]")) return tryCaptain();
     if (e.target.closest("[data-transfer]")) return requestTransfer();
+    if (e.target.closest("[data-loan]")) return requestLoan();
   });
   document.getElementById("btn-fast").addEventListener("click", () => {
     state.fastMatches = !state.fastMatches;

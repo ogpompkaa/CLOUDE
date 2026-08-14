@@ -69,8 +69,17 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
   stabilizuje zespół. Między sezonami skład się zmienia: ktoś odchodzi do lepszego klubu,
   ktoś kończy karierę, przychodzi ktoś nowy. Możesz też walczyć o rolę kapitana i prosić
   zarząd o transfery.
-- **Świat** — 44 rywali AI z własnymi drużynami i karierami, żywy ranking Top 20,
-  oraz rywal kariery, który trafia do Twojej ligi i którego trzeba wyprzedzić.
+- **Świat** — około **180 rywali AI** rozsianych po wszystkich regionach (najwięcej w Europie i WNP),
+  z własnymi klubami, karierami i emeryturami. Do tego żywy ranking Top 20 i rywal kariery,
+  który trafia do Twojej ligi i którego trzeba wyprzedzić.
+- **Sztab** — trenera, analityka, psychologa, fizjoterapeutę, menedżera i menedżera mediów zatrudniasz
+  **sam**, na własny rachunek. Każdy kandydat ma klasę 0-100, tygodniową stawkę, wpisowe i **wizję
+  współpracy**: jeden pracuje tylko z kimś, kto celuje w top, inny woli młodego zawodnika, jeszcze inny
+  nie rusza się za granicę. Jeśli nie pasujesz do jego planu — odmówi, choćbyś miał pieniądze.
+  Możesz dołożyć do stawki, poszukać nowych kandydatów albo zwolnić kogoś za odprawę.
+- **Wypożyczenie** — z ławki mocnego składu można poprosić zarząd o sezon w innym klubie.
+  Grasz niżej i za mniejsze pieniądze, ale realnie grasz; po sezonie wracasz, chyba że klub goszczący
+  Cię wykupi. Z wypożyczenia nie wylatuje się ze składu.
 - **Drama** — gwiazda składu dostaje ofertę i możesz próbować ją zatrzymać, tilciarz rozbija
   szatnię, sztab prosi o zmianę roli pod nowy transfer. Mecz z byłym klubem waży więcej:
   wygrana podnosi formę i psychikę, porażka boli podwójnie.
@@ -83,8 +92,11 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
   zawodnika i debiutanta roku oraz drużyny sezonu, a przy dobrym roku także Twoje wyróżnienie.
 - **Kronika kariery** — oś czasu w profilu zbiera kamienie milowe: pierwszy kontrakt, poziom 9
   na FACEIT, awanse w ESEA, trofea, Majory, wyprzedzenie rywala i transfery.
-- **Pieniądze** — sprzęt, trener, analityk, psycholog, menedżer, fizjoterapeuta i mieszkanie,
-  a do tego portfel inwestycyjny liczony do punktów Hall of Fame.
+- **Pieniądze** — sklep z rzeczami (sprzęt, monitor, fotel, łącze, catering, kurs językowy, studio
+  streamowe, mieszkanie, prywatna sala treningowa), wakacje i bootcamp z drużyną, a do tego
+  **portfel inwestycyjny** z trzema funduszami: lokatą bez ryzyka, funduszem indeksowym i krypto,
+  które potrafi zjeść wpłatę. Odsetki naliczają się co tydzień, a stan portfela liczy się do
+  punktów Hall of Fame.
 
 Przy pierwszym uruchomieniu przeprowadza Cię krótki samouczek, a pełne wyjaśnienie statystyk
 i systemów jest zawsze pod przyciskiem **?** w pasku u góry.

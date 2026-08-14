@@ -165,13 +165,62 @@ check('decyzje się pojawiają', seen.choices > 0, seen.choices + ' wyborów');
 check('rating w rozsądnym zakresie', avgRating > 0.6 && avgRating < 1.6, avgRating.toFixed(2));
 check('K/D w rozsądnym zakresie', kd > 0.5 && kd < 2.0, kd.toFixed(2));
 check('historia meczów zapisana', (c.recent || []).length > 0, (c.recent || []).length + ' wpisów');
-check('ranking świata żyje', Array.isArray(st.world) && st.world.length > 20, (st.world || []).length + ' rywali');
+check('ranking świata żyje', Array.isArray(st.world) && st.world.length > 120, (st.world || []).length + ' rywali');
+const byRegion = (st.world || []).reduce((a, r) => { a[r.region] = (a[r.region] || 0) + 1; return a; }, {});
+check('scena rozłożona po regionach', Object.keys(byRegion).length >= 5 && byRegion.cis >= 20,
+  Object.entries(byRegion).map(([k, v]) => k + ':' + v).join(' '));
 check('cel od zarządu istnieje', !!st.goal, st.goal && st.goal.kind);
 check('plan wykonuje się automatycznie co tydzień',
   (st.log || []).some(l => /Plan tygodnia wykonany|Weekly plan done/.test(l.text)),
   ((st.log || []).find(l => /Plan tygodnia/.test(l.text)) || {}).text || 'brak wpisu w logu');
 check('samouczek startuje przy nowej karierze', tutorialShown, tutorialSteps);
 check('ekran pomocy ma sekcje', helpSections >= 5, helpSections + ' sekcji');
+
+// rynek: sklep, portfel i sztab
+await page.click('.nav-btn[data-view="offers"]');
+const shopCount = await page.$$eval('#shop-list .shop-item', els => els.length).catch(() => 0);
+const fundCount = await page.$$eval('#fund-list .fund-row', els => els.length).catch(() => 0);
+const staffCands = await page.$$eval('#staff-market .shop-item', els => els.length).catch(() => 0);
+check('sklep ma pełną ofertę', shopCount >= 10, shopCount + ' pozycji');
+check('portfel ma trzy fundusze', fundCount === 3, fundCount + '');
+check('rynek sztabu ma kandydatów', staffCands >= 5, staffCands + ' kandydatów');
+await page.evaluate(() => {
+  const s = JSON.parse(localStorage.getItem('cs2-player-career-v1'));
+  s.money = 3000000;
+  localStorage.setItem('cs2-player-career-v1', JSON.stringify(s));
+});
+await page.reload();
+await page.waitForSelector('#game-screen:not(.hidden)');
+await drainOverlays();
+await page.click('.nav-btn[data-view="offers"]');
+await safeClick('[data-fund="deposit"]');
+const afterFund = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+check('wpłata do funduszu działa', (afterFund.funds || {}).deposit > 0, JSON.stringify(afterFund.funds));
+// rozmowy ze sztabem: albo ktoś dołącza, albo odmawia — obie ścieżki muszą działać bez błędu
+let hires = 0, refusals = 0;
+for (let i = 0; i < 8; i++) {
+  const free = await page.$$eval('[data-hire]:not([disabled])', els => els.length).catch(() => 0);
+  if (!free) break;
+  const before = await page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('cs2-player-career-v1')).staff || {}).length);
+  await safeClick('[data-hire="0"]');
+  await safeClick('#modal-close');
+  const now = await page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('cs2-player-career-v1')).staff || {}).length);
+  if (now > before) hires++; else refusals++;
+  await safeClick('#btn-scout-staff');
+}
+check('rozmowy o sztab dają rozstrzygnięcie', hires + refusals > 0, hires + ' zatrudnień, ' + refusals + ' odmów');
+
+// wypożyczenie: prośba kończy się decyzją zarządu w obie strony
+await page.click('.nav-btn[data-view="team"]');
+const loanBtn = await page.$('[data-loan]:not([disabled])');
+if (loanBtn) {
+  await safeClick('[data-loan]');
+  if (await page.isVisible('#choice-overlay:not(.hidden)')) await safeClick('[data-choice="0"]');
+  await drainOverlays();
+}
+const afterLoan = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+check('prośba o wypożyczenie rozpatrzona', !!loanBtn && afterLoan.loanTry === afterLoan.season,
+  afterLoan.loan ? 'wypożyczony do ' + afterLoan.team.name : 'zarząd odmówił');
 
 // zapis i odczyt
 await page.click('.nav-btn[data-view="profile"]');
