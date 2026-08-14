@@ -176,6 +176,25 @@ check('plan wykonuje się automatycznie co tydzień',
 check('samouczek startuje przy nowej karierze', tutorialShown, tutorialSteps);
 check('ekran pomocy ma sekcje', helpSections >= 5, helpSections + ' sekcji');
 
+// scena: feed, ranking klubów
+await page.click('.nav-btn[data-view="scene"]');
+const newsRows = await page.$$eval('#news-list .entry', els => els.length).catch(() => 0);
+const clubRows = await page.$$eval('#clubs-body tr', els => els.map(e => e.textContent)).catch(() => []);
+check('feed sceny żyje', newsRows >= 5, newsRows + ' wpisów');
+check('ranking klubów ma tabelę', clubRows.length >= 10, clubRows.length + ' wierszy');
+check('mój klub jest w rankingu', clubRows.some(r => r.includes(st.team.name)), st.team.name);
+
+// zdrowie: obciążenie i panel
+await page.click('.nav-btn[data-view="train"]');
+const healthTxt = await page.textContent('#health-box').catch(() => '');
+check('panel zdrowia pokazuje obciążenie', /Obciążenie/.test(healthTxt) && typeof st.burn === 'number',
+  'burn ' + Math.round(st.burn || 0));
+
+// kalendarz: kwalifikacje przed Majorem
+const hasRmr = (st.schedule || []).some(e => e.type === 'rmr');
+const hasMajor = (st.schedule || []).some(e => e.major);
+check('kalendarz ma RMR i Major', hasRmr && hasMajor, 'RMR ' + hasRmr + ', Major ' + hasMajor);
+
 // rynek: sklep, portfel i sztab
 await page.click('.nav-btn[data-view="offers"]');
 const shopCount = await page.$$eval('#shop-list .shop-item', els => els.length).catch(() => 0);

@@ -72,6 +72,19 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
 - **Świat** — około **180 rywali AI** rozsianych po wszystkich regionach (najwięcej w Europie i WNP),
   z własnymi klubami, karierami i emeryturami. Do tego żywy ranking Top 20 i rywal kariery,
   który trafia do Twojej ligi i którego trzeba wyprzedzić.
+- **Scena** — osobna zakładka z feedem z całego świata: transfery rywali, wygrane turnieje, skoki
+  w rankingu, emerytury, plotki o Tobie i Twoje własne trofea. Pod feedem ranking zawodników
+  i **ranking organizacji** — kluby budują siłę, zdobywają tytuły, awansują i spadają, a Twoja
+  drużyna jest w tabeli podświetlona.
+- **Zdrowie** — **obciążenie** rośnie od treningów i meczów, spada od odpoczynku, psychologa
+  i własnego mieszkania; na maksimum organizm sam robi sobie tydzień przerwy. Powtarzane kontuzje
+  i wiek zostawiają **przewlekłe urazy** (nadgarstek, kręgosłup, wzrok), które spowalniają rozwój
+  statystyki, przyspieszają jej spadek i zwiększają ryzyko kolejnych kontuzji. Usuwa je **operacja**
+  — za pieniądze i kilka tygodni pauzy.
+- **Major i kadra** — na Majora trzeba się dostać: w 21. tygodniu grasz **RMR** z ekipami z regionu
+  i musisz wygrać dwa mecze z trzech. Bez awansu oglądasz Major z domu. Raz na sezon, jeśli grasz
+  na poziomie, przychodzi **powołanie do reprezentacji** kraju — trzy mecze, zmęczenie, rozpoznawalność
+  i szansa na tytuł do gabloty.
 - **Sztab** — trenera, analityka, psychologa, fizjoterapeutę, menedżera i menedżera mediów zatrudniasz
   **sam**, na własny rachunek. Każdy kandydat ma klasę 0-100, tygodniową stawkę, wpisowe i **wizję
   współpracy**: jeden pracuje tylko z kimś, kto celuje w top, inny woli młodego zawodnika, jeszcze inny

@@ -280,6 +280,12 @@
   #log-feed .entry.bad { border-left-color: var(--danger); } #log-feed .entry.bad .icon { color: var(--danger); }
   #log-feed .entry.info { border-left-color: var(--accent); } #log-feed .entry.info .icon { color: var(--accent); }
   #log-feed .entry.gold { border-left-color: var(--gold); } #log-feed .entry.gold .icon { color: var(--gold); }
+  #news-list .entry { display: flex; align-items: flex-start; gap: 9px; padding: 9px 2px; font-size: 0.8rem;
+    font-family: 'Inter', sans-serif; line-height: 1.45; border-bottom: 1px solid var(--border); }
+  #news-list .entry:last-child { border-bottom: 0; }
+  #news-list .entry .icon { flex-shrink: 0; margin-top: 2px; color: var(--text-faint); }
+  #news-list .entry.gold .icon { color: var(--gold); }
+  #news-list .entry.info .icon { color: var(--accent); }
 
   #ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
   .ach { background: var(--bg-panel); border: 1px solid var(--border); padding: 10px 6px; text-align: center;
@@ -530,6 +536,11 @@
           <h2><svg class="icon"><use href="#i-chart"></use></svg> <span data-i18n="train.skills">Umiejętności</span></h2>
           <div class="stat-list" id="stat-list"></div>
         </div>
+        <div class="glass panel" id="health-panel">
+          <h2><svg class="icon"><use href="#i-heart"></use></svg> <span data-i18n="health.title">Zdrowie</span></h2>
+          <p class="muted" data-i18n="health.info" style="margin-bottom:12px;">Obciążenie rośnie od treningów i meczów, spada od odpoczynku, psychologa i spokojnego mieszkania. Przy maksimum organizm sam robi sobie przerwę.</p>
+          <div id="health-box"></div>
+        </div>
       </section>
 
       <section id="view-team" class="view hidden">
@@ -544,10 +555,23 @@
           <h2><svg class="icon"><use href="#i-globe"></use></svg> <span data-i18n="team.table">Tabela ligi</span></h2>
           <table class="standings-table"><tbody id="standings-body"></tbody></table>
         </div>
+      </section>
+
+      <section id="view-scene" class="view hidden">
+        <div class="glass panel">
+          <h2><svg class="icon"><use href="#i-globe"></use></svg> <span data-i18n="scene.news">Ze sceny</span></h2>
+          <p class="muted" data-i18n="scene.newsInfo" style="margin-bottom:12px;">Transfery, wyniki i ruchy w rankingu z całego świata — także te, które dotyczą Ciebie.</p>
+          <div id="news-list"></div>
+        </div>
         <div class="glass panel">
           <h2><svg class="icon"><use href="#i-chart"></use></svg> <span data-i18n="team.top20">Top 20 zawodników świata</span></h2>
           <p class="muted" data-i18n="team.top20info" style="margin-bottom:10px;">Ranking aktualizuje się po każdym sezonie. Liczy się rating, poziom drużyny, trofea i rozpoznawalność.</p>
           <table class="rank-table"><tbody id="world-body"></tbody></table>
+        </div>
+        <div class="glass panel" id="clubs-panel">
+          <h2><svg class="icon"><use href="#i-medal"></use></svg> <span data-i18n="scene.clubs">Ranking organizacji</span></h2>
+          <p class="muted" data-i18n="scene.clubsInfo" style="margin-bottom:10px;">Kluby budują składy, wygrywają turnieje i spadają. Twoja organizacja jest podświetlona.</p>
+          <table class="rank-table"><tbody id="clubs-body"></tbody></table>
         </div>
       </section>
 
@@ -621,6 +645,7 @@
       <button class="nav-btn active" data-view="career"><svg class="icon"><use href="#i-user"></use></svg><span data-i18n="nav.career">Kariera</span></button>
       <button class="nav-btn" data-view="train"><svg class="icon"><use href="#i-bolt"></use></svg><span data-i18n="nav.train">Trening</span></button>
       <button class="nav-btn" data-view="team"><svg class="icon"><use href="#i-users"></use></svg><span data-i18n="nav.team">Drużyna</span></button>
+      <button class="nav-btn" data-view="scene"><svg class="icon"><use href="#i-globe"></use></svg><span data-i18n="nav.scene">Scena</span></button>
       <button class="nav-btn" data-view="offers"><svg class="icon"><use href="#i-swap"></use></svg><span data-i18n="nav.market">Rynek</span><span class="dot hidden" id="offers-dot"></span></button>
       <button class="nav-btn" data-view="profile"><svg class="icon"><use href="#i-medal"></use></svg><span data-i18n="nav.profile">Profil</span></button>
     </nav>
@@ -766,6 +791,29 @@
     "nav.career": ["Kariera", "Career"],
     "nav.train": ["Trening", "Training"],
     "nav.team": ["Drużyna", "Team"],
+    "nav.scene": ["Scena", "Scene"],
+    "scene.news": ["Ze sceny", "From the scene"],
+    "scene.newsInfo": ["Transfery, wyniki i ruchy w rankingu z całego świata — także te, które dotyczą Ciebie.",
+      "Transfers, results and ranking moves from around the world — including the ones about you."],
+    "scene.clubs": ["Ranking organizacji", "Organisation ranking"],
+    "scene.clubsInfo": ["Kluby budują składy, wygrywają turnieje i spadają. Twoja organizacja jest podświetlona.",
+      "Clubs build rosters, win trophies and fall away. Your organisation is highlighted."],
+    "scene.empty": ["Cisza na scenie. Zagraj kilka tygodni.", "The scene is quiet. Play a few weeks."],
+    "news.transfer": ["{nick} zmienia barwy: {from} → {to}.", "{nick} switches colours: {from} → {to}."],
+    "news.win": ["{team} wygrywa {event}.", "{team} takes {event}."],
+    "news.hot": ["{nick} w formie życia — {rating} ratingu w ostatnich tygodniach.",
+      "{nick} is on the run of their life — {rating} rating over the last few weeks."],
+    "news.rumour": ["Plotka: {team} pyta o {nick}.", "Rumour: {team} is asking about {nick}."],
+    "news.upset": ["Niespodzianka: {team} ogrywa {other}.", "Upset: {team} beats {other}."],
+    "news.retire": ["{nick} ({team}) kończy karierę.", "{nick} ({team}) retires."],
+    "news.rankTop": ["Nowy numer jeden rankingu: {nick} ({team}).", "New world number one: {nick} ({team})."],
+    "news.clubTop": ["{team} zamyka rok jako najmocniejsza organizacja świata.",
+      "{team} closes the year as the strongest organisation in the world."],
+    "news.myTransfer": ["Oficjalnie: {nick} przechodzi z {from} do {to}.", "Official: {nick} moves from {from} to {to}."],
+    "news.myLoan": ["{nick} na wypożyczeniu z {from} do {team}.", "{nick} on loan from {from} to {team}."],
+    "news.myStaff": ["{nick} zatrudnia {name} — nowy {role} w prywatnym sztabie.",
+      "{nick} hires {name} — a new {role} on the private staff."],
+    "news.myTrophy": ["{nick} i {team} wygrywają {event}.", "{nick} and {team} win {event}."],
     "nav.market": ["Rynek", "Market"],
     "nav.profile": ["Profil", "Profile"],
     "career.rating": ["Rating sezonu", "Season rating"],
@@ -854,6 +902,76 @@
     "log.start": ["Zaczynasz karierę jako {role} w {team}.", "You start your career as a {role} at {team}."],
     "log.healed": ["Kontuzja wyleczona — wracasz do składu.", "Injury healed — you are back in the lineup."],
     "log.injury": ["Kontuzja nadgarstka. Pauza: {n} tyg.", "Wrist injury. Out for {n} weeks."],
+    "log.chronic": ["Diagnoza: {name}. To już zostanie.", "Diagnosis: {name}. That one stays with you."],
+    "log.surgery": ["Operacja: {name}. Pauza {n} tyg.", "Surgery: {name}. Out for {n} weeks."],
+    "log.burnout": ["Wypalenie. Organizm odmawia posłuszeństwa — tydzień przerwy.",
+      "Burnout. Your body says no — a week off."],
+    "chr.chronic": ["Przewlekła kontuzja: {name}.", "Chronic injury: {name}."],
+    "chr.surgery": ["Operacja: {name}.", "Surgery: {name}."],
+    "rmr.label": ["RMR — kwalifikacje do Majora", "RMR — Major qualifier"],
+    "rmr.series": ["RMR · mecz {n} vs {opp}", "RMR · match {n} vs {opp}"],
+    "rmr.round": ["Mecz {n}", "Match {n}"],
+    "rmr.result": ["Wynik kwalifikacji", "Qualifier result"],
+    "rmr.qualified": ["Awans na Major ({w} z {n})", "Through to the Major ({w} of {n})"],
+    "rmr.failed": ["Bez awansu ({w} z {n})", "No spot ({w} of {n})"],
+    "week.rmr": ["Trzy mecze o miejsce na Majorze. Rywale z regionu: {region}.",
+      "Three matches for a Major spot. Regional rivals: {region}."],
+    "week.majorOut": ["Bez awansu — Major oglądasz z domu.", "No spot — you watch the Major from home."],
+    "log.rmrIn": ["Awans na Major!", "Through to the Major!"],
+    "log.rmrOut": ["Koniec kwalifikacji — bez Majora w tym sezonie.", "Qualifier over — no Major this season."],
+    "log.majorWatch": ["Major bez Ciebie. Tydzień oglądania i przemyśleń.", "The Major without you. A week of watching and thinking."],
+    "chr.rmrIn": ["Awans na Major.", "Qualified for the Major."],
+    "chr.rmrOut": ["Przegrane kwalifikacje do Majora.", "Failed the Major qualifier."],
+    "major.watchTitle": ["Major bez Ciebie", "The Major without you"],
+    "major.watch": ["{event} zaczyna się bez Twojej drużyny. Zostaje oglądanie i robota na przyszły sezon.",
+      "{event} starts without your team. All that is left is watching — and work for next season."],
+    "news.rmrIn": ["{team} z {nick} w składzie melduje się na Majorze.",
+      "{team} with {nick} books a Major spot."],
+    "news.natWin": ["{nick} sięga po tytuł z reprezentacją {country}.", "{nick} takes the title with {country}."],
+    "nat.callTitle": ["Powołanie do kadry", "National call-up"],
+    "nat.call": ["Sztab reprezentacji {country} pyta o Twoją dyspozycyjność. W składzie: {squad}.",
+      "The {country} national staff asks if you are available. In the squad: {squad}."],
+    "nat.accept": ["Jadę", "I am in"],
+    "nat.acceptDesc": ["Trzy mecze, rozpoznawalność i szansa na tytuł — kosztem kondycji.",
+      "Three matches, recognition and a shot at the title — at the cost of stamina."],
+    "nat.decline": ["Odmawiam", "I pass"],
+    "nat.declineDesc": ["Odpoczynek zamiast turnieju. Kibice tego nie lubią.",
+      "Rest instead of a tournament. The fans will not love it."],
+    "nat.round": ["Runda {n}", "Round {n}"],
+    "nat.won": ["wygrana", "won"],
+    "nat.lost": ["porażka", "lost"],
+    "nat.caps": ["Występy w kadrze", "National caps"],
+    "nat.trophy": ["Mistrzostwo z reprezentacją {country}", "Title with {country}"],
+    "nat.resultTitle": ["Reprezentacja {country}", "{country} national team"],
+    "nat.champion": ["Złoto z kadrą {country}. Takie rzeczy pamięta się do końca kariery.",
+      "Gold with {country}. That is the kind of thing you remember for good."],
+    "nat.out": ["Turniej reprezentacji {country} zakończony.", "The {country} national tournament is over."],
+    "log.natDecline": ["Odmowa gry w kadrze — kibice krzywo patrzą.", "You turned down the national team — the fans noticed."],
+    "log.natWin": ["Mistrzostwo z reprezentacją {country}!", "Title with the {country} national team!"],
+    "log.natPlayed": ["Turniej z kadrą {country}: {n} wygranych rund.", "Tournament with {country}: {n} rounds won."],
+    "chr.natWin": ["Mistrzostwo z reprezentacją {country}.", "Title with the {country} national team."],
+    "match.prizeShort": ["Nagroda", "Prize"],
+    "health.title": ["Zdrowie", "Health"],
+    "health.info": ["Obciążenie rośnie od treningów i meczów, spada od odpoczynku, psychologa i spokojnego mieszkania. Przy maksimum organizm sam robi sobie przerwę.",
+      "Load builds from training and matches and falls with rest, a psychologist and a calm home. At the top your body takes the break for you."],
+    "health.load": ["Obciążenie", "Load"],
+    "health.burnLow": ["świeży", "fresh"],
+    "health.burnMid": ["zmęczony", "worn"],
+    "health.burnHigh": ["na granicy", "at the limit"],
+    "health.burnMax": ["wypalony", "burnt out"],
+    "health.none": ["Bez przewlekłych urazów.", "No chronic injuries."],
+    "health.chronicTitle": ["Przewlekła kontuzja", "Chronic injury"],
+    "health.chronic": ["Lekarz nie ma dobrych wiadomości: {name}. To nie przejdzie samo.",
+      "The doctor has no good news: {name}. This one will not pass on its own."],
+    "health.effect": ["Skutek", "Effect"],
+    "health.surgeryCost": ["Operacja", "Surgery"],
+    "health.surgery": ["Operacja ({amount}, {n} tyg.)", "Surgery ({amount}, {n} wks)"],
+    "health.confirmSurgery": ["Operować {name}? Koszt {amount}, pauza {n} tygodni.",
+      "Operate on {name}? Costs {amount}, out for {n} weeks."],
+    "health.since": ["od sezonu {n}", "since season {n}"],
+    "health.burnTitle": ["Organizm mówi dość", "Your body says enough"],
+    "health.burn": ["Tygodnie bez regeneracji zebrały żniwo. Tydzień przerwy, spadek formy i psychiki — i sygnał, żeby zwolnić.",
+      "Weeks without recovery caught up with you. A week off, a drop in form and mental — and a signal to slow down."],
     "log.reasonInjury": ["Kontuzja", "Injury"],
     "log.reasonBurnout": ["Wypalenie", "Burnout"],
     "log.win": ["wygrana", "a win"],
@@ -1520,6 +1638,21 @@
     { id: "gaming",  name: ["Prywatna sala treningowa", "Private practice room"], cost: 320000, upkeep: 2400,
       desc: ["Serwer, ściana taktyczna i cisza. +12% do każdego treningu.", "Server, tactics wall and quiet. +12% from every training action."] },
   ];
+  // Przewlekłe kontuzje: nie mijają same, kosztują statystyki i wracają pod obciążeniem.
+  // Operacja usuwa problem, ale wypisuje Cię na kilka tygodni.
+  const CHRONIC = [
+    { id: "wrist", name: ["Przeciążony nadgarstek", "Chronic wrist strain"], stat: "aim",
+      desc: ["Aim spada szybciej, a kontuzje wracają częściej.", "Aim decays faster and injuries come back more often."],
+      surgery: 120000, weeks: 4 },
+    { id: "back", name: ["Kręgosłup", "Back problems"], stat: "reflex",
+      desc: ["Długie sesje męczą podwójnie, refleks siada.", "Long sessions drain twice as hard and reflex suffers."],
+      surgery: 150000, weeks: 5 },
+    { id: "eyes", name: ["Przemęczenie wzroku", "Eye strain"], stat: "sense",
+      desc: ["Trudniej utrzymać koncentrację przez cały mecz.", "Holding focus through a full match gets harder."],
+      surgery: 60000, weeks: 2 },
+  ];
+  const BURN_LIMIT = 100;
+
   const VACATION_COST = 30000;
   const BOOTCAMP_COST = 48000;
   const STAFF_SCOUT_COST = 6000;
@@ -1814,6 +1947,7 @@
     const leagueWeeks = [2, 4, 6, 8, 10, 14, 16, 18, 20, 22];
     for (let w = 1; w <= SEASON_LENGTH; w++) {
       if (w === 12) sched.push({ type: "event", name: "Winter Series", major: false });
+      else if (w === 21) sched.push({ type: "rmr", name: "RMR" });
       else if (w === 24) sched.push({ type: "event", name: "Intercontinental Major", major: true });
       else if (w === 26) sched.push({ type: "playoff", name: "Playoff ligi" });
       else if (leagueWeeks.indexOf(w) >= 0) sched.push({ type: "league", opp: 1 + ((leagueWeeks.indexOf(w)) % 5) });
@@ -1844,7 +1978,8 @@
                 trophies: [], seasons: [], bestRank: 0, bestRating: 0, recent: [], timeline: [] },
       ach: {}, log: [], rank: 0, retired: false,
       weekPlan: [], lastPlan: [], plan: [], plan2: [], autoPlan: true, smartRest: true, extras: {}, goal: null,
-      staff: {}, staffMarket: [], funds: { deposit: 0, index: 0, crypto: 0 }, fundLast: 0, loan: null, loanTry: 0, nemesis: null, nemesisBeaten: 0, fastMatches: false,
+      staff: {}, staffMarket: [], funds: { deposit: 0, index: 0, crypto: 0 }, fundLast: 0, loan: null, loanTry: 0,
+      news: [], clubs: null, chronic: [], burn: 0, injuries: 0, majorSpot: false, natCall: 0, natCaps: 0, nemesis: null, nemesisBeaten: 0, fastMatches: false,
       lead: 18 + ((ARCHETYPES.find(a => a.id === archId) || {}).lead || 0), captain: false, captainTry: 0, transferTry: 0,
       phase: null, craft: 0, rep: 0, audience: 0, trophies2: 0, tutorialDone: false,
       adapt: 0, formerTeams: [], maps: {},
@@ -2002,6 +2137,159 @@
     document.getElementById("rank-overlay").classList.remove("hidden");
   }
 
+  // ---------- zdrowie i długowieczność ----------
+  // Wypalenie jest procesem, nie rzutem kostką: rośnie od harówki, spada od odpoczynku.
+  // Kontuzje, które wracają, zostawiają ślad na stałe — chyba że zdecydujesz się na operację.
+  function chronicList() {
+    if (!Array.isArray(state.chronic)) state.chronic = [];
+    return state.chronic;
+  }
+  function chronicCount() { return chronicList().length; }
+  function hasChronic(id) { return chronicList().some(c => c.id === id); }
+  function chronicPenalty(statId) {
+    // każde schorzenie spowalnia rozwój swojej statystyki i przyspiesza jej spadek z wiekiem
+    return chronicList().reduce((a, c) => {
+      const def = CHRONIC.find(x => x.id === c.id);
+      return a + (def && def.stat === statId ? 0.18 : 0.05);
+    }, 0);
+  }
+
+  function maybeChronic() {
+    const risk = clamp((state.injuries || 0) * 0.045 + (state.age - 22) * 0.012 + (state.burn || 0) / 900
+      - staffQ("physio") / 320, 0, 0.55);
+    if (chronicCount() >= 2 || Math.random() > risk) return;
+    const free = CHRONIC.filter(c => !hasChronic(c.id));
+    if (!free.length) return;
+    const def = pick(free);
+    chronicList().push({ id: def.id, since: state.season });
+    addLog(TR("log.chronic", { name: tx(def.name) }), "bad");
+    chronicle(TR("chr.chronic", { name: tx(def.name) }), "bad");
+    showModal(TR("health.chronicTitle"), TR("health.chronic", { name: tx(def.name) }),
+      '<div class="recap-line"><span>' + esc(TR("health.effect")) + "</span><b>" + esc(tx(def.desc)) + "</b></div>" +
+      '<div class="recap-line"><span>' + esc(TR("health.surgeryCost")) + "</span><b>" + money(def.surgery) +
+      " · " + def.weeks + " tyg.</b></div>");
+  }
+
+  function surgery(id) {
+    const def = CHRONIC.find(c => c.id === id);
+    if (!def || !hasChronic(id) || state.money < def.surgery) return;
+    if (!confirm(TR("health.confirmSurgery", { name: tx(def.name), amount: money(def.surgery), n: def.weeks }))) return;
+    state.money -= def.surgery;
+    state.chronic = chronicList().filter(c => c.id !== id);
+    state.injury = Math.max(state.injury || 0, def.weeks);
+    state.form = clamp(state.form - 12, 0, 100);
+    addLog(TR("log.surgery", { name: tx(def.name), n: def.weeks }), "info");
+    chronicle(TR("chr.surgery", { name: tx(def.name) }), "info");
+    render(); save();
+  }
+
+  // Licznik wypalenia: harówka bez regeneracji podnosi go tygodniami, aż zbierze żniwo
+  function tickHealth() {
+    if (typeof state.burn !== "number") state.burn = 0;
+    const load = (MAX_ENERGY - state.energy) * 3.5;            // ile energii poszło w tym tygodniu
+    const rest = state.stamina > 65 ? 9 : state.stamina > 45 ? 5 : 0;
+    const care = 3 + staffQ("psycho") / 22 + (owned("house") ? 2 : 0);
+    state.burn = clamp(state.burn + load * 0.5 - rest - care + (state.mental < 40 ? 4 : 0), 0, BURN_LIMIT);
+    if (state.burn >= 85 && Math.random() < 0.35) {
+      // organizm mówi dość: tydzień przerwy i realny spadek formy
+      state.burn = clamp(state.burn - 45, 0, BURN_LIMIT);
+      state.injury = Math.max(state.injury, 1);
+      state.mental = clamp(state.mental - 12, 0, 100);
+      state.form = clamp(state.form - 10, 0, 100);
+      addLog(TR("log.burnout"), "bad");
+      showModal(TR("health.burnTitle"), TR("health.burn"), "");
+      maybeChronic();
+    }
+  }
+
+  function burnLabel() {
+    const b = state.burn || 0;
+    return b < 30 ? TR("health.burnLow") : b < 60 ? TR("health.burnMid") : b < 85 ? TR("health.burnHigh") : TR("health.burnMax");
+  }
+
+  // ---------- kluby: żywy ranking organizacji ----------
+  // Każda organizacja ma siłę, formę i dorobek; wygrane turnieje i transfery przesuwają ją w tabeli.
+  function makeClubs() {
+    return ORGS.map(o => ({
+      n: o.n, r: o.r, t: o.t,
+      power: clamp(Math.round(30 + o.t * 14 + rnd(-6, 6)), 10, 99),
+      trophies: o.t >= 3 ? irnd(1, 6) : o.t >= 2 ? irnd(0, 2) : 0,
+      form: 0,
+    }));
+  }
+  function clubs() {
+    if (!state.clubs || !state.clubs.length) state.clubs = makeClubs();
+    // ekipa z drabinki albo klub spoza listy organizacji też musi mieć swój wiersz
+    if (state.team && state.team.name && !state.clubs.some(c => c.n === state.team.name)) {
+      state.clubs.push({ n: state.team.name, r: myRegion(), t: state.team.tier,
+        power: clamp(Math.round(teamStrength()), 10, 99), trophies: 0, form: 0 });
+    }
+    return state.clubs;
+  }
+  function clubOf(name) { return clubs().find(c => c.n === name); }
+  function clubScore(c) { return c.power * 2 + c.trophies * 6 + c.form * 3; }
+  function clubTable() {
+    return clubs().slice().sort((a, b) => clubScore(b) - clubScore(a));
+  }
+
+  // Sezon w świecie klubów: kto rośnie, kto się sypie, kto zgarnia tytuły
+  function evolveClubs() {
+    const list = clubs();
+    list.forEach(c => {
+      const drift = rnd(-7, 7) + (55 - c.power) * 0.06;      // regresja do średniej
+      c.power = clamp(Math.round(c.power + drift), 10, 99);
+      c.form = Math.round(rnd(-2, 2));
+      if (c.power > 78 && Math.random() < 0.35) { c.trophies++; }
+      if (Math.random() < 0.2) c.t = clamp(c.t + (c.power > 72 ? 1 : -1), 0, 4);
+    });
+    // Twój klub żyje wynikami Twojego sezonu, nie losem
+    const mine = state.team ? clubOf(state.team.name) : null;
+    if (mine) {
+      mine.power = clamp(Math.round(mine.power * 0.6 + teamStrength() * 0.4), 10, 99);
+      mine.t = state.team.tier;
+      mine.trophies += state.career.trophies.filter(t => t.season === state.season).length;
+    }
+    // tytuły sezonu rozdane — trzy najmocniejsze kluby dostają wzmiankę w newsach
+    const top = clubTable().slice(0, 3);
+    if (top[0]) news("news.clubTop", { team: top[0].n }, "gold");
+  }
+
+  // ---------- feed sceny ----------
+  function news(key, params, kind) {
+    if (!state.news) state.news = [];
+    state.news.unshift({ s: state.season, w: state.week, key: key, p: params || {}, kind: kind || "info" });
+    if (state.news.length > 60) state.news.length = 60;
+  }
+
+  // Tygodniowe drobiazgi: scena żyje także wtedy, gdy Ty akurat trenujesz
+  function weeklyNews() {
+    if (!state.world || !state.world.length) return;
+    const roll = Math.random();
+    const myReg = myRegion();
+    const local = state.world.filter(r => r.region === myReg);
+    const pool = (Math.random() < 0.5 && local.length ? local : state.world);
+    const who = pick(pool);
+    if (!who) return;
+    if (roll < 0.3) {
+      const to = pickOrgIn(who.region, clamp(who.tier + (Math.random() < 0.5 ? 1 : 0), 0, 4));
+      if (to !== who.team) {
+        news("news.transfer", { nick: who.nick, from: who.team, to: to }, "info");
+        who.team = to;
+      }
+    } else if (roll < 0.55) {
+      const c = pick(clubs().filter(x => x.r === who.region && x.t >= 2)) || pick(clubs());
+      news("news.win", { team: c.n, event: pick(["Elite League", "BLAST Open", "IEM", "ESL Pro League", "Thunderpick", "PGL"]) }, "info");
+      c.form = 2; c.power = clamp(c.power + 2, 10, 99);
+    } else if (roll < 0.72) {
+      news("news.hot", { nick: who.nick, rating: (who.rating + rnd(0.05, 0.2)).toFixed(2) }, "info");
+    } else if (roll < 0.85 && state.hype > 45) {
+      news("news.rumour", { nick: state.nick, team: pickOrgIn(myReg, clamp(state.team.tier + 1, 0, 4)) }, "gold");
+    } else if (state.team && state.league) {
+      const opp = pick(state.league.teams.filter(t => !t.me));
+      if (opp) news("news.upset", { team: opp.name, other: pickOrgIn(myReg, 4) }, "info");
+    }
+  }
+
   function evolveWorld() {
     if (!state.world) { state.world = makeWorld(); return; }
     const used = state.world.map(r => r.nick).concat([state.nick]);
@@ -2021,6 +2309,7 @@
       }
       if (r.rating > 1.15 && Math.random() < 0.3) r.trophies++;
       if (r.age > 31 && Math.random() < 0.45) {      // emerytura, wchodzi nowy talent z tej samej sceny
+        if (r.tier >= 3) news("news.retire", { nick: r.nick, team: r.team }, "info");
         const fresh = makeAiPlayer(r.region, used);
         fresh.age = irnd(17, 20);
         fresh.tier = clamp(Math.min(fresh.tier, 3), 0, cap);
@@ -2029,6 +2318,9 @@
         Object.keys(fresh).forEach(k => { r[k] = fresh[k]; });
       }
     });
+    evolveClubs();
+    const top = worldTable().slice(0, 3).filter(r => !r.me);
+    if (top[0]) news("news.rankTop", { nick: top[0].nick, team: top[0].team }, "gold");
   }
 
   // ---------- wpływ na skład ----------
@@ -2120,6 +2412,7 @@
     const newRegion = orgRegion(org.n);
     if (newRegion !== myRegion()) state.adapt = owned("lang") ? 3 : 6;
     addLog(TR("log.loanYes", { team: org.n, from: parent.name }), "gold");
+    news("news.myLoan", { nick: state.nick, team: org.n, from: parent.name }, "gold");
     chronicle(TR("chr.loan", { team: org.n }), "info");
     showModal(TR("loan.yesTitle"), TR("loan.yes", { team: org.n, from: parent.name }),
       '<div class="recap-line"><span>' + esc(TR("season.team")) + "</span><b>" + esc(org.n) + " (" + esc(tx(tier(t).name)) + ")</b></div>" +
@@ -2392,6 +2685,7 @@
     state.staff[c.id] = { name: c.name, q: c.q, pay: pay, vision: c.vision, since: state.season };
     state.staffMarket.splice(idx, 1);
     addLog(TR("log.staffYes", { name: c.name, role: tx(def.name) }), "gold");
+    if (c.q >= 75) news("news.myStaff", { nick: state.nick, name: c.name, role: tx(def.name).toLowerCase() }, "info");
     chronicle(TR("chr.staff", { role: tx(def.name), name: c.name }), "info");
     showModal(TR("staff.yesTitle"), TR("staff.yes", { name: c.name, role: tx(def.name).toLowerCase() }),
       '<div class="recap-line"><span>' + esc(TR("staff.quality")) + "</span><b>" + c.q + "</b></div>" +
@@ -2510,6 +2804,11 @@
     if (LANG === "en") return n === 1 ? "frag" : "frags";
     if (n === 1) return "frag";
     return (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? "fragi" : "fragów";
+  }
+  function trophyWord(n) {
+    if (LANG === "en") return n === 1 ? "trophy" : "trophies";
+    if (n === 1) return "trofeum";
+    return (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? "trofea" : "trofeów";
   }
   function speedLabel(i) { return TR("live.speed" + i); }
   let live = null;
@@ -2815,7 +3114,7 @@
     const gearF = (1 + staffQ("coach") / 260) * (statId === "reflex" && owned("monitor") ? 1.20 : 1)
       * (statId === "aim" && owned("net") ? 1.10 : 1) * (owned("gaming") ? 1.12 : 1)
       * (teamHasTrait("mentor") ? 1.15 : 1);
-    return state.talent * ageF * room * mult * 0.45 * gearF;
+    return state.talent * ageF * room * mult * 0.45 * gearF * clamp(1 - chronicPenalty(statId), 0.45, 1);
   }
 
   // ---------- akcje tygodnia ----------
@@ -3015,6 +3314,14 @@
       state.fundLast = 0;
     }
     if (typeof state.loanTry !== "number") state.loanTry = 0;
+    if (!Array.isArray(state.news)) state.news = [];
+    if (!Array.isArray(state.chronic)) state.chronic = [];
+    if (typeof state.burn !== "number") state.burn = 0;
+    if (typeof state.injuries !== "number") state.injuries = 0;
+    if (typeof state.majorSpot !== "boolean") state.majorSpot = false;
+    if (typeof state.natCall !== "number") state.natCall = 0;
+    if (typeof state.natCaps !== "number") state.natCaps = 0;
+    if (!state.clubs || !state.clubs.length) state.clubs = makeClubs();
     if (state.loan === undefined) state.loan = null;
     if (!state.extras) state.extras = {};
     if (typeof state.nemesisBeaten !== "number") state.nemesisBeaten = 0;
@@ -3431,11 +3738,12 @@
     if (inPhase2()) { nextWeek2(); return; }
     if (inLadder()) { ladderMonth(); render(); save(); return; }
     const ev = currentEvent();
-    const isMatch = ev.type === "league" || ev.type === "event" || ev.type === "playoff";
+    const isMatch = ev.type === "league" || ev.type === "event" || ev.type === "playoff" || ev.type === "rmr";
     if (!isMatch) { advanceWeek(); render(); save(); return; }
     if (state.injury >= 2 || state.mental <= 12) { missMatch(ev); return; }
     const dispatch = () => {
       if (ev.type === "league") playLeagueMatch(ev);
+      else if (ev.type === "rmr") playRmr(ev);
       else if (ev.type === "event") playEvent(ev);
       else playPlayoff();
     };
@@ -3448,6 +3756,7 @@
   function missMatch(ev) {
     const reason = TR(state.injury > 0 ? "log.reasonInjury" : "log.reasonBurnout");
     const oppStr = ev.type === "league" ? state.league.teams[ev.opp].str : tier(state.team.tier).str + 3;
+    if (ev.type === "rmr") state.majorSpot = false;      // nie zagrałeś kwalifikacji — nie ma Majora
     const won = Math.random() < clamp(0.5 + (matesAvg() - oppStr) * 0.02, 0.15, 0.8);
     if (ev.type === "league") {
       const me = state.league.teams[0], opp = state.league.teams[ev.opp];
@@ -3509,7 +3818,131 @@
     });
   }
 
+  // ---------- kadra narodowa ----------
+  // Powołanie przychodzi raz na sezon i tylko wtedy, gdy nazwisko na to zasługuje.
+  function countryName() {
+    const c = COUNTRIES.find(x => x.code === state.country);
+    return c ? tx(c.name) : "—";
+  }
+  function nationalReady() {
+    if (state.stage !== "pro" || state.natCall === state.season) return false;
+    const r = state.seasonStats.matches >= 4 ? seasonRating() : careerRating();
+    return r >= 1.0 || (state.rank && state.rank <= 40) || state.hype >= 55;
+  }
+
+  function nationalCall(done) {
+    state.natCall = state.season;
+    const mates = state.world.filter(w => w.region === myRegion())
+      .sort((a, b) => b.rating - a.rating).slice(0, 12);
+    const squad = mates.slice(0, 4);
+    const squadStr = squad.length
+      ? squad.reduce((a, m) => a + (55 + (m.rating - 0.9) * 60 + m.tier * 4), 0) / squad.length
+      : tier(state.team.tier).str;
+    showChoice(TR("nat.callTitle"), TR("nat.call", { country: countryName(), squad: squad.map(m => m.nick).join(", ") }), [
+      { label: TR("nat.accept"), desc: TR("nat.acceptDesc") },
+      { label: TR("nat.decline"), desc: TR("nat.declineDesc") },
+    ], ci => {
+      closeChoice();
+      if (ci === 1) {
+        state.hype = clamp(state.hype - 4, 0, 100);
+        state.stamina = clamp(state.stamina + 10, 0, 100);
+        addLog(TR("log.natDecline"), "info");
+        done();
+        return;
+      }
+      // krótki turniej reprezentacji: trzy rundy, każda mocniejsza
+      const power = squadStr * 0.7 + playerPower() * 0.3 + staffQ("analyst") / 30;
+      let wins = 0;
+      const rows = [];
+      for (let i = 0; i < 3; i++) {
+        const opp = tier(clamp(state.team.tier + 1, 0, 4)).str + i * 3 + rnd(-3, 3);
+        const p = clamp(0.5 + (power - opp) * 0.022, 0.12, 0.88);
+        const won = Math.random() < p;
+        rows.push([TR("nat.round", { n: i + 1 }), TR(won ? "nat.won" : "nat.lost")]);
+        if (!won) break;
+        wins++;
+      }
+      state.natCaps = (state.natCaps || 0) + 1;
+      state.stamina = clamp(state.stamina - 14, 0, 100);
+      const champ = wins === 3;
+      const pay = Math.round(tier(state.team.tier).prize * (champ ? 0.5 : 0.12 * wins + 0.05));
+      state.money += pay; state.career.earned += pay;
+      state.hype = clamp(state.hype + (champ ? 14 : 4 + wins * 2), 0, 100);
+      if (champ) {
+        state.career.trophies.push({ name: TR("nat.trophy", { country: countryName() }), season: state.season,
+          major: false, tier: clamp(state.team.tier + 1, 0, 4) });
+        addLog(TR("log.natWin", { country: countryName() }), "gold");
+        chronicle(TR("chr.natWin", { country: countryName() }), "gold");
+        news("news.natWin", { nick: state.nick, country: countryName() }, "gold");
+      } else {
+        addLog(TR("log.natPlayed", { country: countryName(), n: wins }), "info");
+      }
+      rows.push([TR("nat.caps"), String(state.natCaps)]);
+      rows.push([TR("match.prizeShort"), money(pay)]);
+      showModal(TR("nat.resultTitle", { country: countryName() }),
+        TR(champ ? "nat.champion" : "nat.out", { country: countryName() }),
+        rows.map(x => '<div class="recap-line"><span>' + esc(x[0]) + "</span><b>" + esc(x[1]) + "</b></div>").join(""));
+      modalAfterClose = () => { done(); };
+    });
+  }
+
+  // ---------- kwalifikacje do Majora ----------
+  // Do Majora nie wchodzi się z automatu: najpierw RMR z ekipami z Twojego regionu.
+  function playRmr(ev) {
+    const base = tier(state.team.tier).str - 1;
+    const region = myRegion();
+    const rivals = ORGS.filter(o => o.r === region && o.n !== state.team.name);
+    const lines = [];
+    let wins = 0, played = 0, last = null;
+
+    function runOne() {
+      const oppName = rivals.length ? pick(rivals).n : pickOrg(state.team.tier);
+      const oppStr = base + rnd(-2, 5) + played * 2;
+      runSeries(oppStr, 3, TR("rmr.series", { n: played + 1, opp: oppName }), oppName, res => {
+        applyMatchResult(res, TR("rmr.label"));
+        last = res;
+        lines.push({ label: TR("rmr.round", { n: played + 1 }) + " vs " + oppName,
+          score: res.mapsWon + "-" + res.mapsLost, won: res.won, rating: res.me.rating });
+        if (res.won) wins++;
+        played++;
+        if (wins >= 2 || played >= 3) { finishRmr(); return; }
+        runOne();
+      });
+    }
+
+    function finishRmr() {
+      state.majorSpot = wins >= 2;
+      const prize = Math.round(tier(state.team.tier).prize * (state.majorSpot ? 0.3 : 0.08));
+      state.money += prize; state.career.earned += prize;
+      if (state.majorSpot) {
+        state.hype = clamp(state.hype + 6, 0, 100);
+        addLog(TR("log.rmrIn"), "gold");
+        chronicle(TR("chr.rmrIn"), "gold");
+        news("news.rmrIn", { nick: state.nick, team: state.team.name }, "gold");
+      } else {
+        state.mental = clamp(state.mental - 8, 0, 100);
+        state.form = clamp(state.form - 5, 0, 100);
+        addLog(TR("log.rmrOut"), "bad");
+        chronicle(TR("chr.rmrOut"), "bad");
+      }
+      const extra = TR(state.majorSpot ? "rmr.qualified" : "rmr.failed", { w: wins, n: played }) +
+        " · " + TR("match.prize", { amount: money(prize) });
+      showMatch(TR("rmr.label"), last, "", { lines: lines, extra: extra, champion: state.majorSpot });
+    }
+
+    runOne();
+  }
+
   function playEvent(ev) {
+    // Major bez kwalifikacji ogląda się z domu
+    if (ev.major && !state.majorSpot) {
+      state.mental = clamp(state.mental - 4, 0, 100);
+      state.hype = clamp(state.hype - 3, 0, 100);
+      addLog(TR("log.majorWatch"), "bad");
+      showModal(TR("major.watchTitle"), TR("major.watch", { event: ev.name }), "");
+      modalAfterClose = () => { advanceWeek(); render(); save(); };
+      return;
+    }
     const base = tier(state.team.tier).str + (ev.major ? 6 : 2);
     const stages = ev.major
       ? [{ n: ["Faza grupowa", "Group stage"], bo: 1, opp: base - 4 }, { n: ["Ćwierćfinał", "Quarter-final"], bo: 3, opp: base },
@@ -3542,6 +3975,7 @@
     let extra = TR("match.prize", { amount: money(prize) });
     if (won) {
       state.career.trophies.push({ name: ev.name, season: state.season, major: !!ev.major, tier: state.team.tier });
+      news("news.myTrophy", { nick: state.nick, team: state.team.name, event: ev.name }, "gold");
       if (state.extras && state.extras.bonus) {
         const bn = Math.round(tier(state.team.tier).prize * 0.4);
         state.money += bn; state.career.earned += bn;
@@ -3593,6 +4027,7 @@
         lines.push({ label: "Finał", score: fin.mapsWon + "-" + fin.mapsLost, won: fin.won, rating: fin.me.rating });
         if (fin.won) {
           state.career.trophies.push({ name: TR("league.title", { n: state.season }), season: state.season, major: false, tier: state.team.tier });
+          news("news.myTrophy", { nick: state.nick, team: state.team.name, event: TR("league.title", { n: state.season }) }, "gold");
           if (state.extras && state.extras.bonus) {
             const bn = Math.round(tier(state.team.tier).prize * 0.4);
             state.money += bn; state.career.earned += bn;
@@ -3620,6 +4055,7 @@
     if (staffQ("physio")) state.stamina = clamp(state.stamina + 1 + staffQ("physio") / 45, 0, 100);
     if (staffQ("media")) state.hype = clamp(state.hype + staffQ("media") / 55, 0, 100);
     tickFunds();
+    if (Math.random() < 0.55) weeklyNews();
     state.stamina = clamp(state.stamina + 9, 0, 100);
     state.mental = clamp(state.mental + 3, 0, 100);
     state.hype = clamp(state.hype - 1.2 - state.hype * 0.012, 0, 100);
@@ -3632,10 +4068,13 @@
     if (state.injury > 0) {
       state.injury--;
       if (state.injury === 0) addLog(TR("log.healed"), "good");
-    } else if (state.stamina < 25 && Math.random() < 0.07 * (1 - staffQ("physio") / 140)) {
+    } else if (state.stamina < 25 && Math.random() < (0.07 + chronicCount() * 0.03) * (1 - staffQ("physio") / 140)) {
       state.injury = staffQ("physio") > 60 ? 1 : irnd(1, 3);
+      state.injuries = (state.injuries || 0) + 1;
       addLog(TR("log.injury", { n: state.injury }), "bad");
+      maybeChronic();
     }
+    tickHealth();
     state.form = clamp(state.form + (state.form < 50 ? 2 : -1), 0, 100);
     state.energy = MAX_ENERGY;
 
@@ -3650,6 +4089,11 @@
     state.week++;
     if (state.week > SEASON_LENGTH) { endSeason(); return; }
     autoTrain();
+    // powołanie do kadry: wolny tydzień w połowie sezonu, raz na rok
+    if (state.week === 13 && nationalReady() && currentEvent().type === "free") {
+      nationalCall(() => { render(); save(); });
+      return;
+    }
     if (Math.random() < 0.17) { runLifeEvent(() => { render(); save(); }); return; }
     maybeDrama(() => { render(); save(); });
   }
@@ -3772,6 +4216,7 @@
       }
       state.hype = clamp(state.hype + 5, 0, 100);
       addLog(TR("log.transferLine", { from: old, to: o.team, salary: money(state.team.salary) }), "gold");
+      news("news.myTransfer", { nick: state.nick, from: old, to: o.team }, "gold");
       chronicle(TR("chr.transfer", { team: o.team }), "info");
       const terms = [];
       if (ex.guaranteed) terms.push("gwarancja miejsca w składzie");
@@ -3942,8 +4387,9 @@
     const arch = archDef();
     if (state.age >= (arch.declineAge || 27)) {
       const dm = arch.declineMul || 1;
-      state.stats.aim = clamp(state.stats.aim - rnd(0.8, 2.6) * dm, 1, 99);
-      state.stats.reflex = clamp(state.stats.reflex - rnd(1.2, 3.4) * dm, 1, 99);
+      const ch = 1 + chronicCount() * 0.25;
+      state.stats.aim = clamp(state.stats.aim - rnd(0.8, 2.6) * dm * (hasChronic("wrist") ? ch + 0.3 : ch), 1, 99);
+      state.stats.reflex = clamp(state.stats.reflex - rnd(1.2, 3.4) * dm * (hasChronic("back") ? ch + 0.3 : ch), 1, 99);
       state.stats.sense = clamp(state.stats.sense + rnd(0.4, 1.4), 1, 99);
     }
     state.team.contract--;
@@ -3958,6 +4404,7 @@
     state.league = makeLeague();
     state.schedule = makeSchedule();
     state.goal = makeGoal();
+    state.majorSpot = false;                     // do Majora kwalifikujesz się od nowa
     refreshStaffMarket();                        // co roku na rynku są inni ludzie
     checkAch();
     autoTrain();
@@ -4170,6 +4617,23 @@
       "<p>Każdy ma też <b>wizję współpracy</b> — jeden pracuje tylko z kimś, kto celuje w top, inny woli młodego zawodnika, " +
       "jeszcze inny nie rusza się za granicę. Jeśli nie pasujesz do jego planu, odmówi, choćbyś miał pieniądze. " +
       "Możesz dołożyć 35% do stawki, żeby przekonać wahającego się, poszukać nowych kandydatów albo zwolnić kogoś za odprawę.</p>" },
+    { h: "Scena, kluby i newsy", body:
+      "<p>Zakładka <b>Scena</b> to feed z całego świata: transfery rywali AI, wygrane turnieje, skoki w rankingu, " +
+      "emerytury, plotki o Twoim nazwisku i Twoje własne trofea. Pod nim ranking zawodników i <b>ranking organizacji</b>.</p>" +
+      "<p>Kluby żyją własnym życiem: budują siłę, wygrywają tytuły, awansują i spadają. Twoja organizacja jest podświetlona, " +
+      "a jej pozycja zależy od tego, jak Wam idzie w sezonie.</p>" },
+    { h: "Zdrowie i długowieczność", body:
+      "<p><b>Obciążenie</b> rośnie od treningów i meczów, a spada od odpoczynku, psychologa i własnego mieszkania. " +
+      "Przy maksimum organizm sam robi sobie tydzień przerwy — z utratą formy i psychiki.</p>" +
+      "<p>Powtarzające się kontuzje i wiek mogą zostawić <b>przewlekły uraz</b> (nadgarstek, kręgosłup, wzrok). " +
+      "Taki uraz spowalnia rozwój swojej statystyki, przyspiesza jej spadek po trzydziestce i zwiększa ryzyko kolejnych kontuzji. " +
+      "Da się go usunąć <b>operacją</b> — kosztuje pieniądze i kilka tygodni pauzy. Dobry fizjoterapeuta zmniejsza ryzyko.</p>" },
+    { h: "Major i kadra narodowa", body:
+      "<p>Na Major nie wchodzi się z automatu. W 21. tygodniu sezonu grasz <b>RMR</b> — trzy mecze z ekipami z Twojego regionu, " +
+      "z których trzeba wygrać dwa. Bez awansu Major oglądasz z domu, z odbiciem na psychice i hype.</p>" +
+      "<p>Raz na sezon, jeśli grasz na poziomie, dostajesz <b>powołanie do reprezentacji</b> swojego kraju. " +
+      "Trzy mecze, kondycja w plecy, ale rozpoznawalność, pieniądze i szansa na tytuł, który wchodzi do gabloty. " +
+      "Odmowa daje odpoczynek i kosztuje trochę sympatii kibiców.</p>" },
     { h: "Wypożyczenie", body:
       "<p>W zakładce Drużyna możesz poprosić zarząd o <b>wypożyczenie</b> na sezon. Kluby chętniej wypuszczają zawodnika, " +
       "który siedzi w cieniu mocniejszego składu — gwiazdy i kapitana nikt nie oddaje.</p>" +
@@ -4239,6 +4703,22 @@
       "<p>Each also has a <b>vision of the job</b> — one only works with someone aiming for the top, another prefers a young " +
       "player, another will not relocate. If you do not fit their plan they turn you down, money or no money. You can add 35% " +
       "to the rate to sway someone on the fence, scout for new candidates, or dismiss someone against a severance payment.</p>" },
+    { h: "The scene, clubs and news", body:
+      "<p>The <b>Scene</b> tab is a feed from all over the world: AI rivals changing clubs, tournaments won, ranking moves, " +
+      "retirements, rumours about your name and your own trophies. Below it sit the player ranking and the <b>club ranking</b>.</p>" +
+      "<p>Clubs live their own lives: they build strength, win titles, rise and fall. Your organisation is highlighted, " +
+      "and its position follows how your season goes.</p>" },
+    { h: "Health and longevity", body:
+      "<p><b>Load</b> builds from training and matches and drops with rest, a psychologist and your own place. " +
+      "At the top your body takes a week off for you — costing form and mental.</p>" +
+      "<p>Repeated injuries and age can leave a <b>chronic problem</b> (wrist, back, eyes). It slows the growth of its stat, " +
+      "speeds up the decline past thirty and raises the risk of further injuries. <b>Surgery</b> removes it for money and a few " +
+      "weeks out. A good physio lowers the risk.</p>" },
+    { h: "The Major and the national team", body:
+      "<p>You do not walk into a Major. In week 21 you play the <b>RMR</b> — three matches against teams from your region, " +
+      "two of which you must win. Miss out and you watch the Major from home, with a hit to mental and hype.</p>" +
+      "<p>Once a season, if you are playing at the level, your country <b>calls you up</b>. Three matches, stamina spent, " +
+      "but recognition, money and a shot at a title that goes into your cabinet. Turning it down buys rest and costs some goodwill.</p>" },
     { h: "Loan moves", body:
       "<p>In the Team tab you can ask the board for a <b>loan move</b> for a season. Clubs let go of a player who sits in the " +
       "shadow of a stronger lineup far more readily — nobody loans out their star or their captain.</p>" +
@@ -4753,7 +5233,7 @@
     document.getElementById("hud-week").textContent = state.week + "/" + SEASON_LENGTH;
     document.getElementById("hud-season").textContent = state.season;
 
-    renderCareer(); renderTrain(); renderTeam(); renderInfluence(); renderShop(); renderStaff(); renderWorld(); renderOffers();
+    renderCareer(); renderTrain(); renderTeam(); renderInfluence(); renderShop(); renderStaff(); renderWorld(); renderScene(); renderOffers();
     renderPlayerCard(); renderRatingChart(); renderRecent(); renderProfile();
     document.getElementById("offers-dot").classList.toggle("hidden", state.offers.length === 0);
   }
@@ -4803,9 +5283,12 @@
         '<div class="vs-row"><div class="vs-team"><div class="team-name">' + esc(state.team.name) + '</div><div class="team-str">' + esc(TR("week.strength", { n: Math.round(teamStrength()) })) + '</div></div>' +
         '<div class="vs-mid">VS</div>' +
         '<div class="vs-team"><div class="team-name">' + esc(opp.name) + '</div><div class="team-str">' + esc(TR("week.strength", { n: opp.str })) + '</div></div></div></div>';
+    } else if (ev.type === "rmr") {
+      box.innerHTML = '<div class="ev-card big"><div class="ev-name">' + esc(TR("rmr.label")) + "</div>" +
+        '<div class="ev-sub">' + esc(TR("week.rmr", { region: regionName(myRegion()) })) + "</div></div>";
     } else if (ev.type === "event") {
       box.innerHTML = '<div class="ev-card big"><div class="ev-name">' + esc(ev.name) + '</div>' +
-        '<div class="ev-sub">' + esc(TR(ev.major ? "week.major" : "week.cup")) + "</div></div>";
+        '<div class="ev-sub">' + esc(TR(ev.major && !state.majorSpot ? "week.majorOut" : ev.major ? "week.major" : "week.cup")) + "</div></div>";
     } else if (ev.type === "playoff") {
       const pos = sortedStandings().findIndex(t => t.me) + 1;
       box.innerHTML = '<div class="ev-card big"><div class="ev-name">' + esc(TR("week.playoff")) + "</div>" +
@@ -4998,6 +5481,27 @@
         '<div class="stat-val">' + Math.round(x[1]) + "</div></div>");
     });
     document.getElementById("stat-list").innerHTML = rows.join("");
+    renderHealth();
+  }
+
+  function renderHealth() {
+    const panel = document.getElementById("health-panel");
+    panel.classList.toggle("hidden", inPhase2());
+    if (inPhase2()) return;
+    const b = Math.round(state.burn || 0);
+    let html = '<div class="stat-row"><div class="stat-name">' + esc(TR("health.load")) + " · " + esc(burnLabel()) + "</div>" +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + b + "%; background:" + barColor(100 - b) + '"></div></div>' +
+      '<div class="stat-val">' + b + "</div></div>";
+    const list = chronicList();
+    html += list.length ? list.map(c => {
+      const def = CHRONIC.find(x => x.id === c.id) || {};
+      return '<div class="shop-item"><div><div class="si-name">' + esc(tx(def.name)) + "</div>" +
+        '<div class="si-desc">' + esc(tx(def.desc)) + "</div>" +
+        '<div class="si-upkeep">' + esc(TR("health.since", { n: c.since })) + "</div></div>" +
+        '<div class="si-btns"><button data-surgery="' + c.id + '"' + (state.money < def.surgery ? " disabled" : "") + ">" +
+        esc(TR("health.surgery", { amount: money(def.surgery), n: def.weeks })) + "</button></div></div>";
+    }).join("") : '<p class="muted" style="margin-top:10px;">' + esc(TR("health.none")) + "</p>";
+    document.getElementById("health-box").innerHTML = html;
   }
 
   function renderTeam() {
@@ -5121,6 +5625,31 @@
     }).join("");
     document.getElementById("btn-scout-staff").disabled = state.money < STAFF_SCOUT_COST;
     document.getElementById("scout-label").textContent = TR("staff.scout", { amount: money(STAFF_SCOUT_COST) });
+  }
+
+  // Feed sceny + ranking organizacji
+  function renderScene() {
+    const list = state.news || [];
+    document.getElementById("news-list").innerHTML = list.length
+      ? list.slice(0, 22).map(n =>
+          '<div class="entry ' + (n.kind === "gold" ? "gold" : "info") + '">' +
+          icon(n.kind === "gold" ? "trophy" : "globe") +
+          '<span><b style="color:var(--text-faint); font-size:0.72rem">S' + n.s + " T" + n.w + "</b> " +
+          esc(TR(n.key, n.p)) + "</span></div>").join("")
+      : '<p class="muted">' + esc(TR("scene.empty")) + "</p>";
+
+    const table = clubTable();
+    const myName = state.team ? state.team.name : "";
+    const myPos = table.findIndex(c => c.n === myName);
+    const row = (c, i) => '<tr class="' + (c.n === myName ? "me" : "") + '"><td class="rk">' + (i + 1) + "</td><td>" +
+      esc(c.n) + '<div class="rk-team">' + esc(regionName(c.r)) + " · " + esc(tx(tier(c.t).name)) +
+      " · " + c.trophies + " " + esc(trophyWord(c.trophies)) + "</div></td>" +
+      '<td class="rk-rat">' + Math.round(clubScore(c)) + "</td></tr>";
+    let html = table.slice(0, 12).map((c, i) => row(c, i)).join("");
+    if (myPos >= 12) {
+      html += '<tr class="rk-gap"><td colspan="3">···</td></tr>' + row(table[myPos], myPos);
+    }
+    document.getElementById("clubs-body").innerHTML = html;
   }
 
   function renderWorld() {
@@ -5418,6 +5947,10 @@
     const b = e.target.closest("[data-act]");
     if (!b) return;
     if (inPhase2()) doAction2(b.dataset.act); else doAction(b.dataset.act);
+  });
+  document.getElementById("health-box").addEventListener("click", e => {
+    const su = e.target.closest("[data-surgery]");
+    if (su) surgery(su.dataset.surgery);
   });
   document.getElementById("plan-slots").addEventListener("click", e => {
     const d = e.target.closest("[data-plan-del]");
