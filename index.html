@@ -476,6 +476,8 @@
       <div class="role-grid" id="role-picker"></div>
       <label data-i18n="start.arch">Typ zawodnika</label>
       <div class="role-grid" id="arch-picker"></div>
+      <label data-i18n="start.scenario">Początek kariery</label>
+      <div class="role-grid" id="scen-picker"></div>
       <label data-i18n="start.diff">Poziom trudności</label>
       <div class="role-grid" id="diff-picker"></div>
       <button id="start-btn" data-i18n="start.begin">Rozpocznij karierę</button>
@@ -762,6 +764,19 @@
 </div>
 
 <!-- GENERIC MODAL (sezon / koniec kariery) -->
+<div id="legacy-overlay" class="overlay hidden">
+  <div class="glass overlay-box" style="max-width:520px;">
+    <h2 style="justify-content:center; color:var(--gold); font-size:1.25rem;" id="lg-title"></h2>
+    <p class="muted" style="text-align:center;" id="lg-verdict"></p>
+    <div class="kv-grid" id="lg-stats" style="margin-top:14px;"></div>
+    <h3 style="margin-top:18px;" data-i18n="lg.moments">Momenty kariery</h3>
+    <div id="lg-timeline"></div>
+    <h3 style="margin-top:16px;" data-i18n="lg.place">Miejsce w historii sceny</h3>
+    <div id="lg-place"></div>
+    <button class="full primary" id="lg-close" style="margin-top:16px;">OK</button>
+  </div>
+</div>
+
 <div id="modal-overlay" class="overlay hidden">
   <div class="glass overlay-box" style="max-width:440px;">
     <h2 style="justify-content:center; color:var(--text); font-size:1.2rem;" id="modal-title"></h2>
@@ -792,6 +807,7 @@
     "start.country": ["Kraj", "Country"],
     "start.role": ["Rola w składzie", "Role in the lineup"],
     "start.arch": ["Typ zawodnika", "Player type"],
+    "start.scenario": ["Początek kariery", "How your career starts"],
     "start.diff": ["Poziom trudności", "Difficulty"],
     "start.begin": ["Rozpocznij karierę", "Start career"],
     "start.lang": ["Język / Language", "Język / Language"],
@@ -985,6 +1001,15 @@
     "agent.drop": ["Rozwiąż umowę", "End the deal"],
     "log.agentOn": ["Podpisujesz umowę z agentem.", "You sign with an agent."],
     "log.agentOff": ["Koniec współpracy z agentem.", "You part ways with your agent."],
+    "lg.title": ["Kariera: {nick}", "Career: {nick}"],
+    "lg.sub": ["{role} · {country} · od {from} do {to} roku życia", "{role} · {country} · from {from} to {to} years old"],
+    "lg.moments": ["Momenty kariery", "Career moments"],
+    "lg.noMoments": ["Ta kariera nie zostawiła śladu w kronikach.", "This career left no mark in the chronicles."],
+    "lg.place": ["Miejsce w historii sceny", "Your place in scene history"],
+    "lg.era": ["Era", "Era"],
+    "lg.eraOf": ["czasy {nick} — {n} {word} na szczycie", "the {nick} years — {n} {word} on top"],
+    "lg.eraNone": ["scena bez wyraźnego króla", "a scene with no clear king"],
+    "lg.hofPlace": ["Miejsce w Hall of Fame", "Hall of Fame position"],
     "hist.title": ["Historia sceny", "Scene history"],
     "hist.info": ["Kto rządził światem w kolejnych sezonach i gdzie w tym byłeś Ty.",
       "Who ruled the world season by season — and where you stood in it."],
@@ -1605,15 +1630,15 @@
   // Sponsor nie płaci za nic: umowa niesie warunek na sezon i premię za jego wykonanie.
   // Niewywiązanie się kończy współpracę i kosztuje karę umowną.
   const SPONSOR_GOALS = [
-    { id: "streams", label: ["{n} streamów w sezonie", "{n} streams this season"], target: () => irnd(6, 10),
+    { id: "streams", label: ["{n} streamów w sezonie", "{n} streams this season"], target: () => irnd(4, 7),
       progress: () => state.s3 ? state.s3.streams : 0 },
     { id: "hype", label: ["Rozpoznawalność {n}+ na koniec sezonu", "Reach {n}+ hype by the end of the season"],
-      target: () => clamp(Math.round(state.hype + irnd(6, 14)), 20, 95), progress: () => Math.round(state.hype) },
-    { id: "media", label: ["{n} akcji medialnych", "{n} media appearances"], target: () => irnd(5, 9),
+      target: () => clamp(Math.round(state.hype + irnd(4, 9)), 20, 86), progress: () => Math.round(state.hype) },
+    { id: "media", label: ["{n} akcji medialnych", "{n} media appearances"], target: () => irnd(3, 6),
       progress: () => state.s3 ? state.s3.media : 0 },
     { id: "trophy", label: ["Trofeum w sezonie", "A trophy this season"], target: () => 1,
       progress: () => state.career.trophies.filter(t => t.season === state.season).length },
-    { id: "rating", label: ["Rating sezonu {n}+", "Season rating of {n}+"], target: () => 1.05,
+    { id: "rating", label: ["Rating sezonu {n}+", "Season rating of {n}+"], target: () => 1.0,
       progress: () => +seasonRating().toFixed(2) },
   ];
   const AGENT_CUT = 0.08;      // procent od premii sponsorskich
@@ -1768,6 +1793,55 @@
       surgery: 60000, weeks: 2 },
   ];
   const BURN_LIMIT = 100;
+
+  // Scenariusze startowe: inny punkt wejścia w karierę niż zawsze ten sam nastolatek z Premiera.
+  // Każdy zmienia wiek, statystyki, etap i sytuację wyjściową — reszta gry działa normalnie.
+  const SCENARIOS = [
+    { id: "classic", name: ["Klasyczny start", "Classic start"],
+      desc: ["Trzynastolatek, konto na Premierze i nic poza tym.", "Thirteen years old, a Premier account and nothing else."] },
+    { id: "academy", name: ["Akademia topowego klubu", "Top club academy"],
+      desc: ["Szesnastolatek w akademii: lepsze statystyki i sprzęt, ale oczekiwania od pierwszego dnia.",
+             "Sixteen, in an academy: better stats and gear, but expectations from day one."],
+      apply: s2 => {
+        s2.age = 16;
+        Object.keys(s2.stats).forEach(k => { s2.stats[k] = clamp(s2.stats[k] + 16, 1, 99); });
+        s2.ladder.premier = 14500; s2.ladder.elo = 1450;
+        s2.shop.gear = true; s2.shop.monitor = true;
+        s2.money = 12000; s2.hype = 12;
+      } },
+    { id: "outback", name: ["Talent z Oceanii", "Talent from Oceania"],
+      desc: ["Osiemnastolatek z regionu bez zaplecza: mocna mechanika, słaba scena i długa droga do Europy.",
+             "Eighteen, from a region with no infrastructure: strong mechanics, a thin scene and a long road to Europe."],
+      apply: s2 => {
+        s2.age = 18; s2.country = "au";
+        s2.stats.aim = clamp(s2.stats.aim + 22, 1, 99);
+        s2.stats.reflex = clamp(s2.stats.reflex + 18, 1, 99);
+        s2.stats.team = clamp(s2.stats.team - 4, 1, 99);
+        s2.ladder.premier = 17500; s2.ladder.elo = 1620;
+        s2.talent *= 1.1;
+      } },
+    { id: "comeback", name: ["Powrót po kontuzji", "Comeback from injury"],
+      desc: ["Dwudziestodwulatek z przeszłością: gotowy warsztat, przewlekły uraz nadgarstka i klub, który zaryzykował.",
+             "Twenty-two with a past: a finished game, a chronic wrist problem and a club that took the risk."],
+      apply: s2 => {
+        s2.age = 22;
+        Object.keys(s2.stats).forEach(k => { s2.stats[k] = clamp(s2.stats[k] + 34, 1, 99); });
+        s2.chronic = [{ id: "wrist", since: 1 }];
+        s2.injuries = 3; s2.burn = 35; s2.mental = 55;
+        s2.money = 60000; s2.hype = 30;
+        s2.startPro = 1;                       // startujesz z kontraktem
+      } },
+    { id: "late", name: ["Późny debiut", "Late debut"],
+      desc: ["Dwudziestopięciolatek z pracy do gry: mało czasu na rozwój, za to spokojna głowa i pieniądze na sztab.",
+             "Twenty-five, leaving a job for the game: little time left to grow, but a calm head and money for staff."],
+      apply: s2 => {
+        s2.age = 25;
+        Object.keys(s2.stats).forEach(k => { s2.stats[k] = clamp(s2.stats[k] + 24, 1, 99); });
+        s2.stats.sense = clamp(s2.stats.sense + 10, 1, 99);
+        s2.money = 220000; s2.mental = 92;
+        s2.ladder.premier = 18500; s2.ladder.elo = 1680;
+      } },
+  ];
 
   const VACATION_COST = 30000;
   const BOOTCAMP_COST = 48000;
@@ -1956,6 +2030,7 @@
   let pendingRole = "awp";
   let pendingArch = "grinder";
   let pendingDiff = "normal";
+  let pendingScen = "classic";
   let matchMods = { round: 0, rating: 0, notes: [] };
   let choiceHandler = null;
   let bulkAction = false;         // seria akcji z planu: rysujemy dopiero na końcu
@@ -2072,8 +2147,9 @@
     return sched;
   }
 
-  function defaultState(nick, roleId, archId, diffId, countryCode) {
+  function defaultState(nick, roleId, archId, diffId, countryCode, scenId) {
     const arch = ARCHETYPES.find(a => a.id === archId) || ARCHETYPES[1];
+    const scen = SCENARIOS.find(x => x.id === scenId) || SCENARIOS[0];
     const diff = DIFFICULTIES.find(d => d.id === diffId) || DIFFICULTIES[1];
     const baseStats = { aim: 30, reflex: 30, sense: 20, util: 16, team: 20 };
     Object.keys(arch.stats || {}).forEach(k => { baseStats[k] = clamp(baseStats[k] + arch.stats[k], 1, 99); });
@@ -2082,7 +2158,7 @@
       stage: "ladder",
       ladder: { premier: irnd(PREMIER_START[0], PREMIER_START[1]), elo: FACEIT_START, div: 0, divWins: 0,
                 queue: "premier", matches: 0, mates: 0 },
-      arch: arch.id, diff: diff.id, country: countryCode || "pl",
+      arch: arch.id, diff: diff.id, country: countryCode || "pl", scenario: scen.id, startAge: 0,
       money: 1500, hype: 5,
       stats: baseStats,
       talent: rnd(arch.talent[0], arch.talent[1]) * diff.talentMul,
@@ -2102,6 +2178,9 @@
       adapt: 0, formerTeams: [], maps: {},
     };
     state = s;
+    s.scenario = scen.id;
+    if (scen.apply) scen.apply(s);             // scenariusz przestawia punkt wejścia w karierę
+    s.startAge = s.age;
     s.team = makeTeam(0, "Team " + nick.toUpperCase().slice(0, 6));
     s.team.salary = 0;
     s.stage = "ladder";
@@ -2111,6 +2190,17 @@
     s.league = makeLeague();
     s.schedule = makeSchedule();
     s.goal = makeGoal();
+    if (s.startPro) {
+      // powrót po kontuzji zaczyna z podpisanym kontraktem, nie na drabince
+      delete s.startPro;
+      const t = clamp(irnd(1, 2), 0, 4);
+      s.team = makeTeam(t);
+      s.stage = "pro";
+      s.league = makeLeague();
+      s.schedule = makeSchedule();
+      s.goal = makeGoal();
+      addLog(TR("ladder.turnedPro", { team: s.team.name }), "gold");
+    }
     s.plan = trimPlan(presets()[0].list);      // od pierwszego tygodnia gra się planem, nie klikaniem
     refreshStaffMarket();
     addLog(TR("log.start", { role: tx(role().name), team: s.team.name }), "info");
@@ -3100,6 +3190,11 @@
     if (n === 1) return "frag";
     return (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? "fragi" : "fragów";
   }
+  function seasonWord(n) {
+    if (LANG === "en") return n === 1 ? "season" : "seasons";
+    if (n === 1) return "sezon";
+    return (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? "sezony" : "sezonów";
+  }
   function trophyWord(n) {
     if (LANG === "en") return n === 1 ? "trophy" : "trophies";
     if (n === 1) return "trofeum";
@@ -3633,6 +3728,7 @@
     if (typeof state.talkWeek !== "number") state.talkWeek = 0;
     if (typeof state.roleFight !== "number") state.roleFight = 0;
     if (typeof state.roleChange !== "number") state.roleChange = 0;
+    if (!state.startAge) state.startAge = Math.max(12, state.age - (state.career.seasons || []).length);
     if (!Array.isArray(state.history)) state.history = [];
     if (!state.clubs || !state.clubs.length) state.clubs = makeClubs();
     if (state.loan === undefined) state.loan = null;
@@ -4258,8 +4354,8 @@
     }
     const base = tier(state.team.tier).str + (ev.major ? 6 : 2);
     const stages = ev.major
-      ? [{ n: ["Faza grupowa", "Group stage"], bo: 1, opp: base - 4 }, { n: ["Ćwierćfinał", "Quarter-final"], bo: 3, opp: base },
-         { n: ["Półfinał", "Semi-final"], bo: 3, opp: base + 4 }, { n: ["Finał", "Final"], bo: 3, opp: base + 7 }]
+      ? [{ n: ["Faza grupowa", "Group stage"], bo: 1, opp: base - 5 }, { n: ["Ćwierćfinał", "Quarter-final"], bo: 3, opp: base - 1 },
+         { n: ["Półfinał", "Semi-final"], bo: 3, opp: base + 2 }, { n: ["Finał", "Final"], bo: 3, opp: base + 5 }]
       : [{ n: ["Ćwierćfinał", "Quarter-final"], bo: 1, opp: base - 3 }, { n: ["Półfinał", "Semi-final"], bo: 3, opp: base + 1 },
          { n: ["Finał", "Final"], bo: 3, opp: base + 4 }];
     const lines = [];
@@ -4881,7 +4977,8 @@
     const verdict = TR(s > 1400 ? "end.goat" : s > 800 ? "end.legend" : s > 400 ? "end.solid" : "end.plain");
     showModal(TR(inPhase2() ? "end.title2" : "end.title"), verdict,
       rows.map(x => '<div class="recap-line"><span>' + esc(x[0]) + '</span><b>' + esc(x[1]) + '</b></div>').join(""));
-    if (inPhase2()) finishCareer();
+    // po drugim rozdziale nie ma już kolejnej drogi — od razu pełne podsumowanie
+    if (inPhase2()) { finishCareer(); modalAfterClose = showFinalModal; }
     else modalAfterClose = offerSecondCareer;
     save();
   }
@@ -4915,9 +5012,56 @@
     render();
   }
 
+  // Podsumowanie kariery: liczby, momenty i miejsce w historii sceny
   function showFinalModal() {
-    showModal("Hall of Fame", TR("end.saved"),
-      '<div class="recap-line"><span>' + esc(TR("end.hof")) + "</span><b>" + hofScore() + "</b></div>");
+    const c = state.career;
+    const avg = c.matches ? c.rating / c.matches : 0;
+    const pts = hofScore();
+    const startAge = state.startAge || (c.seasons.length ? state.age - c.seasons.length : state.age);
+    document.getElementById("lg-title").textContent = TR("lg.title", { nick: state.nick });
+    document.getElementById("lg-verdict").textContent =
+      TR("lg.sub", { role: tx(role().name), country: countryName(), from: startAge, to: state.age }) + " · " +
+      TR(pts > 1400 ? "end.goat" : pts > 800 ? "end.legend" : pts > 400 ? "end.solid" : "end.plain");
+
+    const kv = [
+      [TR("kv.seasons"), c.seasons.length], [TR("kv.matches2"), c.matches],
+      [TR("end.avg"), avg.toFixed(2)], [TR("kv.trophies"), c.trophies.length],
+      [TR("hist.majors"), c.trophies.filter(t => t.major).length], [TR("end.mvps"), c.mvps],
+      [TR("end.bestRank"), c.bestRank > 0 ? "#" + c.bestRank : "—"],
+      [TR("kv.earned"), money(c.earned + (state.invest || 0))],
+      [TR("nat.caps"), state.natCaps || 0], [TR("end.hof"), pts],
+    ];
+    document.getElementById("lg-stats").innerHTML = kv.map(x =>
+      '<div class="kv"><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + "</div></div>").join("");
+
+    // najlepsze momenty: złote wpisy z kroniki, od najstarszego
+    const gold = (c.timeline || []).filter(t => t.kind === "gold").slice(0, 10).reverse();
+    const tl = gold.length ? gold : (c.timeline || []).slice(0, 8).reverse();
+    document.getElementById("lg-timeline").innerHTML = tl.length
+      ? tl.map(e => '<div class="map-line"><span>' + esc(e.text) + "</span><span>S" + e.s + " · " +
+          esc(TR("team.years", { n: e.age })) + "</span></div>").join("")
+      : '<p class="muted">' + esc(TR("lg.noMoments")) + "</p>";
+
+    // gdzie jesteś na tle sceny i własnych poprzednich karier
+    const h = state.history || [];
+    const yearsNo1 = h.filter(x => x.no1me).length;
+    const rivals = {};
+    h.forEach(x => { if (!x.no1me) rivals[x.no1] = (rivals[x.no1] || 0) + 1; });
+    const topRival = Object.keys(rivals).sort((a, b) => rivals[b] - rivals[a])[0];
+    const hof = loadHof().concat([{ nick: state.nick, hof: pts }]).sort((a, b) => b.hof - a.hof);
+    const place = hof.findIndex(x => x.hof === pts && x.nick === state.nick) + 1;
+    const lines = [
+      [TR("hist.yearsNo1"), String(yearsNo1)],
+      [TR("lg.era"), topRival ? TR("lg.eraOf", { nick: topRival, n: rivals[topRival], word: seasonWord(rivals[topRival]) })
+        : TR("lg.eraNone")],
+      [TR("lg.hofPlace"), "#" + place + " / " + hof.length],
+    ];
+    const majorTitles = c.trophies.filter(t => t.major).map(t => t.name);
+    if (majorTitles.length) lines.push([TR("hist.majors"), majorTitles.join(", ")]);
+    document.getElementById("lg-place").innerHTML = lines.map(x =>
+      '<div class="map-line"><span>' + esc(x[0]) + "</span><span>" + esc(x[1]) + "</span></div>").join("");
+
+    document.getElementById("legacy-overlay").classList.remove("hidden");
   }
 
   // ---------- samouczek i pomoc ----------
@@ -4935,8 +5079,8 @@
       text: ["Graj powyżej oczekiwań swojego poziomu, buduj hype w mediach, a zadzwonią lepsze kluby. Przy podpisywaniu negocjujesz pensję, gwarancję miejsca i bonusy — ale za wygórowane żądania klub może zerwać rozmowy.",
              "Play above what your tier expects, build hype in the media, and better clubs will call. When signing you negotiate salary, a guaranteed spot and bonuses — but demand too much and the club walks away."] },
     { icon: "chart", title: ["Cel: szczyt rankingu świata", "The goal: the top of the world ranking"],
-      text: ["44 zawodników AI rozwija kariery równolegle z Tobą. Jeden z nich jest Twoim rywalem i trafia do Twojej ligi. Wszystko — trofea, ranking, zarobki — składa się na punkty Hall of Fame na koniec kariery. Powodzenia.",
-             "44 AI players build careers alongside yours. One of them is your rival and lands in your league. Everything — trophies, ranking, earnings — feeds the Hall of Fame score at the end. Good luck."] },
+      text: ["Około 180 zawodników AI rozwija kariery równolegle z Tobą. Jeden z nich jest Twoim rywalem i trafia do Twojej ligi. Wszystko — trofea, ranking, zarobki — składa się na punkty Hall of Fame na koniec kariery. Powodzenia.",
+             "Around 180 AI players build careers alongside yours. One of them is your rival and lands in your league. Everything — trophies, ranking, earnings — feeds the Hall of Fame score at the end. Good luck."] },
   ];
 
   let tutStep = 0;
@@ -5006,6 +5150,18 @@
       "<p>Każdy ma też <b>wizję współpracy</b> — jeden pracuje tylko z kimś, kto celuje w top, inny woli młodego zawodnika, " +
       "jeszcze inny nie rusza się za granicę. Jeśli nie pasujesz do jego planu, odmówi, choćbyś miał pieniądze. " +
       "Możesz dołożyć 35% do stawki, żeby przekonać wahającego się, poszukać nowych kandydatów albo zwolnić kogoś za odprawę.</p>" },
+    { h: "Początek kariery", body:
+      "<p>Na ekranie startowym wybierasz <b>scenariusz</b>, czyli punkt wejścia w karierę. " +
+      "<b>Klasyczny start</b> to trzynastolatek z kontem na Premierze. <b>Akademia</b> daje szesnastolatka z lepszymi " +
+      "statystykami, sprzętem i wyższym CS Rating. <b>Talent z Oceanii</b> to osiemnastolatek z mocną mechaniką, " +
+      "ale ze sceny bez zaplecza. <b>Powrót po kontuzji</b> zaczyna od razu z kontraktem, gotowym warsztatem " +
+      "i przewlekłym urazem nadgarstka. <b>Późny debiut</b> to dwudziestopięciolatek z pieniędzmi na sztab, " +
+      "ale z krótkim oknem na rozwój.</p>" +
+      "<p>Scenariusz zmienia tylko start — reszta gry działa tak samo, więc każdy da się doprowadzić na szczyt.</p>" },
+    { h: "Podsumowanie kariery", body:
+      "<p>Definitywne zakończenie kariery odsłania pełne <b>podsumowanie</b>: liczby całej drogi, oś najważniejszych " +
+      "momentów z kroniki, Twoje miejsce w historii sceny (lata na szczycie, czyja to była era, pozycja w Hall of Fame) " +
+      "i werdykt liczony z punktów kariery.</p>" },
     { h: "Szatnia: rozmowy i rola", body:
       "<p>W zakładce Drużyna każdy kolega ma przycisk <b>Rozmowa</b> — raz w tygodniu. Możesz go podbudować (relacja i chemia w górę), " +
       "powiedzieć mu wprost, co myślisz (z autorytetem podnosisz jego poziom, bez autorytetu robisz sobie wroga) albo podpytać o warsztat " +
@@ -5111,6 +5267,17 @@
       "<p>Each also has a <b>vision of the job</b> — one only works with someone aiming for the top, another prefers a young " +
       "player, another will not relocate. If you do not fit their plan they turn you down, money or no money. You can add 35% " +
       "to the rate to sway someone on the fence, scout for new candidates, or dismiss someone against a severance payment.</p>" },
+    { h: "How your career starts", body:
+      "<p>On the start screen you pick a <b>scenario</b> — the point where your career begins. " +
+      "<b>Classic start</b> is a thirteen-year-old with a Premier account. <b>Academy</b> gives you a sixteen-year-old " +
+      "with better stats, gear and a higher CS Rating. <b>Talent from Oceania</b> is eighteen with strong mechanics " +
+      "but no infrastructure around them. <b>Comeback from injury</b> starts with a contract already signed, a finished " +
+      "game and a chronic wrist problem. <b>Late debut</b> is twenty-five with money for staff but a short runway.</p>" +
+      "<p>The scenario only changes the start — the rest of the game plays the same, so every one of them can reach the top.</p>" },
+    { h: "The career summary", body:
+      "<p>Ending your career for good opens the full <b>summary</b>: the numbers of the whole road, a timeline of the " +
+      "biggest moments from your chronicle, your place in scene history (seasons on top, whose era it was, your Hall of " +
+      "Fame position) and a verdict based on your career points.</p>" },
     { h: "The locker room: talks and your role", body:
       "<p>In the Team tab every teammate has a <b>Talk</b> button — once a week. You can back them up (bond and chemistry up), " +
       "tell them straight what you think (with authority you raise their level, without it you make an enemy) or ask about their game " +
@@ -6346,6 +6513,9 @@
     document.getElementById("arch-picker").innerHTML = ARCHETYPES.map(a =>
       '<button class="role-opt' + (a.id === pendingArch ? " sel" : "") + '" data-arch="' + a.id + '">' +
       "<b>" + esc(tx(a.name)) + "</b><span>" + esc(tx(a.desc)) + "</span></button>").join("");
+    document.getElementById("scen-picker").innerHTML = SCENARIOS.map(sc =>
+      '<button class="role-opt' + (sc.id === pendingScen ? " sel" : "") + '" data-scen="' + sc.id + '">' +
+      "<b>" + esc(tx(sc.name)) + "</b><span>" + esc(tx(sc.desc)) + "</span></button>").join("");
     document.getElementById("diff-picker").innerHTML = DIFFICULTIES.map(d =>
       '<button class="role-opt' + (d.id === pendingDiff ? " sel" : "") + '" data-diff="' + d.id + '">' +
       "<b>" + esc(tx(d.name)) + "</b><span>" + esc(tx(d.desc)) + "</span></button>").join("");
@@ -6365,7 +6535,7 @@
     const nickIn = document.getElementById("nick-input").value.trim();
     const nick = nickIn || pick(NICK_POOL);
     const country = document.getElementById("country-select").value || "pl";
-    defaultState(nick, pendingRole, pendingArch, pendingDiff, country);
+    defaultState(nick, pendingRole, pendingArch, pendingDiff, country, pendingScen);
     document.getElementById("start-wrap").classList.add("hidden");
     document.getElementById("game-screen").classList.remove("hidden");
     switchView("career");
@@ -6389,6 +6559,12 @@
     const b = e.target.closest("[data-role]");
     if (!b) return;
     pendingRole = b.dataset.role;
+    renderRolePicker();
+  });
+  document.getElementById("scen-picker").addEventListener("click", e => {
+    const b = e.target.closest("[data-scen]");
+    if (!b) return;
+    pendingScen = b.dataset.scen;
     renderRolePicker();
   });
   document.getElementById("arch-picker").addEventListener("click", e => {
@@ -6475,6 +6651,10 @@
   document.getElementById("mo-close").addEventListener("click", () => {
     document.getElementById("match-overlay").classList.add("hidden");
     if (matchAfterClose) { const f = matchAfterClose; matchAfterClose = null; f(); }
+  });
+  document.getElementById("lg-close").addEventListener("click", () => {
+    document.getElementById("legacy-overlay").classList.add("hidden");
+    render();
   });
   document.getElementById("modal-close").addEventListener("click", () => {
     document.getElementById("modal-overlay").classList.add("hidden");

@@ -127,7 +127,17 @@ i systemów jest zawsze pod przyciskiem **?** w pasku u góry.
 ## Start kariery
 
 Na ekranie startowym wybierasz język (polski albo angielski), nick, kraj, rolę w składzie,
-**typ zawodnika** i poziom trudności.
+**typ zawodnika**, **scenariusz startowy** i poziom trudności.
+
+Scenariusz decyduje, w którym momencie wchodzisz w karierę:
+
+| Scenariusz | Start |
+|---|---|
+| Klasyczny start | 13 lat, konto na Premierze, zero zaplecza |
+| Akademia topowego klubu | 16 lat, lepsze statystyki, sprzęt i wyższy CS Rating |
+| Talent z Oceanii | 18 lat, mocna mechanika, scena bez zaplecza |
+| Powrót po kontuzji | 22 lata, gotowy kontrakt i przewlekły uraz nadgarstka |
+| Późny debiut | 25 lat, pieniądze na sztab, krótkie okno na rozwój |
 
 Typ zawodnika ustawia talent, statystyki startowe i to, jak kariera układa się w czasie:
 cudowne dziecko rośnie błyskawicznie, ale wcześniej traci refleks; grinder ma żelazną kondycję;
@@ -151,7 +161,9 @@ z rzędu kończą się rozstaniem** z organizacją (albo zapaścią zasięgów u
 sezon otwiera drzwi do mocniejszego klubu. Zakładka Drużyna pokazuje ranking sztabowców
 lub top kanałów sceny — w zależności od tego, którą drogę wybrałeś.
 
-Definitywne zakończenie kariery zapisuje ją w lokalnym **Hall of Fame** — galerii wszystkich
+Definitywne zakończenie kariery odsłania pełne **podsumowanie**: liczby całej drogi, oś najważniejszych
+momentów, Twoje miejsce w historii sceny (lata na szczycie, czyja to była era, pozycja w Hall of Fame)
+i werdykt. Kariera zapisuje się w lokalnym **Hall of Fame** — galerii wszystkich
 Twoich zawodników z punktacją liczoną z trofeów, rankingu, ratingu i zarobków. Kolejne kariery
 dopisują się do listy, więc można je porównywać.
 

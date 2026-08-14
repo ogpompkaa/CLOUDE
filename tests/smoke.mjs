@@ -41,6 +41,7 @@ const safeClick = async sel => {
 };
 
 await page.goto('file://' + gamePath);
+const scenCount = await page.$$eval('[data-scen]', els => els.length).catch(() => 0);
 await page.fill('#nick-input', 'żółw');           // polskie znaki muszą przejść
 await page.click('#start-btn');
 await page.waitForSelector('#game-screen:not(.hidden)');
@@ -49,6 +50,9 @@ await page.waitForSelector('#game-screen:not(.hidden)');
 const start = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
 check('kariera zaczyna się jako nastolatek', start.age >= 12 && start.age <= 13, start.age + ' lat');
 check('start na drabince', start.stage === 'ladder', start.stage);
+check('scenariusze startowe do wyboru', scenCount >= 4, scenCount + ' scenariuszy');
+check('zapis pamięta scenariusz i wiek startu', !!start.scenario && start.startAge === start.age,
+  start.scenario + ', start w wieku ' + start.startAge);
 check('CS Rating na starcie', start.ladder.premier > 1000 && start.ladder.premier < 12000, String(start.ladder.premier));
 
 // plan tygodnia jest ustawiony od startu i wykonuje się sam
@@ -317,6 +321,18 @@ check('drugi rozdział startuje', st2.phase === 'coach', st2.phase || 'brak');
 check('drugi rozdział ma cel sezonowy', !!(st2.goal2 && st2.goal2.kind), st2.goal2 && st2.goal2.kind);
 check('ranking sztabu istnieje', Array.isArray(st2.staffWorld) && st2.staffWorld.length >= 10,
   (st2.staffWorld || []).length + ' sztabowców');
+
+// definitywny koniec kariery pokazuje podsumowanie
+await page.click('.nav-btn[data-view="profile"]');
+await safeClick('#btn-retire');
+await safeClick('#modal-close');
+await page.waitForSelector('#choice-overlay:not(.hidden)', { timeout: 4000 }).catch(() => {});
+if (await page.isVisible('#choice-overlay:not(.hidden)')) await safeClick('[data-choice="3"]');
+await page.waitForTimeout(400);
+const legacyShown = await page.isVisible('#legacy-overlay:not(.hidden)');
+const legacyStats = legacyShown ? await page.$$eval('#lg-stats .kv', els => els.length) : 0;
+check('podsumowanie kariery się pokazuje', legacyShown && legacyStats >= 8,
+  legacyShown ? legacyStats + ' kafelków' : 'brak ekranu');
 
 await browser.close();
 
