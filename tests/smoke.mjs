@@ -47,8 +47,9 @@ const goto = async (view, sub) => {
 };
 
 await page.goto('file://' + gamePath);
-const scenCount = await page.$$eval('[data-scen]', els => els.length).catch(() => 0);
 await page.fill('#nick-input', 'żółw');           // polskie znaki muszą przejść
+await page.click('#step-next');                   // ekran startowy ma dwa kroki
+const scenCount = await page.$$eval('[data-scen]', els => els.length).catch(() => 0);
 await page.click('#start-btn');
 await page.waitForSelector('#game-screen:not(.hidden)');
 

@@ -88,6 +88,19 @@
     clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px)); }
   .panel { padding: 18px; margin: 0 16px 16px; }
   .mt { margin-top: 12px; }
+
+  /* --- Dostępność: focus, pola dotyku, ograniczenie animacji --- */
+  :focus { outline: none; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button, select, input, textarea { font: inherit; }
+  .nav-btn { min-height: 48px; min-width: 48px; }
+  .sub-btn { min-height: 42px; }
+  .shop-item button, .si-btns button, .pos-actions button, .plan-presets button { min-height: 38px; }
+  .mate-acts button, .a-add, .plan-slot { min-height: 34px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
   .cut { clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
 
   .icon { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -0.15em; flex-shrink: 0; }
@@ -129,13 +142,19 @@
   }
   #start-btn { width: 100%; padding: 14px; font-size: 1rem; }
 
-  .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin: 8px 0 18px; }
+  .step-dots { display: flex; gap: 6px; justify-content: center; margin: 0 0 18px; }
+  .dot-step { width: 26px; height: 3px; background: var(--border-strong); }
+  .dot-step.on { background: var(--accent); }
+  .role-grid.two { grid-template-columns: 1fr 1fr; }
+  .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px;
+    margin: 8px 0 16px; align-items: stretch; }
   .role-opt { background: var(--bg-panel-2); border: 1px solid var(--border); color: var(--text); text-align: left;
     padding: 10px 12px; text-transform: none; letter-spacing: normal; flex-direction: column; align-items: flex-start; gap: 2px;
     clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%); }
   .role-opt.sel { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent), 0 0 18px -6px var(--accent); }
-  .role-opt b { font-size: 0.86rem; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; }
-  .role-opt span { font-size: 0.66rem; color: var(--text-dim); font-weight: 500; font-family: 'Inter', sans-serif; line-height: 1.3; }
+  .role-opt b { font-size: 0.84rem; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; line-height: 1.2; }
+  .role-opt span { font-size: 0.66rem; color: var(--text-dim); font-weight: 500; font-family: 'Inter', sans-serif;
+    line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 
   /* --- HUD --- */
   #hud-bar { position: sticky; top: 0; z-index: 6; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
@@ -318,7 +337,20 @@
   #rank-overlay { z-index: 23; }
   #choice-overlay { z-index: 24; }
   #save-overlay { z-index: 26; }
-  .overlay-box { max-width: 470px; width: 100%; padding: 22px 20px; max-height: 88vh; overflow-y: auto; }
+  .overlay-box { max-width: 440px; width: 100%; padding: 22px 20px; max-height: 88vh; overflow-y: auto; }
+  .overlay-box.wide { max-width: 520px; }
+  /* wspólny nagłówek, treść i stopka każdego okna */
+  .ov-head { text-align: center; margin-bottom: 14px; }
+  .ov-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.05rem; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--text); line-height: 1.25; }
+  .ov-title.gold { color: var(--gold); }
+  .ov-sub { font-size: 0.78rem; color: var(--text-dim); margin-top: 6px; line-height: 1.5;
+    font-family: 'Inter', sans-serif; }
+  .ov-sub:empty { display: none; }
+  .ov-icon { color: var(--accent); font-size: 1.8rem; margin-bottom: 4px; }
+  .ov-body { margin: 14px 0; line-height: 1.55; }
+  .ov-foot { display: flex; gap: 8px; margin-top: 16px; }
+  .ov-tabs { display: flex; gap: 8px; margin: 12px 0; }
   .match-head { text-align: center; margin-bottom: 14px; }
   .match-score { font-size: 2.1rem; line-height: 1; margin: 6px 0 4px; }
   .match-score .win { color: var(--good); } .match-score .loss { color: var(--danger); }
@@ -488,31 +520,43 @@
 
 <div id="app">
 
+
   <!-- START -->
   <div id="start-wrap">
     <div id="start-screen" class="glass">
       <h1><svg class="icon"><use href="#i-crosshair"></use></svg> <span data-i18n="app.title">Kariera Pro Playera</span></h1>
-      <p class="subtitle" data-i18n="app.intro">Zaczynasz jako nikomu nieznany gracz z FACEIT-a. Trenuj aim, czytaj grę, wygrywaj mecze, zdobywaj oferty od coraz lepszych organizacji i zostań legendą sceny.</p>
-      <p class="disclaimer" data-i18n="app.disclaimer">Fanowski projekt. Nazwy organizacji użyte wyłącznie identyfikacyjnie.</p>
-      <label data-i18n="start.lang">Język / Language</label>
-      <div class="role-grid" style="grid-template-columns:1fr 1fr;">
-        <button class="role-opt sel" data-lang="pl"><b>Polski</b></button>
-        <button class="role-opt" data-lang="en"><b>English</b></button>
+      <div class="start-step" data-step="0"><p class="subtitle" data-i18n="app.intro">Zaczynasz jako nikomu nieznany gracz z FACEIT-a. Trenuj aim, czytaj grę, wygrywaj mecze, zdobywaj oferty od coraz lepszych organizacji i zostań legendą sceny.</p>
+      <p class="disclaimer" data-i18n="app.disclaimer">Fanowski projekt. Nazwy organizacji użyte wyłącznie identyfikacyjnie.</p></div>
+      <div class="step-dots"><span class="dot-step on" data-step="0"></span><span class="dot-step" data-step="1"></span></div>
+
+      <div class="start-step" data-step="0">
+        <label data-i18n="start.lang">Język / Language</label>
+        <div class="role-grid two">
+          <button class="role-opt sel" data-lang="pl"><b>Polski</b></button>
+          <button class="role-opt" data-lang="en"><b>English</b></button>
+        </div>
+        <label for="nick-input" data-i18n="start.nick">Twój nick</label>
+        <input id="nick-input" type="text" maxlength="14" placeholder="np. sh4dow" autocomplete="off">
+        <label for="country-select" data-i18n="start.country">Kraj</label>
+        <select id="country-select"></select>
+        <label data-i18n="start.role">Rola w składzie</label>
+        <div class="role-grid" id="role-picker"></div>
+        <button id="step-next" data-i18n="start.next">Dalej</button>
       </div>
-      <label for="nick-input" data-i18n="start.nick">Twój nick</label>
-      <input id="nick-input" type="text" maxlength="14" placeholder="np. sh4dow" autocomplete="off">
-      <label for="country-select" data-i18n="start.country">Kraj</label>
-      <select id="country-select"></select>
-      <label data-i18n="start.role">Rola w składzie</label>
-      <div class="role-grid" id="role-picker"></div>
-      <label data-i18n="start.arch">Typ zawodnika</label>
-      <div class="role-grid" id="arch-picker"></div>
-      <label data-i18n="start.scenario">Początek kariery</label>
-      <div class="role-grid" id="scen-picker"></div>
-      <label data-i18n="start.diff">Poziom trudności</label>
-      <div class="role-grid" id="diff-picker"></div>
-      <button id="start-btn" data-i18n="start.begin">Rozpocznij karierę</button>
-      <div id="hof-teaser" class="muted" style="margin-top:14px;"></div>
+
+      <div class="start-step hidden" data-step="1">
+        <label data-i18n="start.arch">Typ zawodnika</label>
+        <div class="role-grid" id="arch-picker"></div>
+        <label data-i18n="start.scenario">Początek kariery</label>
+        <div class="role-grid" id="scen-picker"></div>
+        <label data-i18n="start.diff">Poziom trudności</label>
+        <div class="role-grid" id="diff-picker"></div>
+        <div class="ov-foot">
+          <button class="secondary full" id="step-back" data-i18n="start.back">Wstecz</button>
+          <button class="full primary" id="start-btn" data-i18n="start.begin">Rozpocznij karierę</button>
+        </div>
+      </div>
+      <div id="hof-teaser" class="muted mt"></div>
     </div>
   </div>
 
@@ -523,7 +567,7 @@
       <div class="hud-pill"><svg class="icon"><use href="#i-coin"></use></svg> <span id="hud-money"></span></div>
       <div class="hud-pill"><svg class="icon"><use href="#i-bolt"></use></svg> <span id="hud-energy"></span><small data-i18n="hud.energy">Energia</small></div>
       <div class="hud-pill"><svg class="icon"><use href="#i-calendar"></use></svg> <span id="hud-week"></span><small><span data-i18n="hud.season">Sezon</span> <span id="hud-season"></span></small></div>
-      <button id="btn-help" class="secondary" title="Jak grać" style="padding:9px 11px; margin-left:auto;">?</button>
+      <button id="btn-help" aria-label="Pomoc" class="secondary" title="Jak grać" style="padding:9px 11px; margin-left:auto;">?</button>
       <button id="cta-next">Dalej <svg class="icon"><use href="#i-arrow-right"></use></svg></button>
     </div>
 
@@ -641,7 +685,7 @@
           <div id="staff-hired"></div>
           <h3 data-i18n="market.staffMarket">Dostępni kandydaci</h3>
           <div id="staff-market"></div>
-          <button class="full mt" id="btn-scout-staff"><svg class="icon"><use href="#i-search"></use></svg> <span id="scout-label">Poszukaj nowych kandydatów</span></button>
+          <button class="full mt" id="btn-scout-staff"><svg class="icon"><use href="#i-search"></use></svg> <span id="scout-label" data-i18n="staff.scoutShort">Szukaj kandydatów</span></button>
         </div>
         <div class="glass panel" data-panel="deals">
           <h2><svg class="icon"><use href="#i-swap"></use></svg> <span data-i18n="market.offers">Oferty transferowe</span></h2>
@@ -703,64 +747,64 @@
 
 <!-- MECZ NA ŻYWO -->
 <div id="live-overlay" class="overlay hidden">
-  <div class="glass overlay-box">
-    <div style="text-align:center;">
-      <div class="ev-name" id="lv-title"></div>
-      <div class="match-sub" id="lv-map"></div>
+  <div class="glass overlay-box" role="dialog" aria-modal="true" aria-labelledby="lv-title">
+    <div class="ov-head">
+      <div class="ov-title" id="lv-title"></div>
+      <div class="ov-sub" id="lv-map"></div>
       <div id="lv-score"></div>
-      <div class="match-sub" id="lv-round"></div>
+      <div class="ov-sub" id="lv-round"></div>
     </div>
     <div class="kv-grid" id="lv-stats"></div>
     <div id="lv-feed"></div>
-    <div style="display:flex; gap:8px; margin-top:12px;">
+    <div class="ov-foot">
       <button class="secondary full" id="lv-speed" data-i18n="live.speed0">Przyspiesz</button>
-      <button class="full" id="lv-skip" data-i18n="live.skip">Pomiń do wyniku</button>
+      <button class="full primary" id="lv-skip" data-i18n="live.skip">Pomiń do wyniku</button>
     </div>
   </div>
 </div>
 
 <!-- MATCH RESULT -->
 <div id="match-overlay" class="overlay hidden">
-  <div class="glass overlay-box">
-    <div class="match-head">
-      <div class="ev-name" id="mo-title"></div>
+  <div class="glass overlay-box" role="dialog" aria-modal="true" aria-labelledby="mo-title">
+    <div class="match-head ov-head">
+      <div class="ov-title" id="mo-title"></div>
       <div class="match-score" id="mo-score"></div>
-      <div class="match-sub" id="mo-sub"></div>
+      <div class="ov-sub" id="mo-sub"></div>
     </div>
     <div id="mo-maps"></div>
     <table class="sb-table">
       <thead><tr><th data-i18n="match.player">Zawodnik</th><th>K</th><th>D</th><th>ADR</th><th>Rating</th></tr></thead>
       <tbody id="mo-scoreboard"></tbody>
     </table>
-    <div id="mo-extra" style="margin-top:12px;"></div>
-    <button class="full primary" id="mo-close" data-i18n="hud.next" style="margin-top:14px;">Dalej</button>
+    <div id="mo-extra" class="mt"></div>
+    <div class="ov-foot"><button class="full primary" id="mo-close" data-i18n="hud.next">Dalej</button></div>
   </div>
 </div>
 
 <!-- RANKING GRACZY -->
 <div id="rank-overlay" class="overlay hidden">
-  <div class="glass overlay-box" style="max-width:470px;">
-    <div class="ev-name" style="text-align:center;" id="rank-title"></div>
-    <div class="match-sub" style="text-align:center;" id="rank-sub"></div>
-    <div style="display:flex; gap:8px; margin:12px 0;">
+  <div class="glass overlay-box" role="dialog" aria-modal="true" aria-labelledby="rank-title">
+    <div class="ov-head"><div class="ov-title" id="rank-title"></div>
+      <div class="ov-sub" id="rank-sub"></div></div>
+    <div class="ov-tabs">
       <button class="secondary full" id="rank-tab-region"></button>
       <button class="secondary full" id="rank-tab-world"></button>
     </div>
     <table class="rank-table"><tbody id="rank-body"></tbody></table>
-    <button class="full primary" id="rank-close" data-i18n="help.close" style="margin-top:12px;">Zamknij</button>
+    <div class="ov-foot"><button class="full primary" id="rank-close" data-i18n="help.close">Zamknij</button></div>
   </div>
 </div>
 
 <!-- SAMOUCZEK -->
 <div id="tutorial-overlay" class="overlay hidden">
-  <div class="glass overlay-box" style="max-width:420px;">
-    <div style="text-align:center;">
-      <div id="tut-icon" style="color:var(--accent); font-size:1.8rem;"></div>
-      <div class="ev-name" id="tut-title" style="margin-top:6px;"></div>
-      <div class="match-sub" id="tut-step"></div>
+  <div class="glass overlay-box" role="dialog" aria-modal="true" aria-labelledby="tut-title">
+    <div class="ov-head">
+      <div id="tut-icon" class="ov-icon"></div>
+      <div class="ov-title" id="tut-title"></div>
+      <div class="ov-sub" id="tut-step"></div>
     </div>
-    <p class="muted" id="tut-text" style="margin:14px 0;"></p>
-    <div style="display:flex; gap:8px;">
+    <p class="muted ov-body" id="tut-text"></p>
+    <div class="ov-foot">
       <button class="secondary full" id="tut-skip" data-i18n="tut.skip">Pomiń</button>
       <button class="primary full" id="tut-next">Dalej</button>
     </div>
@@ -769,20 +813,20 @@
 
 <!-- POMOC -->
 <div id="help-overlay" class="overlay hidden">
-  <div class="glass overlay-box" style="max-width:480px;">
-    <div class="ev-name" style="text-align:center;" data-i18n="help.title">Jak grać</div>
-    <div id="help-body" style="margin-top:14px;"></div>
-    <button class="full primary" id="help-close" data-i18n="help.close" style="margin-top:14px;">Zamknij</button>
+  <div class="glass overlay-box wide" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <div class="ov-head"><div class="ov-title" id="help-title" data-i18n="help.title">Jak grać</div></div>
+    <div id="help-body" class="mt"></div>
+    <div class="ov-foot"><button class="full primary" id="help-close" data-i18n="help.close">Zamknij</button></div>
   </div>
 </div>
 
 <!-- SAVE / LOAD -->
 <div id="save-overlay" class="overlay hidden">
-  <div class="glass overlay-box" style="max-width:460px;">
-    <div class="ev-name" style="text-align:center;" id="save-title"></div>
-    <p class="muted" style="text-align:center; margin:8px 0 12px;" id="save-hint"></p>
+  <div class="glass overlay-box" role="dialog" aria-modal="true" aria-labelledby="save-title">
+    <div class="ov-head"><div class="ov-title" id="save-title"></div>
+      <div class="ov-sub" id="save-hint"></div></div>
     <textarea id="save-text" spellcheck="false"></textarea>
-    <div style="display:flex; gap:8px; margin-top:12px;">
+    <div class="ov-foot">
       <button class="good full hidden" id="save-load-btn" data-i18n="save.load">Wczytaj</button>
       <button class="secondary full" id="save-close" data-i18n="help.close">Zamknij</button>
     </div>
@@ -791,33 +835,33 @@
 
 <!-- CHOICE -->
 <div id="choice-overlay" class="overlay hidden">
-  <div class="glass overlay-box" style="max-width:440px;">
-    <div class="ev-name" id="ch-title" style="text-align:center;"></div>
-    <p class="muted" id="ch-text" style="text-align:center; margin:8px 0 14px;"></p>
+  <div class="glass overlay-box" role="dialog" aria-modal="true" aria-labelledby="ch-title">
+    <div class="ov-head"><div class="ov-title" id="ch-title"></div>
+      <div class="ov-sub" id="ch-text"></div></div>
     <div id="ch-options"></div>
   </div>
 </div>
 
 <!-- GENERIC MODAL (sezon / koniec kariery) -->
 <div id="legacy-overlay" class="overlay hidden">
-  <div class="glass overlay-box" style="max-width:520px;">
-    <h2 style="justify-content:center; color:var(--gold); font-size:1.25rem;" id="lg-title"></h2>
-    <p class="muted" style="text-align:center;" id="lg-verdict"></p>
-    <div class="kv-grid" id="lg-stats" style="margin-top:14px;"></div>
+  <div class="glass overlay-box wide" role="dialog" aria-modal="true" aria-labelledby="lg-title">
+    <div class="ov-head"><div class="ov-title gold" id="lg-title"></div>
+      <div class="ov-sub" id="lg-verdict"></div></div>
+    <div class="kv-grid mt" id="lg-stats"></div>
     <h3 data-i18n="lg.moments">Momenty kariery</h3>
     <div id="lg-timeline"></div>
     <h3 data-i18n="lg.place">Miejsce w historii sceny</h3>
     <div id="lg-place"></div>
-    <button class="full primary" id="lg-close" style="margin-top:16px;">OK</button>
+    <div class="ov-foot"><button class="full primary" id="lg-close">OK</button></div>
   </div>
 </div>
 
 <div id="modal-overlay" class="overlay hidden">
-  <div class="glass overlay-box" style="max-width:440px;">
-    <h2 style="justify-content:center; color:var(--text); font-size:1.2rem;" id="modal-title"></h2>
-    <p class="muted" style="text-align:center;" id="modal-text"></p>
-    <div id="modal-body" style="margin:14px 0;"></div>
-    <button class="full primary" id="modal-close">OK</button>
+  <div class="glass overlay-box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="ov-head"><div class="ov-title" id="modal-title"></div>
+      <div class="ov-sub" id="modal-text"></div></div>
+    <div id="modal-body"></div>
+    <div class="ov-foot"><button class="full primary" id="modal-close">OK</button></div>
   </div>
 </div>
 
@@ -844,6 +888,8 @@
     "start.arch": ["Typ zawodnika", "Player type"],
     "start.scenario": ["Początek kariery", "How your career starts"],
     "start.diff": ["Poziom trudności", "Difficulty"],
+    "start.next": ["Dalej", "Next"],
+    "start.back": ["Wstecz", "Back"],
     "start.begin": ["Rozpocznij karierę", "Start career"],
     "start.lang": ["Język / Language", "Język / Language"],
     "hud.energy": ["Energia", "Energy"],
@@ -1347,6 +1393,7 @@
       "A higher rate ({amount}/wk) improves your odds a lot."],
     "staff.taken": ["Masz już", "Already have"],
     "staff.fire": ["Zwolnij", "Dismiss"],
+    "staff.scoutShort": ["Szukaj kandydatów", "Scout candidates"],
     "staff.scout": ["Szukaj kandydatów · {amount}", "Scout candidates · {amount}"],
     "staff.fitsOk": ["✓ pasujesz do tej wizji", "✓ you fit this vision"],
     "staff.fitsNo": ["✗ nie pasujesz — spodziewaj się odmowy", "✗ you do not fit — expect a no"],
@@ -5871,6 +5918,17 @@
   // ---------- render ----------
   function barColor(v) { return v >= 75 ? "var(--good)" : v >= 45 ? "var(--accent)" : "var(--gold)"; }
 
+  // Rysujemy tylko to, co widać: przy 180 zawodnikach i 70 klubach przerysowywanie
+  // wszystkich zakładek naraz kosztowało tyle, co cała reszta tygodnia razem wzięta.
+  const VIEW_RENDER = {
+    career: () => { renderCareer(); },
+    train: () => { renderTrain(); },
+    team: () => { renderTeam(); renderInfluence(); },
+    scene: () => { renderScene(); renderWorld(); },
+    offers: () => { renderShop(); renderStaff(); renderOffers(); },
+    profile: () => { renderPlayerCard(); renderRatingChart(); renderRecent(); renderProfile(); },
+  };
+
   function render() {
     if (!state) return;
     document.getElementById("hud-money").textContent = money(state.money);
@@ -5878,8 +5936,8 @@
     document.getElementById("hud-week").textContent = state.week + "/" + SEASON_LENGTH;
     document.getElementById("hud-season").textContent = state.season;
 
-    renderCareer(); renderTrain(); renderTeam(); renderInfluence(); renderShop(); renderStaff(); renderWorld(); renderScene(); renderOffers();
-    renderPlayerCard(); renderRatingChart(); renderRecent(); renderProfile();
+    const draw = VIEW_RENDER[currentView] || VIEW_RENDER.career;
+    draw();
     document.getElementById("offers-dot").classList.toggle("hidden", state.offers.length === 0);
   }
 
@@ -6646,6 +6704,13 @@
     pendingDiff = b.dataset.diff;
     renderRolePicker();
   });
+  function setStartStep(n) {
+    document.querySelectorAll(".start-step").forEach(el => el.classList.toggle("hidden", +el.dataset.step !== n));
+    document.querySelectorAll(".dot-step").forEach(el => el.classList.toggle("on", +el.dataset.step <= n));
+    window.scrollTo(0, 0);
+  }
+  document.getElementById("step-next").addEventListener("click", () => setStartStep(1));
+  document.getElementById("step-back").addEventListener("click", () => setStartStep(0));
   document.getElementById("start-btn").addEventListener("click", startGame);
   document.getElementById("nick-input").addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
 
@@ -6724,6 +6789,19 @@
   document.getElementById("mo-close").addEventListener("click", () => {
     document.getElementById("match-overlay").classList.add("hidden");
     if (matchAfterClose) { const f = matchAfterClose; matchAfterClose = null; f(); }
+  });
+  // Esc zamyka okna informacyjne; okno wyboru wymaga decyzji, więc go nie dotyka
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    const order = ["legacy-overlay", "help-overlay", "rank-overlay", "save-overlay", "modal-overlay", "match-overlay"];
+    for (const id of order) {
+      const el = document.getElementById(id);
+      if (el && !el.classList.contains("hidden")) {
+        const btn = el.querySelector("#lg-close, #help-close, #rank-close, #save-close, #modal-close, #mo-close");
+        if (btn) btn.click();
+        return;
+      }
+    }
   });
   document.getElementById("lg-close").addEventListener("click", () => {
     document.getElementById("legacy-overlay").classList.add("hidden");
