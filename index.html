@@ -357,6 +357,16 @@
   .match-score { font-size: 2.1rem; line-height: 1; margin: 6px 0 4px; }
   .match-score .win { color: var(--good); } .match-score .loss { color: var(--danger); }
   .match-sub { font-size: 0.75rem; color: var(--text-dim); }
+  .mini-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .mini-chart { background: var(--bg-void); border: 1px solid var(--border); padding: 8px 10px; }
+  .mini-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.68rem; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 2px; }
+  .lg-list { margin-top: 10px; }
+  .lg-row { display: flex; align-items: center; gap: 8px; font-size: 0.74rem; padding: 4px 0;
+    font-family: 'Inter', sans-serif; }
+  .lg-dot { width: 10px; height: 10px; flex-shrink: 0; }
+  .lg-name { color: var(--text); }
+  .lg-val { margin-left: auto; color: var(--text-dim); font-family: 'Rajdhani', sans-serif; font-weight: 700; }
   .mo-flavour { font-size: 0.78rem; color: var(--text-dim); font-style: italic; text-align: center;
     margin: 0 0 12px; line-height: 1.5; font-family: 'Inter', sans-serif; }
   .map-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 0.78rem;
@@ -703,18 +713,32 @@
       </section>
 
       <section id="view-profile" class="view hidden">
-        <div class="subnav" id="sub-profile"><button class="sub-btn active" data-sub="card"><span data-i18n="sub.card">Karta</span></button><button class="sub-btn" data-sub="stats"><span data-i18n="sub.stats">Statystyki</span></button><button class="sub-btn" data-sub="log"><span data-i18n="sub.log">Dziennik</span></button></div>
+        <div class="subnav" id="sub-profile"><button class="sub-btn active" data-sub="card"><span data-i18n="sub.card">Karta</span></button><button class="sub-btn" data-sub="charts"><span data-i18n="sub.charts">Wykresy</span></button><button class="sub-btn" data-sub="stats"><span data-i18n="sub.stats">Statystyki</span></button><button class="sub-btn" data-sub="log"><span data-i18n="sub.log">Dziennik</span></button></div>
         <div class="glass panel" data-panel="card">
           <h2><svg class="icon"><use href="#i-user"></use></svg> <span data-i18n="profile.card">Karta zawodnika</span></h2>
           <div id="player-card"></div>
-          <h3 data-i18n="profile.chart">Rating w kolejnych sezonach</h3>
-          <div id="rating-chart"></div>
           <h3 data-i18n="profile.recent">Ostatnie mecze</h3>
           <div id="recent-matches"></div>
         </div>
         <div class="glass panel" data-panel="stats">
+          <h2><svg class="icon"><use href="#i-flag"></use></svg> <span data-i18n="chal.title">Wyzwania kariery</span></h2>
+          <p class="muted" data-i18n="chal.info">Cele na całą karierę. Nagroda w gotówce i w punktach kariery.</p>
+          <div id="chal-list"></div>
+        </div>
+        <div class="glass panel" data-panel="stats">
           <h2><svg class="icon"><use href="#i-medal"></use></svg> <span data-i18n="profile.ach">Osiągnięcia</span></h2>
           <div id="ach-grid"></div>
+        </div>
+        <div class="glass panel" data-panel="charts">
+          <h2><svg class="icon"><use href="#i-chart"></use></svg> <span data-i18n="profile.charts">Kariera w liczbach</span></h2>
+          <h3 data-i18n="profile.chart">Rating w kolejnych sezonach</h3>
+          <div id="rating-chart"></div>
+          <h3 data-i18n="profile.statChart">Rozwój statystyk</h3>
+          <div id="stat-chart"></div>
+          <h3 data-i18n="profile.earnChart">Z czego żyjesz</h3>
+          <div id="earn-chart"></div>
+          <h3 data-i18n="profile.rankChart">Miejsce w rankingu świata</h3>
+          <div id="rank-chart"></div>
         </div>
         <div class="glass panel" data-panel="stats">
           <h2><svg class="icon"><use href="#i-trophy"></use></svg> <span data-i18n="profile.stats">Statystyki kariery</span></h2>
@@ -918,6 +942,7 @@
     "sub.funds": ["Portfel", "Wallet"],
     "sub.deals": ["Umowy", "Deals"],
     "sub.card": ["Karta", "Card"],
+    "sub.charts": ["Wykresy", "Charts"],
     "sub.stats": ["Statystyki", "Stats"],
     "sub.log": ["Dziennik", "Log"],
     "scene.news": ["Ze sceny", "From the scene"],
@@ -1008,6 +1033,24 @@
       "Sponsors appear once your hype grows (media, streams, tournament wins)."],
     "profile.card": ["Karta zawodnika", "Player card"],
     "profile.chart": ["Rating w kolejnych sezonach", "Rating across seasons"],
+    "chal.title": ["Wyzwania kariery", "Career challenges"],
+    "chal.info": ["Cele na całą karierę. Nagroda w gotówce i w punktach kariery.",
+      "Goals for a whole career. Paid in cash and in career points."],
+    "chal.short": ["Wyzwania", "Challenges"],
+    "chal.doneTitle": ["Wyzwanie ukończone", "Challenge complete"],
+    "chal.done": ["{name} — zaliczone. Takie rzeczy zostają w papierach.",
+      "{name} — done. That one stays on the record."],
+    "chal.reward": ["Nagroda", "Reward"],
+    "chal.points": ["Punkty kariery", "Career points"],
+    "log.challenge": ["Wyzwanie ukończone: {name} (+{amount}).", "Challenge complete: {name} (+{amount})."],
+    "chr.challenge": ["Wyzwanie: {name}.", "Challenge: {name}."],
+    "profile.charts": ["Kariera w liczbach", "The career in numbers"],
+    "profile.statChart": ["Rozwój statystyk", "Stat growth"],
+    "profile.earnChart": ["Z czego żyjesz", "Where the money comes from"],
+    "profile.rankChart": ["Miejsce w rankingu świata", "World ranking position"],
+    "profile.earnWait": ["Zarobki pojawią się po pierwszej wypłacie.", "Earnings show up after your first paycheck."],
+    "profile.rankWait": ["Wykres pojawi się po drugim sezonie w rankingu.",
+      "The chart appears after your second ranked season."],
     "profile.chartWait": ["Wykres pojawi się po drugim ukończonym sezonie.", "The chart appears after your second finished season."],
     "profile.recent": ["Ostatnie mecze", "Recent matches"],
     "profile.noMatches": ["Brak rozegranych meczów.", "No matches played yet."],
@@ -2346,6 +2389,18 @@
     if (state.career.timeline.length > 60) state.career.timeline.length = 60;
   }
 
+  // Każdy przychód ma źródło — dzięki temu profil pokazuje, z czego naprawdę żyjesz
+  function earn(amount, src) {
+    const a = Math.round(amount);
+    state.money += a;
+    state.career.earned += a;
+    if (!state.challenges) state.challenges = {};
+    if (!state.earnSrc) state.earnSrc = { salary: 0, prize: 0, stream: 0, sponsor: 0, other: 0 };
+    state.earnSrc[src || "other"] = (state.earnSrc[src || "other"] || 0) + a;
+    if (state.s2) state.s2.earned = (state.s2.earned || 0) + a;
+    return a;
+  }
+
   function addLog(text, type) {
     state.log.unshift({ t: "S" + state.season + " T" + state.week, text: text, type: type || "info" });
     if (state.log.length > 70) state.log.length = 70;
@@ -2460,7 +2515,8 @@
       staff: {}, staffMarket: [], funds: { deposit: 0, index: 0, crypto: 0 }, fundLast: 0, loan: null, loanTry: 0,
       news: [], clubs: null, chronic: [], burn: 0, injuries: 0, majorSpot: false, natCall: 0, natCaps: 0,
       talkWeek: 0, roleFight: 0, roleChange: 0, history: [], agent: false, s3: { streams: 0, media: 0 },
-      stack: null, stackAsked: false, academy: null, style2: "default", signTry: 0, platform: null, nemesis: null, nemesisBeaten: 0, fastMatches: false,
+      stack: null, stackAsked: false, academy: null, style2: "default", signTry: 0, platform: null,
+      earnSrc: { salary: 0, prize: 0, stream: 0, sponsor: 0, other: 0 }, challenges: {}, nemesis: null, nemesisBeaten: 0, fastMatches: false,
       lead: 18 + ((ARCHETYPES.find(a => a.id === archId) || {}).lead || 0), captain: false, captainTry: 0, transferTry: 0,
       phase: null, craft: 0, rep: 0, audience: 0, trophies2: 0, tutorialDone: false,
       adapt: 0, formerTeams: [], maps: {},
@@ -2830,6 +2886,7 @@
     if (!state.style2) state.style2 = "default";
     if (typeof state.signTry !== "number") state.signTry = 0;
     if (state.platform === undefined) state.platform = null;
+    if (!state.earnSrc) state.earnSrc = { salary: 0, prize: 0, stream: 0, sponsor: 0, other: state.career.earned || 0 };
     if (state.ladder && typeof state.ladder.scoutEyes !== "number") state.ladder.scoutEyes = 0;
     if (!state.s3) state.s3 = { streams: 0, media: 0 };
     // stare umowy sponsorskie dostają warunek, żeby dało się je rozliczyć
@@ -3826,9 +3883,8 @@
     if (id === "stream") state.s3.streams++;
     if (id === "media") state.s3.media++;
     if (id === "stream") {
-      const earn = Math.round((120 + state.hype * (14 + state.team.tier * 7) * rnd(0.7, 1.3)) * (owned("studio") ? 1.4 : 1));
-      state.money += earn; state.career.earned += earn;
-      addLog(TR("log.stream", { amount: money(earn) }), "good");
+      const got = earn((120 + state.hype * (14 + state.team.tier * 7) * rnd(0.7, 1.3)) * (owned("studio") ? 1.4 : 1), "stream");
+      addLog(TR("log.stream", { amount: money(got) }), "good");
     }
     if (!bulkAction) { render(); save(); }
   }
@@ -4367,8 +4423,7 @@
     }
     const champ = wins === rounds;
     st.lans += isLan ? 1 : 0;
-    const prize = champ ? irnd(9000, 22000) : wins * irnd(1200, 2600);
-    state.money += prize; state.career.earned += prize;
+    const prize = earn(champ ? irnd(9000, 22000) : wins * irnd(1200, 2600), "prize");
     state.hype = clamp(state.hype + (champ ? 9 : 2 + wins), 0, 100);
     st.chem = clamp(st.chem + (champ ? 8 : wins ? 3 : -2), 0, 100);
     state.stamina = clamp(state.stamina - 8, 0, 100);
@@ -4731,8 +4786,7 @@
       state.natCaps = (state.natCaps || 0) + 1;
       state.stamina = clamp(state.stamina - 14, 0, 100);
       const champ = wins === 3;
-      const pay = Math.round(tier(state.team.tier).prize * (champ ? 0.5 : 0.12 * wins + 0.05));
-      state.money += pay; state.career.earned += pay;
+      const pay = earn(tier(state.team.tier).prize * (champ ? 0.5 : 0.12 * wins + 0.05), "prize");
       state.hype = clamp(state.hype + (champ ? 14 : 4 + wins * 2), 0, 100);
       if (champ) {
         state.career.trophies.push({ name: TR("nat.trophy", { country: countryName() }), season: state.season,
@@ -4778,8 +4832,7 @@
 
     function finishRmr() {
       state.majorSpot = wins >= 2;
-      const prize = Math.round(tier(state.team.tier).prize * (state.majorSpot ? 0.3 : 0.08));
-      state.money += prize; state.career.earned += prize;
+      const prize = earn(tier(state.team.tier).prize * (state.majorSpot ? 0.3 : 0.08), "prize");
       if (state.majorSpot) {
         state.hype = clamp(state.hype + 6, 0, 100);
         addLog(TR("log.rmrIn"), "gold");
@@ -4836,11 +4889,10 @@
     const placeIdx = out ? stageIdx : stages.length;
     const won = !out;
     const prizeMul = [0.12, 0.3, 0.65, 1][clamp(placeIdx, 0, 3)] * (won ? 1.6 : 1);
-    const prize = Math.round(tier(state.team.tier).prize * prizeMul * (ev.major ? 2.2 : 1) * 0.35);
-    state.money += prize; state.career.earned += prize;
+    const prize = earn(tier(state.team.tier).prize * prizeMul * (ev.major ? 2.2 : 1) * 0.35, "prize");
     let extra = TR("match.prize", { amount: money(prize) });
     if (won) {
-      state.career.trophies.push({ name: ev.name, season: state.season, major: !!ev.major, tier: state.team.tier });
+      state.career.trophies.push({ name: ev.name, season: state.season, major: !!ev.major, tier: state.team.tier, age: state.age });
       news("news.myTrophy", { nick: state.nick, team: state.team.name, event: ev.name }, "gold");
       if (state.extras && state.extras.bonus) {
         const bn = Math.round(tier(state.team.tier).prize * 0.4);
@@ -4909,9 +4961,8 @@
 
   function advanceWeek() {
     // tygodniowe rozliczenia
-    state.money += state.team.salary;
-    state.career.earned += state.team.salary;
-    state.sponsors.forEach(sp => { state.money += sp.pay; state.career.earned += sp.pay; });
+    earn(state.team.salary, "salary");
+    state.sponsors.forEach(sp => earn(sp.pay, "sponsor"));
     state.money -= upkeepTotal();
     if (state.captain) state.team.chem = clamp(state.team.chem + 2, 0, 100);
     if (staffQ("psycho")) state.mental = clamp(state.mental + 1.5 + staffQ("psycho") / 40, 0, 100);
@@ -5160,8 +5211,7 @@
       if (sp.season === undefined) { sp.season = state.season; sp.goal = sp.goal || "hype"; sp.target = sp.target || 40; }
       const pr = sponsorProgress(sp);
       if (pr.done) {
-        const bonus = Math.round(sp.bonus * (state.agent ? 1 - AGENT_CUT : 1));
-        state.money += bonus; state.career.earned += bonus;
+        const bonus = earn(sp.bonus * (state.agent ? 1 - AGENT_CUT : 1), "sponsor");
         rows.push([sp.name, TR("spon.rowDone", { amount: money(bonus) })]);
         addLog(TR("log.sponsorDone", { name: sp.name, amount: money(bonus) }), "gold");
         sp.season = state.season + 1;
@@ -5239,7 +5289,10 @@
     if (rank > 0 && (state.career.bestRank === 0 || rank < state.career.bestRank)) state.career.bestRank = rank;
     state.career.bestRating = Math.max(state.career.bestRating, +r.toFixed(2));
     state.career.seasons.push({ season: state.season, team: state.team.name, tier: state.team.tier,
-      matches: ss.matches, wins: ss.wins, rating: +r.toFixed(2), rank: rank });
+      matches: ss.matches, wins: ss.wins, rating: +r.toFixed(2), rank: rank,
+      stats: { aim: Math.round(state.stats.aim), reflex: Math.round(state.stats.reflex),
+               sense: Math.round(state.stats.sense), util: Math.round(state.stats.util),
+               team: Math.round(state.stats.team) } });
 
     const rows = [];
     rows.push([TR("season.team"), state.team.name + " (" + tx(tier(state.team.tier).name) + ")"]);
@@ -5254,7 +5307,7 @@
     if (state.goal) {
       rows.push([TR("goal.title"), goalText(state.goal)]);
       if (gp.done) {
-        state.money += state.goal.reward; state.career.earned += state.goal.reward;
+        earn(state.goal.reward, "other");
         state.team.patience = Math.min(5, state.team.patience + 1);
         state.hype = clamp(state.hype + 4, 0, 100);
         rows.push([TR("season.goalResult"), TR("season.goalDone", { amount: money(state.goal.reward) })]);
@@ -5401,7 +5454,90 @@
     showModal(TR("gala.title", { n: state.season - 1 }), TR("gala.sub"), html);
   }
 
+  // ---------- wyzwania na całą karierę ----------
+  // Cele, które sprawdzają się dopiero na dystansie: nagroda w gotówce, rozpoznawalności
+  // i punktach kariery. Postęp widać w profilu, więc wiadomo, o co jeszcze można zagrać.
+  const CHALLENGES = [
+    { id: "wonder", name: ["Cudowne dziecko", "Wonder kid"],
+      desc: ["Major przed 23. rokiem życia.", "Win a Major before you turn 23."],
+      prog: () => ({ now: state.career.trophies.some(t => t.major && t.age !== undefined ? t.age < 23 : false) ? 1 : 0, max: 1 }),
+      test: () => state.career.trophies.some(t => t.major && (t.age || 99) < 23),
+      pts: 320, cash: 250000 },
+    { id: "climb", name: ["Od zera do topu", "Zero to the top"],
+      desc: ["Zagraj sezon w tier 0 i doprowadź karierę do Top 5 świata.",
+             "Play a season at tier 0 and take the career to the world top 5."],
+      prog: () => ({ now: (state.career.seasons.some(x => x.tier === 0) ? 1 : 0) +
+        (state.career.bestRank > 0 && state.career.bestRank <= 5 ? 1 : 0), max: 2 }),
+      test: () => state.career.seasons.some(x => x.tier === 0) && state.career.bestRank > 0 && state.career.bestRank <= 5,
+      pts: 280, cash: 200000 },
+    { id: "loyal", name: ["Jeden klub", "One club man"],
+      desc: ["Pięć pełnych sezonów w tej samej organizacji.", "Five full seasons at the same organisation."],
+      prog: () => {
+        const runs = {};
+        state.career.seasons.forEach(x => { runs[x.team] = (runs[x.team] || 0) + 1; });
+        const best = Object.keys(runs).reduce((a, k) => Math.max(a, runs[k]), 0);
+        return { now: Math.min(best, 5), max: 5 };
+      },
+      test: function () { return this.prog().now >= 5; },
+      pts: 220, cash: 180000 },
+    { id: "staff", name: ["Własny sztab", "A staff of your own"],
+      desc: ["Zatrudnij jednocześnie czterech fachowców klasy 70+.",
+             "Employ four specialists rated 70 or better at the same time."],
+      prog: () => ({ now: Object.keys(state.staff || {}).filter(k => state.staff[k].q >= 70).length, max: 4 }),
+      test: () => Object.keys(state.staff || {}).filter(k => state.staff[k].q >= 70).length >= 4,
+      pts: 180, cash: 150000 },
+    { id: "world", name: ["Obieżyświat", "Globetrotter"],
+      desc: ["Zagraj w klubach z trzech różnych regionów.", "Play for clubs from three different regions."],
+      prog: () => {
+        const regs = {};
+        (state.formerTeams || []).concat([state.team ? state.team.name : ""]).forEach(n => { if (n) regs[orgRegion(n)] = 1; });
+        return { now: Math.min(Object.keys(regs).length, 3), max: 3 };
+      },
+      test: function () { return this.prog().now >= 3; },
+      pts: 160, cash: 120000 },
+    { id: "iron", name: ["Żelazne zdrowie", "Iron health"],
+      desc: ["Dojedź do 30. roku życia bez przewlekłego urazu.", "Reach 30 with no chronic injury."],
+      prog: () => ({ now: state.age >= 30 && !(state.chronic || []).length ? 1 : 0, max: 1 }),
+      test: () => state.age >= 30 && !(state.chronic || []).length,
+      pts: 200, cash: 160000 },
+    { id: "national", name: ["Duma kraju", "National pride"],
+      desc: ["Dziesięć występów w reprezentacji.", "Ten national team appearances."],
+      prog: () => ({ now: Math.min(state.natCaps || 0, 10), max: 10 }),
+      test: () => (state.natCaps || 0) >= 10,
+      pts: 150, cash: 120000 },
+    { id: "machine", name: ["Maszyna", "The machine"],
+      desc: ["Trzy sezony z ratingiem 1.15 albo lepszym.", "Three seasons at 1.15 rating or better."],
+      prog: () => ({ now: Math.min(state.career.seasons.filter(x => x.rating >= 1.15).length, 3), max: 3 }),
+      test: () => state.career.seasons.filter(x => x.rating >= 1.15).length >= 3,
+      pts: 260, cash: 200000 },
+  ];
+
+  function challengeDone(id) { return !!(state.challenges && state.challenges[id]); }
+
+  function checkChallenges() {
+    if (!state.challenges) state.challenges = {};
+    CHALLENGES.forEach(ch => {
+      if (challengeDone(ch.id)) return;
+      let ok = false;
+      try { ok = ch.test(); } catch (e) { ok = false; }
+      if (!ok) return;
+      state.challenges[ch.id] = state.season;
+      earn(ch.cash, "other");
+      state.hype = clamp(state.hype + 6, 0, 100);
+      addLog(TR("log.challenge", { name: tx(ch.name), amount: money(ch.cash) }), "gold");
+      chronicle(TR("chr.challenge", { name: tx(ch.name) }), "gold");
+      showModal(TR("chal.doneTitle"), TR("chal.done", { name: tx(ch.name) }),
+        '<div class="recap-line"><span>' + esc(TR("chal.reward")) + "</span><b>" + money(ch.cash) + "</b></div>" +
+        '<div class="recap-line"><span>' + esc(TR("chal.points")) + "</span><b>+" + ch.pts + "</b></div>");
+    });
+  }
+
+  function challengePoints() {
+    return CHALLENGES.reduce((a, ch) => a + (challengeDone(ch.id) ? ch.pts : 0), 0);
+  }
+
   function checkAch() {
+    checkChallenges();
     ACHIEVEMENTS.forEach(a => {
       if (!state.ach[a.id] && a.test(state)) {
         state.ach[a.id] = true;
@@ -5415,7 +5551,7 @@
     const avg = c.matches ? c.rating / c.matches : 0;
     return Math.round(trophyWeight(c.trophies) * 26 + c.trophies.filter(t => t.major).length * 250 + c.mvps * 90 +
       (c.bestRank > 0 ? Math.max(0, 130 - c.bestRank) * 6 : 0) + avg * 300 + c.wins * 3 +
-      Math.min(700, (c.earned + (state.invest || 0)) / 12000));
+      Math.min(700, (c.earned + (state.invest || 0)) / 12000) + challengePoints());
   }
 
   function retire() {
@@ -5486,7 +5622,9 @@
       [TR("hist.majors"), c.trophies.filter(t => t.major).length], [TR("end.mvps"), c.mvps],
       [TR("end.bestRank"), c.bestRank > 0 ? "#" + c.bestRank : "—"],
       [TR("kv.earned"), money(c.earned + (state.invest || 0))],
-      [TR("nat.caps"), state.natCaps || 0], [TR("end.hof"), pts],
+      [TR("nat.caps"), state.natCaps || 0],
+      [TR("chal.short"), CHALLENGES.filter(ch => challengeDone(ch.id)).length + " / " + CHALLENGES.length],
+      [TR("end.hof"), pts],
     ];
     document.getElementById("lg-stats").innerHTML = kv.map(x =>
       '<div class="kv"><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + "</div></div>").join("");
@@ -6071,9 +6209,8 @@
     if (a.mental) state.mental = clamp(state.mental + a.mental, 0, 100);
     if (a.money) { const m2 = Math.round(a.money * (0.7 + state.rep / 160)); state.money += m2; state.career.earned += m2; state.s2.earned += m2; }
     if (id === "stream2") {
-      const earn = Math.round(300 + state.audience * 18 * rnd(0.8, 1.25));
-      state.money += earn; state.career.earned += earn; state.s2.earned += earn;
-      addLog("Stream: +" + money(earn) + " (widownia " + state.audience + "k)", "good");
+      const got = earn(300 + state.audience * 18 * rnd(0.8, 1.25), "stream");
+      addLog("Stream: +" + money(got) + " (widownia " + state.audience + "k)", "good");
     }
     if (!bulkAction) { render(); save(); }
   }
@@ -6403,7 +6540,7 @@
     team: () => { renderTeam(); renderInfluence(); },
     scene: () => { renderScene(); renderWorld(); },
     offers: () => { renderShop(); renderStaff(); renderOffers(); },
-    profile: () => { renderPlayerCard(); renderRatingChart(); renderRecent(); renderProfile(); },
+    profile: () => { renderPlayerCard(); renderRatingChart(); renderStatChart(); renderEarnChart(); renderRankChart(); renderRecent(); renderProfile(); },
   };
 
   function render() {
@@ -6976,6 +7113,114 @@
   }
 
   // Pojedyncza seria zmian w czasie: linia + linia odniesienia 1.00, bez legendy
+  // ---------- wykresy kariery ----------
+  // Trzy pytania: jak rosłem, z czego żyłem, gdzie byłem w rankingu.
+  // Statystyki jako małe wielokrotności (jedna seria = jeden kolor, bez legendy),
+  // zarobki jako jeden słupek udziałów, ranking jako linia z odwróconą osią.
+  const CHART_W = 320;
+
+  function chartAxisLabel(v) { return String(v); }
+
+  // 1. rozwój statystyk — pięć mini-wykresów w tej samej skali 0-100
+  function renderStatChart() {
+    const box = document.getElementById("stat-chart");
+    if (!box) return;
+    const seasons = (state.career.seasons || []).filter(x => x.stats);
+    if (seasons.length < 2) {
+      box.innerHTML = '<p class="muted">' + esc(TR("profile.chartWait")) + "</p>";
+      return;
+    }
+    const W = 150, H = 74, padL = 4, padR = 26, padT = 8, padB = 12;
+    const html = STAT_DEFS.map(sd => {
+      const vals = seasons.map(x => x.stats[sd.id] || 0);
+      const x = i => padL + (seasons.length === 1 ? 0 : i * (W - padL - padR) / (seasons.length - 1));
+      const y = v => padT + (100 - v) / 100 * (H - padT - padB);
+      const pts = vals.map((v, i) => x(i).toFixed(1) + "," + y(v).toFixed(1)).join(" ");
+      const last = vals[vals.length - 1];
+      let svg = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(tx(sd.name)) + '">';
+      svg += '<line class="chart-ref" x1="' + padL + '" y1="' + y(50).toFixed(1) + '" x2="' + (W - padR) + '" y2="' + y(50).toFixed(1) + '"/>';
+      svg += '<polyline class="chart-line" points="' + pts + '"/>';
+      svg += '<circle class="chart-dot" cx="' + x(vals.length - 1).toFixed(1) + '" cy="' + y(last).toFixed(1) + '" r="3.2"/>';
+      seasons.forEach((sn, i) => {
+        svg += '<circle class="chart-hit" cx="' + x(i).toFixed(1) + '" cy="' + y(vals[i]).toFixed(1) + '" r="10">' +
+          "<title>S" + sn.season + " · " + esc(tx(sd.name)) + " " + vals[i] + "</title></circle>";
+      });
+      svg += '<text class="chart-last" x="' + (W - padR + 4) + '" y="' + (y(last) + 4).toFixed(1) + '">' + last + "</text>";
+      svg += "</svg>";
+      return '<div class="mini-chart"><div class="mini-title">' + esc(tx(sd.name)) + "</div>" + svg + "</div>";
+    }).join("");
+    box.innerHTML = '<div class="mini-grid">' + html + "</div>";
+  }
+
+  // 2. źródła zarobków — jeden słupek udziałów z legendą i wartościami
+  const EARN_SRC = [
+    { id: "salary", name: ["Pensja", "Salary"], c: "#3987e5" },
+    { id: "prize", name: ["Nagrody", "Prize money"], c: "#d95926" },
+    { id: "stream", name: ["Streamy", "Streams"], c: "#199e70" },
+    { id: "sponsor", name: ["Sponsorzy", "Sponsors"], c: "#c98500" },
+    { id: "other", name: ["Inne", "Other"], c: "#6b7280" },
+  ];
+
+  function renderEarnChart() {
+    const box = document.getElementById("earn-chart");
+    if (!box) return;
+    const src = state.earnSrc || {};
+    const rows = EARN_SRC.map(e => ({ e: e, v: Math.max(0, Math.round(src[e.id] || 0)) })).filter(r => r.v > 0);
+    const total = rows.reduce((a, r) => a + r.v, 0);
+    if (!total) { box.innerHTML = '<p class="muted">' + esc(TR("profile.earnWait")) + "</p>"; return; }
+    rows.sort((a, b) => b.v - a.v);
+    const W = 320, H = 26, gap = 2;
+    let cx = 0;
+    let svg = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(TR("profile.earnChart")) + '">';
+    rows.forEach((r, i) => {
+      const w = Math.max(3, (r.v / total) * (W - gap * (rows.length - 1)));
+      svg += '<rect x="' + cx.toFixed(1) + '" y="0" width="' + w.toFixed(1) + '" height="' + H + '" fill="' + r.e.c + '">' +
+        "<title>" + esc(tx(r.e.name)) + " · " + esc(money(r.v)) + " · " + Math.round(r.v / total * 100) + "%</title></rect>";
+      cx += w + gap;
+    });
+    svg += "</svg>";
+    const legend = rows.map(r =>
+      '<div class="lg-row"><span class="lg-dot" style="background:' + r.e.c + '"></span>' +
+      '<span class="lg-name">' + esc(tx(r.e.name)) + "</span>" +
+      '<span class="lg-val">' + esc(money(r.v)) + " · " + Math.round(r.v / total * 100) + "%</span></div>").join("");
+    box.innerHTML = '<div class="chart-wrap">' + svg + "</div>" + '<div class="lg-list">' + legend + "</div>";
+  }
+
+  // 3. pozycja w rankingu — im wyżej na wykresie, tym lepsze miejsce
+  function renderRankChart() {
+    const box = document.getElementById("rank-chart");
+    if (!box) return;
+    const seasons = (state.career.seasons || []).filter(x => x.rank);
+    if (seasons.length < 2) { box.innerHTML = '<p class="muted">' + esc(TR("profile.rankWait")) + "</p>"; return; }
+    const W = 320, H = 118, padL = 30, padR = 16, padT = 12, padB = 18;
+    const best = Math.min.apply(null, seasons.map(x => x.rank));
+    const worst = Math.max.apply(null, seasons.map(x => x.rank));
+    const lo = Math.max(1, best - 2), hi = worst + 3;
+    const x = i => padL + (seasons.length === 1 ? 0 : i * (W - padL - padR) / (seasons.length - 1));
+    const y = v => padT + (v - lo) / (hi - lo) * (H - padT - padB);   // 1. miejsce na górze
+    const pts = seasons.map((sn, i) => x(i).toFixed(1) + "," + y(sn.rank).toFixed(1)).join(" ");
+    const lastIdx = seasons.length - 1;
+    let svg = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(TR("profile.rankChart")) + '">';
+    if (lo <= 20 && hi >= 20) {
+      svg += '<line class="chart-ref" x1="' + padL + '" y1="' + y(20).toFixed(1) + '" x2="' + (W - padR) + '" y2="' + y(20).toFixed(1) + '"/>';
+      svg += '<text class="chart-axis" x="2" y="' + (y(20) + 3).toFixed(1) + '">#20</text>';
+    }
+    svg += '<text class="chart-axis" x="2" y="' + (padT + 3) + '">#' + lo + "</text>";
+    svg += '<text class="chart-axis" x="2" y="' + (H - padB + 3) + '">#' + hi + "</text>";
+    svg += '<polyline class="chart-line" points="' + pts + '"/>';
+    seasons.forEach((sn, i) => {
+      svg += '<circle class="chart-dot" cx="' + x(i).toFixed(1) + '" cy="' + y(sn.rank).toFixed(1) + '" r="3.2"/>';
+      svg += '<circle class="chart-hit" cx="' + x(i).toFixed(1) + '" cy="' + y(sn.rank).toFixed(1) + '" r="11">' +
+        "<title>S" + sn.season + " · #" + sn.rank + " · " + esc(sn.team) + "</title></circle>";
+    });
+    svg += '<text class="chart-axis" x="' + padL + '" y="' + (H - 4) + '">S' + seasons[0].season + "</text>";
+    svg += '<text class="chart-axis" text-anchor="end" x="' + (W - padR) + '" y="' + (H - 4) + '">S' + seasons[lastIdx].season + "</text>";
+    svg += '<text class="chart-last" text-anchor="end" x="' + (W - padR) + '" y="' + (y(seasons[lastIdx].rank) - 8).toFixed(1) + '">#' +
+      seasons[lastIdx].rank + "</text>";
+    svg += "</svg>";
+    box.innerHTML = '<div class="chart-wrap">' + svg + "</div>";
+  }
+
   function renderRatingChart() {
     const box = document.getElementById("rating-chart");
     const seasons = state.career.seasons;
@@ -7051,6 +7296,21 @@
 
   function renderProfile() {
     document.getElementById("btn-fast").textContent = TR(state.fastMatches ? "profile.fastOn" : "profile.fastOff");
+    const cl = document.getElementById("chal-list");
+    if (cl) {
+      cl.innerHTML = CHALLENGES.map(ch => {
+        let pr = { now: 0, max: 1 };
+        try { pr = ch.prog.call(ch); } catch (e) { /* brak danych */ }
+        const done = challengeDone(ch.id);
+        const pct = clamp(pr.now / pr.max * 100, 0, 100);
+        return '<div class="shop-item"><div><div class="si-name">' + (done ? "✓ " : "") + esc(tx(ch.name)) + "</div>" +
+          '<div class="si-desc">' + esc(tx(ch.desc)) + "</div>" +
+          '<div class="si-q"><span class="q-val">' + pr.now + " / " + pr.max + "</span>" +
+          '<div class="bar-track"><div class="bar-fill" style="width:' + pct + "%; background:" +
+          (done ? "var(--good)" : barColor(pct)) + '"></div></div></div></div>' +
+          '<div class="si-btns"><span class="si-pay">+' + ch.pts + "</span></div></div>";
+      }).join("");
+    }
     document.getElementById("ach-grid").innerHTML = ACHIEVEMENTS.map(a =>
       '<div class="ach' + (state.ach[a.id] ? "" : " locked") + '">' + icon(a.icon) +
       '<div class="ach-name">' + esc(tx(a.name)) + "</div></div>").join("");

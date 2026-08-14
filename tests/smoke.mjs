@@ -302,7 +302,7 @@ const nickAfter = await page.textContent('#pc-nick');
 check('eksport i import zapisu', nickAfter.trim().toLowerCase() === 'żółw', nickAfter);
 
 // karta gracza i wykres
-await goto('profile', 'card');
+await goto('profile', 'charts');
 const chartPoints = await page.$$eval('#rating-chart .chart-dot', els => els.length);
 if (c.seasons.length >= 2) {
   check('wykres ratingu ma punkty', chartPoints === c.seasons.length, chartPoints + ' punktów');
@@ -310,7 +310,15 @@ if (c.seasons.length >= 2) {
   const txt = await page.textContent('#rating-chart');
   check('wykres czeka na drugi sezon', /drugim/.test(txt), txt.trim());
 }
+await goto('profile', 'card');
 check('karta gracza wyrenderowana', (await page.$$('#player-card .pcard')).length === 1);
+await goto('profile', 'charts');
+const miniCharts = await page.$$eval('#stat-chart .mini-chart', els => els.length).catch(() => 0);
+const earnBars = await page.$$eval('#earn-chart rect', els => els.length).catch(() => 0);
+check('wykresy kariery się rysują', miniCharts === 5 || earnBars > 0,
+  miniCharts + ' mini-wykresów, ' + earnBars + ' słupków zarobków');
+check('zarobki mają rozbicie na źródła', !!st.earnSrc && Object.values(st.earnSrc).some(v => v > 0),
+  JSON.stringify(st.earnSrc || {}).slice(0, 60));
 
 // drugi rozdział: emerytura i rola trenera
 await goto('profile', 'log');

@@ -106,6 +106,13 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
 - **Sponsorzy** — każda umowa ma **warunek na sezon** (streamy, akcje medialne, poziom hype'u, rating
   albo trofeum), premię za wykonanie i karę umowną za niewykonanie. Warunek widać przed podpisem
   i można odmówić. **Agent** za wpisowe podwaja liczbę ofert i podnosi stawki o 18%, ale bierze 8% premii.
+- **Wykresy kariery** — w profilu: rating sezon po sezonie, rozwój pięciu statystyk jako małe
+  wykresy w tej samej skali, rozbicie zarobków na pensję, nagrody, streamy i sponsorów oraz
+  pozycja w rankingu świata w czasie (im wyżej, tym lepsze miejsce).
+- **Wyzwania kariery** — osiem celów na cały przebieg: Major przed 23. rokiem życia, droga
+  z tier 0 do Top 5, pięć sezonów w jednym klubie, czterech fachowców klasy 70+, kluby z trzech
+  regionów, trzydziestka bez przewlekłego urazu, dziesięć występów w kadrze, trzy sezony
+  z ratingiem 1.15+. Każde płaci gotówką i punktami kariery, a postęp widać na paskach w profilu.
 - **Historia sceny** — archiwum wszystkich sezonów: numer jeden świata, najmocniejsza organizacja,
   zwycięzca Majora i Twoje miejsce w danym roku. Pod spodem rekordy kariery.
 - **Drama** — gwiazda składu dostaje ofertę i możesz próbować ją zatrzymać, tilciarz rozbija
