@@ -6221,7 +6221,11 @@
     if (a.rep) state.rep = clamp(state.rep + a.rep * (1 - state.rep / 105), 0, 100);
     if (a.chem && state.team) state.team.chem = clamp(state.team.chem + a.chem, 0, 100);
     if (a.mates && state.team) {
-      state.team.mates.forEach(m => { m.skill = clamp(m.skill + a.mates * (0.5 + state.craft / 140), 25, 97); });
+      // im wyżej, tym trudniej: bez tego każdy skład dochodził do sufitu i zostawał tam na lata
+      state.team.mates.forEach(m => {
+        const room = Math.pow(clamp((97 - m.skill) / 40, 0, 1), 1.2);
+        m.skill = clamp(m.skill + a.mates * (0.5 + state.craft / 140) * room, 25, 97);
+      });
     }
     if (a.audience) {
       // malejący zwrot: im większa widownia, tym trudniej o kolejnych widzów
@@ -6266,7 +6270,10 @@
     // turniej albo playoff: kilka serii pod rząd
     const rounds = ev.type === "playoff" ? 2 : (ev.major ? 4 : 3);
     let wins = 0;
-    const base = tier(state.team.tier).str + (ev.major ? 6 : 2);
+    // w turniejach spotykasz najlepszych — poprzeczka podnosi się razem z Twoim składem,
+    // ale z zapasem, żeby dobra robota dawała tytuły
+    const base = Math.max(tier(state.team.tier).str - 2, staffTeamStrength() - 9)
+      + (ev.major ? 6 : 2) + (state.trophies2 || 0) * 0.35;
     for (let i = 0; i < rounds; i++) {
       if (!simStaffMatch(base + 3 + i * 6)) break;
       wins++;
@@ -6315,7 +6322,9 @@
     state.energy = MAX_ENERGY;
     if (state.team) state.team.mates.forEach(m => {
       const youth = styleDef().dev * ((m.age || 24) <= 21 ? 1.6 : 0.7);
-      m.skill = clamp(m.skill + rnd(-0.3, 0.5) + youth * 0.3, 25, 97);
+      // skład ciąży ku poziomowi swojej ligi — sam z siebie nie rośnie w nieskończoność
+      const pull = (tier(state.team.tier).str + 6 - m.skill) * 0.03;
+      m.skill = clamp(m.skill + rnd(-0.3, 0.5) + youth * 0.3 + pull, 25, 97);
     });
     state.week++;
     if (state.week > SEASON_LENGTH) { endSeason2(); return; }
