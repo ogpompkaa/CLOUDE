@@ -7412,6 +7412,8 @@
     document.getElementById("view-" + name).classList.remove("hidden");
     document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.view === name));
     applySubs(name);
+    // od kiedy rysujemy tylko aktywny widok, wejście w zakładkę musi ją odświeżyć
+    if (state) render();
     window.scrollTo(0, 0);
   }
 

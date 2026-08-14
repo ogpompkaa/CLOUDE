@@ -75,6 +75,11 @@ await safeClick('#btn-help');
 const helpSections = await page.$$eval('#help-body .help-sec h4', e => e.length).catch(() => 0);
 await safeClick('#help-close');
 
+// wejście w zakładkę musi ją narysować bez żadnej dodatkowej akcji
+await safeClick('.nav-btn[data-view="team"]');
+const freshTeam = await page.$$eval('#mates-list .mate-row', els => els.length).catch(() => 0);
+check('nowa zakładka rysuje się od razu', freshTeam > 0, freshTeam + ' wierszy składu');
+
 // preset przestawia plan jednym kliknięciem
 await goto('train', 'plan');
 const planBefore = await page.$$eval('.plan-slot', els => els.length);
