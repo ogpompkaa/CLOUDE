@@ -12,7 +12,11 @@ projekt nie jest powiązany z żadną z nich ani z wydawcą gry.
 Otwórz `index.html` w przeglądarce. To wszystko — żadnego serwera, budowania ani instalacji.
 Wszystkie zasoby, łącznie z krojami pisma, są wbudowane w plik, więc gra działa bez internetu.
 Postęp zapisuje się automatycznie w `localStorage`; można go też wyeksportować jako tekst
-z zakładki Profil.
+z zakładki Profil. Zapis ma numer wersji i **kopię zapasową**: gra tworzy ją przed wczytaniem
+cudzego zapisu i przed rozpoczęciem nowej kariery, a przy uszkodzonym stanie wczytuje kopię
+zamiast pokazywać pusty ekran. Kopię można też przywrócić ręcznie w oknie zapisu. Wklejenie
+niepoprawnych danych albo zapisu z nowszej wersji gry kończy się komunikatem, a nie utratą
+bieżącej kariery.
 
 Interfejs jest dostępny po polsku i po angielsku (przełącznik na ekranie startowym) i zaprojektowany
 pod ekran telefonu, ale działa na każdej szerokości. Każda zakładka dzieli się na **podzakładki**

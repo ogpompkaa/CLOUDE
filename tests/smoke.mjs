@@ -306,6 +306,7 @@ await page.waitForSelector('#game-screen:not(.hidden)');
 const nickAfter = await page.textContent('#pc-nick');
 check('eksport i import zapisu', nickAfter.trim().toLowerCase() === 'żółw', nickAfter);
 
+
 // karta gracza i wykres
 await goto('profile', 'charts');
 const chartPoints = await page.$$eval('#rating-chart .chart-dot', els => els.length);
@@ -367,6 +368,16 @@ const legacyShown = await page.isVisible('#legacy-overlay:not(.hidden)');
 const legacyStats = legacyShown ? await page.$$eval('#lg-stats .kv', els => els.length) : 0;
 check('podsumowanie kariery się pokazuje', legacyShown && legacyStats >= 8,
   legacyShown ? legacyStats + ' kafelków' : 'brak ekranu');
+
+// odporność zapisu — na końcu, żeby nie mieszać w sekwencji emerytury
+const saveMeta = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+check('zapis ma numer wersji', typeof saveMeta.v === 'number' && saveMeta.v >= 2, 'v=' + (saveMeta.v || '—'));
+const rejected = await page.evaluate(() => {
+  const before = localStorage.getItem('cs2-player-career-v1');
+  document.getElementById('save-text');
+  return before && before.length > 100;
+});
+check('zapis zachowany po całym przebiegu', rejected);
 
 await browser.close();
 
