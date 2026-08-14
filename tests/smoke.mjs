@@ -195,6 +195,30 @@ const hasRmr = (st.schedule || []).some(e => e.type === 'rmr');
 const hasMajor = (st.schedule || []).some(e => e.major);
 check('kalendarz ma RMR i Major', hasRmr && hasMajor, 'RMR ' + hasRmr + ', Major ' + hasMajor);
 
+// szatnia: rozmowa i rola
+await page.click('.nav-btn[data-view="team"]');
+const roleBox = await page.textContent('#role-box').catch(() => '');
+check('pasek roli w składzie', /Twoja rola/.test(roleBox), roleBox.replace(/\s+/g, ' ').slice(0, 60));
+const talkBtn = await page.$('[data-talk]:not([disabled])');
+if (talkBtn) {
+  const bondBefore = await page.evaluate(() => (JSON.parse(localStorage.getItem('cs2-player-career-v1')).team.mates[0] || {}).bond);
+  await safeClick('[data-talk]');
+  await safeClick('[data-choice="0"]');
+  await drainOverlays();
+  const stTalk = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+  check('rozmowa z kolegą działa', stTalk.talkWeek > 0, 'relacja ' + Math.round(bondBefore) + ' → ' +
+    Math.round((stTalk.team.mates[0] || {}).bond));
+} else {
+  check('rozmowa z kolegą działa', false, 'brak przycisku');
+}
+
+// historia sceny i rekordy
+await page.click('.nav-btn[data-view="scene"]');
+const histTxt = await page.textContent('#hist-body').catch(() => '');
+const recTxt = await page.textContent('#records-box').catch(() => '');
+check('archiwum sezonów się zapisuje', /#1/.test(histTxt), histTxt.replace(/\s+/g, ' ').slice(0, 60));
+check('rekordy kariery liczone', /Trofea|Trophies/.test(recTxt), recTxt.replace(/\s+/g, ' ').slice(0, 60));
+
 // rynek: sklep, portfel i sztab
 await page.click('.nav-btn[data-view="offers"]');
 const shopCount = await page.$$eval('#shop-list .shop-item', els => els.length).catch(() => 0);
@@ -238,6 +262,14 @@ if (loanBtn) {
   await drainOverlays();
 }
 const afterLoan = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+// sponsorzy: agent i warunki umów
+await page.click('.nav-btn[data-view="offers"]');
+await safeClick('[data-agent]');
+const stAgent = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+check('agent do zatrudnienia', typeof stAgent.agent === 'boolean', 'agent: ' + stAgent.agent);
+check('umowy sponsorskie mają warunek', (stAgent.sponsors || []).every(sp => sp.goal && sp.bonus > 0),
+  (stAgent.sponsors || []).map(sp => sp.name + ':' + sp.goal).join(', ') || 'brak umów');
+
 check('prośba o wypożyczenie rozpatrzona', !!loanBtn && afterLoan.loanTry === afterLoan.season,
   afterLoan.loan ? 'wypożyczony do ' + afterLoan.team.name : 'zarząd odmówił');
 

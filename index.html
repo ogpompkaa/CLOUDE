@@ -403,6 +403,10 @@
   .match-row .mr-label { flex: 1; min-width: 0; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .match-row .mr-rating { font-family: 'Rajdhani', sans-serif; font-weight: 700; }
 
+  .mate-acts { display: flex; gap: 6px; margin-top: 7px; }
+  .mate-acts button { font-size: 0.62rem; padding: 4px 9px; background: var(--bg-panel-2);
+    border: 1px solid var(--border); color: var(--text-dim); font-family: 'Inter', sans-serif; font-weight: 700;
+    text-transform: none; letter-spacing: normal; }
   .infl-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 10px; }
 
   .help-sec { margin-bottom: 14px; }
@@ -548,6 +552,7 @@
           <h2><svg class="icon"><use href="#i-users"></use></svg> <span id="team-title"></span></h2>
           <div id="team-info" class="muted" style="margin-bottom:12px;"></div>
           <div id="nemesis-box"></div>
+          <div id="role-box"></div>
           <div id="influence-box"></div>
           <div id="mates-list"></div>
         </div>
@@ -567,6 +572,13 @@
           <h2><svg class="icon"><use href="#i-chart"></use></svg> <span data-i18n="team.top20">Top 20 zawodników świata</span></h2>
           <p class="muted" data-i18n="team.top20info" style="margin-bottom:10px;">Ranking aktualizuje się po każdym sezonie. Liczy się rating, poziom drużyny, trofea i rozpoznawalność.</p>
           <table class="rank-table"><tbody id="world-body"></tbody></table>
+        </div>
+        <div class="glass panel">
+          <h2><svg class="icon"><use href="#i-doc"></use></svg> <span data-i18n="hist.title">Historia sceny</span></h2>
+          <p class="muted" data-i18n="hist.info" style="margin-bottom:10px;">Kto rządził światem w kolejnych sezonach i gdzie w tym byłeś Ty.</p>
+          <table class="standings-table"><tbody id="hist-body"></tbody></table>
+          <h3 style="margin-top:16px;" data-i18n="hist.records">Rekordy kariery</h3>
+          <div id="records-box"></div>
         </div>
         <div class="glass panel" id="clubs-panel">
           <h2><svg class="icon"><use href="#i-medal"></use></svg> <span data-i18n="scene.clubs">Ranking organizacji</span></h2>
@@ -951,6 +963,89 @@
     "log.natPlayed": ["Turniej z kadrą {country}: {n} wygranych rund.", "Tournament with {country}: {n} rounds won."],
     "chr.natWin": ["Mistrzostwo z reprezentacją {country}.", "Title with the {country} national team."],
     "match.prizeShort": ["Nagroda", "Prize"],
+    "spon.offerTitle": ["Oferta sponsorska: {name}", "Sponsorship offer: {name}"],
+    "spon.offer": ["{name} proponuje {pay} tygodniowo. Warunek na sezon: {goal}. Wykonasz — premia {bonus}. Nie wykonasz — kara {penalty} i koniec współpracy.",
+      "{name} offers {pay} a week. Season condition: {goal}. Meet it and the bonus is {bonus}. Miss it and it costs {penalty} and the deal ends."],
+    "spon.sign": ["Podpisuję", "Sign it"],
+    "spon.signDesc": ["Stała wypłata i premia, jeśli dowieziesz warunek.", "Steady money and a bonus if you deliver."],
+    "spon.pass": ["Dziękuję", "Pass"],
+    "spon.passDesc": ["Bez zobowiązań i bez kary.", "No obligation and no penalty."],
+    "spon.onTrack": ["premia {amount}", "bonus {amount}"],
+    "spon.behind": ["kara {amount}", "penalty {amount}"],
+    "spon.rowDone": ["warunek dowieziony, premia {amount}", "condition met, bonus {amount}"],
+    "spon.rowFail": ["warunek niewykonany, kara {amount}", "condition missed, penalty {amount}"],
+    "log.sponsorDone": ["{name}: warunek wykonany, premia {amount}.", "{name}: condition met, bonus {amount}."],
+    "log.sponsorFail": ["{name} zrywa umowę — kara {amount}.", "{name} ends the deal — penalty {amount}."],
+    "news.sponsor": ["{nick} podpisuje umowę z {name}.", "{nick} signs a deal with {name}."],
+    "agent.title": ["Agent", "Agent"],
+    "agent.on": ["Pracuje dla Ciebie: dwa razy więcej ofert sponsorskich i +18% do stawek. Bierze 8% premii.",
+      "Working for you: twice as many sponsorship offers and +18% on rates. Takes 8% of bonuses."],
+    "agent.off": ["Za wpisowe znajdzie Ci lepsze umowy sponsorskie i wynegocjuje wyższe stawki.",
+      "For a signing fee he finds better sponsorship deals and negotiates higher rates."],
+    "agent.drop": ["Rozwiąż umowę", "End the deal"],
+    "log.agentOn": ["Podpisujesz umowę z agentem.", "You sign with an agent."],
+    "log.agentOff": ["Koniec współpracy z agentem.", "You part ways with your agent."],
+    "hist.title": ["Historia sceny", "Scene history"],
+    "hist.info": ["Kto rządził światem w kolejnych sezonach i gdzie w tym byłeś Ty.",
+      "Who ruled the world season by season — and where you stood in it."],
+    "hist.empty": ["Historia zacznie się po pierwszym sezonie.", "History starts after your first season."],
+    "hist.no1": ["#1 świata: {nick}", "World #1: {nick}"],
+    "hist.line": ["Najmocniejsza organizacja: {club} · Major: {major}",
+      "Strongest organisation: {club} · Major: {major}"],
+    "hist.records": ["Rekordy kariery", "Career records"],
+    "hist.bestRating": ["Najlepszy sezon (rating)", "Best season (rating)"],
+    "hist.bestRank": ["Najwyższe miejsce w rankingu", "Highest world ranking"],
+    "hist.trophies": ["Trofea", "Trophies"],
+    "hist.majors": ["Majory", "Majors"],
+    "hist.yearsNo1": ["Sezony na szczycie", "Seasons as world #1"],
+    "hist.top3": ["Sezony w Top 3", "Seasons in the top 3"],
+    "team.talk": ["Rozmowa", "Talk"],
+    "team.fight": ["Walcz o rolę", "Fight for the spot"],
+    "talk.title": ["Rozmowa z {nick}", "A word with {nick}"],
+    "talk.intro": ["{nick} · {role} · {trait} · relacja {bond}. Jak podchodzisz do tematu?",
+      "{nick} · {role} · {trait} · bond {bond}. How do you play it?"],
+    "talk.support": ["Podbuduj go", "Back them up"],
+    "talk.supportDesc": ["Bezpiecznie: relacja i chemia w górę.", "Safe: bond and chemistry up."],
+    "talk.honest": ["Powiedz, co myślisz", "Say what you think"],
+    "talk.honestDesc": ["Z autorytetem podniesiesz mu poziom. Bez niego zrobisz sobie wroga.",
+      "With authority you raise their level. Without it you make an enemy."],
+    "talk.learn": ["Podpytaj o warsztat", "Ask about their game"],
+    "talk.learnDesc": ["Od kogoś lepszego można się nauczyć konkretów.", "You can learn real things from someone better."],
+    "talk.supportRes": ["{nick} odbija się od dna i wraca do gry z lepszą głową.",
+      "{nick} picks themselves up and comes back with a clearer head."],
+    "talk.honestOk": ["{nick} przyjmuje to na klatę. Szatnia wie, kto tu nadaje ton.",
+      "{nick} takes it on the chin. The locker room knows who sets the tone."],
+    "talk.honestBad": ["{nick} odbiera to jako atak. Zrobiło się zimno.",
+      "{nick} takes it as an attack. Things just got cold."],
+    "talk.learnOk": ["{nick} tłumaczy Ci swoje podejście — {stat} w górę.",
+      "{nick} walks you through their approach — {stat} up."],
+    "talk.learnFlat": ["Gadacie o grze jak równy z równym. Dobra rozmowa, nic więcej.",
+      "You talk shop as equals. A good conversation, nothing more."],
+    "log.talk": ["Rozmowa z {nick}.", "A word with {nick}."],
+    "role.boxTitle": ["Twoja rola: {role}", "Your role: {role}"],
+    "role.pressure": ["{nick} (siła {skill}) gra na Twojej pozycji i jest w lepszej formie. Sztab to widzi.",
+      "{nick} (strength {skill}) plays your position and is in better shape. The staff can see it."],
+    "role.safe": ["Twoja pozycja w składzie jest bezpieczna.", "Your spot in the lineup is safe."],
+    "role.changeBtn": ["Zmień rolę", "Change role"],
+    "role.changeCost": ["Raz na sezon · kilka tygodni gorszej formy", "Once a season · a few weeks of worse form"],
+    "role.changeTitle": ["Zmiana roli", "Role change"],
+    "role.change": ["Nowa rola to inne wagi statystyk i inny plan treningowy. Przez kilka tygodni forma będzie gorsza.",
+      "A new role means different stat weights and a different training plan. Your form will dip for a few weeks."],
+    "role.taken": ["zajęta w składzie", "taken in the lineup"],
+    "role.changed": ["Od teraz grasz jako {role}. Plan tygodnia ustawił się pod nową rolę.",
+      "From now on you play as {role}. Your weekly plan switched to match."],
+    "role.earlyTitle": ["Za wcześnie", "Too soon"],
+    "role.early": ["Rolę zmieniasz raz na sezon.", "You change your role once a season."],
+    "role.fightTitle": ["Walka o miejsce w składzie", "Fight for the spot"],
+    "role.won": ["Sztab stawia na Ciebie. {nick} przechodzi na rolę: {role}.",
+      "The staff back you. {nick} moves to a new role: {role}."],
+    "role.lost": ["{nick} wygrywa rywalizację. Zarząd zapamięta ten tydzień.",
+      "{nick} wins the battle. The board will remember this week."],
+    "log.roleWon": ["Wygrana rywalizacja o miejsce z {nick}.", "Won the battle for the spot with {nick}."],
+    "log.roleLost": ["Przegrana rywalizacja o miejsce z {nick}.", "Lost the battle for the spot with {nick}."],
+    "chr.roleWon": ["Wygrana walka o miejsce z {nick}.", "Won the fight for the spot with {nick}."],
+    "log.roleChange": ["Zmiana roli w składzie: {role}.", "Role change: {role}."],
+    "chr.roleChange": ["Przekwalifikowanie na rolę: {role}.", "Switched role: {role}."],
     "health.title": ["Zdrowie", "Health"],
     "health.info": ["Obciążenie rośnie od treningów i meczów, spada od odpoczynku, psychologa i spokojnego mieszkania. Przy maksimum organizm sam robi sobie przerwę.",
       "Load builds from training and matches and falls with rest, a psychologist and a calm home. At the top your body takes the break for you."],
@@ -1426,6 +1521,10 @@
   }
   // pola danych zapisane jako [pl, en]
   function tx(v) { return Array.isArray(v) ? (LANG === "en" ? v[1] : v[0]) : v; }
+  // podstawienie tokenów w tekście, który już jest przetłumaczony (np. etykieta z tabeli danych)
+  function fill(text, p) {
+    return String(text).replace(/\{(\w+)\}/g, (m, n) => (p && p[n] !== undefined ? p[n] : m));
+  }
 
   function applyStaticI18n() {
     document.querySelectorAll("[data-i18n]").forEach(el => {
@@ -1502,6 +1601,23 @@
     { name: "PulseGear", hype: 45, pay: 5200 }, { name: "VoltCola", hype: 60, pay: 9000 },
     { name: "ApexPeripherals", hype: 72, pay: 15000 }, { name: "NovaBank", hype: 85, pay: 28000 },
   ];
+
+  // Sponsor nie płaci za nic: umowa niesie warunek na sezon i premię za jego wykonanie.
+  // Niewywiązanie się kończy współpracę i kosztuje karę umowną.
+  const SPONSOR_GOALS = [
+    { id: "streams", label: ["{n} streamów w sezonie", "{n} streams this season"], target: () => irnd(6, 10),
+      progress: () => state.s3 ? state.s3.streams : 0 },
+    { id: "hype", label: ["Rozpoznawalność {n}+ na koniec sezonu", "Reach {n}+ hype by the end of the season"],
+      target: () => clamp(Math.round(state.hype + irnd(6, 14)), 20, 95), progress: () => Math.round(state.hype) },
+    { id: "media", label: ["{n} akcji medialnych", "{n} media appearances"], target: () => irnd(5, 9),
+      progress: () => state.s3 ? state.s3.media : 0 },
+    { id: "trophy", label: ["Trofeum w sezonie", "A trophy this season"], target: () => 1,
+      progress: () => state.career.trophies.filter(t => t.season === state.season).length },
+    { id: "rating", label: ["Rating sezonu {n}+", "Season rating of {n}+"], target: () => 1.05,
+      progress: () => +seasonRating().toFixed(2) },
+  ];
+  const AGENT_CUT = 0.08;      // procent od premii sponsorskich
+  const AGENT_FEE = 40000;     // wpisowe za podpisanie umowy z agentem
 
   // Prawdziwe organizacje sceny CS2, z regionem i typowym poziomem (0-4)
   const ORGS = [
@@ -1979,7 +2095,8 @@
       ach: {}, log: [], rank: 0, retired: false,
       weekPlan: [], lastPlan: [], plan: [], plan2: [], autoPlan: true, smartRest: true, extras: {}, goal: null,
       staff: {}, staffMarket: [], funds: { deposit: 0, index: 0, crypto: 0 }, fundLast: 0, loan: null, loanTry: 0,
-      news: [], clubs: null, chronic: [], burn: 0, injuries: 0, majorSpot: false, natCall: 0, natCaps: 0, nemesis: null, nemesisBeaten: 0, fastMatches: false,
+      news: [], clubs: null, chronic: [], burn: 0, injuries: 0, majorSpot: false, natCall: 0, natCaps: 0,
+      talkWeek: 0, roleFight: 0, roleChange: 0, history: [], agent: false, s3: { streams: 0, media: 0 }, nemesis: null, nemesisBeaten: 0, fastMatches: false,
       lead: 18 + ((ARCHETYPES.find(a => a.id === archId) || {}).lead || 0), captain: false, captainTry: 0, transferTry: 0,
       phase: null, craft: 0, rep: 0, audience: 0, trophies2: 0, tutorialDone: false,
       adapt: 0, formerTeams: [], maps: {},
@@ -2321,6 +2438,65 @@
     evolveClubs();
     const top = worldTable().slice(0, 3).filter(r => !r.me);
     if (top[0]) news("news.rankTop", { nick: top[0].nick, team: top[0].team }, "gold");
+    archiveSeason();
+  }
+
+  // ---------- historia sceny ----------
+  // Po każdym sezonie zapisujemy, kto rządził światem — i gdzie w tym byłeś Ty.
+  function archiveSeason() {
+    if (!Array.isArray(state.history)) state.history = [];
+    if (typeof state.agent !== "boolean") state.agent = false;
+    if (!state.s3) state.s3 = { streams: 0, media: 0 };
+    // stare umowy sponsorskie dostają warunek, żeby dało się je rozliczyć
+    (state.sponsors || []).forEach(sp => {
+      if (sp.goal) return;
+      const g = pick(SPONSOR_GOALS);
+      sp.goal = g.id; sp.target = g.target(); sp.season = state.season;
+      sp.bonus = Math.round(sp.pay * 7); sp.penalty = Math.round(sp.pay * 4);
+    });
+    const table = worldTable();
+    const best = table[0];
+    const myRow = table.find(r => r.me);
+    const myPos = table.findIndex(r => r.me) + 1;
+    const clubTop = clubTable()[0];
+    const myTrophies = state.career.trophies.filter(t => t.season === state.season);
+    const major = myTrophies.find(t => t.major);
+    state.history.unshift({
+      s: state.season,
+      no1: best ? best.nick : "—", no1team: best ? best.team : "—", no1me: !!(best && best.me),
+      club: clubTop ? clubTop.n : "—",
+      major: major ? state.nick : aiMajorWinner(),
+      myRank: myPos, myRating: myRow ? +myRow.rating.toFixed(2) : 0,
+      myTeam: state.team ? state.team.name : "—", myTrophies: myTrophies.length,
+    });
+    if (state.history.length > 40) state.history.length = 40;
+  }
+
+  // Major bez Ciebie też ma zwycięzcę — ktoś z czołówki rankingu
+  function aiMajorWinner() {
+    const table = worldTable().filter(r => !r.me).slice(0, 8);
+    return table.length ? pick(table).nick : "—";
+  }
+
+  // Rekordy liczone z całej historii kariery i sceny
+  function sceneRecords() {
+    const h = state.history || [];
+    const rows = [];
+    const seasons = state.career.seasons || [];
+    if (seasons.length) {
+      const bestSeason = seasons.slice().sort((a, b) => b.rating - a.rating)[0];
+      rows.push([TR("hist.bestRating"), bestSeason.rating.toFixed(2) + " · S" + bestSeason.season]);
+    }
+    if (state.career.bestRank) rows.push([TR("hist.bestRank"), "#" + state.career.bestRank]);
+    rows.push([TR("hist.trophies"), String(state.career.trophies.length)]);
+    const majors = state.career.trophies.filter(t => t.major).length;
+    rows.push([TR("hist.majors"), String(majors)]);
+    if (state.natCaps) rows.push([TR("nat.caps"), String(state.natCaps)]);
+    const mine = h.filter(x => x.no1me).length;
+    rows.push([TR("hist.yearsNo1"), String(mine)]);
+    const top3 = (seasons.filter(x => x.rank && x.rank <= 3) || []).length;
+    rows.push([TR("hist.top3"), String(top3)]);
+    return rows;
   }
 
   // ---------- wpływ na skład ----------
@@ -2444,6 +2620,125 @@
     state.schedule = makeSchedule();
     rows.push([TR("loan.rowEnd"), TR("loan.returned", { team: parent.name })]);
     addLog(TR("log.loanBack", { team: parent.name }), "info");
+  }
+
+  // ---------- szatnia: rozmowy, walka o rolę, przekwalifikowanie ----------
+  function weekStamp() { return state.season * 100 + state.week; }
+  function talkedThisWeek() { return state.talkWeek === weekStamp(); }
+
+  function talkTo(nick) {
+    const m = state.team.mates.find(x => x.nick === nick);
+    if (!m || talkedThisWeek()) return;
+    state.talkWeek = weekStamp();
+    const bond = m.bond || 0;
+    const opts = [
+      { id: "support", label: TR("talk.support"), desc: TR("talk.supportDesc") },
+      { id: "honest", label: TR("talk.honest"), desc: TR("talk.honestDesc") },
+      { id: "learn", label: TR("talk.learn", { nick: m.nick }), desc: TR("talk.learnDesc") },
+    ];
+    showChoice(TR("talk.title", { nick: m.nick }),
+      TR("talk.intro", { nick: m.nick, role: tx((ROLES.find(r => r.id === m.role) || ROLES[0]).name),
+        trait: tx(traitInfo((m.traits || [])[0] || "").name) || "—", bond: Math.round(bond) }),
+      opts, ci => {
+        closeChoice();
+        let txt = "";
+        if (opts[ci].id === "support") {
+          m.bond = clamp(bond + irnd(5, 10), 0, 100);
+          state.team.chem = clamp(state.team.chem + 2, 0, 100);
+          if ((m.traits || []).indexOf("tilter") >= 0) { m.skill = clamp(m.skill + 0.8, 25, 97); }
+          txt = TR("talk.supportRes", { nick: m.nick });
+        } else if (opts[ci].id === "honest") {
+          // szczera rozmowa działa, gdy masz autorytet; bez niego robi z Ciebie wroga
+          const p = clamp(0.3 + state.lead * 0.006 + bond * 0.004 + (state.captain ? 0.15 : 0), 0.1, 0.9);
+          if (Math.random() < p) {
+            m.skill = clamp(m.skill + rnd(1.2, 2.6), 25, 97);
+            m.bond = clamp(bond + 5, 0, 100);
+            state.team.chem = clamp(state.team.chem + 4, 0, 100);
+            state.lead = clamp(state.lead + 1.2, 1, 99);
+            txt = TR("talk.honestOk", { nick: m.nick });
+          } else {
+            m.bond = clamp(bond - 12, 0, 100);
+            state.team.chem = clamp(state.team.chem - 5, 0, 100);
+            txt = TR("talk.honestBad", { nick: m.nick });
+          }
+        } else {
+          // uczysz się od kogoś lepszego — im większa różnica, tym więcej wyciągniesz
+          const gap = m.skill - playerPower();
+          if (gap > 2) {
+            const st = pick(STAT_DEFS).id;
+            const g = growth(st, clamp(gap * 0.12, 0.4, 2.4));
+            state.stats[st] = clamp(state.stats[st] + g, 1, 99);
+            m.bond = clamp(bond + 4, 0, 100);
+            txt = TR("talk.learnOk", { nick: m.nick, stat: tx(STAT_DEFS.find(x => x.id === st).name) });
+          } else {
+            m.bond = clamp(bond + 6, 0, 100);
+            state.mental = clamp(state.mental + 3, 0, 100);
+            txt = TR("talk.learnFlat", { nick: m.nick });
+          }
+        }
+        addLog(TR("log.talk", { nick: m.nick }), "info");
+        showModal(TR("talk.title", { nick: m.nick }), txt, "");
+        modalAfterClose = () => { render(); save(); };
+      });
+  }
+
+  // Kto realnie zabiera Ci miejsce: ten sam rola i wyższa forma
+  function roleRival() {
+    if (!state.team || !state.team.mates) return null;
+    return state.team.mates.find(m => m.role === state.role && m.skill > playerPower() + 2) || null;
+  }
+
+  function fightForRole() {
+    const rival = roleRival();
+    if (!rival || state.roleFight === state.season) return;
+    state.roleFight = state.season;
+    const mine = playerPower() + state.form * 0.08 + state.lead * 0.12 + staffQ("coach") / 25
+      + (state.captain ? 4 : 0) + (rival.bond || 0) * 0.04;
+    const theirs = rival.skill + rnd(-2, 6) + (rival.seasons || 0) * 0.6;
+    if (mine > theirs) {
+      // wygrywasz rywalizację: kolega przesuwa się na inną rolę
+      const free = ROLES.filter(r => r.id !== state.role && !state.team.mates.some(m => m !== rival && m.role === r.id));
+      rival.role = (pick(free) || ROLES[0]).id;
+      rival.bond = clamp((rival.bond || 0) - 8, 0, 100);
+      state.form = clamp(state.form + 8, 0, 100);
+      state.hype = clamp(state.hype + 4, 0, 100);
+      state.lead = clamp(state.lead + 2, 1, 99);
+      addLog(TR("log.roleWon", { nick: rival.nick }), "gold");
+      chronicle(TR("chr.roleWon", { nick: rival.nick }), "gold");
+      showModal(TR("role.fightTitle"), TR("role.won", { nick: rival.nick,
+        role: tx((ROLES.find(r => r.id === rival.role) || ROLES[0]).name) }), "");
+    } else {
+      state.form = clamp(state.form - 8, 0, 100);
+      state.mental = clamp(state.mental - 8, 0, 100);
+      state.team.patience = Math.max(0, state.team.patience - 1);
+      addLog(TR("log.roleLost", { nick: rival.nick }), "bad");
+      showModal(TR("role.fightTitle"), TR("role.lost", { nick: rival.nick }), "");
+    }
+    modalAfterClose = () => { render(); save(); };
+  }
+
+  // Przekwalifikowanie: nowe wagi statystyk kosztują kilka tygodni gorszej formy
+  function changeRole() {
+    if (state.roleChange === state.season) { showModal(TR("role.earlyTitle"), TR("role.early"), ""); return; }
+    const taken = (state.team.mates || []).map(m => m.role);
+    const opts = ROLES.filter(r => r.id !== state.role).map(r => ({
+      label: tx(r.name), desc: tx(r.desc) + (taken.indexOf(r.id) >= 0 ? " · " + TR("role.taken") : ""),
+    }));
+    const cands = ROLES.filter(r => r.id !== state.role);
+    showChoice(TR("role.changeTitle"), TR("role.change"), opts.concat([{ label: TR("loan.cancel"), desc: "" }]), ci => {
+      closeChoice();
+      if (ci >= cands.length) { render(); save(); return; }
+      const r = cands[ci];
+      state.roleChange = state.season;
+      state.role = r.id;
+      state.form = clamp(state.form - 14, 0, 100);
+      state.adapt = Math.max(state.adapt || 0, 4);
+      state.plan = trimPlan(presets()[0].list);   // plan pod nową rolę
+      addLog(TR("log.roleChange", { role: tx(r.name) }), "info");
+      chronicle(TR("chr.roleChange", { role: tx(r.name) }), "info");
+      showModal(TR("role.changeTitle"), TR("role.changed", { role: tx(r.name) }), "");
+      modalAfterClose = () => { render(); save(); };
+    });
   }
 
   function requestTransfer() {
@@ -3137,6 +3432,9 @@
     if (a.form) state.form = clamp(state.form + a.form, 0, 100);
     if (a.hype) state.hype = clamp(state.hype + a.hype * (0.6 + state.team.tier * 0.2) * (1 + staffQ("media") / 130), 0, 100);
     state.weekPlan.push(id);
+    if (!state.s3) state.s3 = { streams: 0, media: 0 };
+    if (id === "stream") state.s3.streams++;
+    if (id === "media") state.s3.media++;
     if (id === "stream") {
       const earn = Math.round((120 + state.hype * (14 + state.team.tier * 7) * rnd(0.7, 1.3)) * (owned("studio") ? 1.4 : 1));
       state.money += earn; state.career.earned += earn;
@@ -3220,6 +3518,17 @@
     runPlan(true);
   }
 
+  // Preset pod rolę dobiera akcje pod najważniejsze statystyki i dopycha plan do pełnej energii
+  function rolePreset(order, byStat) {
+    const list = [byStat(order[0]), "scrim"].filter(Boolean);
+    let i = 1;
+    while (planCost(list) < MAX_ENERGY && i < order.length) {
+      const id = byStat(order[i++]);
+      if (id) list.push(id);
+    }
+    return trimPlan(list);
+  }
+
   // Gotowce, żeby nie trzeba było składać planu od zera
   function presets() {
     if (inPhase2()) {
@@ -3237,7 +3546,7 @@
     const order = STAT_DEFS.map(s => s.id).sort((a, b) => (w[b] || 0) - (w[a] || 0));
     const byStat = id => (ACTIONS.find(a => a.stat === id) || {}).id;
     return [
-      { key: "preset.role", list: [byStat(order[0]), byStat(order[1]), "scrim"].filter(Boolean) },
+      { key: "preset.role", list: rolePreset(order, byStat) },
       { key: "preset.balance", list: ["aimlab", "demo", "nades", "rest"] },
       { key: "preset.fame", list: ["stream", "media", "aimlab", "rest"] },
       { key: "preset.regen", list: ["rest", "gym", "demo", "talks"] },
@@ -3321,6 +3630,10 @@
     if (typeof state.majorSpot !== "boolean") state.majorSpot = false;
     if (typeof state.natCall !== "number") state.natCall = 0;
     if (typeof state.natCaps !== "number") state.natCaps = 0;
+    if (typeof state.talkWeek !== "number") state.talkWeek = 0;
+    if (typeof state.roleFight !== "number") state.roleFight = 0;
+    if (typeof state.roleChange !== "number") state.roleChange = 0;
+    if (!Array.isArray(state.history)) state.history = [];
     if (!state.clubs || !state.clubs.length) state.clubs = makeClubs();
     if (state.loan === undefined) state.loan = null;
     if (!state.extras) state.extras = {};
@@ -4245,13 +4558,86 @@
     state.offers = state.offers.filter(x => x.id !== id);
     render(); save();
   }
+  // Sponsor przychodzi z konkretną umową: stawka tygodniowa, warunek na sezon i premia
+  function makeSponsorDeal(def) {
+    const g = pick(SPONSOR_GOALS);
+    const target = g.target();
+    const pay = Math.round(def.pay * rnd(0.9, 1.2) * (1 + staffQ("media") / 200) * (state.agent ? 1.18 : 1));
+    return { name: def.name, pay: pay, goal: g.id, target: target,
+      bonus: Math.round(pay * irnd(5, 9)), penalty: Math.round(pay * 4), season: state.season };
+  }
+  function sponsorGoalText(sp) {
+    const g = SPONSOR_GOALS.find(x => x.id === sp.goal) || SPONSOR_GOALS[0];
+    return fill(tx(g.label), { n: sp.target });
+  }
+  function sponsorProgress(sp) {
+    const g = SPONSOR_GOALS.find(x => x.id === sp.goal) || SPONSOR_GOALS[0];
+    const now = g.progress();
+    return { now: now, done: now >= sp.target, label: (typeof now === "number" && now % 1 ? now.toFixed(2) : now) + " / " + sp.target };
+  }
+
   function maybeSponsor() {
     if (state.sponsors.length >= 3) return;
     const avail = SPONSOR_POOL.filter(s => state.hype >= s.hype && !state.sponsors.some(x => x.name === s.name));
-    if (!avail.length || Math.random() > 0.18) return;
-    const s = avail[0];
-    state.sponsors.push({ name: s.name, pay: Math.round(s.pay * rnd(0.9, 1.2) * (1 + staffQ("media") / 200)) });
-    addLog(TR("log.sponsor", { name: s.name }), "good");
+    if (!avail.length) return;
+    if (Math.random() > 0.18 * (state.agent ? 2 : 1)) return;
+    const deal = makeSponsorDeal(avail[avail.length - 1]);
+    // umowa jest propozycją, nie prezentem — warunek widać przed podpisem
+    showChoice(TR("spon.offerTitle", { name: deal.name }),
+      TR("spon.offer", { name: deal.name, pay: money(deal.pay), goal: sponsorGoalText(deal),
+        bonus: money(deal.bonus), penalty: money(deal.penalty) }), [
+      { label: TR("spon.sign"), desc: TR("spon.signDesc") },
+      { label: TR("spon.pass"), desc: TR("spon.passDesc") },
+    ], ci => {
+      closeChoice();
+      if (ci === 0) {
+        state.sponsors.push(deal);
+        addLog(TR("log.sponsor", { name: deal.name }), "good");
+        news("news.sponsor", { nick: state.nick, name: deal.name }, "info");
+      }
+      render(); save();
+    });
+  }
+
+  // Rozliczenie umów sponsorskich na koniec sezonu
+  function settleSponsors(rows) {
+    if (!state.sponsors || !state.sponsors.length) return;
+    const kept = [];
+    state.sponsors.forEach(sp => {
+      if (sp.season === undefined) { sp.season = state.season; sp.goal = sp.goal || "hype"; sp.target = sp.target || 40; }
+      const pr = sponsorProgress(sp);
+      if (pr.done) {
+        const bonus = Math.round(sp.bonus * (state.agent ? 1 - AGENT_CUT : 1));
+        state.money += bonus; state.career.earned += bonus;
+        rows.push([sp.name, TR("spon.rowDone", { amount: money(bonus) })]);
+        addLog(TR("log.sponsorDone", { name: sp.name, amount: money(bonus) }), "gold");
+        sp.season = state.season + 1;
+        const g = pick(SPONSOR_GOALS);
+        sp.goal = g.id; sp.target = g.target();      // nowy warunek na kolejny rok
+        sp.pay = Math.round(sp.pay * rnd(1.05, 1.25));
+        kept.push(sp);
+      } else {
+        state.money -= sp.penalty; state.career.earned -= sp.penalty;
+        rows.push([sp.name, TR("spon.rowFail", { amount: money(sp.penalty) })]);
+        addLog(TR("log.sponsorFail", { name: sp.name, amount: money(sp.penalty) }), "bad");
+        state.hype = clamp(state.hype - 4, 0, 100);
+      }
+    });
+    state.sponsors = kept;
+  }
+
+  // Agent bierze procent, ale otwiera drzwi, których sam nie otworzysz
+  function toggleAgent() {
+    if (state.agent) {
+      state.agent = false;
+      addLog(TR("log.agentOff"), "info");
+    } else {
+      if (state.money < AGENT_FEE) return;
+      state.money -= AGENT_FEE;
+      state.agent = true;
+      addLog(TR("log.agentOn"), "gold");
+    }
+    render(); save();
   }
 
   // ---------- koniec sezonu ----------
@@ -4327,6 +4713,8 @@
       }
     }
 
+    settleSponsors(rows);
+
     // rywalizacja z nemesis
     if (state.nemesis) {
       const nr = nemesisRank();
@@ -4400,6 +4788,7 @@
     state.week = 1;
     state.energy = MAX_ENERGY;
     state.seasonStats = { matches: 0, wins: 0, kills: 0, deaths: 0, adr: 0, rating: 0, best: 0 };
+    state.s3 = { streams: 0, media: 0 };
     if (!state.nemesis) state.nemesis = pickNemesis();
     state.league = makeLeague();
     state.schedule = makeSchedule();
@@ -4617,6 +5006,25 @@
       "<p>Każdy ma też <b>wizję współpracy</b> — jeden pracuje tylko z kimś, kto celuje w top, inny woli młodego zawodnika, " +
       "jeszcze inny nie rusza się za granicę. Jeśli nie pasujesz do jego planu, odmówi, choćbyś miał pieniądze. " +
       "Możesz dołożyć 35% do stawki, żeby przekonać wahającego się, poszukać nowych kandydatów albo zwolnić kogoś za odprawę.</p>" },
+    { h: "Szatnia: rozmowy i rola", body:
+      "<p>W zakładce Drużyna każdy kolega ma przycisk <b>Rozmowa</b> — raz w tygodniu. Możesz go podbudować (relacja i chemia w górę), " +
+      "powiedzieć mu wprost, co myślisz (z autorytetem podnosisz jego poziom, bez autorytetu robisz sobie wroga) albo podpytać o warsztat " +
+      "— od kogoś lepszego od siebie wyciągniesz konkretny przyrost statystyki.</p>" +
+      "<p>Jeśli kolega gra na <b>Twojej pozycji</b> i jest w lepszej formie, pasek nad składem to pokaże. Możesz raz na sezon " +
+      "<b>powalczyć o miejsce</b>: wygrana przesuwa go na inną rolę i podbija Twoją formę, przegrana kosztuje formę, psychikę " +
+      "i cierpliwość zarządu.</p>" +
+      "<p>Możesz też <b>zmienić rolę</b> (raz na sezon). Nowa rola to inne wagi statystyk, kilka tygodni gorszej formy i automatycznie " +
+      "przestawiony plan treningowy.</p>" },
+    { h: "Sponsorzy i agent", body:
+      "<p>Sponsor nie płaci za nic. Każda umowa ma <b>warunek na sezon</b> — liczba streamów, akcji medialnych, poziom rozpoznawalności, " +
+      "rating albo trofeum — oraz premię za jego wykonanie i karę umowną za niewykonanie. Warunek widzisz przed podpisem i możesz odmówić.</p>" +
+      "<p>Dowieziony warunek to premia, podwyżka stawki i nowy cel na kolejny rok. Niedowieziony kończy współpracę, kosztuje karę " +
+      "i trochę rozpoznawalności.</p>" +
+      "<p><b>Agent</b> za wpisowe podwaja liczbę ofert i podnosi stawki o 18%, ale bierze 8% premii. Opłaca się przy wysokim hype.</p>" },
+    { h: "Historia sceny", body:
+      "<p>Na Scenie zapisuje się <b>archiwum sezonów</b>: kto był numerem jeden świata, która organizacja zamknęła rok na szczycie, " +
+      "kto wygrał Majora i jak Ty wypadłeś w tym roku. Pod spodem <b>rekordy kariery</b>: najlepszy sezon, najwyższe miejsce, trofea, " +
+      "Majory, występy w kadrze i lata na szczycie.</p>" },
     { h: "Scena, kluby i newsy", body:
       "<p>Zakładka <b>Scena</b> to feed z całego świata: transfery rywali AI, wygrane turnieje, skoki w rankingu, " +
       "emerytury, plotki o Twoim nazwisku i Twoje własne trofea. Pod nim ranking zawodników i <b>ranking organizacji</b>.</p>" +
@@ -4703,6 +5111,27 @@
       "<p>Each also has a <b>vision of the job</b> — one only works with someone aiming for the top, another prefers a young " +
       "player, another will not relocate. If you do not fit their plan they turn you down, money or no money. You can add 35% " +
       "to the rate to sway someone on the fence, scout for new candidates, or dismiss someone against a severance payment.</p>" },
+    { h: "The locker room: talks and your role", body:
+      "<p>In the Team tab every teammate has a <b>Talk</b> button — once a week. You can back them up (bond and chemistry up), " +
+      "tell them straight what you think (with authority you raise their level, without it you make an enemy) or ask about their game " +
+      "— from someone better than you that means a real stat gain.</p>" +
+      "<p>If a teammate plays <b>your position</b> and is in better shape, the bar above the squad says so. Once a season you can " +
+      "<b>fight for the spot</b>: win and they move to another role while your form jumps, lose and it costs form, mental " +
+      "and the board's patience.</p>" +
+      "<p>You can also <b>change your role</b> (once a season). A new role means different stat weights, a few weeks of worse form " +
+      "and a training plan that switches to match.</p>" },
+    { h: "Sponsors and your agent", body:
+      "<p>Sponsors do not pay for nothing. Every deal carries a <b>season condition</b> — a number of streams, media appearances, " +
+      "a hype level, a rating or a trophy — plus a bonus for meeting it and a penalty for missing it. You see the condition before " +
+      "signing and you can walk away.</p>" +
+      "<p>Meet it and you get the bonus, a rate rise and a new target for next year. Miss it and the deal ends, costing the penalty " +
+      "and some recognition.</p>" +
+      "<p>An <b>agent</b> doubles the number of offers and lifts rates by 18% for a signing fee, but takes 8% of your bonuses. " +
+      "Worth it once your hype is high.</p>" },
+    { h: "Scene history", body:
+      "<p>The Scene tab keeps a <b>season archive</b>: who was world number one, which organisation closed the year on top, " +
+      "who won the Major and where you stood that year. Below it are your <b>career records</b>: best season, highest ranking, " +
+      "trophies, Majors, national caps and years at the top.</p>" },
     { h: "The scene, clubs and news", body:
       "<p>The <b>Scene</b> tab is a feed from all over the world: AI rivals changing clubs, tournaments won, ranking moves, " +
       "retirements, rumours about your name and your own trophies. Below it sit the player ranking and the <b>club ranking</b>.</p>" +
@@ -5519,6 +5948,15 @@
     document.getElementById("team-info").textContent = TR("team.info", {
       tier: tx(tier(state.team.tier).name), chem: Math.round(state.team.chem),
       years: state.team.contract, str: Math.round(teamStrength()) });
+    const rival = inPhase2() ? null : roleRival();
+    document.getElementById("role-box").innerHTML = inPhase2() ? "" :
+      '<div class="goal-box" style="border-left-color:' + (rival ? "var(--danger)" : "var(--border-strong)") + '">' +
+      '<div class="g-title">' + esc(TR("role.boxTitle", { role: tx(role().name) })) + "</div>" +
+      '<div class="g-desc">' + esc(rival ? TR("role.pressure", { nick: rival.nick, skill: Math.round(rival.skill) })
+        : TR("role.safe")) + "</div>" +
+      '<div class="infl-actions"><button class="act" data-rolechange="1"' +
+      (state.roleChange === state.season ? " disabled" : "") + '><span class="a-title">' + icon("swap") + " " +
+      esc(TR("role.changeBtn")) + '</span><span class="a-desc">' + esc(TR("role.changeCost")) + "</span></button></div></div>";
     const mates = [{ nick: state.nick, skill: Math.round(playerPower()), role: state.role, age: state.age, me: true }]
       .concat(state.team.mates.map(m => ({ nick: m.nick, skill: Math.round(m.skill), role: m.role, age: m.age,
         traits: m.traits || [], bond: m.bond || 0 })));
@@ -5530,7 +5968,13 @@
         '<span class="trait-chip" title="' + esc(tx(traitInfo(t).desc)) + '">' + esc(tx(traitInfo(t).name)) + "</span>").join("") +
         '<span class="trait-chip bond">' + esc(TR("team.bond", { n: Math.round(m.bond || 0) })) + "</span></div>") +
       '<div class="bar-track" style="margin-top:5px"><div class="bar-fill" style="width:' + clamp(m.skill, 0, 100) +
-      "%; background:" + barColor(m.skill) + '"></div></div></div>' +
+      "%; background:" + barColor(m.skill) + '"></div></div>' +
+      (m.me || inPhase2() ? "" : '<div class="mate-acts">' +
+        '<button data-talk="' + esc(m.nick) + '"' + (talkedThisWeek() ? " disabled" : "") + ">" +
+        esc(TR("team.talk")) + "</button>" +
+        (rival && rival.nick === m.nick ? '<button data-rolefight="1"' +
+          (state.roleFight === state.season ? " disabled" : "") + ">" + esc(TR("team.fight")) + "</button>" : "") +
+        "</div>") + "</div>" +
       '<div class="stat-val">' + m.skill + "</div></div>").join("");
 
     document.getElementById("standings-body").innerHTML = sortedStandings().map((t, i) =>
@@ -5638,6 +6082,18 @@
           esc(TR(n.key, n.p)) + "</span></div>").join("")
       : '<p class="muted">' + esc(TR("scene.empty")) + "</p>";
 
+    const hist = state.history || [];
+    document.getElementById("hist-body").innerHTML = hist.length
+      ? hist.slice(0, 14).map(h =>
+          '<tr class="' + (h.no1me ? "me" : "") + '"><td class="st-rank">S' + h.s + "</td><td>" +
+          '<div class="sb-name">' + esc(TR("hist.no1", { nick: h.no1 })) + "</div>" +
+          '<div class="sb-meta">' + esc(TR("hist.line", { club: h.club, major: h.major })) + "</div></td>" +
+          '<td class="st-num">' + (h.myRank ? "#" + h.myRank : "—") + "<br><small>" +
+          (h.myRating ? h.myRating.toFixed(2) : "—") + "</small></td></tr>").join("")
+      : '<tr><td colspan="3" class="muted">' + esc(TR("hist.empty")) + "</td></tr>";
+    document.getElementById("records-box").innerHTML = sceneRecords().map(r =>
+      '<div class="map-line"><span>' + esc(r[0]) + "</span><span>" + esc(r[1]) + "</span></div>").join("");
+
     const table = clubTable();
     const myName = state.team ? state.team.name : "";
     const myPos = table.findIndex(c => c.n === myName);
@@ -5707,10 +6163,24 @@
         '<button class="secondary" data-reject="' + o.id + '">' + icon("x") + " " + esc(TR("offer.reject")) + "</button></div></div>").join("");
     }
     const sl = document.getElementById("sponsors-list");
-    sl.innerHTML = state.sponsors.length
-      ? state.sponsors.map(s => '<div class="offer-card"><div class="offer-top"><div class="offer-team">' + esc(s.name) +
-          '</div><div class="offer-team" style="color:var(--good)">' + money(s.pay) + (LANG === "en" ? "/wk" : "/tydz.") + "</div></div></div>").join("")
-      : '<p class="muted">' + esc(TR("market.noSponsors")) + "</p>";
+    sl.innerHTML = (state.agent
+      ? '<div class="shop-item"><div><div class="si-name">' + esc(TR("agent.title")) + "</div>" +
+        '<div class="si-desc">' + esc(TR("agent.on")) + "</div></div>" +
+        '<div class="si-btns"><button data-agent="1">' + esc(TR("agent.drop")) + "</button></div></div>"
+      : '<div class="shop-item"><div><div class="si-name">' + esc(TR("agent.title")) + "</div>" +
+        '<div class="si-desc">' + esc(TR("agent.off")) + "</div></div>" +
+        '<div class="si-btns"><button data-agent="1"' + (state.money < AGENT_FEE ? " disabled" : "") + ">" +
+        money(AGENT_FEE) + "</button></div></div>") +
+      (state.sponsors.length
+      ? state.sponsors.map(s => {
+          const pr = sponsorProgress(s);
+          return '<div class="offer-card"><div class="offer-top"><div class="offer-team">' + esc(s.name) +
+            '</div><div class="offer-team" style="color:var(--good)">' + money(s.pay) + (LANG === "en" ? "/wk" : "/tydz.") + "</div></div>" +
+            '<div class="offer-meta" style="margin-top:6px">' + esc(sponsorGoalText(s)) + " · " + esc(pr.label) +
+            " · " + esc(TR(pr.done ? "spon.onTrack" : "spon.behind", { amount: money(pr.done ? s.bonus : s.penalty) })) +
+            "</div></div>";
+        }).join("")
+      : '<p class="muted">' + esc(TR("market.noSponsors")) + "</p>");
   }
 
   // ---------- karta gracza, wykres i historia ----------
@@ -5994,6 +6464,9 @@
     if (h) return hireStaff(parseInt(h.dataset.hire, 10), false);
   });
   document.getElementById("btn-scout-staff").addEventListener("click", scoutStaff);
+  document.getElementById("sponsors-list").addEventListener("click", e => {
+    if (e.target.closest("[data-agent]")) return toggleAgent();
+  });
   document.getElementById("offers-list").addEventListener("click", e => {
     const a = e.target.closest("[data-accept]"), r = e.target.closest("[data-reject]");
     if (a) acceptOffer(a.dataset.accept);
@@ -6012,6 +6485,14 @@
       return;
     }
     render();
+  });
+  document.getElementById("mates-list").addEventListener("click", e => {
+    const t = e.target.closest("[data-talk]");
+    if (t) return talkTo(t.dataset.talk);
+    if (e.target.closest("[data-rolefight]")) return fightForRole();
+  });
+  document.getElementById("role-box").addEventListener("click", e => {
+    if (e.target.closest("[data-rolechange]")) return changeRole();
   });
   document.getElementById("influence-box").addEventListener("click", e => {
     if (e.target.closest("[data-captain]")) return tryCaptain();

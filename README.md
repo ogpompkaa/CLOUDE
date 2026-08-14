@@ -93,6 +93,15 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
 - **Wypożyczenie** — z ławki mocnego składu można poprosić zarząd o sezon w innym klubie.
   Grasz niżej i za mniejsze pieniądze, ale realnie grasz; po sezonie wracasz, chyba że klub goszczący
   Cię wykupi. Z wypożyczenia nie wylatuje się ze składu.
+- **Szatnia** — z każdym kolegą możesz raz w tygodniu **porozmawiać**: podbudować go, powiedzieć wprost,
+  co myślisz (ryzykowne bez autorytetu), albo podpytać o warsztat i realnie podciągnąć statystykę.
+  Jeśli ktoś gra na Twojej pozycji i jest w lepszej formie, raz na sezon możesz **powalczyć o miejsce
+  w składzie** — albo samemu **zmienić rolę**, płacąc kilkoma tygodniami gorszej formy.
+- **Sponsorzy** — każda umowa ma **warunek na sezon** (streamy, akcje medialne, poziom hype'u, rating
+  albo trofeum), premię za wykonanie i karę umowną za niewykonanie. Warunek widać przed podpisem
+  i można odmówić. **Agent** za wpisowe podwaja liczbę ofert i podnosi stawki o 18%, ale bierze 8% premii.
+- **Historia sceny** — archiwum wszystkich sezonów: numer jeden świata, najmocniejsza organizacja,
+  zwycięzca Majora i Twoje miejsce w danym roku. Pod spodem rekordy kariery.
 - **Drama** — gwiazda składu dostaje ofertę i możesz próbować ją zatrzymać, tilciarz rozbija
   szatnię, sztab prosi o zmianę roli pod nowy transfer. Mecz z byłym klubem waży więcej:
   wygrana podnosi formę i psychikę, porażka boli podwójnie.
