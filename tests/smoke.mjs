@@ -131,7 +131,7 @@ for (let i = 0; i < SEASON_WEEKS * SEASONS + 2; i++) {
   await safeClick('#cta-next');
   await drainOverlays();
   if (i % 7 === 0) {
-    await safeClick('.nav-btn[data-view="offers"]');
+    await goto('offers', 'deals');                  // oferty żyją w podzakładce Umowy
     if (await page.$('[data-accept]')) { await safeClick('[data-accept]'); await drainOverlays(); }
   }
 }
@@ -333,6 +333,15 @@ check('drugi rozdział startuje', st2.phase === 'coach', st2.phase || 'brak');
 check('drugi rozdział ma cel sezonowy', !!(st2.goal2 && st2.goal2.kind), st2.goal2 && st2.goal2.kind);
 check('ranking sztabu istnieje', Array.isArray(st2.staffWorld) && st2.staffWorld.length >= 10,
   (st2.staffWorld || []).length + ' sztabowców');
+// drugi rozdział ma własne decyzje: styl gry i transfery albo kontrakt z platformą
+await safeClick('.nav-btn[data-view="career"]');
+const p2panel = await page.textContent('#goal-card').catch(() => '');
+check('drugi rozdział ma panel decyzji', /Decyzje sztabowca/.test(p2panel), p2panel.replace(/\s+/g, ' ').slice(0, 50));
+await safeClick('[data-style]');
+if (await page.isVisible('#choice-overlay:not(.hidden)')) await safeClick('[data-choice="1"]');
+await drainOverlays();
+const st3 = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+check('styl gry da się zmienić', st3.style2 && st3.style2 !== 'default', 'styl: ' + st3.style2);
 
 // definitywny koniec kariery pokazuje podsumowanie
 await goto('profile', 'log');

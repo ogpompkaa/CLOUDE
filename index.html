@@ -183,6 +183,8 @@
   .nav-btn.active { color: var(--accent); }
   .nav-btn.active .icon { filter: drop-shadow(0 0 6px var(--accent-glow)); }
   .nav-btn .dot { position: absolute; transform: translate(14px, -8px); width: 7px; height: 7px; background: var(--gold); border-radius: 50%; }
+  .sub-btn .dot { display: inline-block; width: 6px; height: 6px; background: var(--gold); border-radius: 50%;
+    margin-left: 5px; vertical-align: middle; }
 
   /* --- Podzakładki widoku --- */
   .subnav { display: flex; gap: 4px; margin-bottom: 12px; background: var(--bg-panel); border: 1px solid var(--border);
@@ -355,6 +357,8 @@
   .match-score { font-size: 2.1rem; line-height: 1; margin: 6px 0 4px; }
   .match-score .win { color: var(--good); } .match-score .loss { color: var(--danger); }
   .match-sub { font-size: 0.75rem; color: var(--text-dim); }
+  .mo-flavour { font-size: 0.78rem; color: var(--text-dim); font-style: italic; text-align: center;
+    margin: 0 0 12px; line-height: 1.5; font-family: 'Inter', sans-serif; }
   .map-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 0.78rem;
     padding: 7px 11px; background: var(--bg-void); border: 1px solid var(--border); margin-bottom: 6px;
     font-family: 'Rajdhani', sans-serif; font-weight: 600; }
@@ -667,7 +671,7 @@
       </section>
 
       <section id="view-offers" class="view hidden">
-        <div class="subnav" id="sub-offers"><button class="sub-btn active" data-sub="shop"><span data-i18n="sub.shop">Sklep</span></button><button class="sub-btn" data-sub="staff"><span data-i18n="sub.staff">Sztab</span></button><button class="sub-btn" data-sub="funds"><span data-i18n="sub.funds">Portfel</span></button><button class="sub-btn" data-sub="deals"><span data-i18n="sub.deals">Umowy</span></button></div>
+        <div class="subnav" id="sub-offers"><button class="sub-btn active" data-sub="shop"><span data-i18n="sub.shop">Sklep</span></button><button class="sub-btn" data-sub="staff"><span data-i18n="sub.staff">Sztab</span></button><button class="sub-btn" data-sub="funds"><span data-i18n="sub.funds">Portfel</span></button><button class="sub-btn" data-sub="deals"><span data-i18n="sub.deals">Umowy</span><span class="dot hidden" id="deals-dot"></span></button></div>
         <div class="glass panel" data-panel="shop">
           <h2><svg class="icon"><use href="#i-coin"></use></svg> <span data-i18n="market.shop">Inwestycje w karierę</span></h2>
           <div id="shop-list"></div>
@@ -1252,6 +1256,45 @@
     "rank.sub": ["{scope} · Twoja pozycja: {pos} z {all}", "{scope} · your position: {pos} of {all}"],
     "rank.world": ["Świat", "World"],
     "rank.hint": ["Kliknij, aby zobaczyć pełny ranking", "Tap to see the full ranking"],
+    "stack.formTitle": ["Stały skład na wieczory", "A regular five"],
+    "stack.form": ["Znajomi z serwerów proponują, żebyście grali razem na stałe: {list}. Jeden skład, wspólne kwalifikacje, wspólne wpadki.",
+      "Some regulars suggest you play together for good: {list}. One lineup, shared qualifiers, shared disasters."],
+    "stack.accept": ["Wchodzę w to", "I am in"],
+    "stack.acceptDesc": ["Lepsze wyniki, teamplay rośnie, otwierają się otwarte kwalifikacje.",
+      "Better results, teamplay grows, open qualifiers become possible."],
+    "stack.decline": ["Gram sam", "I play solo"],
+    "stack.declineDesc": ["Bez zobowiązań, ale i bez turniejów.", "No obligations — and no tournaments."],
+    "stack.row": ["chemia {chem} · {n} meczów", "chemistry {chem} · {n} matches"],
+    "stack.chem": ["Chemia stacka", "Stack chemistry"],
+    "stack.title": ["Twój stack", "Your stack"],
+    "stack.none": ["Grasz sam. Stały skład przyjdzie z czasem.", "You play solo. A regular five comes with time."],
+    "stack.info": ["{name} · chemia {chem} · {w} z {n} wygranych · LAN-y: {lans}",
+      "{name} · chemistry {chem} · {w} of {n} won · LANs: {lans}"],
+    "log.stackFormed": ["Zakładacie stały skład: {name}.", "You form a regular five: {name}."],
+    "log.stackLeft": ["{nick} odchodzi ze stacka — ktoś dał lepszą propozycję.",
+      "{nick} leaves the stack — someone made a better offer."],
+    "chr.stack": ["Stały skład: {name}.", "A regular five: {name}."],
+    "qual.title": ["Otwarte kwalifikacje", "Open qualifier"],
+    "qual.lanTitle": ["Lokalny LAN", "Local LAN"],
+    "qual.won": ["{name} wygrywa turniej. Ktoś to zapamięta.", "{name} wins it. Someone will remember that."],
+    "qual.out": ["Koniec drogi po {n} rundach.", "The run ends after {n} rounds."],
+    "qual.rounds": ["Wygrane rundy", "Rounds won"],
+    "log.qualWin": ["Wygrany turniej ze stackiem {name}!", "Tournament won with {name}!"],
+    "log.qualOut": ["Turniej zakończony: {n} wygranych rund.", "Tournament over: {n} rounds won."],
+    "chr.qualWin": ["Wygrany turniej ze stackiem {name}.", "Won a tournament with {name}."],
+    "news.qualWin": ["{team} z {nick} w składzie wygrywa otwarte kwalifikacje.",
+      "{team} with {nick} wins an open qualifier."],
+    "acad.title": ["Akademia {team}", "{team} academy"],
+    "acad.text": ["{team} prowadzi akademię i widzi Twoje wyniki. Bez wielkiej pensji, za to z trenerem, planem i realną ścieżką do pierwszego składu.",
+      "{team} runs an academy and has seen your results. No real salary, but a coach, a plan and a genuine path to the main roster."],
+    "acad.join": ["Wchodzę do akademii", "Join the academy"],
+    "acad.joinDesc": ["Stypendium co miesiąc, szybszy rozwój, częstsze oferty — także z tego klubu.",
+      "A monthly stipend, faster growth, more offers — including from this club."],
+    "acad.pass": ["Zostaję na wolnym rynku", "Stay a free agent"],
+    "acad.passDesc": ["Bez zobowiązań wobec klubu.", "No commitment to the club."],
+    "acad.row": ["Akademia", "Academy"],
+    "log.acadJoin": ["Wchodzisz do akademii {team}.", "You join the {team} academy."],
+    "chr.acad": ["Akademia {team}.", "{team} academy."],
     "ladder.stage": ["Droga na scenę", "The climb"],
     "ladder.monthTitle": ["Miesiąc grania", "A month of games"],
     "ladder.monthSub": ["Kolejka: {q}", "Queue: {q}"],
@@ -1318,6 +1361,40 @@
     "g2.earn": ["Zarób {n} w tym sezonie.", "Earn {n} this season."],
     "g2.collabs": ["Zrób {n} kolaboracji z innymi twórcami.", "Do {n} collaborations with other creators."],
     "p2.channel": ["własny kanał", "own channel"],
+    "p2.decisions": ["Decyzje sztabowca", "Staff decisions"],
+    "p2.styleBtn": ["Styl gry", "Playing style"],
+    "p2.styleTitle": ["Styl gry drużyny", "Team playing style"],
+    "p2.styleText": ["Jak ma grać ten skład? Wybór zmienia siłę w meczach, rozrzut wyników i tempo rozwoju zawodników.",
+      "How should this lineup play? The choice changes match strength, result variance and how fast the players develop."],
+    "log.style": ["Nowy styl gry: {style}.", "New playing style: {style}."],
+    "p2.signBtn": ["Ściągnij zawodnika", "Sign a player"],
+    "p2.signTitle": ["Transfer do składu", "Squad signing"],
+    "p2.signText": ["Zarząd daje zielone światło na jeden ruch w tym sezonie. Kogo bierzemy?",
+      "The board green-lights one move this season. Who are we taking?"],
+    "p2.signStr": ["siła {n}", "strength {n}"],
+    "p2.signOut": ["Kto zwalnia miejsce?", "Who makes way?"],
+    "p2.signOutText": ["Skład ma pięć miejsc. Kogo zastąpi {nick}?", "The lineup has five spots. Who does {nick} replace?"],
+    "p2.signDone": ["{inn} wchodzi w miejsce {out}. Chemia potrzebuje czasu.",
+      "{inn} comes in for {out}. Chemistry needs time."],
+    "p2.signEarlyTitle": ["Za wcześnie", "Too soon"],
+    "p2.signEarly": ["Jeden transfer na sezon. Zarząd nie da więcej.", "One signing a season. The board will not go further."],
+    "p2.signPoorTitle": ["Brak budżetu", "No budget"],
+    "p2.signPoor": ["Na nikogo sensownego Cię teraz nie stać.", "You cannot afford anyone worth taking right now."],
+    "log.p2sign": ["Transfer: {inn} za {out} ({amount}).", "Signing: {inn} for {out} ({amount})."],
+    "chr.p2sign": ["Transfer do składu: {nick}.", "Squad signing: {nick}."],
+    "p2.platTitle": ["Kontrakt z platformą", "Platform deal"],
+    "p2.platText": ["Platforma proponuje wyłączność: {amount} tygodniowo niezależnie od oglądalności, ale wolniejszy przyrost widowni i przychodów z niej.",
+      "A platform offers exclusivity: {amount} a week regardless of viewership, but slower audience and revenue growth."],
+    "p2.platYes": ["Podpisuję", "Sign it"],
+    "p2.platYesDesc": ["Pewne pieniądze co tydzień.", "Guaranteed money every week."],
+    "p2.platNo": ["Zostaję niezależny", "Stay independent"],
+    "p2.platNoDesc": ["Więcej ryzyka, ale sufit wyżej.", "More risk, higher ceiling."],
+    "p2.platBtn": ["Kontrakt z platformą", "Platform deal"],
+    "p2.platEnd": ["Zerwij kontrakt", "End the deal"],
+    "p2.platOn": ["na wyłączności", "exclusive"],
+    "p2.platOff": ["niezależny", "independent"],
+    "p2.platNote": ["Wyłączność daje stałą wypłatę kosztem tempa wzrostu kanału.",
+      "Exclusivity trades channel growth for a steady paycheck."],
     "p2.leaguePos": ["Miejsce w lidze", "League position"],
     "p2.trophies": ["Trofea w tym rozdziale", "Trophies this chapter"],
     "p2.rankStaff": ["Ranking sztabowców", "Staff ranking"],
@@ -1594,6 +1671,30 @@
     "stats.record": ["Bilans", "Record"],
     "stats.cabinet": ["Gablota", "Trophy cabinet"],
     "stats.hofLine": ["{pts} pkt · {tr} trofeów", "{pts} pts · {tr} trophies"],
+    "fl.win": ["Robota wykonana. Następny.", "Job done. Next one."],
+    "fl.loss": ["Bywa. Demo do przejrzenia i idziemy dalej.", "It happens. A demo to review and move on."],
+    "fl.tight": ["Mecz rozstrzygnięty w kilku rundach. Takie się pamięta.",
+      "Decided by a handful of rounds. Those are the ones you remember."],
+    "fl.soClose": ["Zabrakło dwóch rund. Boli bardziej niż lanie.",
+      "Two rounds short. That hurts more than a hiding."],
+    "fl.rout": ["Rozjechany od pierwszej rundy. Rywal nie zdążył się zorientować.",
+      "Run over from round one. They never got going."],
+    "fl.beaten": ["Nic nie działało. Trzeba to obejrzeć na spokojnie.",
+      "Nothing worked. This one needs a calm rewatch."],
+    "fl.comeback": ["Z martwych. Po takiej połowie nikt nie dawał Wam szans.",
+      "Back from the dead. After that half nobody gave you a chance."],
+    "fl.carry": ["{r} ratingu. Ten mecz był Twój.", "{r} rating. That match was yours."],
+    "fl.passenger": ["Zła noc. {r} ratingu i twarde pytania w szatni.",
+      "A bad night. {r} rating and hard questions in the locker room."],
+    "fl.ace": ["Ace na tablicy. Klip poleci wszędzie.", "An ace on the board. That clip travels."],
+    "fl.slumpBreak": ["Pierwsza wygrana od dawna. Głowa wraca na miejsce.",
+      "The first win in a while. Your head settles back."],
+    "fl.tired": ["Wygrane rundy na samej rutynie. Zmęczenie widać na ekranie.",
+      "Rounds won on routine alone. The tiredness shows on screen."],
+    "fl.former": ["Mecz z byłym klubem. Nikt nie musiał tłumaczyć, o co gramy.",
+      "A match against a former club. Nobody had to explain the stakes."],
+    "fl.champion": ["Trofeum. Reszta sceny musi się z tym pogodzić.",
+      "A trophy. The rest of the scene has to live with it."],
     "match.win": ["Wygrana z {opp}", "Win against {opp}"],
     "match.loss": ["Porażka z {opp}", "Loss against {opp}"],
     "match.champion": ["Wygrany turniej!", "Tournament won!"],
@@ -1618,6 +1719,33 @@
     "tut.skip": ["Pomiń", "Skip"],
     "help.title": ["Jak grać", "How to play"],
     "help.close": ["Zamknij", "Close"],
+    "life.moveout.yes": ["Własne mieszkanie, własny rytm dnia. Głowa odetchnęła.",
+      "Your own place, your own rhythm. Your head can breathe."],
+    "life.moveout.no": ["Zostajesz. Obiady na stole, oszczędności rosną.",
+      "You stay. Dinner on the table, savings growing."],
+    "life.toxic.off": ["Telefon w szufladzie. Świat poczeka.", "Phone in a drawer. The world can wait."],
+    "life.toxic.win": ["Jedna celna odpowiedź i internet jest po Twojej stronie.",
+      "One well-aimed reply and the internet is on your side."],
+    "life.toxic.lose": ["Odpowiedź podgrzała sprawę. Lepiej było milczeć.",
+      "The reply only fed it. Silence would have been better."],
+    "life.charity.yes": ["Nocny stream, zebrane pieniądze i mnóstwo dobrych komentarzy.",
+      "An all-nighter, money raised and a wall of good comments."],
+    "life.charity.no": ["Wpłata poszła cicho. Ty poszedłeś spać.",
+      "The donation went quietly. You went to bed."],
+    "life.oldfriend.ok": ["Kolega dostał testy i się obronił. Miło mieć rację.",
+      "Your friend got the tryout and delivered. It feels good to be right."],
+    "life.oldfriend.bad": ["Nie dowiózł. Ktoś pamięta, kto go polecił.",
+      "They flopped. Someone remembers who put the word in."],
+    "life.oldfriend.no": ["Odmawiasz. Rozmowa kończy się szybciej, niż powinna.",
+      "You decline. The conversation ends faster than it should."],
+    "life.photo.yes": ["Dzień w studiu, {amount} na koncie i materiał na cały sezon.",
+      "A day in the studio, {amount} in the bank and content for a season."],
+    "life.photo.no": ["Sponsor przełknął. Ty zostałeś przy grze.",
+      "The sponsor swallowed it. You stayed with the game."],
+    "life.burn.rest": ["Tydzień na luzie. Świat nie skończył się bez Ciebie.",
+      "A week off the gas. The world did not end without you."],
+    "life.burn.push": ["Grasz dalej, jakby nic. Organizm zapisuje to sobie na później.",
+      "You push on as if nothing happened. Your body files it for later."],
     "life.interview.praise": ["Skład docenia, że ich kryjesz.", "The squad appreciates you covering for them."],
     "life.interview.truth": ["Cytat obiega internet. W szatni jest chłodno.", "The quote goes round the internet. The locker room turns cold."],
     "life.interview.none": ["Bez dramy. Wracasz do treningu.", "No drama. Back to training."],
@@ -2049,6 +2177,69 @@
 
   // Wydarzenia poza serwerem
   const LIFE = [
+    { id: "moveout", when: () => state.age >= 18 && state.money > 60000 && !state.extras.movedOut,
+      title: ["Wyprowadzka z domu", "Moving out"],
+      text: ["Stać Cię na własny kąt bliżej sceny. Rodzice mówią, żebyś się dobrze zastanowił.",
+             "You can afford your own place closer to the scene. Your parents tell you to think it through."], opts: [
+      { label: ["Wyprowadzam się", "I am moving out"], desc: ["Spokój i wolność, ale koszty i mniej wsparcia.", "Peace and freedom, but costs and less support."],
+        eff: () => { state.money -= 40000; state.extras.movedOut = true; state.mental = clamp(state.mental + 8, 0, 100);
+          state.stamina = clamp(state.stamina - 5, 0, 100); return TR("life.moveout.yes"); } },
+      { label: ["Zostaję na razie", "I stay for now"], desc: ["Oszczędzasz i masz obiady.", "You save money and get dinners."],
+        eff: () => { state.money += 6000; state.mental = clamp(state.mental + 3, 0, 100); return TR("life.moveout.no"); } },
+    ]},
+    { id: "toxic", when: () => state.hype >= 40,
+      title: ["Fala hejtu", "A wave of hate"],
+      text: ["Po słabym meczu komentarze robią się osobiste. Telefon wibruje bez przerwy.",
+             "After a poor match the comments get personal. Your phone will not stop."], opts: [
+      { label: ["Wyłącz telefon", "Switch the phone off"], desc: ["Odcinasz się. Głowa odpoczywa, hype trochę siada.", "You cut it off. Your head rests, hype dips."],
+        eff: () => { state.mental = clamp(state.mental + 10, 0, 100); state.hype = clamp(state.hype - 3, 0, 100);
+          return TR("life.toxic.off"); } },
+      { label: ["Odpowiedz publicznie", "Answer publicly"], desc: ["Ryzykowne: albo Cię pokochają, albo dolejesz oliwy.", "Risky: they either love it or you pour fuel on it."],
+        eff: () => { if (Math.random() < 0.45) { state.hype = clamp(state.hype + 8, 0, 100); return TR("life.toxic.win"); }
+          state.mental = clamp(state.mental - 10, 0, 100); return TR("life.toxic.lose"); } },
+    ]},
+    { id: "charity", title: ["Stream charytatywny", "Charity stream"],
+      text: ["Organizatorzy zbiórki pytają, czy dołożysz swoje kilka godzin.",
+             "A fundraiser asks if you can put in a few hours."], opts: [
+      { label: ["Gram całą noc", "Play all night"], desc: ["Ludzie to zapamiętają. Kondycja nie.", "People will remember it. Your body will not."],
+        eff: () => { state.hype = clamp(state.hype + 7, 0, 100); state.stamina = clamp(state.stamina - 12, 0, 100);
+          state.mental = clamp(state.mental + 5, 0, 100); return TR("life.charity.yes"); } },
+      { label: ["Wpłacam i śpię", "Donate and sleep"], desc: ["Cicha wpłata zamiast nocy na wizji.", "A quiet donation instead of a night on camera."],
+        eff: () => { state.money -= 8000; state.mental = clamp(state.mental + 4, 0, 100); return TR("life.charity.no"); } },
+    ]},
+    { id: "oldfriend", when: () => state.stage === "pro" && state.age >= 20,
+      title: ["Znajomy z drabinki", "A friend from the grind"],
+      text: ["Kolega, z którym kiedyś graliście po nocach, prosi o polecenie do akademii.",
+             "Someone you used to grind with at night asks you to put in a word at an academy."], opts: [
+      { label: ["Poleć go", "Recommend them"], desc: ["Nazwisko za nazwisko. Trochę ryzykujesz swoim.", "A name for a name. You risk a bit of yours."],
+        eff: () => { if (Math.random() < 0.6) { state.hype = clamp(state.hype + 3, 0, 100); state.mental = clamp(state.mental + 6, 0, 100);
+            return TR("life.oldfriend.ok"); } state.hype = clamp(state.hype - 4, 0, 100); return TR("life.oldfriend.bad"); } },
+      { label: ["Nie mieszaj mnie w to", "Keep me out of it"], desc: ["Bezpiecznie, ale zostanie osad.", "Safe, but it leaves a taste."],
+        eff: () => { state.mental = clamp(state.mental - 4, 0, 100); return TR("life.oldfriend.no"); } },
+    ]},
+    { id: "photoshoot", when: () => state.sponsors.length > 0,
+      title: ["Sesja dla sponsora", "Sponsor photoshoot"],
+      text: ["Cały dzień w studiu zamiast na serwerze. Sponsor płaci ekstra.",
+             "A whole day in a studio instead of on the server. The sponsor pays extra."], opts: [
+      { label: ["Jadę na sesję", "Do the shoot"], desc: ["Pieniądze i hype kosztem dnia treningu.", "Money and hype at the cost of a training day."],
+        eff: () => { const m = irnd(9000, 22000); state.money += m; state.career.earned += m;
+          state.hype = clamp(state.hype + 5, 0, 100); state.form = clamp(state.form - 3, 0, 100);
+          return TR("life.photo.yes", { amount: money(m) }); } },
+      { label: ["Zostaję na treningu", "Stay and practise"], desc: ["Forma ważniejsza od zdjęć.", "Form matters more than photos."],
+        eff: () => { state.form = clamp(state.form + 4, 0, 100); return TR("life.photo.no"); } },
+    ]},
+    { id: "burnwarn", when: () => (state.burn || 0) > 55,
+      title: ["Ktoś zwraca uwagę", "Someone says it out loud"],
+      text: ["Kolega z zespołu mówi wprost: wyglądasz, jakbyś nie spał od tygodni.",
+             "A teammate tells you straight: you look like you have not slept in weeks."], opts: [
+      { label: ["Bierzesz tydzień luzu", "Take a week easy"], desc: ["Obciążenie w dół, forma chwilowo też.", "Load drops, form dips for a moment."],
+        eff: () => { state.burn = clamp((state.burn || 0) - 35, 0, 100); state.stamina = clamp(state.stamina + 18, 0, 100);
+          state.mental = clamp(state.mental + 10, 0, 100); state.form = clamp(state.form - 4, 0, 100);
+          return TR("life.burn.rest"); } },
+      { label: ["Nie ma czasu", "No time for that"], desc: ["Grasz dalej. Organizm zapamięta.", "You keep going. Your body keeps score."],
+        eff: () => { state.burn = clamp((state.burn || 0) + 8, 0, 100); state.form = clamp(state.form + 3, 0, 100);
+          return TR("life.burn.push"); } },
+    ]},
     { id: "interview", title: ["Wywiad po meczu", "Post-match interview"],
       text: ["Dziennikarz pyta wprost o formę Twojego składu.", "A journalist asks bluntly about your lineup's form."], opts: [
       { label: ["Chwal drużynę", "Praise the team"], desc: ["Bezpiecznie. Chemia w składzie rośnie.", "Safe. Chemistry goes up."],
@@ -2268,7 +2459,8 @@
       weekPlan: [], lastPlan: [], plan: [], plan2: [], autoPlan: true, smartRest: true, extras: {}, goal: null,
       staff: {}, staffMarket: [], funds: { deposit: 0, index: 0, crypto: 0 }, fundLast: 0, loan: null, loanTry: 0,
       news: [], clubs: null, chronic: [], burn: 0, injuries: 0, majorSpot: false, natCall: 0, natCaps: 0,
-      talkWeek: 0, roleFight: 0, roleChange: 0, history: [], agent: false, s3: { streams: 0, media: 0 }, nemesis: null, nemesisBeaten: 0, fastMatches: false,
+      talkWeek: 0, roleFight: 0, roleChange: 0, history: [], agent: false, s3: { streams: 0, media: 0 },
+      stack: null, stackAsked: false, academy: null, style2: "default", signTry: 0, platform: null, nemesis: null, nemesisBeaten: 0, fastMatches: false,
       lead: 18 + ((ARCHETYPES.find(a => a.id === archId) || {}).lead || 0), captain: false, captainTry: 0, transferTry: 0,
       phase: null, craft: 0, rep: 0, audience: 0, trophies2: 0, tutorialDone: false,
       adapt: 0, formerTeams: [], maps: {},
@@ -2632,6 +2824,13 @@
   function archiveSeason() {
     if (!Array.isArray(state.history)) state.history = [];
     if (typeof state.agent !== "boolean") state.agent = false;
+    if (state.stack === undefined) state.stack = null;
+    if (typeof state.stackAsked !== "boolean") state.stackAsked = false;
+    if (state.academy === undefined) state.academy = null;
+    if (!state.style2) state.style2 = "default";
+    if (typeof state.signTry !== "number") state.signTry = 0;
+    if (state.platform === undefined) state.platform = null;
+    if (state.ladder && typeof state.ladder.scoutEyes !== "number") state.ladder.scoutEyes = 0;
     if (!state.s3) state.s3 = { streams: 0, media: 0 };
     // stare umowy sponsorskie dostają warunek, żeby dało się je rozliczyć
     (state.sponsors || []).forEach(sp => {
@@ -3890,6 +4089,75 @@
              "Real team leagues. This is where orgs find you."] },
   ];
 
+  // ---------- stały stack na drabince ----------
+  // Zanim zadzwoni pierwszy klub, buduje się ekipę: ci sami ludzie co wieczór,
+  // wspólne kwalifikacje i lokalne LAN-y. Stack rośnie razem z Tobą albo się rozpada.
+  const STACK_NAMES_KEY = "stack";
+
+  function stack() {
+    if (!state.stack) state.stack = null;
+    return state.stack;
+  }
+  function stackAvg() {
+    const st = stack();
+    return st && st.mates.length ? st.mates.reduce((a, m) => a + m.skill, 0) / st.mates.length : 0;
+  }
+  // gra ze stałym stackiem daje przewagę rosnącą z chemią
+  function stackBonus() {
+    const st = stack();
+    if (!st) return 0;
+    return clamp((stackAvg() - 40) * 0.06 + (st.chem - 50) * 0.05, -3, 7);
+  }
+
+  function makeStack() {
+    const used = [state.nick];
+    const base = clamp(ladderPower() - 4, 20, 80);
+    return {
+      name: pick(["Team " + state.nick.toUpperCase().slice(0, 5), "5 na 5", "Stack " + state.nick.slice(0, 4),
+        pick(["Nocna Zmiana", "Aim Gods", "Ostatni Rzut", "Piąty Do Stacka", "Bez Nazwy"])]),
+      mates: [0, 1, 2, 3].map(() => {
+        const m = makeMate(base, used);
+        m.skill = clamp(m.skill, 20, 88);
+        return m;
+      }),
+      chem: irnd(45, 60), wins: 0, played: 0, lans: 0, since: state.season,
+    };
+  }
+
+  function formStack(done) {
+    const st = makeStack();
+    showChoice(TR("stack.formTitle"), TR("stack.form", { list: st.mates.map(m => m.nick).join(", ") }), [
+      { label: TR("stack.accept"), desc: TR("stack.acceptDesc") },
+      { label: TR("stack.decline"), desc: TR("stack.declineDesc") },
+    ], ci => {
+      closeChoice();
+      if (ci === 0) {
+        state.stack = st;
+        addLog(TR("log.stackFormed", { name: st.name }), "gold");
+        chronicle(TR("chr.stack", { name: st.name }), "gold");
+      }
+      done();
+    });
+  }
+
+  // Stack żyje: chemia rośnie od wspólnych wygranych, a ludzie odchodzą, gdy stoisz w miejscu
+  function tickStack(won, lost) {
+    const st = stack();
+    if (!st) return;
+    st.played += won + lost;
+    st.wins += won;
+    st.chem = clamp(st.chem + (won > lost ? 1.6 : -1.2), 0, 100);
+    st.mates.forEach(m => { m.skill = clamp(m.skill + rnd(-0.2, 0.7), 20, 92); });
+    // ktoś dostaje lepszą propozycję i znika, jeśli ekipa nie idzie do przodu
+    if (st.chem < 35 && Math.random() < 0.2) {
+      const gone = pick(st.mates);
+      const used = [state.nick].concat(st.mates.map(m => m.nick));
+      st.mates[st.mates.indexOf(gone)] = makeMate(clamp(ladderPower() - 3, 20, 85), used);
+      st.chem = clamp(st.chem + 8, 0, 100);
+      addLog(TR("log.stackLeft", { nick: gone.nick }), "bad");
+    }
+  }
+
   function ladderPower() {
     // na drabince liczy się mechanika i głowa, teamplay dopiero w ESL
     const st = state.stats;
@@ -3899,7 +4167,7 @@
   function playPremier() {
     const L = state.ladder;
     const opp = 28 + L.premier / 620;                       // lobby rośnie razem z ratingiem
-    const p = clamp(0.5 + (ladderPower() - opp) * 0.03, 0.15, 0.9);
+    const p = clamp(0.5 + (ladderPower() + stackBonus() - opp) * 0.03, 0.15, 0.9);
     let w = 0, l = 0;
     for (let i = 0; i < 3; i++) { if (Math.random() < p) w++; else l++; }
     const delta = Math.round((w - l) * irnd(260, 560) * (1 + L.premier / 40000));
@@ -3913,7 +4181,7 @@
   function playFaceit() {
     const L = state.ladder;
     const opp = 34 + L.elo / 58;
-    const p = clamp(0.5 + (ladderPower() - opp) * 0.03, 0.15, 0.9);
+    const p = clamp(0.5 + (ladderPower() + stackBonus() - opp) * 0.03, 0.15, 0.9);
     let w = 0, l = 0;
     for (let i = 0; i < 3; i++) { if (Math.random() < p) w++; else l++; }
     const before = faceitLevel(L.elo);
@@ -3931,7 +4199,8 @@
   function playEsl() {
     const L = state.ladder;
     const div = ESL_DIVS[L.div];
-    const p = clamp(0.5 + (ladderPower() + L.mates - div.str) * 0.035, 0.12, 0.9);
+    // w ESEA gra się składem: stack zastępuje przypadkowych kolegów z kolejki
+    const p = clamp(0.5 + (ladderPower() + Math.max(L.mates, stackBonus() * 2.2) - div.str) * 0.035, 0.12, 0.9);
     let w = 0, l = 0;
     for (let i = 0; i < 3; i++) { if (Math.random() < p) w++; else l++; }
     L.divWins += w;
@@ -4036,11 +4305,21 @@
     for (let i = 0; i < LADDER_WEEKS; i++) {
       const res = L.queue === "esl" ? playEsl() : L.queue === "faceit" ? playFaceit() : playPremier();
       w += res.w; l += res.l;
+      tickStack(res.w, res.l);
       state.stamina = clamp(state.stamina - 5, 0, 100);
       state.form = clamp(state.form + (res.w > res.l ? 4 : -3), 0, 100);
       ["aim", "reflex", "sense"].forEach(k => { state.stats[k] = clamp(state.stats[k] + growth(k, 0.6), 1, 99); });
     }
     state.hype = clamp(state.hype + (L.queue === "esl" ? 2.5 : 0.8), 0, 100);
+    if (stack()) {
+      state.stats.team = clamp(state.stats.team + growth("team", 1.1), 1, 99);
+      state.stats.util = clamp(state.stats.util + growth("util", 0.6), 1, 99);
+    }
+    if (state.academy) {
+      state.money += 3500;                       // stypendium akademii
+      state.career.earned += 3500;
+      ["aim", "sense", "util"].forEach(k => { state.stats[k] = clamp(state.stats[k] + growth(k, 0.5), 1, 99); });
+    }
     maybeProOffer();
 
     const rows = [];
@@ -4048,24 +4327,104 @@
     if (L.queue === "faceit") rows.push(["FACEIT elo", before.elo + " → " + L.elo + " (lvl " + faceitLevel(L.elo) + ")"]);
     if (L.queue === "esl") rows.push([tx(ESL_DIVS[L.div].name), TR("ladder.divWins", { n: L.divWins })]);
     rows.push([TR("ladder.record"), w + "W / " + l + "P"]);
+    if (stack()) rows.push([stack().name, TR("stack.row", { chem: Math.round(stack().chem), n: stack().played })]);
+    if (state.academy) rows.push([TR("acad.row"), state.academy.team]);
     showModal(TR("ladder.monthTitle"), TR("ladder.monthSub", { q: tx(QUEUES.find(q => q.id === L.queue).name) }),
       rows.map(x => '<div class="recap-line"><span>' + esc(x[0]) + "</span><b>" + esc(x[1]) + "</b></div>").join(""));
     modalAfterClose = () => {
       advanceLadderMonth();
       const seasonModalOpen = !document.getElementById("modal-overlay").classList.contains("hidden");
-      if (!seasonModalOpen && Math.random() < 0.4) { runLadderEvent(() => { render(); save(); }); return; }
-      render(); save();
+      if (seasonModalOpen) { render(); save(); return; }
+      const after = () => { render(); save(); };
+      // propozycja stacka przychodzi raz, gdy masz już przegrane i wygrane za sobą
+      if (!stack() && !state.stackAsked && L.matches >= 24 && Math.random() < 0.5) {
+        state.stackAsked = true;
+        formStack(after);
+        return;
+      }
+      if (qualifierReady() && Math.random() < 0.18) { playQualifier(after); return; }
+      if (maybeAcademy()) return;
+      if (Math.random() < 0.35) { runLadderEvent(after); return; }
+      after();
     };
+  }
+
+  // ---------- otwarte kwalifikacje i lokalne LAN-y ----------
+  // Ze stackiem można wejść na turniej, na którym patrzą skauci. Bez stacka nie ma zgłoszenia.
+  function qualifierReady() {
+    return !!stack() && stack().played >= 12 && state.ladder.matches >= 40;
+  }
+
+  function playQualifier(done) {
+    const st = stack();
+    const power = ladderPower() * 0.45 + stackAvg() * 0.55 + stackBonus() * 2;
+    const isLan = Math.random() < 0.35;                 // LAN to wydarzenie, nie norma
+    const rounds = 3;
+    let wins = 0;
+    for (let i = 0; i < rounds; i++) {
+      const opp = 42 + i * 7 + rnd(-4, 5) + (isLan ? 3 : 0);
+      if (Math.random() < clamp(0.5 + (power - opp) * 0.03, 0.1, 0.9)) wins++; else break;
+    }
+    const champ = wins === rounds;
+    st.lans += isLan ? 1 : 0;
+    const prize = champ ? irnd(9000, 22000) : wins * irnd(1200, 2600);
+    state.money += prize; state.career.earned += prize;
+    state.hype = clamp(state.hype + (champ ? 9 : 2 + wins), 0, 100);
+    st.chem = clamp(st.chem + (champ ? 8 : wins ? 3 : -2), 0, 100);
+    state.stamina = clamp(state.stamina - 8, 0, 100);
+    if (champ) {
+      state.ladder.scoutEyes = (state.ladder.scoutEyes || 0) + 2;   // skauci zaczynają notować nazwisko
+      addLog(TR("log.qualWin", { name: st.name }), "gold");
+      // do kroniki trafia pierwszy tytuł i LAN-y, nie każda wygrana kwalifikacja
+      if (isLan || st.wins2 === undefined) chronicle(TR("chr.qualWin", { name: st.name }), "gold");
+      st.wins2 = (st.wins2 || 0) + 1;
+      news("news.qualWin", { nick: state.nick, team: st.name }, "info");
+    } else {
+      state.ladder.scoutEyes = (state.ladder.scoutEyes || 0) + (wins >= 2 ? 1 : 0);
+      addLog(TR("log.qualOut", { n: wins }), "info");
+    }
+    showModal(TR(isLan ? "qual.lanTitle" : "qual.title"),
+      TR(champ ? "qual.won" : "qual.out", { name: st.name, n: wins }),
+      '<div class="recap-line"><span>' + esc(TR("qual.rounds")) + "</span><b>" + wins + " / " + rounds + "</b></div>" +
+      '<div class="recap-line"><span>' + esc(TR("match.prizeShort")) + "</span><b>" + money(prize) + "</b></div>" +
+      '<div class="recap-line"><span>' + esc(TR("stack.chem")) + "</span><b>" + Math.round(st.chem) + "</b></div>");
+    modalAfterClose = done;
+  }
+
+  // ---------- akademia klubu ----------
+  // Zanim przyjdzie prawdziwy kontrakt, można wejść do akademii: mała pensja i realny trening.
+  function maybeAcademy() {
+    const L = state.ladder;
+    if (state.academy || L.div < 1 || Math.random() > 0.18 + (L.scoutEyes || 0) * 0.03) return false;
+    const org = pickOrgIn(myRegion(), clamp(irnd(2, 4), 0, 4));
+    showChoice(TR("acad.title", { team: org }), TR("acad.text", { team: org }), [
+      { label: TR("acad.join"), desc: TR("acad.joinDesc") },
+      { label: TR("acad.pass"), desc: TR("acad.passDesc") },
+    ], ci => {
+      closeChoice();
+      if (ci === 0) {
+        state.academy = { team: org, since: state.season };
+        state.money += 4000;
+        addLog(TR("log.acadJoin", { team: org }), "gold");
+        chronicle(TR("chr.acad", { team: org }), "gold");
+      }
+      render(); save();
+    });
+    return true;
   }
 
   // Organizacje zaczynają dzwonić dopiero z ESEA Advanced wzwyż
   function maybeProOffer() {
     const L = state.ladder;
-    if (L.div < 2 || state.offers.length) return;
-    const chance = clamp((L.div - 1) * 0.16 + (ladderPower() - 50) * 0.012, 0, 0.55);
+    // z akademią albo z wygranymi turniejami kluby patrzą już od ESEA Main
+    const gate = state.academy || (L.scoutEyes || 0) >= 4 ? 1 : 2;
+    if (L.div < gate || state.offers.length) return;
+    const chance = clamp((L.div - 1) * 0.16 + (ladderPower() - 50) * 0.012
+      + (L.scoutEyes || 0) * 0.05 + (state.academy ? 0.12 : 0), 0, 0.65);
     if (Math.random() > chance) return;
     const t = clamp(L.div - 1, 0, 2);
-    const team = makeTeam(t);
+    // klub, w którego akademii siedzisz, ma pierwszeństwo
+    const team = state.academy && Math.random() < 0.5 ? makeTeam(t, state.academy.team) : makeTeam(t);
     state.offers.push({
       id: "o" + Date.now(), team: team.name, tier: t,
       salary: Math.round(tier(t).salary * rnd(0.8, 1.1)), years: irnd(1, 3),
@@ -4105,6 +4464,8 @@
   // Podpisanie pierwszego kontraktu kończy drabinkę i zaczyna karierę w organizacji
   function enterProCareer() {
     state.stage = "pro";
+    state.academy = null;
+    state.stack = null;
     state.league = makeLeague();
     state.schedule = makeSchedule();
     state.goal = makeGoal();
@@ -5530,6 +5891,88 @@
     return { done: s2.collabs >= g.target, label: s2.collabs + " / " + g.target };
   }
 
+  // ---------- drugi rozdział: styl gry, transfery, kontrakt z platformą ----------
+  const STYLES = [
+    { id: "default", name: ["Zbalansowany", "Balanced"], desc: ["Bez ekstremów. Skład gra tak, jak umie.", "No extremes. The lineup plays to its level."],
+      str: 0, variance: 0, dev: 0 },
+    { id: "aggro", name: ["Agresywny", "Aggressive"], desc: ["Więcej wygranych z mocnymi, więcej wpadek ze słabszymi.", "More wins against the strong, more slips against the weak."],
+      str: 1.5, variance: 5, dev: 0.4 },
+    { id: "slow", name: ["Ułożony", "Structured"], desc: ["Mniej losowości, wolniejszy rozwój zawodników.", "Less variance, slower player development."],
+      str: 2.5, variance: -4, dev: -0.3 },
+    { id: "young", name: ["Na młodych", "Youth first"], desc: ["Słabszy wynik teraz, szybszy rozwój składu.", "Weaker results now, faster squad growth."],
+      str: -2.5, variance: 2, dev: 1.2 },
+  ];
+  function styleDef() { return STYLES.find(x => x.id === state.style2) || STYLES[0]; }
+
+  function setStyle() {
+    showChoice(TR("p2.styleTitle"), TR("p2.styleText"),
+      STYLES.map(x => ({ label: tx(x.name), desc: tx(x.desc) })), ci => {
+        closeChoice();
+        state.style2 = STYLES[ci].id;
+        addLog(TR("log.style", { style: tx(STYLES[ci].name) }), "info");
+        render(); save();
+      });
+  }
+
+  // Trener i analityk mogą raz na sezon ściągnąć zawodnika — o ile klub słucha
+  function signPlayer() {
+    if (!phaseDef().hasTeam) return;
+    if (state.signTry === state.season) { showModal(TR("p2.signEarlyTitle"), TR("p2.signEarly"), ""); return; }
+    state.signTry = state.season;
+    const budget = clamp(state.rep * 0.9 + state.craft * 0.5 + state.trophies2 * 6, 20, 100);
+    const used = state.team.mates.map(m => m.nick).concat([state.nick]);
+    const base = tier(state.team.tier).str;
+    const cands = [0, 1, 2].map(i => {
+      const m = makeMate(base + (budget - 50) * 0.12 + i * 2, used);
+      m.fee = Math.round((m.skill - 40) * 2600 * (1 + state.team.tier * 0.2));
+      return m;
+    }).filter(m => m.fee < state.money + 1);
+    if (!cands.length) { showModal(TR("p2.signPoorTitle"), TR("p2.signPoor"), ""); return; }
+    showChoice(TR("p2.signTitle"), TR("p2.signText"),
+      cands.map(c => ({ label: c.nick, desc: tx((ROLES.find(r => r.id === c.role) || ROLES[0]).name) + " · " +
+        TR("team.years", { n: c.age }) + " · " + TR("p2.signStr", { n: Math.round(c.skill) }) + " · " + money(c.fee) }))
+        .concat([{ label: TR("loan.cancel"), desc: "" }]), ci => {
+      closeChoice();
+      if (ci >= cands.length) { render(); save(); return; }
+      const inc = cands[ci];
+      showChoice(TR("p2.signOut"), TR("p2.signOutText", { nick: inc.nick }),
+        state.team.mates.map(m => ({ label: m.nick, desc: TR("p2.signStr", { n: Math.round(m.skill) }) })), oi => {
+          closeChoice();
+          const out = state.team.mates[oi];
+          state.money -= inc.fee;
+          state.team.mates[oi] = inc;
+          state.team.chem = clamp(state.team.chem - 10, 0, 100);
+          addLog(TR("log.p2sign", { inn: inc.nick, out: out.nick, amount: money(inc.fee) }), "gold");
+          chronicle(TR("chr.p2sign", { nick: inc.nick }), "info");
+          showModal(TR("p2.signTitle"), TR("p2.signDone", { inn: inc.nick, out: out.nick }), "");
+          modalAfterClose = () => { render(); save(); };
+        });
+    });
+  }
+
+  // Streamer może podpisać wyłączność z platformą: pewne pieniądze kontra wolność
+  function platformDeal() {
+    if (state.phase !== "streamer") return;
+    if (state.platform) {
+      state.platform = null;
+      addLog(TR("log.platformOff"), "info");
+      render(); save();
+      return;
+    }
+    const pay = Math.round(6000 + state.audience * 220);
+    showChoice(TR("p2.platTitle"), TR("p2.platText", { amount: money(pay) }), [
+      { label: TR("p2.platYes"), desc: TR("p2.platYesDesc") },
+      { label: TR("p2.platNo"), desc: TR("p2.platNoDesc") },
+    ], ci => {
+      closeChoice();
+      if (ci === 0) {
+        state.platform = { pay: pay, since: state.season };
+        addLog(TR("log.platformOn", { amount: money(pay) }), "gold");
+      }
+      render(); save();
+    });
+  }
+
   function newS2() {
     return { wins: 0, matches: 0, trophies: 0, collabs: 0, earned: 0,
              startStr: state.team ? Math.round(staffTeamStrength()) : 0 };
@@ -5685,11 +6128,12 @@
   }
 
   function staffTeamStrength() {
-    return matesAvg() + (state.team.chem - 50) * 0.09 + (state.craft - 30) * 0.16;
+    return matesAvg() + (state.team.chem - 50) * 0.09 + (state.craft - 30) * 0.16 + styleDef().str;
   }
 
   function simStaffMatch(oppStr) {
-    const p = clamp(0.5 + (staffTeamStrength() - oppStr) * 0.02, 0.12, 0.9);
+    const v = styleDef().variance;                 // agresja zwiększa rozrzut, układ go tnie
+    const p = clamp(0.5 + (staffTeamStrength() - oppStr + rnd(-v, v)) * 0.02, 0.10, 0.92);
     return Math.random() < p;
   }
 
@@ -5698,15 +6142,21 @@
     state.money += state.team && def.hasTeam ? state.team.salary : 0;
     if (def.hasTeam) state.career.earned += state.team.salary;
     if (state.phase === "streamer") {
+      if (state.platform) {
+        state.money += state.platform.pay; state.career.earned += state.platform.pay; state.s2.earned += state.platform.pay;
+      }
       // przychód pasywny rośnie wolniej niż widownia
-      const passive = Math.round(Math.pow(state.audience, 0.9) * 8);
+      const passive = Math.round(Math.pow(state.audience, 0.9) * 8 * (state.platform ? 0.75 : 1));
       state.money += passive; state.career.earned += passive; state.s2.earned += passive;
       state.audience = Math.max(0, Math.round(state.audience * 0.98)); // widownia odpływa bez treści
     }
     state.money -= upkeepTotal();
     state.mental = clamp(state.mental + 4, 0, 100);
     state.energy = MAX_ENERGY;
-    if (state.team) state.team.mates.forEach(m => { m.skill = clamp(m.skill + rnd(-0.3, 0.5), 25, 97); });
+    if (state.team) state.team.mates.forEach(m => {
+      const youth = styleDef().dev * ((m.age || 24) <= 21 ? 1.6 : 0.7);
+      m.skill = clamp(m.skill + rnd(-0.3, 0.5) + youth * 0.3, 25, 97);
+    });
     state.week++;
     if (state.week > SEASON_LENGTH) { endSeason2(); return; }
     autoTrain();
@@ -5856,7 +6306,8 @@
 
   // Wydarzenie poza serwerem; po rozstrzygnięciu wywołuje done()
   function runLifeEvent(done) {
-    const ev = pick(LIFE);
+    const pool = LIFE.filter(e => { try { return !e.when || e.when(); } catch (err) { return false; } });
+    const ev = pick(pool.length ? pool : LIFE);
     showChoice(tx(ev.title), tx(ev.text), ev.opts.map(o => ({ label: tx(o.label), desc: tx(o.desc) })), i => {
       const txt = ev.opts[i].eff();
       addLog(tx(ev.title) + ": " + txt, "info");
@@ -5876,7 +6327,32 @@
 
   let matchAfterClose = null;
   let modalAfterClose = null;
+  // Jedno zdanie o tym, co ten mecz właściwie znaczył — dobierane do wyniku i sytuacji
+  function matchFlavour(res, multi) {
+    const r = res && res.me ? res.me.rating : 1;
+    const keys = [];
+    if (multi && multi.champion) keys.push("fl.champion");
+    if (res && res.maps && res.maps[0]) {
+      const m = res.maps[0];
+      if (res.won && m.a - m.b <= 2) keys.push("fl.tight");
+      if (!res.won && m.b - m.a <= 2) keys.push("fl.soClose");
+      if (res.won && m.a - m.b >= 9) keys.push("fl.rout");
+      if (!res.won && m.b - m.a >= 9) keys.push("fl.beaten");
+      if (m.half1 && ((m.half1.a <= 3 && res.won) || (m.half1.b <= 3 && !res.won))) keys.push("fl.comeback");
+    }
+    if (r >= 1.35) keys.push("fl.carry");
+    else if (r <= 0.72) keys.push("fl.passenger");
+    if (res && res.me && (res.me.aces || 0) > 0) keys.push("fl.ace");
+    if (state.form <= 32 && res && res.won) keys.push("fl.slumpBreak");
+    if ((state.burn || 0) > 70) keys.push("fl.tired");
+    if (state.formerTeams && oppWasFormer) keys.push("fl.former");
+    if (!keys.length) keys.push(res && res.won ? "fl.win" : "fl.loss");
+    return TR(pick(keys), { nick: state.nick, r: r.toFixed(2) });
+  }
+  let oppWasFormer = false;
+
   function showMatch(title, res, oppName, multi) {
+    oppWasFormer = !!(oppName && state.formerTeams && state.formerTeams.indexOf(oppName) >= 0);
     document.getElementById("mo-title").textContent = title;
     const scoreEl = document.getElementById("mo-score");
     if (multi) {
@@ -5894,7 +6370,8 @@
           (m.half1 ? ' <span class="muted">(' + m.half1.a + ":" + m.half1.b + " " + m.half1.side + ")</span>" : "") +
           '</span><span style="color:' + (m.won ? "var(--good)" : "var(--danger)") + '">' +
           m.a + " : " + m.b + "</span></div>").join("");
-    document.getElementById("mo-maps").innerHTML = mapsHtml;
+    document.getElementById("mo-maps").innerHTML =
+      '<div class="mo-flavour">' + esc(matchFlavour(res, multi)) + "</div>" + mapsHtml;
 
     const rows = [{ nick: state.nick, me: true, kills: res.me.kills, deaths: res.me.deaths, adr: res.me.adr, rating: res.me.rating }]
       .concat(res.mates.map(m => ({ nick: m.nick, me: false, kills: m.kills, deaths: m.deaths, adr: m.adr, rating: m.rating })))
@@ -5938,7 +6415,9 @@
 
     const draw = VIEW_RENDER[currentView] || VIEW_RENDER.career;
     draw();
-    document.getElementById("offers-dot").classList.toggle("hidden", state.offers.length === 0);
+    const noOffers = state.offers.length === 0;
+    document.getElementById("offers-dot").classList.toggle("hidden", noOffers);
+    document.getElementById("deals-dot").classList.toggle("hidden", noOffers);
   }
 
   function renderCareer() {
@@ -6049,10 +6528,20 @@
             : TR("ladder.needElo", { n: ESL_GATE })) + "</span>" : "") + "</button>";
     }).join("");
 
+    const st = stack();
     document.getElementById("goal-card").innerHTML =
       '<div class="goal-box"><div class="g-title">' + esc(TR("ladder.goalTitle")) + "</div>" +
       '<div class="g-desc">' + esc(eslUnlocked() ? TR("ladder.goalEsl")
-        : faceitUnlocked() ? TR("ladder.goalFaceit") : TR("ladder.goalPremier", { n: FACEIT_GATE })) + "</div></div>";
+        : faceitUnlocked() ? TR("ladder.goalFaceit") : TR("ladder.goalPremier", { n: FACEIT_GATE })) + "</div></div>" +
+      '<div class="pos-box"><div class="pos-head"><span class="pos-role">' + esc(TR("stack.title")) + "</span>" +
+      (state.academy ? '<span class="pos-cap">' + esc(TR("acad.row")) + ": " + esc(state.academy.team) + "</span>" : "") +
+      "</div>" +
+      '<div class="pos-note">' + esc(st
+        ? TR("stack.info", { name: st.name, chem: Math.round(st.chem), w: st.wins, n: st.played, lans: st.lans })
+        : TR("stack.none")) + "</div>" +
+      (st ? '<div class="trait-row" style="margin-top:8px">' + st.mates.map(m =>
+        '<span class="trait-chip">' + esc(m.nick) + " · " + Math.round(m.skill) + "</span>").join("") + "</div>" : "") +
+      "</div>";
     document.getElementById("btn-skip").classList.add("hidden");
     document.getElementById("week-hint").textContent = TR("ladder.hint");
     document.getElementById("cta-next").innerHTML = TR("ladder.playMonth") + " " + icon("arrow-right");
@@ -6086,6 +6575,7 @@
     document.getElementById("pc-kv").innerHTML = kv.map(x =>
       '<div class="kv"><div class="k">' + esc(x[0]) + '</div><div class="v">' + esc(x[1]) + "</div></div>").join("");
 
+    document.getElementById("goal-card").dataset.phase2 = "1";
     const ev = currentEvent();
     const box = document.getElementById("week-card");
     if (!def.hasTeam) {
@@ -6104,11 +6594,23 @@
         '<div class="ev-sub">Czas na pracę ze składem.</div></div>';
     }
     const g2 = state.goal2 ? goal2Progress() : null;
-    document.getElementById("goal-card").innerHTML = state.goal2
+    const hasTeam = def.hasTeam;
+    document.getElementById("goal-card").innerHTML = (state.goal2
       ? '<div class="goal-box"><div class="g-title">' + esc(TR(g2.done ? "goal.done" : "goal.title")) + "</div>" +
         '<div class="g-desc">' + esc(TR("goal.line", { text: goal2Text(state.goal2), progress: g2.label,
           reward: money(state.goal2.reward) })) + "</div></div>"
-      : "";
+      : "") +
+      '<div class="pos-box"><div class="pos-head"><span class="pos-role">' + esc(TR("p2.decisions")) + "</span>" +
+      (hasTeam ? '<span class="pos-cap">' + esc(tx(styleDef().name)) + "</span>"
+        : '<span class="pos-cap">' + esc(state.platform ? TR("p2.platOn") : TR("p2.platOff")) + "</span>") + "</div>" +
+      '<div class="pos-note">' + esc(hasTeam ? tx(styleDef().desc) : TR("p2.platNote")) + "</div>" +
+      '<div class="pos-actions">' +
+      (hasTeam
+        ? '<button data-style="1">' + esc(TR("p2.styleBtn")) + "</button>" +
+          '<button data-sign="1"' + (state.signTry === state.season ? " disabled" : "") + ">" +
+          esc(TR("p2.signBtn")) + "</button>"
+        : '<button data-platform="1">' + esc(TR(state.platform ? "p2.platEnd" : "p2.platBtn")) + "</button>") +
+      "</div></div>";
     document.getElementById("btn-skip").classList.add("hidden");
     document.getElementById("week-hint").textContent = state.energy > 0
       ? TR("career.hint2", { n: state.energy }) : TR("career.hint2done");
@@ -6821,6 +7323,11 @@
     const t = e.target.closest("[data-talk]");
     if (t) return talkTo(t.dataset.talk);
     if (e.target.closest("[data-rolefight]")) return fightForRole();
+  });
+  document.getElementById("goal-card").addEventListener("click", e => {
+    if (e.target.closest("[data-style]")) return setStyle();
+    if (e.target.closest("[data-sign]")) return signPlayer();
+    if (e.target.closest("[data-platform]")) return platformDeal();
   });
   document.getElementById("influence-box").addEventListener("click", e => {
     if (e.target.closest("[data-captain]")) return tryCaptain();

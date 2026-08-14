@@ -29,10 +29,15 @@ to kilkadziesiąt decyzji, a nie kilkaset kliknięć. Pniesz się po realnej dra
 3. **ESEA / ESL** — Open, Main, Advanced i ESL Challenger League. Awans wymaga serii wygranych,
    a od **Advanced** zaczynają dzwonić organizacje.
 
-Co kilka miesięcy dzieje się coś, co wymaga decyzji: rodzice pytają o oceny, znajomi szukają
-piątego do stacka, pojawia się otwarty turniej, płatny trener, seria porażek albo testy do
-akademii. Wybory realnie zmieniają statystyki, psychikę i to, jak szybko wchodzisz wyżej.
-Typowa droga to pierwszy kontrakt około **17 roku życia**.
+Po kilkudziesięciu meczach znajomi z serwerów proponują **stały stack**: jeden skład na wieczory,
+który rośnie razem z Tobą, ma własną chemię i realnie podnosi wyniki w kolejkach. Ze stackiem
+wchodzisz na **otwarte kwalifikacje i lokalne LAN-y** — wygrana to pieniądze, rozpoznawalność
+i oczy skautów. Od ESEA Main może przyjść zaproszenie do **akademii klubu**: stypendium, szybszy
+rozwój i pierwszeństwo tego klubu przy pierwszym kontrakcie.
+
+Co kilka miesięcy dzieje się też coś, co wymaga decyzji: rodzice pytają o oceny, pojawia się
+płatny trener, seria porażek albo testy. Wybory realnie zmieniają statystyki, psychikę i to,
+jak szybko wchodzisz wyżej. Typowa droga to pierwszy kontrakt między **18 a 20 rokiem życia**.
 
 Podpisanie pierwszego kontraktu kończy grind i uruchamia pełną karierę klubową opisaną niżej.
 W grze występuje **ponad 70 prawdziwych organizacji** podzielonych na regiony (Europa, WNP,
@@ -161,6 +166,11 @@ albo liczby kolaboracji. Zrealizowany cel to premia i rozpoznawalność; **dwa n
 z rzędu kończą się rozstaniem** z organizacją (albo zapaścią zasięgów u streamera), a dobry
 sezon otwiera drzwi do mocniejszego klubu. Zakładka Drużyna pokazuje ranking sztabowców
 lub top kanałów sceny — w zależności od tego, którą drogę wybrałeś.
+
+Trener i analityk ustawiają **styl gry** drużyny (zbalansowany, agresywny, ułożony, na młodych)
+— zmienia siłę w meczach, rozrzut wyników i tempo rozwoju zawodników — oraz raz na sezon mogą
+**ściągnąć zawodnika** do składu za własne pieniądze. Streamer może podpisać **kontrakt
+z platformą**: pewna wypłata co tydzień kosztem tempa wzrostu kanału.
 
 Definitywne zakończenie kariery odsłania pełne **podsumowanie**: liczby całej drogi, oś najważniejszych
 momentów, Twoje miejsce w historii sceny (lata na szczycie, czyja to była era, pozycja w Hall of Fame)
