@@ -1860,6 +1860,7 @@
     s.schedule = makeSchedule();
     s.goal = makeGoal();
     s.plan = trimPlan(presets()[0].list);      // od pierwszego tygodnia gra się planem, nie klikaniem
+    refreshStaffMarket();
     addLog(TR("log.start", { role: tx(role().name), team: s.team.name }), "info");
     return s;
   }
@@ -3002,7 +3003,7 @@
     if (typeof state.autoPlan !== "boolean") state.autoPlan = true;
     if (typeof state.smartRest !== "boolean") state.smartRest = true;
     if (!state.staff) state.staff = {};
-    if (!Array.isArray(state.staffMarket)) state.staffMarket = [];
+    if (!Array.isArray(state.staffMarket) || !state.staffMarket.length) refreshStaffMarket();
     if (!state.funds) {
       // stary portfel wchodzi w całości na lokatę
       state.funds = { deposit: state.invest || 0, index: 0, crypto: 0 };
@@ -5088,7 +5089,8 @@
     document.getElementById("staff-hired").innerHTML = hired.length
       ? hired.map(k => staffRow(k, state.staff[k])).join("")
       : '<p class="muted">' + esc(TR("staff.none")) + "</p>";
-    if (!state.staffMarket || !state.staffMarket.length) refreshStaffMarket();
+    // rynek generujemy raz i zapisujemy — bez tego kandydaci zmienialiby się przy każdym odświeżeniu
+    if (!state.staffMarket || !state.staffMarket.length) { refreshStaffMarket(); save(); }
     document.getElementById("staff-market").innerHTML = state.staffMarket.map((c, i) => {
       const def = STAFF_ROLES.find(r => r.id === c.id);
       const vis = visionOf(c.vision);
