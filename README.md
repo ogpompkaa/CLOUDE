@@ -121,6 +121,10 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
 - **Regiony** — oferty przychodzą też z innych scen (Europa, WNP, obie Ameryki, Azja, Oceania).
   Przeprowadzka oznacza kilka tygodni aklimatyzacji z gorszą formą, ale otwiera inne ligi
   i inny ranking regionalny.
+- **Ranking żyje formą** — pozycja w rankingu świata liczy się z bieżącego ratingu, poziomu klubu,
+  hype'u i trofeów, przy czym **trofea wygasają**: sprzed roku liczą się prawie w całości, sprzed
+  pięciu lat w ułamku. Pierwsze miejsce trzeba bronić. Punkty kariery w Hall of Fame działają
+  odwrotnie — liczą cały dorobek bez wygaszania.
 - **Punkty rankingowe** — kafelek w karcie zawodnika; kliknięcie otwiera pełny ranking
   zawodników w Twoim regionie i na świecie, z Twoją pozycją pośrodku listy.
 - **Gala końca sezonu** — po podsumowaniu roku odsłaniane jest Top 10 świata, nagrody dla
