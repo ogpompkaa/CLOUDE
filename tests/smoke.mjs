@@ -141,6 +141,24 @@ for (let i = 0; i < SEASON_WEEKS * SEASONS + 2; i++) {
   }
 }
 
+// przewijanie sezonu: jeden klik ma ruszyć kalendarz i oddać stan graczowi
+await drainOverlays();
+await safeClick('.nav-btn[data-view="career"]');
+const ffBefore = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+if (!ffBefore.retired && await page.isVisible('#btn-ff')) {
+  await safeClick('#btn-ff');
+  await page.waitForFunction(() => !document.getElementById('btn-ff').disabled, { timeout: 60000 }).catch(() => {});
+  const ffAfter = await page.evaluate(() => JSON.parse(localStorage.getItem('cs2-player-career-v1')));
+  const moved = ffAfter.season > ffBefore.season || ffAfter.week > ffBefore.week || ffAfter.retired;
+  check('przewijanie sezonu rusza kalendarz', moved,
+    `S${ffBefore.season}T${ffBefore.week} → S${ffAfter.season}T${ffAfter.week}`);
+  check('przewijanie oddaje sterowanie', ffAfter.fastMatches === false, 'fastMatches: ' + ffAfter.fastMatches);
+  await drainOverlays();
+} else {
+  check('przewijanie sezonu rusza kalendarz', false, 'brak przycisku przewijania');
+  check('przewijanie oddaje sterowanie', false, 'nie uruchomiono');
+}
+
 async function drainOverlays() {
   for (let g = 0; g < 40; g++) {
     if (await page.isVisible('#tutorial-overlay:not(.hidden)')) { await safeClick('#tut-skip'); continue; }

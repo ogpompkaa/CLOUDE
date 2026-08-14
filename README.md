@@ -60,6 +60,11 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
   albo psychika spadną poniżej 32, więc plan nie zajedzie Cię do kontuzji. Automat da się
   wyłączyć, a niewykorzystaną energię zawsze można wydać ręcznie. Drugi rozdział ma własny
   plan i własne gotowce.
+- **Przewijanie sezonu** — przycisk „Przewiń sezon” pod kartą tygodnia rozgrywa kolejne tygodnie
+  za Ciebie: mecze lecą w trybie szybkim, wołania taktyczne bierze kapitan, a drobne wydarzenia
+  poza serwerem rozstrzygają się w tle i trafiają do logu. Przewijanie zatrzymuje się na końcu
+  sezonu, na każdej realnej decyzji (oferta, kadra, wyprowadzka, zmiana roli) i przy końcu kariery,
+  a potem pokazuje podsumowanie: dokąd doszedłeś, ile meczów, jaki rating i bilans konta.
 - **Trening** — aim, refleks, game sense, utility, teamplay, rozmowy w składzie, stream,
   media, odpoczynek i regeneracja. Kondycja i psychika nie resetują się co tydzień,
   więc przetrenowanie realnie psuje formę, a w skrajnym przypadku kończy się kontuzją

@@ -607,7 +607,10 @@
         <div class="glass panel">
           <h2><svg class="icon"><use href="#i-calendar"></use></svg> <span data-i18n="career.week">Ten tydzień</span></h2>
           <div id="week-card"></div>
-          <button class="full secondary hidden" id="btn-skip" style="margin-bottom:10px;"><svg class="icon"><use href="#i-arrow-right"></use></svg> <span data-i18n="career.skip">Przewiń do najbliższego meczu</span></button>
+          <div class="ov-tabs" style="margin:0 0 10px;">
+            <button class="secondary full hidden" id="btn-skip"><svg class="icon"><use href="#i-arrow-right"></use></svg> <span data-i18n="career.skip">Do meczu</span></button>
+            <button class="secondary full" id="btn-ff"><svg class="icon"><use href="#i-arrow-right"></use></svg> <span data-i18n="career.ff">Przewiń sezon</span></button>
+          </div>
           <div id="goal-card"></div>
           <div id="week-hint" class="muted"></div>
         </div>
@@ -970,6 +973,20 @@
     "nav.profile": ["Profil", "Profile"],
     "career.rating": ["Rating sezonu", "Season rating"],
     "career.week": ["Ten tydzień", "This week"],
+    "career.ff": ["Przewiń sezon", "Fast-forward"],
+    "ff.title": ["Przewinięte tygodnie", "Weeks fast-forwarded"],
+    "ff.stopSeason": ["Sezon dobiegł końca — dalej decydujesz sam.", "The season is over — you take it from here."],
+    "ff.stopChoice": ["Coś wymaga Twojej decyzji, więc przewijanie się zatrzymało.",
+      "Something needs your call, so the fast-forward stopped."],
+    "ff.stopRetire": ["Koniec drogi zawodnika.", "The playing road ends here."],
+    "ff.weeks": ["Zatrzymano na", "Stopped at"],
+    "ff.toWeek": ["tydzień {n}", "week {n}"],
+    "ff.toSeason": ["sezon {n}", "season {n}"],
+    "ff.matches": ["Mecze", "Matches"],
+    "ff.rating": ["Średni rating", "Average rating"],
+    "ff.money": ["Bilans", "Balance"],
+    "log.ff": ["Przewinięto do {where}: {n} meczów, bilans {amount}.",
+               "Fast-forwarded to {where}: {n} matches, balance {amount}."],
     "career.skip": ["Przewiń do najbliższego meczu", "Skip to the next match"],
     "career.hintEnergy": ["Masz jeszcze {n} pkt energii — wykorzystaj je w zakładce Trening.",
       "You still have {n} energy — spend it in the Training tab."],
@@ -1271,6 +1288,54 @@
       "You sit {pos}th in the table. Out of the playoff — the season ends here."],
     "week.free": ["Tydzień bez meczu", "A week without a match"],
     "week.freeSub": ["Czas na trening, stream albo regenerację.", "Time to train, stream or recover."],
+    "cap.earlyTitle": ["Za wcześnie", "Too soon"],
+    "cap.early": ["W tym sezonie już rozmawiałeś o roli kapitana. Spróbuj po przerwie.",
+      "You have already talked about the captaincy this season. Try after the break."],
+    "cap.wonTitle": ["Nowy kapitan", "New captain"],
+    "cap.won": ["Skład wybrał Ciebie na lidera zespołu. Chemia rośnie szybciej, a drużyna gra pewniej.",
+      "The lineup picked you as its leader. Chemistry grows faster and the team plays with more certainty."],
+    "cap.lostTitle": ["Odmowa", "Turned down"],
+    "cap.lost": ["Skład uznał, że nie masz jeszcze pozycji, by prowadzić zespół.",
+      "The lineup decided you do not yet have the standing to lead."],
+    "log.captain": ["Zostajesz kapitanem {team}.", "You become captain of {team}."],
+    "log.captainNo": ["Nieudana próba przejęcia roli kapitana.", "Your bid for the captaincy failed."],
+    "tr.early": ["Zarząd rozpatruje jedną Twoją prośbę transferową na sezon.",
+      "The board handles one transfer request from you per season."],
+    "tr.noTitle": ["Zarząd odmawia", "The board says no"],
+    "tr.no": ["Nie masz jeszcze na tyle mocnej pozycji, żeby układać skład.",
+      "You do not have the standing to pick the lineup yet."],
+    "tr.pickTitle": ["Kogo ściągamy?", "Who are we signing?"],
+    "tr.pick": ["Zarząd zgodził się na jeden transfer. Wskaż zawodnika.",
+      "The board agreed to one signing. Pick your player."],
+    "tr.outTitle": ["Kto odchodzi?", "Who makes way?"],
+    "tr.out": ["Skład ma pięć miejsc. Kogo zastąpi {nick}?", "The lineup has five spots. Who does {nick} replace?"],
+    "tr.doneTitle": ["Skład zmieniony", "Lineup changed"],
+    "tr.done": ["{inn} dołącza w miejsce {out}. Nowa chemia wymaga czasu — zagrajcie scrimy.",
+      "{inn} comes in for {out}. The new chemistry needs time — get some scrims in."],
+    "log.transferNo": ["Zarząd odrzucił Twoją prośbę o transfer.", "The board turned down your transfer request."],
+    "log.transferDone": ["Transfer na Twoją prośbę: {out} → {inn}", "Signing at your request: {out} → {inn}"],
+    "po.semi": ["Półfinał ligi", "League semi-final"],
+    "po.semiShort": ["Półfinał", "Semi-final"],
+    "po.final": ["Finał ligi", "League final"],
+    "po.finalShort": ["Finał", "Final"],
+    "nego.brokeTitle": ["Negocjacje zerwane", "Talks collapsed"],
+    "nego.broke": ["{team} kończy rozmowy. Przeceniłeś swoją pozycję.",
+      "{team} walks away. You overplayed your hand."],
+    "log.negoBroke": ["{team} wycofuje ofertę — Twoje żądania były zbyt wysokie.",
+      "{team} pulls the offer — your demands were too high."],
+    "nego.roleTitle": ["Wybór roli", "Choice of role"],
+    "nego.roleText": ["Masz w kontrakcie prawo wyboru pozycji w składzie.",
+      "Your contract gives you the right to pick your position."],
+    "p2.leagueTitle": ["Mecz ligowy", "League match"],
+    "p2.leagueWon": ["{team} vs {opp} — wygrana.", "{team} vs {opp} — win."],
+    "p2.leagueLost": ["{team} vs {opp} — porażka.", "{team} vs {opp} — defeat."],
+    "p2.champ": ["Mistrzostwo! Twój sztab dowiózł tytuł.", "Champions! Your staff work delivered the title."],
+    "p2.rounds": ["Wygrane serie: {w} z {n}.", "Series won: {w} of {n}."],
+    "p2.weekChannel": ["Tydzień pracy nad kanałem", "A week on the channel"],
+    "p2.weekFree": ["Tydzień bez meczu", "A week with no match"],
+    "log.platformOn": ["Podpisujesz kontrakt z platformą ({amount}/tydz.).",
+      "You sign a platform deal ({amount}/wk)."],
+    "log.platformOff": ["Koniec kontraktu z platformą.", "The platform deal ends."],
     "week.freeStaff": ["Czas na pracę ze składem.", "Time to work with the squad."],
     "week.channel": ["Tydzień pracy nad kanałem", "A week on the channel"],
     "week.channelSub": ["Streamy, klipy i kolaboracje. Widownia odpływa, jeśli nic nie wrzucasz.",
@@ -2423,9 +2488,6 @@
       if (raw) localStorage.setItem(BACKUP_KEY, raw);
     } catch (e) { /* brak miejsca na kopię — trudno */ }
   }
-  function hasBackup() {
-    try { return !!localStorage.getItem(BACKUP_KEY); } catch (e) { return false; }
-  }
   function backupInfo() {
     try {
       const d = JSON.parse(localStorage.getItem(BACKUP_KEY));
@@ -3051,20 +3113,20 @@
 
   function tryCaptain() {
     if (state.captain) return;
-    if (state.captainTry === state.season) { showModal("Za wcześnie", "W tym sezonie już rozmawiałeś o roli kapitana. Spróbuj po przerwie.", ""); return; }
+    if (state.captainTry === state.season) { showModal(TR("cap.earlyTitle"), TR("cap.early"), ""); return; }
     state.captainTry = state.season;
     const p = clamp(influenceScore() / 130 + 0.08, 0.08, 0.85);
     if (Math.random() < p) {
       state.captain = true;
       state.team.chem = clamp(state.team.chem + 6, 0, 100);
       state.lead = clamp(state.lead + 4, 1, 99);
-      addLog("Zostajesz kapitanem " + state.team.name + ".", "gold");
-      showModal("Nowy kapitan", "Skład wybrał Ciebie na lidera zespołu. Chemia rośnie szybciej, a drużyna gra pewniej.", "");
+      addLog(TR("log.captain", { team: state.team.name }), "gold");
+      showModal(TR("cap.wonTitle"), TR("cap.won"), "");
     } else {
       state.team.chem = clamp(state.team.chem - 5, 0, 100);
       state.mental = clamp(state.mental - 4, 0, 100);
-      addLog("Nieudana próba przejęcia roli kapitana.", "bad");
-      showModal("Odmowa", "Skład uznał, że nie masz jeszcze pozycji, by prowadzić zespół.", "");
+      addLog(TR("log.captainNo"), "bad");
+      showModal(TR("cap.lostTitle"), TR("cap.lost"), "");
     }
     render(); save();
   }
@@ -3284,13 +3346,13 @@
   }
 
   function requestTransfer() {
-    if (state.transferTry === state.season) { showModal("Za wcześnie", "Zarząd rozpatruje jedną Twoją prośbę transferową na sezon.", ""); return; }
+    if (state.transferTry === state.season) { showModal(TR("cap.earlyTitle"), TR("tr.early"), ""); return; }
     const p = clamp(influenceScore() / 120, 0.05, 0.9);
     if (Math.random() > p) {
       state.transferTry = state.season;
       state.mental = clamp(state.mental - 3, 0, 100);
-      addLog("Zarząd odrzucił Twoją prośbę o transfer.", "bad");
-      showModal("Zarząd odmawia", "Nie masz jeszcze na tyle mocnej pozycji, żeby układać skład.", "");
+      addLog(TR("log.transferNo"), "bad");
+      showModal(TR("tr.noTitle"), TR("tr.no"), "");
       render(); save();
       return;
     }
@@ -3298,12 +3360,12 @@
     const base = tier(state.team.tier).str + 3;
     const used = state.team.mates.map(m => m.nick).concat([state.nick]);
     const cands = [0, 1, 2].map(() => makeMate(base + rnd(0, 6), used));
-    showChoice("Kogo ściągamy?", "Zarząd zgodził się na jeden transfer. Wskaż zawodnika.",
+    showChoice(TR("tr.pickTitle"), TR("tr.pick"),
       cands.map(c => ({ label: c.nick, desc: tx((ROLES.find(r => r.id === c.role) || ROLES[0]).name) + " · " + c.age + " lat · siła " + c.skill })),
       ci => {
         closeChoice();
         const inc = cands[ci];
-        showChoice("Kto odchodzi?", "Skład ma pięć miejsc. Kogo zastąpi " + inc.nick + "?",
+        showChoice(TR("tr.outTitle"), TR("tr.out", { nick: inc.nick }),
           state.team.mates.map(m => ({ label: m.nick, desc: tx((ROLES.find(r => r.id === m.role) || ROLES[0]).name) + " · siła " + Math.round(m.skill) })),
           oi => {
             closeChoice();
@@ -3311,9 +3373,8 @@
             state.team.mates[oi] = inc;
             state.team.chem = clamp(state.team.chem - 12, 0, 100);
             state.transferTry = state.season;
-            addLog("Transfer na Twoją prośbę: " + outp.nick + " → " + inc.nick, "gold");
-            showModal("Skład zmieniony", inc.nick + " dołącza w miejsce " + outp.nick +
-              ". Nowa chemia wymaga czasu — zagrajcie scrimy.", "");
+            addLog(TR("log.transferDone", { out: outp.nick, inn: inc.nick }), "gold");
+            showModal(TR("tr.doneTitle"), TR("tr.done", { inn: inc.nick, out: outp.nick }), "");
             render(); save();
           });
       });
@@ -4101,6 +4162,77 @@
 
   // ---------- QoL: przewiń tydzień, zapis ----------
 
+  // ---------- przewijanie sezonu ----------
+  // Wydarzenia, których przewijanie nigdy nie rozstrzyga za gracza
+  const FF_ASK = ["moveout", "roleswap"];
+  // Sterujemy prawdziwym przepływem tygodnia i zamykamy okna za gracza, więc symulacja
+  // przebiega dokładnie tak samo jak klikanie. Każdy wybór przerywa przewijanie —
+  // decyzje zostają przy graczu.
+  let ff = null;
+
+  function ffSnapshot() {
+    const c = state.career;
+    return { matches: c.matches, wins: c.wins, rating: c.rating, money: state.money,
+             trophies: c.trophies.length, season: state.season, week: state.week, mvps: c.mvps };
+  }
+
+  function startFastForward() {
+    if (ff || state.retired || inLadder()) return;
+    ff = { from: ffSnapshot(), guard: 0, wasFast: state.fastMatches, stop: null };
+    state.fastMatches = true;                      // bez animacji rund
+    document.getElementById("btn-ff").disabled = true;
+    ffStep();
+  }
+
+  function ffOpen(id) { return !document.getElementById(id).classList.contains("hidden"); }
+
+  function ffStep() {
+    if (!ff) return;
+    if (ff.guard++ > 400) { ffFinish("guard"); return; }
+    if (ffOpen("live-overlay")) { document.getElementById("lv-skip").click(); return ffSoon(); }
+    if (ffOpen("match-overlay")) { document.getElementById("mo-close").click(); return ffSoon(); }
+    if (ffOpen("choice-overlay")) { ffFinish("choice"); return; }        // decyzja gracza
+    // okna informacyjne zamykamy sami; koniec sezonu wyłapie warunek niżej
+    if (ffOpen("modal-overlay")) { document.getElementById("modal-close").click(); return ffSoon(); }
+    if (ffOpen("rank-overlay")) { document.getElementById("rank-close").click(); return ffSoon(); }
+    if (state.retired || state.pendingRetire) { ffFinish("retire"); return; }
+    if (state.season !== ff.from.season) { ffFinish("season"); return; }
+    nextWeek();
+    ffSoon();
+  }
+
+  function ffSoon(fn) { setTimeout(fn || ffStep, 0); }
+
+  function ffFinish(reason) {
+    if (!ff) return;
+    const from = ff.from;
+    state.fastMatches = ff.wasFast;
+    ff = null;
+    const btn = document.getElementById("btn-ff");
+    if (btn) btn.disabled = false;
+    const c = state.career;
+    const m = c.matches - from.matches;
+    const w = c.wins - from.wins;
+    const r = m ? (c.rating - from.rating) / m : 0;
+    const rows = [
+      [TR("ff.weeks"), (state.season > from.season ? TR("ff.toSeason", { n: state.season }) : TR("ff.toWeek", { n: state.week }))],
+      [TR("ff.matches"), m + " (" + w + "W / " + (m - w) + "P)"],
+      [TR("ff.rating"), m ? r.toFixed(2) : "—"],
+      [TR("ff.money"), money(state.money - from.money)],
+    ];
+    if (c.trophies.length > from.trophies) rows.push([TR("kv.trophies"), "+" + (c.trophies.length - from.trophies)]);
+    if (c.mvps > from.mvps) rows.push(["MVP", "+" + (c.mvps - from.mvps)]);
+    const moved = m || state.week !== from.week || state.season !== from.season;
+    render(); save();
+    if (!moved) return;
+    const where = state.season > from.season ? TR("ff.toSeason", { n: state.season }) : TR("ff.toWeek", { n: state.week });
+    addLog(TR("log.ff", { where: where, n: m, amount: money(state.money - from.money) }), "info");
+    // gdy na wierzchu leży decyzja albo inne okno, podsumowanie zostaje w logu — nie zasłaniamy wyboru
+    if (ffOpen("choice-overlay") || ffOpen("modal-overlay") || ffOpen("live-overlay") || ffOpen("match-overlay")) return;
+    showModal(TR("ff.title"), TR("ff.stop" + (reason === "choice" ? "Choice" : reason === "retire" ? "Retire" : "Season")),
+      rows.map(x => '<div class="recap-line"><span>' + esc(x[0]) + "</span><b>" + esc(x[1]) + "</b></div>").join(""));
+  }
+
   function skipToMatch() {
     let guard = 0;
     while (currentEvent().type === "free" && guard++ < SEASON_LENGTH) {
@@ -4279,8 +4411,6 @@
   // ---------- stały stack na drabince ----------
   // Zanim zadzwoni pierwszy klub, buduje się ekipę: ci sami ludzie co wieczór,
   // wspólne kwalifikacje i lokalne LAN-y. Stack rośnie razem z Tobą albo się rozpada.
-  const STACK_NAMES_KEY = "stack";
-
   function stack() {
     if (!state.stack) state.stack = null;
     return state.stack;
@@ -5059,9 +5189,9 @@
       return;
     }
     const oppStr = tier(state.team.tier).str + 4;
-    runSeries(oppStr, 3, "Półfinał ligi", "", semi => {
-      applyMatchResult(semi, "Półfinał ligi");
-      const lines = [{ label: "Półfinał", score: semi.mapsWon + "-" + semi.mapsLost, won: semi.won, rating: semi.me.rating }];
+    runSeries(oppStr, 3, TR("po.semi"), "", semi => {
+      applyMatchResult(semi, TR("po.semi"));
+      const lines = [{ label: TR("po.semiShort"), score: semi.mapsWon + "-" + semi.mapsLost, won: semi.won, rating: semi.me.rating }];
 
       function finish(champ, last) {
         const prize = Math.round(tier(state.team.tier).prize * (champ ? 1.2 : semi.won ? 0.6 : 0.3));
@@ -5071,9 +5201,9 @@
       }
 
       if (!semi.won) { finish(false, semi); return; }
-      runSeries(oppStr + 4, 3, "Finał ligi", "", fin => {
-        applyMatchResult(fin, "Finał ligi");
-        lines.push({ label: "Finał", score: fin.mapsWon + "-" + fin.mapsLost, won: fin.won, rating: fin.me.rating });
+      runSeries(oppStr + 4, 3, TR("po.final"), "", fin => {
+        applyMatchResult(fin, TR("po.final"));
+        lines.push({ label: TR("po.finalShort"), score: fin.mapsWon + "-" + fin.mapsLost, won: fin.won, rating: fin.me.rating });
         if (fin.won) {
           state.career.trophies.push({ name: TR("league.title", { n: state.season }), season: state.season, major: false, tier: state.team.tier });
           news("news.myTrophy", { nick: state.nick, team: state.team.name, event: TR("league.title", { n: state.season }) }, "gold");
@@ -5226,9 +5356,9 @@
       const risk = clamp((dem - tolerance) * 0.17, 0, 0.75);
       if (Math.random() < risk) {
         state.offers = state.offers.filter(x => x.id !== o.id);
-        addLog(o.team + " wycofuje ofertę — Twoje żądania były zbyt wysokie.", "bad");
+        addLog(TR("log.negoBroke", { team: o.team }), "bad");
         state.mental = clamp(state.mental - 6, 0, 100);
-        showModal("Negocjacje zerwane", o.team + " kończy rozmowy. Przeceniłeś swoją pozycję.", "");
+        showModal(TR("nego.brokeTitle"), TR("nego.broke", { team: o.team }), "");
         render(); save();
         return;
       }
@@ -5275,7 +5405,7 @@
         '<div class="recap-line"><span>' + esc(TR("goal.title")) + '</span><b>' + esc(goalText(state.goal)) + "</b></div>");
       if (ex.roleChoice) {
         modalAfterClose = () => {
-          showChoice("Wybór roli", "Masz w kontrakcie prawo wyboru pozycji w składzie.",
+          showChoice(TR("nego.roleTitle"), TR("nego.roleText"),
             ROLES.map(r => ({ label: tx(r.name), desc: tx(r.desc) })), i => {
               state.role = ROLES[i].id;
               closeChoice();
@@ -5848,6 +5978,11 @@
       "dzięki temu plan nie zajedzie Cię do kontuzji.</p>" +
       "<p>Plan zostaje do odwołania, więc zmieniasz go tylko wtedy, gdy chcesz coś zmienić. Energię, której plan nie zużył, " +
       "możesz wydać ręcznie, a przyciskiem „Wykonaj plan teraz” odpalasz go poza kolejnością.</p>" },
+    { h: "Przewijanie sezonu", body:
+      "<p>Przycisk <b>„Przewiń sezon”</b> pod kartą tygodnia gra za Ciebie kolejne tygodnie: mecze lecą w trybie szybkim, " +
+      "wołania taktyczne bierze na siebie kapitan, a drobne sprawy poza serwerem załatwiasz sam w tle — wszystko ląduje w logu.</p>" +
+      "<p>Przewijanie <b>zatrzymuje się</b> na końcu sezonu, na każdej realnej decyzji (oferta, kadra, wyprowadzka, zmiana roli) " +
+      "i wtedy, gdy kończysz karierę. Po zatrzymaniu dostajesz podsumowanie: dokąd doszedłeś, ile meczów, jaki rating i bilans konta.</p>" },
     { h: "Kondycja, psychika, forma", body:
       "<p><b>Kondycja</b> spada od treningów i meczów. Poniżej 25 grozi kontuzją, a przy niskiej wartości trening daje o połowę mniej.</p>" +
       "<p><b>Psychika</b> spada po porażkach i od przemęczenia. Przy bardzo niskiej opuszczasz mecz z powodu wypalenia.</p>" +
@@ -5971,6 +6106,11 @@
       "so the plan cannot grind you into an injury.</p>" +
       "<p>The plan sticks until you change it. Energy the plan leaves unspent is still yours to use by hand, and " +
       "“Run the plan now” fires it off out of turn.</p>" },
+    { h: "Fast-forward", body:
+      "<p>The <b>Fast-forward</b> button under the week card plays the coming weeks for you: matches run in fast mode, " +
+      "the captain makes the tactical calls and you handle the small off-server stuff yourself in the background — it all lands in the log.</p>" +
+      "<p>It <b>stops</b> at the end of the season, at every real decision (an offer, the national team, moving out, a change of role) " +
+      "and when your career ends. Once it stops you get a recap: where you got to, matches played, rating and the money balance.</p>" },
     { h: "Stamina, mental, form", body:
       "<p><b>Stamina</b> drops from training and matches. Below 25 you risk injury, and low stamina halves what training gives you.</p>" +
       "<p><b>Mental</b> drops after losses and from overwork. Very low and you miss a match to burnout.</p>" +
@@ -6380,7 +6520,7 @@
       if (won) state.s2.wins++;
       addLog(TR(won ? "log.matchWin" : "log.matchLoss",
         { label: "Liga vs " + opp.name, w: won ? 1 : 0, l: won ? 0 : 1, r: "—" }), won ? "good" : "bad");
-      showModal("Mecz ligowy", state.team.name + " vs " + opp.name + " — " + (won ? "wygrana" : "porażka") + ".",
+      showModal(TR("p2.leagueTitle"), TR(won ? "p2.leagueWon" : "p2.leagueLost", { team: state.team.name, opp: opp.name }),
         '<div class="recap-line"><span>Twój wkład</span><b>' + esc(tx(def.craftName)) + " " + Math.round(state.craft) + "</b></div>" +
         '<div class="recap-line"><span>Siła drużyny</span><b>' + Math.round(staffTeamStrength()) + "</b></div>");
       modalAfterClose = () => { advanceWeek2(); render(); save(); };
@@ -6409,7 +6549,7 @@
       state.rep = clamp(state.rep + 10, 0, 100);
       addLog("Trofeum jako " + tx(def.name).toLowerCase() + ": " + label, "gold");
     }
-    showModal(label, champ ? "Mistrzostwo! Twój sztab dowiózł tytuł." : "Wygrane serie: " + wins + " z " + rounds + ".",
+    showModal(label, champ ? TR("p2.champ") : TR("p2.rounds", { w: wins, n: rounds }),
       '<div class="recap-line"><span>Nagroda</span><b>' + money(prize) + "</b></div>");
     modalAfterClose = () => { advanceWeek2(); render(); save(); };
   }
@@ -6574,7 +6714,7 @@
     matchMods = { round: 0, rating: 0, notes: [] };
     const d = pick(DECISIONS);
     const opts = d.opts.map(o => ({ label: tx(o.label), desc: tx(o.desc), odds: Math.round(decisionOdds(o) * 100) }));
-    showChoice(tx(d.title), tx(d.text), opts, i => {
+    const resolve = i => {
       const o = d.opts[i];
       const ok = Math.random() < decisionOdds(o);
       if (ok) {
@@ -6588,15 +6728,28 @@
         matchMods.notes.push("✗ " + tx(o.label));
         state.mental = clamp(state.mental - 2, 0, 100);
       }
-      closeChoice();
+    };
+    // przy przewijaniu wołanie taktyczne bierze na siebie kapitan — inaczej stawalibyśmy przed każdym meczem
+    if (ff) {
+      resolve(irnd(0, d.opts.length - 1));
       done();
-    });
+      return;
+    }
+    showChoice(tx(d.title), tx(d.text), opts, i => { resolve(i); closeChoice(); done(); });
   }
 
   // Wydarzenie poza serwerem; po rozstrzygnięciu wywołuje done()
   function runLifeEvent(done) {
     const pool = LIFE.filter(e => { try { return !e.when || e.when(); } catch (err) { return false; } });
     const ev = pick(pool.length ? pool : LIFE);
+    // Przy przewijaniu drobne sprawy załatwiasz sam, w tle — ale wyprowadzka i zmiana roli
+    // zostają decyzją gracza, więc przewijanie się na nich zatrzymuje.
+    if (ff && FF_ASK.indexOf(ev.id) < 0) {
+      const txt = ev.opts[irnd(0, ev.opts.length - 1)].eff();
+      addLog(tx(ev.title) + ": " + txt, "info");
+      done();
+      return;
+    }
     showChoice(tx(ev.title), tx(ev.text), ev.opts.map(o => ({ label: tx(o.label), desc: tx(o.desc) })), i => {
       const txt = ev.opts[i].eff();
       addLog(tx(ev.title) + ": " + txt, "info");
@@ -6774,6 +6927,7 @@
         '<div class="g-desc">' + esc(TR("goal.line", { text: goalText(state.goal), progress: g.label, reward: money(state.goal.reward) })) + "</div></div>"
       : "";
     document.getElementById("btn-skip").classList.toggle("hidden", currentEvent().type !== "free");
+    document.getElementById("btn-ff").classList.remove("hidden");
     document.getElementById("week-hint").textContent = state.energy > 0
       ? TR("career.hintEnergy", { n: state.energy }) : TR("career.hintDone");
     document.getElementById("cta-next").innerHTML =
@@ -6832,6 +6986,7 @@
         '<span class="trait-chip">' + esc(m.nick) + " · " + Math.round(m.skill) + "</span>").join("") + "</div>" : "") +
       "</div>";
     document.getElementById("btn-skip").classList.add("hidden");
+    document.getElementById("btn-ff").classList.add("hidden");
     document.getElementById("week-hint").textContent = TR("ladder.hint");
     document.getElementById("cta-next").innerHTML = TR("ladder.playMonth") + " " + icon("arrow-right");
   }
@@ -6868,7 +7023,7 @@
     const ev = currentEvent();
     const box = document.getElementById("week-card");
     if (!def.hasTeam) {
-      box.innerHTML = '<div class="ev-card rest"><div class="ev-name">Tydzień pracy nad kanałem</div>' +
+      box.innerHTML = '<div class="ev-card rest"><div class="ev-name">' + esc(TR("p2.weekChannel")) + "</div>" +
         '<div class="ev-sub">Streamy, klipy i kolaboracje. Widownia odpływa, jeśli nic nie wrzucasz.</div></div>';
     } else if (ev.type === "league") {
       const opp = state.league.teams[ev.opp];
@@ -6879,8 +7034,8 @@
       box.innerHTML = '<div class="ev-card big"><div class="ev-name">' + esc(ev.name || "Playoff ligi") + "</div>" +
         '<div class="ev-sub">Twoje przygotowanie decyduje, jak daleko zajdzie zespół.</div></div>';
     } else {
-      box.innerHTML = '<div class="ev-card rest"><div class="ev-name">Tydzień bez meczu</div>' +
-        '<div class="ev-sub">Czas na pracę ze składem.</div></div>';
+      box.innerHTML = '<div class="ev-card rest"><div class="ev-name">' + esc(TR("p2.weekFree")) + "</div>" +
+        '<div class="ev-sub">' + esc(TR("week.freeStaff")) + "</div></div>";
     }
     const g2 = state.goal2 ? goal2Progress() : null;
     const hasTeam = def.hasTeam;
@@ -6901,6 +7056,7 @@
         : '<button data-platform="1">' + esc(TR(state.platform ? "p2.platEnd" : "p2.platBtn")) + "</button>") +
       "</div></div>";
     document.getElementById("btn-skip").classList.add("hidden");
+    document.getElementById("btn-ff").classList.remove("hidden");
     document.getElementById("week-hint").textContent = state.energy > 0
       ? TR("career.hint2", { n: state.energy }) : TR("career.hint2done");
     document.getElementById("cta-next").innerHTML = "Dalej " + icon("arrow-right");
@@ -7269,10 +7425,6 @@
   // Trzy pytania: jak rosłem, z czego żyłem, gdzie byłem w rankingu.
   // Statystyki jako małe wielokrotności (jedna seria = jeden kolor, bez legendy),
   // zarobki jako jeden słupek udziałów, ranking jako linia z odwróconą osią.
-  const CHART_W = 320;
-
-  function chartAxisLabel(v) { return String(v); }
-
   // 1. rozwój statystyk — pięć mini-wykresów w tej samej skali 0-100
   function renderStatChart() {
     const box = document.getElementById("stat-chart");
@@ -7788,6 +7940,7 @@
     document.getElementById("help-overlay").classList.add("hidden");
   });
   document.getElementById("btn-skip").addEventListener("click", skipToMatch);
+  document.getElementById("btn-ff").addEventListener("click", startFastForward);
   document.getElementById("btn-export").addEventListener("click", () => openSave("export"));
   document.getElementById("btn-import").addEventListener("click", () => openSave("load"));
   document.getElementById("save-close").addEventListener("click", () => {
