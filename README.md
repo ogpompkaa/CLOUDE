@@ -94,9 +94,10 @@ mecze ligowe, dwa turnieje (w tym Major) oraz playoff dla najlepszej czwórki.
   na FACEIT, awanse w ESEA, trofea, Majory, wyprzedzenie rywala i transfery.
 - **Pieniądze** — sklep z rzeczami (sprzęt, monitor, fotel, łącze, catering, kurs językowy, studio
   streamowe, mieszkanie, prywatna sala treningowa), wakacje i bootcamp z drużyną, a do tego
-  **portfel inwestycyjny** z trzema funduszami: lokatą bez ryzyka, funduszem indeksowym i krypto,
-  które potrafi zjeść wpłatę. Odsetki naliczają się co tydzień, a stan portfela liczy się do
-  punktów Hall of Fame.
+  **portfel inwestycyjny** z trzema funduszami: lokatą (ok. 6% rocznie, bez ryzyka), funduszem
+  indeksowym (ok. 12% ze zmiennością) i krypto (mediana ok. 23%, ale co dwudziesty rok zjada
+  ćwierć wpłaty — i co dwudziesty ją podwaja). Odsetki naliczają się co tydzień, a stan portfela
+  liczy się do punktów Hall of Fame.
 
 Przy pierwszym uruchomieniu przeprowadza Cię krótki samouczek, a pełne wyjaśnienie statystyk
 i systemów jest zawsze pod przyciskiem **?** w pasku u góry.

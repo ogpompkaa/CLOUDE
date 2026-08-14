@@ -1526,11 +1526,11 @@
 
   // Portfel: bezpieczna lokata, fundusz indeksowy i coś, co potrafi zjeść połowę wpłaty
   const FUNDS = [
-    { id: "deposit", name: ["Lokata", "Savings"], icon: "coin", chunk: 50000, rate: 0.0035, risk: 0,
-      desc: ["Pewne, nudne 0,35% tygodniowo.", "Safe, boring 0.35% a week."] },
-    { id: "index", name: ["Fundusz indeksowy", "Index fund"], icon: "chart", chunk: 100000, rate: 0.008, risk: 0.022,
-      desc: ["Średnio 0,8% tygodniowo, ale bywają gorsze miesiące.", "Around 0.8% a week, with bad months mixed in."] },
-    { id: "crypto", name: ["Krypto", "Crypto"], icon: "bolt", chunk: 25000, rate: 0.013, risk: 0.085,
+    { id: "deposit", name: ["Lokata", "Savings"], icon: "coin", chunk: 50000, rate: 0.0012, risk: 0,
+      desc: ["Pewne, nudne ok. 6% w skali roku.", "Safe, boring — around 6% a year."] },
+    { id: "index", name: ["Fundusz indeksowy", "Index fund"], icon: "chart", chunk: 100000, rate: 0.0022, risk: 0.014,
+      desc: ["Ok. 12% rocznie, ale bywają gorsze miesiące.", "Around 12% a year, with bad months mixed in."] },
+    { id: "crypto", name: ["Krypto", "Crypto"], icon: "bolt", chunk: 25000, rate: 0.005, risk: 0.075,
       desc: ["Potrafi podwoić i potrafi wyzerować. Twoja decyzja.", "It can double and it can wipe out. Your call."] },
   ];
 
@@ -2063,8 +2063,13 @@
   // Kluby chętniej wypuszczają zawodnika, który siedzi w cieniu składu — gwiazdy nikt nie oddaje
   function loanChance() {
     const gap = matesAvg() - playerPower();      // ujemny = jesteś mocniejszy od kolegów
-    return clamp(0.3 + gap / 45 + (24 - state.age) / 55 + (state.team.tier - 1) * 0.05
-      - (state.captain ? 0.25 : 0), 0.05, 0.9);
+    const played = state.seasonStats.matches >= 6;
+    const r = played ? seasonRating() : careerRating();
+    let p = 0.18 + gap / 55 + (23 - state.age) / 60 - (state.captain ? 0.3 : 0);
+    // filaru składu nikt nie oddaje — ani zawodnika z czołówki rankingu, ani takiego w formie
+    if ((state.rank && state.rank <= 20) || r >= 1.05) p -= 0.35;
+    if (r < 0.92) p += 0.15;                     // słaby sezon: klub sam chce Cię gdzieś wypchnąć
+    return clamp(p, 0.03, 0.85);
   }
 
   function requestLoan() {
@@ -2314,7 +2319,7 @@
     state.invest = fundTotal();
     state.fundLast = Math.round(change);
     // krach albo hossa warte wzmianki w logu
-    if (Math.abs(change) > 12000) addLog(TR(change > 0 ? "log.fundUp" : "log.fundDown", { amount: money(Math.abs(change)) }), change > 0 ? "good" : "bad");
+    if (Math.abs(change) > 6000) addLog(TR(change > 0 ? "log.fundUp" : "log.fundDown", { amount: money(Math.abs(change)) }), change > 0 ? "good" : "bad");
   }
 
   // ---------- rynek sztabu ----------
@@ -4153,8 +4158,9 @@
       "<p>Zarabiasz z pensji, nagród turniejowych, streamów i sponsorów. W zakładce Rynek kupujesz rzeczy: sprzęt, monitor, " +
       "fotel, łącze, catering, kurs językowy, studio streamowe, mieszkanie i własną salę treningową. Część z nich ma tygodniowe " +
       "koszty utrzymania.</p>" +
-      "<p><b>Portfel inwestycyjny</b> ma trzy fundusze: lokata (0,35% tygodniowo, bez ryzyka), fundusz indeksowy " +
-      "(ok. 0,8% ze zmiennością) i krypto (ok. 1,3%, ale potrafi wyzerować wpłatę). Odsetki naliczają się co tydzień, " +
+      "<p><b>Portfel inwestycyjny</b> ma trzy fundusze: lokata (ok. 6% rocznie, bez ryzyka), fundusz indeksowy " +
+      "(ok. 12% rocznie ze zmiennością) i krypto (mediana ok. 23%, ale co dwudziesty rok kończy się stratą jednej czwartej " +
+      "wpłaty — i co dwudziesty jej podwojeniem). Odsetki naliczają się co tydzień, " +
       "wypłata jest natychmiastowa, a stan portfela liczy się do punktów Hall of Fame.</p>" },
     { h: "Sztab", body:
       "<p>Trener, analityk, psycholog, fizjoterapeuta, menedżer i menedżer mediów pracują dla <b>Ciebie</b>, nie dla klubu. " +
@@ -4221,8 +4227,9 @@
       "<p>You earn from salary, prize money, streams and sponsors. The Market tab sells things: gear, a monitor, a chair, " +
       "a fast connection, catering, a language course, a streaming studio, your own place and a private practice room. " +
       "Some carry weekly upkeep.</p>" +
-      "<p>The <b>investment portfolio</b> has three funds: savings (0.35% a week, no risk), an index fund (around 0.8% with " +
-      "swings) and crypto (around 1.3% and capable of wiping out your deposit). Interest accrues weekly, withdrawal is instant, " +
+      "<p>The <b>investment portfolio</b> has three funds: savings (around 6% a year, no risk), an index fund (around 12% a year " +
+      "with swings) and crypto (a median of around 23%, but one year in twenty loses a quarter of the deposit — and one in " +
+      "twenty doubles it). Interest accrues weekly, withdrawal is instant, " +
       "and the balance counts toward your Hall of Fame score.</p>" },
     { h: "Your staff", body:
       "<p>A coach, analyst, psychologist, physio, manager and media manager work for <b>you</b>, not for the club. " +
