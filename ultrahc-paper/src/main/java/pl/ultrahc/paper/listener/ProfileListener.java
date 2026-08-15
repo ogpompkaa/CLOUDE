@@ -32,6 +32,12 @@ public class ProfileListener implements Listener {
                         plugin.messages().component("welcome.main", null),
                         plugin.messages().component("welcome.sub",
                                 java.util.Map.of("player", player.getName())));
+                // Przedmiot menu w hotbarze (kompas otwiera Hub).
+                var compass = new org.bukkit.inventory.ItemStack(org.bukkit.Material.COMPASS);
+                var cm = compass.getItemMeta();
+                cm.displayName(plugin.messages().component("menu-item", null));
+                compass.setItemMeta(cm);
+                player.getInventory().setItem(4, compass);
             }, 15L);
         }
     }

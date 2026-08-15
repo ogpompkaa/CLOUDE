@@ -122,11 +122,25 @@ public class RecipeManager implements Listener {
         return item;
     }
 
-    /** Nadaje przedmiotowi tag PDC receptury i czytelna nazwe wg id. */
+    /** Nadaje przedmiotowi tag PDC receptury, nazwe, opis (lore) i poswiate. */
     private ItemStack tagged(ItemStack item, String id) {
         ItemMeta meta = item.getItemMeta();
         meta.getPersistentDataContainer().set(recipeKey, PersistentDataType.STRING, id);
         meta.displayName(LegacyComponentSerializer.legacyAmpersand().deserialize("&6" + NAMES.getOrDefault(id, id)));
+
+        // Lore z opisem efektu + oznaczenie receptury.
+        java.util.List<net.kyori.adventure.text.Component> lore = new java.util.ArrayList<>();
+        for (String line : plugin.messages().rawList("shop.desc." + id)) {
+            lore.add(LegacyComponentSerializer.legacyAmpersand().deserialize(line));
+        }
+        lore.add(LegacyComponentSerializer.legacyAmpersand().deserialize("&8Receptura UHC"));
+        meta.lore(lore);
+
+        // Poswiata dla przedmiotow bez wlasnego enchantu (te z enchantem juz swieca).
+        if (item.getEnchantments().isEmpty()) {
+            meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);
+        }
+        meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
         item.setItemMeta(meta);
         return item;
     }

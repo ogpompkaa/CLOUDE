@@ -18,6 +18,12 @@ welcome:
   main: "&6&lULTRAHC"
   sub: "&7Witaj, &e%player%&7!"
 
+menu-item: "&a&lMENU &7(PPM)"
+
+motd:
+  line1: "&6&lULTRAHC &7— sezonowy tryb UHC"
+  line2: "&7100 graczy • klasy • receptury • sezony"
+
 # --------------------------- RANGI / BOSSBAR / TITLE -----------------
 rank:
   prefix: "&7[&6%level%✪&7] "        # przy nicku w TAB i nad glowa

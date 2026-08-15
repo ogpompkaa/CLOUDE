@@ -293,6 +293,7 @@ public class GameInstance {
                             plugin.messages().component("title.win-sub", null));
                     pl.ultrahc.paper.util.Feedback.win(wp);
                     pl.ultrahc.paper.util.Feedback.winParticles(wp);
+                    pl.ultrahc.paper.util.Feedback.launchFirework(wp.getLocation());
                 }
             }
         } else {

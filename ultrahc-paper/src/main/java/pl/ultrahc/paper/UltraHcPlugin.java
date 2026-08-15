@@ -94,6 +94,7 @@ public class UltraHcPlugin extends JavaPlugin {
     private BossBarService bossBarService;
     private RankService rankService;
     private RankFormat rankFormat;
+    private pl.ultrahc.paper.manager.AmbientEffects ambientEffects;
     private SpectateGui spectateGui;
     private AdminGui adminGui;
     private InstanceAdminGui instanceAdminGui;
@@ -154,6 +155,7 @@ public class UltraHcPlugin extends JavaPlugin {
         this.rankFormat = new RankFormat(this);
         getServer().getPluginManager().registerEvents(new ProfileListener(this), this);
         getServer().getPluginManager().registerEvents(new ChatListener(this), this); // czat z ranga (obie role)
+        getServer().getPluginManager().registerEvents(new pl.ultrahc.paper.listener.MotdListener(this), this);
         var cmd = getCommand("uhc");
         if (cmd != null) {
             UhcCommand handler = new UhcCommand(this);
@@ -206,10 +208,12 @@ public class UltraHcPlugin extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new CompassLobbyListener(this), this);
             instanceManager.startLobby();
             this.rankService = new RankService(this);
+            this.ambientEffects = new pl.ultrahc.paper.manager.AmbientEffects(this);
             // Po pelnym starcie: odswiez topki i postaw NPC (swiat lobby musi byc zaladowany).
             getServer().getScheduler().runTask(this, () -> {
                 leaderboardsManager.start();
                 rankService.start();
+                ambientEffects.start();
                 spawnLobbyNpcs();
             });
         }
@@ -256,6 +260,7 @@ public class UltraHcPlugin extends JavaPlugin {
     public void onDisable() {
         if (bossBarService != null) bossBarService.stop();
         if (rankService != null) rankService.stop();
+        if (ambientEffects != null) ambientEffects.stop();
         if (instanceManager != null) instanceManager.shutdown();
         if (hologramManager != null) hologramManager.removeAll();
         if (npcManager != null) npcManager.removeAll();

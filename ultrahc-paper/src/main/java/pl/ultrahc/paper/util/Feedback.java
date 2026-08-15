@@ -58,6 +58,20 @@ public final class Feedback {
         p.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, loc, 30, 0.5, 1.0, 0.5, 0.0);
     }
 
+    /** Wystrzeliwuje fajerwerk (efekt zwyciestwa). */
+    public static void launchFirework(Location loc) {
+        if (loc.getWorld() == null) return;
+        var fw = loc.getWorld().spawn(loc, org.bukkit.entity.Firework.class);
+        var meta = fw.getFireworkMeta();
+        meta.addEffect(org.bukkit.FireworkEffect.builder()
+                .withColor(org.bukkit.Color.YELLOW, org.bukkit.Color.ORANGE)
+                .withFade(org.bukkit.Color.WHITE)
+                .with(org.bukkit.FireworkEffect.Type.BALL_LARGE)
+                .flicker(true).trail(true).build());
+        meta.setPower(1);
+        fw.setFireworkMeta(meta);
+    }
+
     // --------------------------------------------------------- resolwery
     private static Sound snd(String key, Sound def) {
         if (cfg == null) return def;
