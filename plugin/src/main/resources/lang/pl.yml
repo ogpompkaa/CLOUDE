@@ -1,13 +1,54 @@
 # CoreKit — polskie komunikaty. Format MiniMessage: https://docs.advntr.dev/minimessage/format
 messages:
   prefix: "<gradient:#5e9bff:#8f6bff><bold>CoreKit</bold></gradient> <dark_gray>»</dark_gray> "
+  players-only: "<red>Tej komendy może użyć tylko gracz."
+
   command:
     usage: "<gray>Użycie: <white>/corekit <reload|info|profile></white>"
     reloaded: "<green>Przeładowano konfigurację i pliki językowe."
     info: "<gray>Działa CoreKit <white>v<version></white>."
-    players-only: "<red>Tej komendy może użyć tylko gracz."
-    error: "Coś poszło nie tak podczas przetwarzania żądania."
+    error: "<red>Coś poszło nie tak podczas przetwarzania żądania."
     profile:
       none: "<yellow>Nie masz jeszcze zapisanego profilu."
       header: "<gray>─── <white>Twój profil</white> ───"
       playtime: "<gray>Czas gry: <white><playtime></white>"
+
+  heal:
+    self: "<green>Zostałeś uleczony."
+    other: "<green>Uleczono <white><target></white>."
+    notify: "<green>Zostałeś uleczony przez <white><actor></white>."
+  feed:
+    self: "<green>Twój głód został zaspokojony."
+    other: "<green>Nakarmiono <white><target></white>."
+    notify: "<green>Zostałeś nakarmiony przez <white><actor></white>."
+  fly:
+    enabled: "<green>Latanie włączone."
+    disabled: "<yellow>Latanie wyłączone."
+    other-enabled: "<green>Włączono latanie dla <white><target></white>."
+    other-disabled: "<yellow>Wyłączono latanie dla <white><target></white>."
+    notify-enabled: "<green>Latanie włączone przez <white><actor></white>."
+    notify-disabled: "<yellow>Latanie wyłączone przez <white><actor></white>."
+  god:
+    enabled: "<green>Tryb boga włączony."
+    disabled: "<yellow>Tryb boga wyłączony."
+    other-enabled: "<green>Włączono tryb boga dla <white><target></white>."
+    other-disabled: "<yellow>Wyłączono tryb boga dla <white><target></white>."
+  gamemode:
+    self: "<green>Ustawiono tryb gry: <white><mode></white>."
+    other: "<green>Ustawiono <white><target></white> tryb gry: <white><mode></white>."
+    invalid: "<red>Nieznany tryb gry: <white><input></white>."
+
+  home:
+    set: "<green>Ustawiono dom <white><name></white>."
+    deleted: "<yellow>Usunięto dom <white><name></white>."
+    not-found: "<red>Nie masz domu o nazwie <white><name></white>."
+    teleporting: "<gray>Teleportacja do <white><name></white>…"
+    world-missing: "<red>Świat domu <white><name></white> już nie istnieje."
+    limit-reached: "<red>Osiągnięto limit domów (<white><limit></white>). Usuń któryś lub nadpisz istniejący."
+    list-header: "<gray>Twoje domy <dark_gray>(<white><count></white>/<white><limit></white>)</dark_gray>:"
+    list-empty: "<yellow>Nie masz jeszcze domów. Ustaw jeden przez <white>/sethome</white>."
+    list-entry: "<dark_gray>• <white><name></white>"
+
+  spawn:
+    teleporting: "<gray>Teleportacja na spawn…"
+    set: "<green>Ustawiono spawn serwera na Twoją pozycję."

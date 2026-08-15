@@ -16,3 +16,8 @@ storage:
   # Connection pool size. SQLite serialises writes, so a small pool is ideal;
   # WAL mode (enabled automatically) lets reads run concurrently.
   pool-size: 4
+
+homes:
+  # Fallback home limit for players without a `corekit.homes.limit.<n>` node.
+  # Grant e.g. corekit.homes.limit.5 for VIPs, or corekit.homes.unlimited.
+  default-limit: 1

@@ -1,13 +1,54 @@
 # CoreKit — English messages. MiniMessage format: https://docs.advntr.dev/minimessage/format
 messages:
   prefix: "<gradient:#5e9bff:#8f6bff><bold>CoreKit</bold></gradient> <dark_gray>»</dark_gray> "
+  players-only: "<red>This command can only be used by a player."
+
   command:
     usage: "<gray>Usage: <white>/corekit <reload|info|profile></white>"
     reloaded: "<green>Configuration and language files reloaded."
     info: "<gray>Running CoreKit <white>v<version></white>."
-    players-only: "<red>This command can only be used by a player."
-    error: "Something went wrong while processing your request."
+    error: "<red>Something went wrong while processing your request."
     profile:
       none: "<yellow>No stored profile found for you yet."
       header: "<gray>─── <white>Your profile</white> ───"
       playtime: "<gray>Playtime: <white><playtime></white>"
+
+  heal:
+    self: "<green>You have been healed."
+    other: "<green>Healed <white><target></white>."
+    notify: "<green>You were healed by <white><actor></white>."
+  feed:
+    self: "<green>Your hunger has been restored."
+    other: "<green>Fed <white><target></white>."
+    notify: "<green>You were fed by <white><actor></white>."
+  fly:
+    enabled: "<green>Flight enabled."
+    disabled: "<yellow>Flight disabled."
+    other-enabled: "<green>Enabled flight for <white><target></white>."
+    other-disabled: "<yellow>Disabled flight for <white><target></white>."
+    notify-enabled: "<green>Flight enabled by <white><actor></white>."
+    notify-disabled: "<yellow>Flight disabled by <white><actor></white>."
+  god:
+    enabled: "<green>God mode enabled."
+    disabled: "<yellow>God mode disabled."
+    other-enabled: "<green>Enabled god mode for <white><target></white>."
+    other-disabled: "<yellow>Disabled god mode for <white><target></white>."
+  gamemode:
+    self: "<green>Game mode set to <white><mode></white>."
+    other: "<green>Set <white><target></white>'s game mode to <white><mode></white>."
+    invalid: "<red>Unknown game mode: <white><input></white>."
+
+  home:
+    set: "<green>Home <white><name></white> set."
+    deleted: "<yellow>Home <white><name></white> deleted."
+    not-found: "<red>You have no home named <white><name></white>."
+    teleporting: "<gray>Teleporting to <white><name></white>…"
+    world-missing: "<red>The world for home <white><name></white> no longer exists."
+    limit-reached: "<red>Home limit reached (<white><limit></white>). Delete one or overwrite an existing home."
+    list-header: "<gray>Your homes <dark_gray>(<white><count></white>/<white><limit></white>)</dark_gray>:"
+    list-empty: "<yellow>You have no homes yet. Set one with <white>/sethome</white>."
+    list-entry: "<dark_gray>• <white><name></white>"
+
+  spawn:
+    teleporting: "<gray>Teleporting to spawn…"
+    set: "<green>Server spawn set to your location."

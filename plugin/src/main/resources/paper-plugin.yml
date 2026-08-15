@@ -18,3 +18,39 @@ permissions:
   corekit.command.reload:
     description: Reload CoreKit configuration and language files.
     default: op
+
+  # Player utilities — self by default, `.others` gates targeting someone else.
+  corekit.heal:
+    default: op
+  corekit.heal.others:
+    default: op
+  corekit.feed:
+    default: op
+  corekit.feed.others:
+    default: op
+  corekit.fly:
+    default: op
+  corekit.fly.others:
+    default: op
+  corekit.god:
+    default: op
+  corekit.god.others:
+    default: op
+  corekit.gamemode:
+    default: op
+  corekit.gamemode.others:
+    default: op
+
+  # Homes — everyone may use them; limits come from corekit.homes.limit.<n>.
+  corekit.home:
+    description: Use /sethome, /home, /delhome, /homes.
+    default: true
+  corekit.homes.unlimited:
+    description: Bypass the configured home limit.
+    default: op
+
+  # Spawn.
+  corekit.spawn:
+    default: true
+  corekit.setspawn:
+    default: op

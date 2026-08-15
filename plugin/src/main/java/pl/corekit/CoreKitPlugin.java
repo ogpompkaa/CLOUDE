@@ -1,11 +1,18 @@
 package pl.corekit;
 
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import pl.corekit.command.CommandRegistrar;
 import pl.corekit.config.ConfigManager;
+import pl.corekit.feature.god.GodService;
+import pl.corekit.feature.home.HomeService;
+import pl.corekit.feature.spawn.SpawnService;
 import pl.corekit.lang.MessageService;
+import pl.corekit.listener.GodListener;
+import pl.corekit.listener.HomeCacheListener;
 import pl.corekit.listener.PlayerConnectionListener;
 import pl.corekit.storage.DatabaseManager;
+import pl.corekit.storage.HomeRepository;
 import pl.corekit.storage.PlayerProfileRepository;
 
 /**
@@ -25,6 +32,9 @@ public final class CoreKitPlugin extends JavaPlugin {
     private MessageService messages;
     private DatabaseManager database;
     private PlayerProfileRepository profiles;
+    private HomeService homes;
+    private SpawnService spawn;
+    private GodService god;
 
     @Override
     public void onEnable() {
@@ -48,9 +58,17 @@ public final class CoreKitPlugin extends JavaPlugin {
         }
         this.profiles = new PlayerProfileRepository(database);
 
-        // 4. Wiring: listeners and commands.
-        getServer().getPluginManager()
-                .registerEvents(new PlayerConnectionListener(this, profiles, messages), this);
+        // 4. Feature services.
+        this.homes = new HomeService(this, new HomeRepository(database));
+        this.spawn = new SpawnService(this);
+        this.spawn.load();
+        this.god = new GodService();
+
+        // 5. Wiring: listeners and commands.
+        PluginManager pluginManager = getServer().getPluginManager();
+        pluginManager.registerEvents(new PlayerConnectionListener(this, profiles, messages), this);
+        pluginManager.registerEvents(new HomeCacheListener(homes), this);
+        pluginManager.registerEvents(new GodListener(god), this);
         new CommandRegistrar(this, messages).register();
 
         getSLF4JLogger().info("CoreKit v{} enabled.", getPluginMeta().getVersion());
@@ -90,5 +108,17 @@ public final class CoreKitPlugin extends JavaPlugin {
 
     public PlayerProfileRepository profiles() {
         return profiles;
+    }
+
+    public HomeService homes() {
+        return homes;
+    }
+
+    public SpawnService spawn() {
+        return spawn;
+    }
+
+    public GodService god() {
+        return god;
     }
 }

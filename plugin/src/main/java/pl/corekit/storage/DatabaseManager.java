@@ -87,6 +87,18 @@ public final class DatabaseManager {
                         last_seen        INTEGER NOT NULL,
                         playtime_seconds INTEGER NOT NULL DEFAULT 0
                     )""");
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS homes (
+                        uuid  TEXT NOT NULL,
+                        name  TEXT NOT NULL,
+                        world TEXT NOT NULL,
+                        x     REAL NOT NULL,
+                        y     REAL NOT NULL,
+                        z     REAL NOT NULL,
+                        yaw   REAL NOT NULL,
+                        pitch REAL NOT NULL,
+                        PRIMARY KEY (uuid, name)
+                    )""");
         }
     }
 

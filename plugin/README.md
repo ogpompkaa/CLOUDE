@@ -21,7 +21,25 @@ it is the clean, opinionated base you clone features onto.
 | Storage | `storage/DatabaseManager` | Off-thread executor, WAL, graceful drain on shutdown. |
 | Data access | `storage/PlayerProfileRepository` | `CompletableFuture` DAO — the template for new tables. |
 | Events | `listener/PlayerConnectionListener` | Async join/quit persistence; no main-thread I/O. |
-| Commands | `command/CommandRegistrar` | `/corekit reload\|info\|profile` (alias `/ck`). |
+| Commands | `command/CommandRegistrar` + `command/commands/*` | Coordinator + one class per feature. |
+
+## Commands
+
+| Command | Permission | Notes |
+|---|---|---|
+| `/corekit reload\|info\|profile` (`/ck`) | `corekit.command` (+`.reload`) | Admin & diagnostics. |
+| `/heal [player]` | `corekit.heal` (+`.others`) | Full health, hunger, extinguish, air. |
+| `/feed [player]` | `corekit.feed` (+`.others`) | Restore hunger/saturation. |
+| `/fly [player]` | `corekit.fly` (+`.others`) | Toggle flight. |
+| `/god [player]` | `corekit.god` (+`.others`) | Toggle damage immunity (in-memory). |
+| `/gamemode <mode> [player]` (`/gm`, `/gmc /gms /gma /gmsp`) | `corekit.gamemode` (+`.others`) | Names, letters or 0-3 ids. |
+| `/sethome [name]` · `/home [name]` · `/delhome [name]` · `/homes` | `corekit.home` | Async SQLite; tab-completed names. |
+| `/spawn` · `/setspawn` | `corekit.spawn` · `corekit.setspawn` | Stored in `spawn.yml`. |
+
+**Home limits** come from permissions: grant `corekit.homes.limit.<n>` (highest
+granted number wins) or `corekit.homes.unlimited`; the fallback is
+`homes.default-limit` in `config.yml`. `/heal`, `/feed`, `/fly`, `/god` and
+`/gamemode` default to OP; homes and `/spawn` are open to everyone.
 
 ## Build
 
@@ -58,7 +76,8 @@ test server:
 
 1. **New table** → copy `PlayerProfileRepository`; add its `CREATE TABLE` to
    `DatabaseManager#applySchema`.
-2. **New command** → add a `Commands.literal(...)` branch in `CommandRegistrar`.
+2. **New command** → implement `CoreKitCommand` in `command/commands/` and add it
+   to the list in `CommandRegistrar`.
 3. **New config option** → add a field to `Settings`, a default to `config.yml`,
    and bump `config-version` if operators should be nudged to review it.
 4. **New message** → add the key to every `lang/*.yml`; English is the fallback.

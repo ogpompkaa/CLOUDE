@@ -12,7 +12,8 @@ public record Settings(
         String language,
         boolean debug,
         String storageFile,
-        int poolSize
+        int poolSize,
+        int defaultHomeLimit
 ) {
 
     static Settings from(FileConfiguration config) {
@@ -20,7 +21,8 @@ public record Settings(
                 config.getString("settings.language", "en"),
                 config.getBoolean("settings.debug", false),
                 config.getString("storage.file", "data.db"),
-                Math.max(1, config.getInt("storage.pool-size", 4))
+                Math.max(1, config.getInt("storage.pool-size", 4)),
+                Math.max(0, config.getInt("homes.default-limit", 1))
         );
     }
 }
