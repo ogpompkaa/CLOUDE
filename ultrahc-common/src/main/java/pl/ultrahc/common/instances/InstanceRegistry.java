@@ -45,6 +45,13 @@ public class InstanceRegistry {
                         "close_requested INTEGER NOT NULL DEFAULT 0)")) {
             ps.executeUpdate();
         }
+        // Migracja: dodaj kolumne close_requested do istniejacej (starszej) tabeli. Idempotentne.
+        try (PreparedStatement ps = connection.prepareStatement(
+                "ALTER TABLE instances ADD COLUMN close_requested INTEGER NOT NULL DEFAULT 0")) {
+            ps.executeUpdate();
+        } catch (Exception ignored) {
+            // kolumna juz istnieje — ok
+        }
         logger.info("[UltraHC] Rejestr instancji gotowy.");
     }
 

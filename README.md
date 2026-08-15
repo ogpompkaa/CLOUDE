@@ -121,7 +121,9 @@ server:
 
 Cały balans jest w `config.yml` (nic nie jest zahardkodowane). Najważniejsze:
 
-- `game.*` — rozmiar drużyny, progi startu, czasy (no-PvP, countdown, kompas wroga, reconnect).
+- `game.team-size` — tryb areny: 1=SOLO, 2=DUO, 3=TRIO, 4=SQUAD. `party.*` — party (max, wygasanie).
+  W sieci: różne areny z różnym `team-size`; lobby pokazuje party tylko areny, w które się zmieszczą.
+- `game.*` — progi startu, czasy (no-PvP, countdown, kompas wroga, reconnect), killstreak, niskie HP.
 - `border.*` + `arena-showdown.*` — kurczenie 3-fazowe i arenka (sudden-death).
 - `rewards.*` — nagrody XP/PD za czas/kille/wygraną (progi ze spec).
 - `levels.*` — krzywa poziomów (override 0–2 + wzór LINEAR/GEOMETRIC).
@@ -140,6 +142,9 @@ nie jest zahardkodowane w kodzie.
 
 **Gracz:** `/uhc help` · `menu` (Hub) · `classes` / `class [id]` · `buyclass <id>` ·
 `shop` / `buyrecipe <id>` · `quests` · `balance` · `join` / `leave` · `spectate` (po śmierci).
+
+**Party:** `/party` (GUI) · `invite <nick>` · `accept` / `deny` · `leave` · `kick <nick>` ·
+`disband` · `list` · `/pc <wiadomość>` (czat party).
 
 **Admin (`ultrahc.admin`):** `/uhc admin` (panel) · `instances` · `forcestart` · `forceend` ·
 `givexp <gracz> <ile>` · `givepd <gracz> <ile>` · `resetseason` · `season [start|end]` ·
