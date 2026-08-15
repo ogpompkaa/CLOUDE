@@ -52,14 +52,20 @@ public final class HomeGui {
         this.teleport = teleport;
     }
 
+    /** Public entry (from {@code /homes}): opens page 0 with an open-sound cue. */
     public void open(Player player) {
-        open(player, 0);
+        open(player, 0, true);
     }
 
-    /** Fetches the player's homes off-thread, then opens {@code page} on the main thread. */
-    public void open(Player player, int page) {
+    /**
+     * Fetches the player's homes off-thread, then opens {@code page} on the main
+     * thread. {@code announce} plays the open cue — true for a fresh open, false
+     * for internal re-renders (pagination, post-delete refresh) whose triggering
+     * click already produced its own sound.
+     */
+    private void open(Player player, int page, boolean announce) {
         repository.findAll(player.getUniqueId()).thenAccept(list ->
-                plugin.database().sync(() -> showHomes(player, list, page))
+                plugin.database().sync(() -> showHomes(player, list, page, announce))
         ).exceptionally(throwable -> {
             plugin.getSLF4JLogger().warn("Failed to open homes GUI for {}", player.getName(), throwable);
             plugin.database().sync(() -> feedback.error(player, "command.error"));
@@ -67,7 +73,7 @@ public final class HomeGui {
         });
     }
 
-    private void showHomes(Player player, List<Home> list, int requestedPage) {
+    private void showHomes(Player player, List<Home> list, int requestedPage, boolean announce) {
         if (list.isEmpty()) {
             player.closeInventory();
             feedback.error(player, "home.list-empty");
@@ -87,8 +93,10 @@ public final class HomeGui {
             Home home = list.get(i);
             menu.setButton(i - start, homeIcon(player, home), event -> {
                 if (event.isRightClick()) {
+                    feedback.menuClick(player);
                     later(() -> showConfirm(player, home.name(), page));
                 } else {
+                    feedback.menuClick(player);
                     teleportTo(player, home);
                 }
             });
@@ -96,6 +104,9 @@ public final class HomeGui {
 
         buildNavigation(menu, player, list, page, totalPages);
         menu.open(player);
+        if (announce) {
+            feedback.menuOpen(player);
+        }
     }
 
     private ItemStack homeIcon(Player player, Home home) {
@@ -129,12 +140,18 @@ public final class HomeGui {
         if (page > 0) {
             menu.setButton(SLOT_PREV, Icons.of(Material.ARROW,
                             messages.render("gui.nav.prev"), List.of()),
-                    event -> later(() -> showHomes(player, list, page - 1)));
+                    event -> {
+                        feedback.menuPage(player);
+                        later(() -> showHomes(player, list, page - 1, false));
+                    });
         }
         if (page < totalPages - 1) {
             menu.setButton(SLOT_NEXT, Icons.of(Material.ARROW,
                             messages.render("gui.nav.next"), List.of()),
-                    event -> later(() -> showHomes(player, list, page + 1)));
+                    event -> {
+                        feedback.menuPage(player);
+                        later(() -> showHomes(player, list, page + 1, false));
+                    });
         }
     }
 
@@ -165,12 +182,18 @@ public final class HomeGui {
         menu.setButton(11, Icons.of(Material.LIME_WOOL,
                         messages.render("gui.confirm.yes"),
                         List.of(messages.render("gui.confirm.yes-lore"))),
-                event -> confirmDelete(player, name, page));
+                event -> {
+                    feedback.menuClick(player);
+                    confirmDelete(player, name, page);
+                });
 
         menu.setButton(15, Icons.of(Material.RED_WOOL,
                         messages.render("gui.confirm.no"),
                         List.of(messages.render("gui.confirm.no-lore"))),
-                event -> later(() -> open(player, page)));
+                event -> {
+                    feedback.menuCancel(player);
+                    later(() -> open(player, page, false));
+                });
 
         menu.open(player);
     }
@@ -186,7 +209,7 @@ public final class HomeGui {
                         feedback.error(player, "home.not-found",
                                 MessageService.placeholder("name", name));
                     }
-                    open(player, page); // refresh; showHomes clamps the page if it shrank
+                    open(player, page, false); // refresh; showHomes clamps the page if it shrank
                 })
         ).exceptionally(throwable -> {
             plugin.getSLF4JLogger().warn("Failed to delete home for {}", player.getName(), throwable);

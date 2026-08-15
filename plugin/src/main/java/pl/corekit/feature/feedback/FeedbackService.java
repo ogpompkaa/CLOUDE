@@ -73,4 +73,27 @@ public final class FeedbackService {
             player.playSound(player.getLocation(), sound, volume, pitch);
         }
     }
+
+    // ---- Menu UI cues -----------------------------------------------------
+    // Kept semantic (not raw sounds) so every menu shares one consistent voice.
+
+    /** A generic button press inside a menu. */
+    public void menuClick(Player player) {
+        play(player, Sound.UI_BUTTON_CLICK, 0.5f, 1.0f);
+    }
+
+    /** Opening a menu. Slightly higher pitch than a plain click. */
+    public void menuOpen(Player player) {
+        play(player, Sound.UI_BUTTON_CLICK, 0.5f, 1.4f);
+    }
+
+    /** Flipping between pages. */
+    public void menuPage(Player player) {
+        play(player, Sound.ITEM_BOOK_PAGE_TURN, 0.8f, 1.0f);
+    }
+
+    /** Dismissing / cancelling. Lower pitch reads as "back/no". */
+    public void menuCancel(Player player) {
+        play(player, Sound.UI_BUTTON_CLICK, 0.5f, 0.8f);
+    }
 }
