@@ -204,6 +204,7 @@ public class GameInstance {
             pvpFired = true;
             pvpEnabled = true;
             broadcast("game.pvp-enabled", Map.of());
+            titleAll("title.pvp-main", "title.pvp-sub");
         }
         int shrinkStart = cfgInt("border.shrink-start-min", 10) * 60;
         if (!shrinkFired && elapsed >= shrinkStart) {
@@ -225,6 +226,7 @@ public class GameInstance {
         if (!showdownFired && elapsed >= showdown) {
             showdownFired = true;
             broadcast("game.showdown", Map.of());
+            titleAll("title.showdown-main", "title.showdown-sub");
             if (plugin.border() != null) plugin.border().beginShowdown(this);
         }
         int hardCap = cfgInt("game.hard-time-cap-min", 90) * 60;
@@ -252,6 +254,8 @@ public class GameInstance {
             if (killerTeam != null && killerTeam != victimTeam) {
                 killerTeam.addKill();
                 if (plugin.rewards() != null) plugin.rewards().grantKill(killerOrNull);
+                Player killerPlayer = plugin.getServer().getPlayer(killerOrNull);
+                if (killerPlayer != null) pl.ultrahc.paper.util.Feedback.kill(killerPlayer);
             }
         }
         Player victimPlayer = plugin.getServer().getPlayer(victim);
@@ -272,6 +276,15 @@ public class GameInstance {
             String nameKey = cfgInt("game.team-size", 1) == 1 ? "player" : "team";
             broadcast(key, Map.of(nameKey, winner.getName()));
             if (plugin.rewards() != null) plugin.rewards().grantWin(winner.getMembers());
+            for (UUID id : winner.getMembers()) {
+                Player wp = plugin.getServer().getPlayer(id);
+                if (wp != null) {
+                    pl.ultrahc.paper.util.Feedback.title(wp,
+                            plugin.messages().component("title.win-main", null),
+                            plugin.messages().component("title.win-sub", null));
+                    pl.ultrahc.paper.util.Feedback.win(wp);
+                }
+            }
         } else {
             broadcast("game.death-generic", Map.of("victim", "-"));
         }
@@ -357,5 +370,15 @@ public class GameInstance {
 
     private int cfgInt(String path, int def) {
         return plugin.configManager().raw().getInt(path, def);
+    }
+
+    // Title na srodku ekranu dla wszystkich uczestnikow.
+    private void titleAll(String mainKey, String subKey) {
+        var main = plugin.messages().component(mainKey, null);
+        var sub = plugin.messages().component(subKey, null);
+        for (UUID id : participants) {
+            Player p = plugin.getServer().getPlayer(id);
+            if (p != null) pl.ultrahc.paper.util.Feedback.title(p, main, sub);
+        }
     }
 }

@@ -103,6 +103,7 @@ public class ClassGui implements Listener {
         if (plugin.classes().isUnlocked(p, id)) {
             plugin.classes().select(p, id);
             player.sendMessage(msg.prefixed("class.selected", Map.of("class", plugin.classes().displayName(id))));
+            pl.ultrahc.paper.util.Feedback.buy(player);
         } else {
             long price = plugin.classes().price(id);
             if (plugin.classes().buy(p, id)) {
@@ -111,11 +112,13 @@ public class ClassGui implements Listener {
                         "class", plugin.classes().displayName(id),
                         "price", String.valueOf(price),
                         "currency", msg.raw("currency.name"))));
+                pl.ultrahc.paper.util.Feedback.buy(player);
             } else {
                 player.sendMessage(msg.prefixed("currency.not-enough", Map.of(
                         "name", msg.raw("currency.name"),
                         "need", String.valueOf(price),
                         "have", String.valueOf(p.getCredits()))));
+                pl.ultrahc.paper.util.Feedback.error(player);
             }
         }
         open(player); // odswiez statusy

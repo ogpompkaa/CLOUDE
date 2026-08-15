@@ -29,6 +29,8 @@ import pl.ultrahc.paper.npc.NpcManager;
 import pl.ultrahc.paper.manager.AbilityScheduler;
 import pl.ultrahc.paper.manager.LeaderboardsManager;
 import pl.ultrahc.paper.manager.BorderManager;
+import pl.ultrahc.paper.manager.BossBarService;
+import pl.ultrahc.paper.manager.RankService;
 import pl.ultrahc.paper.manager.ClassesManager;
 import pl.ultrahc.paper.manager.CompassManager;
 import pl.ultrahc.paper.manager.HeadManager;
@@ -82,6 +84,8 @@ public class UltraHcPlugin extends JavaPlugin {
     private ClassGui classGuiInstance;
     private StatsGui statsGuiInstance;
     private LobbyMenuGui lobbyMenuGui;
+    private BossBarService bossBarService;
+    private RankService rankService;
 
     @Override
     public void onEnable() {
@@ -143,6 +147,7 @@ public class UltraHcPlugin extends JavaPlugin {
             this.gameManager = new GameManager(this);
             this.scoreboardService = new ScoreboardService(this);
             this.abilityScheduler = new AbilityScheduler(this);
+            this.bossBarService = new BossBarService(this);
             this.recipeManager = new RecipeManager(this);
 
             var pm = getServer().getPluginManager();
@@ -161,6 +166,7 @@ public class UltraHcPlugin extends JavaPlugin {
                 gameManager.enableArena();
                 scoreboardService.start();
                 abilityScheduler.start();
+                bossBarService.start();
                 instanceManager.startArena(); // heartbeat stanu instancji do rejestru
             });
         }
@@ -174,9 +180,11 @@ public class UltraHcPlugin extends JavaPlugin {
             getServer().getPluginManager().registerEvents(arenaSelectGui, this);
             getServer().getPluginManager().registerEvents(new CompassLobbyListener(this), this);
             instanceManager.startLobby();
+            this.rankService = new RankService(this);
             // Po pelnym starcie: odswiez topki i postaw NPC (swiat lobby musi byc zaladowany).
             getServer().getScheduler().runTask(this, () -> {
                 leaderboardsManager.start();
+                rankService.start();
                 spawnLobbyNpcs();
             });
         }
@@ -221,6 +229,8 @@ public class UltraHcPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (bossBarService != null) bossBarService.stop();
+        if (rankService != null) rankService.stop();
         if (instanceManager != null) instanceManager.shutdown();
         if (hologramManager != null) hologramManager.removeAll();
         if (npcManager != null) npcManager.removeAll();

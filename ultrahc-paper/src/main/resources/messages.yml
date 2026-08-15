@@ -6,6 +6,30 @@
 
 prefix: "&8[&6UltraHC&8] &7"
 
+# --------------------------- RANGI / BOSSBAR / TITLE -----------------
+rank:
+  prefix: "&7[&6%level%✪&7] "        # przy nicku w TAB i nad glowa
+  podium-1: "&6&l#1 UHC "
+  podium-2: "&7&l#2 UHC "
+  podium-3: "&c&l#3 UHC "
+
+bossbar:
+  no-pvp: "&aBrak PvP: &e%time%"
+  pvp: "&cPvP aktywne"
+  shrink-soon: "&eGranica kurczy sie za: &6%time%"
+  shrinking: "&cGranica: &6%size%"
+  showdown: "&4&lSUDDEN-DEATH — ARENKA!"
+
+title:
+  pvp-main: "&c&lPvP!"
+  pvp-sub: "&7Walcz do ostatniej druzyny"
+  showdown-main: "&4&lARENKA"
+  showdown-sub: "&7Sudden-death!"
+  win-main: "&6&lWYGRANA!"
+  win-sub: "&7Gratulacje"
+  levelup-main: "&6&lAWANS"
+  levelup-sub: "&ePoziom %level% %star%"
+
 general:
   no-permission: "&cNie masz uprawnien do tej komendy."
   players-only: "&cTa komenda jest tylko dla graczy."

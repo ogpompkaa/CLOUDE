@@ -161,5 +161,11 @@ public class RewardManager {
         p.sendMessage(plugin.messages().prefixed("progress.level-up", Map.of(
                 "level", String.valueOf(profile.getLevel()),
                 "star", plugin.levels().starSymbol())));
+        var msg = plugin.messages();
+        pl.ultrahc.paper.util.Feedback.title(p,
+                msg.component("title.levelup-main", null),
+                msg.component("title.levelup-sub", Map.of(
+                        "level", String.valueOf(profile.getLevel()), "star", plugin.levels().starSymbol())));
+        pl.ultrahc.paper.util.Feedback.levelUp(p);
     }
 }
