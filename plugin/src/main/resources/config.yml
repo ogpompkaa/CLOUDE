@@ -1,0 +1,46 @@
+# ┌────────────────────────────────────────────────────────────┐
+# │  CoreKit — configuration                                     │
+# │  Do not remove `config-version`; it drives upgrade warnings. │
+# └────────────────────────────────────────────────────────────┘
+config-version: 1
+
+settings:
+  # Language file to load from the lang/ folder (e.g. "en", "pl").
+  language: en
+  # Verbose logging for troubleshooting.
+  debug: false
+
+storage:
+  # SQLite database file, relative to the plugin data folder.
+  file: data.db
+  # Connection pool size. SQLite serialises writes, so a small pool is ideal;
+  # WAL mode (enabled automatically) lets reads run concurrently.
+  pool-size: 4
+
+homes:
+  # Fallback home limit for players without a `corekit.homes.limit.<n>` node.
+  # Grant e.g. corekit.homes.limit.5 for VIPs, or corekit.homes.unlimited.
+  default-limit: 1
+
+teleport:
+  # Countdown before /home and /spawn teleport, shown on a boss bar.
+  # 0 = instant. Bypass with corekit.teleport.bypass-warmup.
+  warmup-seconds: 3
+  # Delay between teleports. 0 = none. Bypass with corekit.teleport.bypass-cooldown.
+  cooldown-seconds: 5
+  # Cancel the warmup if the player moves to another block / takes damage.
+  cancel-on-move: true
+  cancel-on-damage: true
+  # How long a /tpa or /tpahere request stays valid before expiring.
+  request-expiry-seconds: 60
+
+back:
+  # Also remember the death location, so /back returns to where you died.
+  on-death: true
+
+feedback:
+  # Play subtle UI sounds on success, errors and teleports.
+  sounds: true
+  # Show quick confirmations (heal, feed, fly, god, gamemode) on the action bar
+  # instead of chat. Errors and important messages always go to chat.
+  action-bar: true

@@ -1,0 +1,171 @@
+package pl.corekit;
+
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
+import pl.corekit.command.CommandRegistrar;
+import pl.corekit.config.ConfigManager;
+import pl.corekit.feature.back.BackService;
+import pl.corekit.feature.feedback.FeedbackService;
+import pl.corekit.feature.god.GodService;
+import pl.corekit.feature.home.HomeGui;
+import pl.corekit.feature.home.HomeService;
+import pl.corekit.feature.spawn.SpawnService;
+import pl.corekit.feature.teleport.TeleportRequestService;
+import pl.corekit.feature.teleport.TeleportService;
+import pl.corekit.gui.MenuListener;
+import pl.corekit.lang.MessageService;
+import pl.corekit.listener.BackListener;
+import pl.corekit.listener.GodListener;
+import pl.corekit.listener.HomeCacheListener;
+import pl.corekit.listener.PlayerConnectionListener;
+import pl.corekit.listener.TeleportListener;
+import pl.corekit.storage.DatabaseManager;
+import pl.corekit.storage.HomeRepository;
+import pl.corekit.storage.PlayerProfileRepository;
+
+/**
+ * Entry point of the CoreKit foundation.
+ *
+ * <p>The plugin follows a strict start-up order: configuration is loaded first,
+ * then localisation, then storage. Storage failure is treated as fatal — a
+ * foundation that silently runs without its database would corrupt every
+ * feature built on top of it, so we disable the plugin instead.
+ *
+ * <p>All heavy I/O (database access) happens off the main server thread; this
+ * class only wires the services together and manages their lifecycle.
+ */
+public final class CoreKitPlugin extends JavaPlugin {
+
+    private ConfigManager configManager;
+    private MessageService messages;
+    private DatabaseManager database;
+    private PlayerProfileRepository profiles;
+    private HomeService homes;
+    private HomeGui homeGui;
+    private SpawnService spawn;
+    private GodService god;
+    private FeedbackService feedback;
+    private TeleportService teleport;
+    private TeleportRequestService teleportRequests;
+    private BackService back;
+
+    @Override
+    public void onEnable() {
+        // 1. Configuration.
+        saveDefaultConfig();
+        this.configManager = new ConfigManager(this);
+        this.configManager.load();
+
+        // 2. Localisation (depends on the configured language).
+        this.messages = new MessageService(this, configManager);
+        this.messages.load();
+
+        // 3. Storage. Fatal if it cannot be initialised.
+        this.database = new DatabaseManager(this, configManager.settings());
+        try {
+            this.database.initialize();
+        } catch (Exception ex) {
+            getSLF4JLogger().error("Failed to initialise storage — disabling CoreKit.", ex);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        this.profiles = new PlayerProfileRepository(database);
+
+        // 4. Feature services.
+        this.feedback = new FeedbackService(this, messages);
+        this.teleport = new TeleportService(this, feedback, messages);
+        this.teleportRequests = new TeleportRequestService(this, feedback, teleport);
+        this.back = new BackService();
+        this.homes = new HomeService(this, new HomeRepository(database));
+        this.homeGui = new HomeGui(this, feedback, homes, teleport);
+        this.spawn = new SpawnService(this);
+        this.spawn.load();
+        this.god = new GodService();
+
+        // 5. Wiring: listeners and commands.
+        PluginManager pluginManager = getServer().getPluginManager();
+        pluginManager.registerEvents(new PlayerConnectionListener(this, profiles, messages), this);
+        pluginManager.registerEvents(new HomeCacheListener(homes), this);
+        pluginManager.registerEvents(new GodListener(god), this);
+        pluginManager.registerEvents(new TeleportListener(this, teleport, teleportRequests), this);
+        pluginManager.registerEvents(new BackListener(this, back), this);
+        pluginManager.registerEvents(new MenuListener(), this);
+        new CommandRegistrar(this).register();
+
+        getSLF4JLogger().info("CoreKit v{} enabled.", getPluginMeta().getVersion());
+    }
+
+    @Override
+    public void onDisable() {
+        // Guard against a failed onEnable: any of these may be null.
+        if (teleport != null) {
+            teleport.cancelAll();
+        }
+        if (teleportRequests != null) {
+            teleportRequests.cancelAll();
+        }
+        if (database != null) {
+            database.shutdown();
+        }
+        getSLF4JLogger().info("CoreKit disabled.");
+    }
+
+    /**
+     * Reloads configuration and localisation at runtime. Storage settings that
+     * require a reconnect (pool size, backend) are intentionally NOT re-applied
+     * here — changing them safely requires draining in-flight queries, which is
+     * a restart-level operation. The command surfaces that caveat to the user.
+     */
+    public void reload() {
+        configManager.load();
+        messages.load();
+    }
+
+    public ConfigManager configManager() {
+        return configManager;
+    }
+
+    public MessageService messages() {
+        return messages;
+    }
+
+    public DatabaseManager database() {
+        return database;
+    }
+
+    public PlayerProfileRepository profiles() {
+        return profiles;
+    }
+
+    public HomeService homes() {
+        return homes;
+    }
+
+    public HomeGui homeGui() {
+        return homeGui;
+    }
+
+    public SpawnService spawn() {
+        return spawn;
+    }
+
+    public GodService god() {
+        return god;
+    }
+
+    public FeedbackService feedback() {
+        return feedback;
+    }
+
+    public TeleportService teleport() {
+        return teleport;
+    }
+
+    public TeleportRequestService teleportRequests() {
+        return teleportRequests;
+    }
+
+    public BackService back() {
+        return back;
+    }
+}
