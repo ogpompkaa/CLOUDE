@@ -79,7 +79,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
             return;
         }
         if (plugin.games() == null) {
-            sender.sendMessage(msg.legacy("&cTen serwer nie jest arena (rola LOBBY)."));
+            sender.sendMessage(msg.prefixed("general.arena-only", null));
             return;
         }
         if (plugin.games().join(player)) {
@@ -87,7 +87,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
             player.sendMessage(msg.prefixed("game.join-game",
                     Map.of("instance", inst != null ? inst.world().getName() : "-")));
         } else {
-            player.sendMessage(msg.legacy("&cNie mozna dolaczyc (gra w toku lub pelna)."));
+            player.sendMessage(msg.prefixed("game.join-failed", null));
         }
     }
 
@@ -103,7 +103,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
             return;
         }
         if (plugin.games() == null || plugin.games().current() == null) {
-            sender.sendMessage(msg.legacy("&cBrak aktywnej instancji (rola LOBBY?)."));
+            sender.sendMessage(msg.prefixed("general.no-instance", null));
             return;
         }
         if (start) {
@@ -128,56 +128,59 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
             switch (args[1].toLowerCase()) {
                 case "start" -> plugin.season().startSeason(sender);
                 case "end" -> plugin.season().endSeason(sender);
-                default -> sender.sendMessage(msg.legacy("&cUzycie: /uhc season [start|end]"));
+                default -> usage(sender, "/uhc season [start|end]");
             }
             return;
         }
         if (sender instanceof Player player) plugin.seasonGui().open(player);
-        else sender.sendMessage(msg.legacy("&cUzycie: /uhc season <start|end>"));
+        else usage(sender, "/uhc season <start|end>");
     }
 
     private void handleStats(CommandSender sender, String[] args) {
         MessagesManager msg = plugin.messages();
         if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
-        if (args.length < 2) { sender.sendMessage(msg.legacy("&cUzycie: /uhc stats <gracz>")); return; }
+        if (args.length < 2) { usage(sender, "/uhc stats <gracz>"); return; }
         Player target = plugin.getServer().getPlayerExact(args[1]);
         if (target == null) { sender.sendMessage(msg.prefixed("admin.player-not-found", Map.of("player", args[1]))); return; }
         PlayerProfile p = plugin.profiles().get(target.getUniqueId());
-        if (p == null) { sender.sendMessage(msg.legacy("&cProfil sie laduje.")); return; }
-        sender.sendMessage(msg.legacy("&6Statystyki &e" + p.getName() + "&6:"));
-        sender.sendMessage(msg.legacy("&7XP: &e" + p.getCredits() + " &8| &7PD: &b" + p.getProgressPoints()
-                + " &8| &7Poziom: &6" + p.getLevel()));
-        sender.sendMessage(msg.legacy("&7Kille: &e" + p.getKills() + " &8| &7Wygrane: &a" + p.getWins()
-                + " &8| &7Klasa: &e" + p.getSelectedClass()));
+        if (p == null) { loading(sender); return; }
+        sender.sendMessage(msg.prefixed("admin.stats-header", Map.of("player", p.getName())));
+        sender.sendMessage(msg.prefixed("admin.stats-line1", Map.of(
+                "xp", String.valueOf(p.getCredits()), "pd", String.valueOf(p.getProgressPoints()),
+                "level", String.valueOf(p.getLevel()))));
+        sender.sendMessage(msg.prefixed("admin.stats-line2", Map.of(
+                "kills", String.valueOf(p.getKills()), "wins", String.valueOf(p.getWins()),
+                "class", plugin.classes().displayName(p.getSelectedClass()))));
     }
 
     private void handleSetStat(CommandSender sender, String[] args) {
         MessagesManager msg = plugin.messages();
         if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
-        if (args.length < 4) { sender.sendMessage(msg.legacy("&cUzycie: /uhc setstat <gracz> <xp|pd|level|kills|wins> <wartosc>")); return; }
+        if (args.length < 4) { usage(sender, "/uhc setstat <gracz> <xp|pd|level|kills|wins> <wartosc>"); return; }
         Player target = plugin.getServer().getPlayerExact(args[1]);
         if (target == null) { sender.sendMessage(msg.prefixed("admin.player-not-found", Map.of("player", args[1]))); return; }
         PlayerProfile p = plugin.profiles().get(target.getUniqueId());
-        if (p == null) { sender.sendMessage(msg.legacy("&cProfil sie laduje.")); return; }
+        if (p == null) { loading(sender); return; }
         long value;
-        try { value = Long.parseLong(args[3]); } catch (NumberFormatException ex) { sender.sendMessage(msg.legacy("&cNiepoprawna liczba.")); return; }
+        try { value = Long.parseLong(args[3]); } catch (NumberFormatException ex) { sender.sendMessage(msg.prefixed("general.invalid-number", null)); return; }
         switch (args[2].toLowerCase()) {
             case "xp" -> p.setCredits(value);
             case "pd" -> p.setProgressPoints(value);
             case "level" -> p.setLevel((int) value);
             case "kills" -> p.setKills((int) value);
             case "wins" -> p.setWins((int) value);
-            default -> { sender.sendMessage(msg.legacy("&cNieznane pole.")); return; }
+            default -> { sender.sendMessage(msg.prefixed("admin.unknown-field", null)); return; }
         }
         plugin.profiles().saveNow(p);
-        sender.sendMessage(msg.legacy("&aUstawiono &e" + args[2] + " &adla &e" + p.getName() + " &ana &e" + value));
+        sender.sendMessage(msg.prefixed("admin.stat-set", Map.of(
+                "field", args[2], "player", p.getName(), "value", String.valueOf(value))));
     }
 
     private void handleSetNpc(CommandSender sender, String[] args) {
         MessagesManager msg = plugin.messages();
         if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
         if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
-        if (args.length < 2) { sender.sendMessage(msg.legacy("&cUzycie: /uhc setnpc <mietek|krzysiu|sklepikarz>")); return; }
+        if (args.length < 2) { usage(sender, "/uhc setnpc <mietek|krzysiu|sklepikarz>"); return; }
         String id = args[1].toLowerCase();
         writeLocation("lobby.npcs." + id, player.getLocation(), true);
         plugin.reloadLobbyNpcs();
@@ -188,7 +191,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         MessagesManager msg = plugin.messages();
         if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
         if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
-        if (args.length < 2) { sender.sendMessage(msg.legacy("&cUzycie: /uhc sethologram <kills|wins|level>")); return; }
+        if (args.length < 2) { usage(sender, "/uhc sethologram <kills|wins|level>"); return; }
         String id = args[1].toLowerCase();
         writeLocation("lobby.leaderboards.holograms." + id, player.getLocation(), false);
         if (plugin.leaderboards() != null) plugin.leaderboards().refresh();
@@ -225,7 +228,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
     private void handleSpectate(CommandSender sender) {
         MessagesManager msg = plugin.messages();
         if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
-        if (plugin.spectateGui() == null) { sender.sendMessage(msg.legacy("&cNiedostepne (rola LOBBY).")); return; }
+        if (plugin.spectateGui() == null) { sender.sendMessage(msg.prefixed("general.feature-lobby-only", null)); return; }
         plugin.spectateGui().open(player);
     }
 
@@ -238,7 +241,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
     private void handleBuyRecipe(CommandSender sender, String[] args) {
         MessagesManager msg = plugin.messages();
         if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
-        if (args.length < 2) { sender.sendMessage(msg.legacy("&cUzycie: /uhc buyrecipe <id>")); return; }
+        if (args.length < 2) { usage(sender, "/uhc buyrecipe <id>"); return; }
         PlayerProfile p = plugin.profiles().get(player.getUniqueId());
         if (p == null) return;
         String id = args[1].toLowerCase();
@@ -262,13 +265,15 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
         PlayerProfile p = plugin.profiles().get(player.getUniqueId());
         if (p == null) return;
-        sender.sendMessage(msg.legacy("&6Klasy:"));
+        sender.sendMessage(msg.prefixed("class.list-header", null));
         for (String id : plugin.classes().ids()) {
             boolean owned = plugin.classes().isUnlocked(p, id);
             boolean sel = id.equals(p.getSelectedClass());
-            sender.sendMessage(msg.legacy("&7- &e" + plugin.classes().displayName(id)
-                    + " &7(" + plugin.classes().price(id) + " XP) "
-                    + (sel ? "&a[wybrana]" : owned ? "&a[posiadana]" : "&c[zablokowana]")));
+            String status = msg.raw(sel ? "class.tag-selected" : owned ? "class.tag-owned" : "class.tag-locked");
+            sender.sendMessage(msg.prefixed("class.list-entry", Map.of(
+                    "class", plugin.classes().displayName(id),
+                    "price", String.valueOf(plugin.classes().price(id)),
+                    "status", status)));
         }
     }
 
@@ -289,11 +294,11 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
     private void handleClassBuy(CommandSender sender, String[] args) {
         MessagesManager msg = plugin.messages();
         if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
-        if (args.length < 2) { sender.sendMessage(msg.legacy("&cUzycie: /uhc buyclass <id>")); return; }
+        if (args.length < 2) { usage(sender, "/uhc buyclass <id>"); return; }
         PlayerProfile p = plugin.profiles().get(player.getUniqueId());
         if (p == null) return;
         String id = args[1].toLowerCase();
-        if (!plugin.classes().exists(id)) { sender.sendMessage(msg.legacy("&cNie ma takiej klasy.")); return; }
+        if (!plugin.classes().exists(id)) { sender.sendMessage(msg.prefixed("class.not-found", null)); return; }
         if (plugin.classes().isUnlocked(p, id)) {
             player.sendMessage(msg.prefixed("class.already-owned", null));
             return;
@@ -315,7 +320,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
     private void handleGameInfo(CommandSender sender) {
         MessagesManager msg = plugin.messages();
         if (plugin.games() == null) {
-            sender.sendMessage(msg.legacy("&7Rola LOBBY — brak instancji gry."));
+            sender.sendMessage(msg.prefixed("general.lobby-role", null));
             return;
         }
         for (String line : plugin.games().describeState()) {
@@ -354,6 +359,14 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         return names;
     }
 
+    private void usage(CommandSender sender, String syntax) {
+        sender.sendMessage(plugin.messages().prefixed("general.usage", Map.of("usage", syntax)));
+    }
+
+    private void loading(CommandSender sender) {
+        sender.sendMessage(plugin.messages().prefixed("general.profile-loading", null));
+    }
+
     private void handleHelp(CommandSender sender) {
         MessagesManager msg = plugin.messages();
         sender.sendMessage(msg.legacy(msg.raw("help.header")));
@@ -369,7 +382,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         }
         PlayerProfile p = plugin.profiles().get(player.getUniqueId());
         if (p == null) {
-            sender.sendMessage(msg.legacy("&cProfil jeszcze sie laduje, sprobuj za chwile."));
+            loading(sender);
             return;
         }
         String currencyName = msg.raw("currency.name");
@@ -402,7 +415,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
             return;
         }
         if (args.length < 3) {
-            sender.sendMessage(msg.legacy("&cUzycie: /uhc " + args[0] + " <gracz> <ilosc>"));
+            usage(sender, "/uhc " + args[0] + " <gracz> <ilosc>");
             return;
         }
         Player target = plugin.getServer().getPlayerExact(args[1]);
@@ -414,12 +427,12 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         try {
             amount = Long.parseLong(args[2]);
         } catch (NumberFormatException e) {
-            sender.sendMessage(msg.legacy("&cNiepoprawna liczba."));
+            sender.sendMessage(msg.prefixed("general.invalid-number", null));
             return;
         }
         PlayerProfile p = plugin.profiles().get(target.getUniqueId());
         if (p == null) {
-            sender.sendMessage(msg.legacy("&cProfil gracza jeszcze sie laduje."));
+            loading(sender);
             return;
         }
         if (currency) {
@@ -448,7 +461,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
             plugin.profiles().storage().resetSeason();
             sender.sendMessage(msg.prefixed("admin.season-reset", null));
         } catch (Exception e) {
-            sender.sendMessage(msg.legacy("&cBlad resetu sezonu: " + e.getMessage()));
+            sender.sendMessage(msg.prefixed("admin.season-error", Map.of("error", String.valueOf(e.getMessage()))));
         }
     }
 }

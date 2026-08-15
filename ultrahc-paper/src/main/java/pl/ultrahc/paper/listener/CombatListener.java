@@ -55,7 +55,7 @@ public class CombatListener implements Listener {
         // Brak PvP przez pierwsze N minut.
         if (!game.pvpEnabled()) {
             e.setCancelled(true);
-            attacker.sendMessage(plugin.messages().legacy("&cPvP jeszcze nieaktywne."));
+            attacker.sendMessage(plugin.messages().prefixed("game.pvp-not-active", null));
             return;
         }
         // Cios doszedl -> combat-tag (do kary za combat-log).

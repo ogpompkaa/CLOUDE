@@ -54,6 +54,13 @@ general:
   players-only: "&cTa komenda jest tylko dla graczy."
   reloaded: "&aKonfiguracja przeladowana."
   unknown-subcommand: "&cNieznana podkomenda. Uzyj &e/uhc help&c."
+  usage: "&cUzycie: &e%usage%"
+  profile-loading: "&cProfil jeszcze sie laduje, sprobuj za chwile."
+  invalid-number: "&cNiepoprawna liczba."
+  arena-only: "&cTen serwer nie jest arena (rola LOBBY)."
+  no-instance: "&cBrak aktywnej instancji (rola LOBBY?)."
+  lobby-role: "&7Rola LOBBY — brak instancji gry."
+  feature-lobby-only: "&cNiedostepne w tej roli serwera."
 
 currency:
   name: "XP"                       # nazwa waluty sklepowej (jedno miejsce)
@@ -86,6 +93,8 @@ game:
   players-alive: "&7Zywych graczy: &a%count%"
   join-game: "&aDolaczono do gry &e%instance%&a."
   reconnect-window: "&eMasz &6%seconds%s &ena powrot do gry."
+  join-failed: "&cNie mozna dolaczyc (gra w toku lub pelna)."
+  pvp-not-active: "&cPvP jeszcze nieaktywne."
 
 head:
   consumed: "&aZjadles glowke — otrzymujesz efekty."
@@ -183,6 +192,12 @@ class:
   status-selected: "&a▶ Wybrana"
   status-owned: "&aPosiadana &7(kliknij, aby wybrac)"
   status-locked: "&cZablokowana &7(kliknij, aby kupic)"
+  not-found: "&cNie ma takiej klasy."
+  list-header: "&6Klasy:"
+  list-entry: "&7- &e%class% &7(%price% XP) %status%"
+  tag-selected: "&a[wybrana]"
+  tag-owned: "&a[posiadana]"
+  tag-locked: "&c[zablokowana]"
   desc:
     civil:
       - "&7Kit: patyk + 8 chlebow"
@@ -305,3 +320,9 @@ admin:
   force-start: "&aWymuszono start gry."
   force-end: "&aWymuszono koniec gry."
   player-not-found: "&cNie znaleziono gracza &e%player%&c."
+  stats-header: "&6Statystyki &e%player%&6:"
+  stats-line1: "&7XP: &e%xp% &8| &7PD: &b%pd% &8| &7Poziom: &6%level%"
+  stats-line2: "&7Kille: &e%kills% &8| &7Wygrane: &a%wins% &8| &7Klasa: &e%class%"
+  stat-set: "&aUstawiono &e%field% &adla &e%player% &ana &e%value%"
+  unknown-field: "&cNieznane pole."
+  season-error: "&cBlad resetu sezonu: %error%"
