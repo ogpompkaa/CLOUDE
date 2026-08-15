@@ -6,11 +6,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import pl.ultrahc.common.model.PlayerProfile;
-import pl.ultrahc.common.storage.Storage;
 import pl.ultrahc.paper.UltraHcPlugin;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Wyswietla poziom gracza (gwiazdka) jako prefiks przy nicku w TAB i nad glowa,
@@ -43,8 +39,7 @@ public class RankService {
         PlayerProfile profile = plugin.profiles().get(player.getUniqueId());
         if (profile == null) return;
 
-        String prefix = podiumTag(player) + plugin.messages().raw("rank.prefix",
-                Map.of("level", String.valueOf(profile.getLevel())));
+        String prefix = plugin.rankFormat().prefix(player.getUniqueId());
 
         // TAB.
         player.playerListName(LEGACY.deserialize(prefix + "&f" + player.getName()));
@@ -56,18 +51,6 @@ public class RankService {
         if (team == null) team = board.registerNewTeam(teamName);
         team.prefix(LEGACY.deserialize(prefix));
         if (!team.hasEntry(player.getName())) team.addEntry(player.getName());
-    }
-
-    /** Zwraca prefiks podium (#1/#2/#3 UHC) jesli gracz jest w Top 3 wg poziomu. */
-    private String podiumTag(Player player) {
-        if (plugin.leaderboards() == null) return "";
-        List<Storage.LeaderboardEntry> top = plugin.leaderboards().top(Storage.LeaderboardType.LEVEL);
-        for (int i = 0; i < Math.min(3, top.size()); i++) {
-            if (top.get(i).uuid().equals(player.getUniqueId())) {
-                return plugin.messages().raw("rank.podium-" + (i + 1));
-            }
-        }
-        return "";
     }
 
     private String shortId(Player player) {

@@ -13,6 +13,9 @@ rank:
   podium-2: "&7&l#2 UHC "
   podium-3: "&c&l#3 UHC "
 
+chat:
+  separator: "&7: &f"
+
 bossbar:
   no-pvp: "&aBrak PvP: &e%time%"
   pvp: "&cPvP aktywne"
@@ -89,6 +92,17 @@ pandora:
 # --------------------------- SCOREBOARD ------------------------------
 scoreboard:
   title: "&6&lULTRAHC"
+  # Animowany tytul — klatki cyklicznie (pusta lista = tytul statyczny powyzej).
+  title-frames:
+    - "&6&lULTRAHC"
+    - "&e&lULTRAHC"
+    - "&f&lU&e&lLTRAHC"
+    - "&f&lUL&e&lTRAHC"
+    - "&f&lULT&e&lRAHC"
+    - "&f&lULTR&e&lAHC"
+    - "&f&lULTRA&e&lHC"
+    - "&f&lULTRAH&e&lC"
+    - "&e&lULTRAHC"
   top-line: "&e%pos% %team% &7%kills%"          # Top 3 druzyny
   self-marker: "&a> %team% &7%kills%"            # marker druzyny gracza
   teammate: "&7- %name%"                         # wspoltowarzysz (znika w solo)

@@ -32,6 +32,8 @@ public class ScoreboardService {
 
     private final UltraHcPlugin plugin;
     private BukkitTask task;
+    private BukkitTask animTask;
+    private int frame;
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacyAmpersand();
 
     public ScoreboardService(UltraHcPlugin plugin) {
@@ -41,12 +43,33 @@ public class ScoreboardService {
     public void start() {
         stop();
         task = plugin.getServer().getScheduler().runTaskTimer(plugin, this::updateAll, 20L, 20L);
+        // Szybsza animacja samego tytulu (co 4 ticki).
+        animTask = plugin.getServer().getScheduler().runTaskTimer(plugin, this::animateTitle, 4L, 4L);
     }
 
     public void stop() {
-        if (task != null) {
-            task.cancel();
-            task = null;
+        if (task != null) { task.cancel(); task = null; }
+        if (animTask != null) { animTask.cancel(); animTask = null; }
+    }
+
+    /** Aktualny (animowany) tytul scoreboardu. */
+    private net.kyori.adventure.text.Component currentTitle() {
+        List<String> frames = plugin.messages().rawList("scoreboard.title-frames");
+        if (frames.isEmpty()) return plugin.messages().component("scoreboard.title", null);
+        return LEGACY.deserialize(frames.get(Math.floorMod(frame, frames.size())));
+    }
+
+    private void animateTitle() {
+        frame++;
+        if (plugin.games() == null) return;
+        GameInstance game = plugin.games().current();
+        if (game == null) return;
+        var title = currentTitle();
+        for (Player player : game.world().getPlayers()) {
+            var board = player.getScoreboard();
+            if (board == null) continue;
+            Objective obj = board.getObjective("uhc");
+            if (obj != null) obj.displayName(title);
         }
     }
 
@@ -69,10 +92,10 @@ public class ScoreboardService {
         }
         Objective obj = board.getObjective("uhc");
         if (obj == null) {
-            obj = board.registerNewObjective("uhc", Criteria.DUMMY, msg.component("scoreboard.title", null));
+            obj = board.registerNewObjective("uhc", Criteria.DUMMY, currentTitle());
             obj.setDisplaySlot(DisplaySlot.SIDEBAR);
         } else {
-            obj.displayName(msg.component("scoreboard.title", null));
+            obj.displayName(currentTitle());
         }
         // Wyczysc poprzednie wpisy.
         for (String entry : new ArrayList<>(board.getEntries())) {

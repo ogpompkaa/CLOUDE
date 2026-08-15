@@ -11,6 +11,7 @@ import pl.ultrahc.paper.listener.CombatListener;
 import pl.ultrahc.paper.listener.CompassListener;
 import pl.ultrahc.paper.listener.DropsListener;
 import pl.ultrahc.paper.listener.DetectorListener;
+import pl.ultrahc.paper.listener.ChatListener;
 import pl.ultrahc.paper.listener.CompassLobbyListener;
 import pl.ultrahc.paper.listener.HeadListener;
 import pl.ultrahc.paper.listener.PandoraListener;
@@ -39,6 +40,7 @@ import pl.ultrahc.paper.manager.HeadManager;
 import pl.ultrahc.paper.manager.InstanceManager;
 import pl.ultrahc.paper.manager.LevelsManager;
 import pl.ultrahc.paper.manager.QuestsManager;
+import pl.ultrahc.paper.manager.RankFormat;
 import pl.ultrahc.paper.manager.RecipeManager;
 import pl.ultrahc.paper.manager.RewardManager;
 import pl.ultrahc.paper.manager.ScoreboardService;
@@ -88,6 +90,7 @@ public class UltraHcPlugin extends JavaPlugin {
     private LobbyMenuGui lobbyMenuGui;
     private BossBarService bossBarService;
     private RankService rankService;
+    private RankFormat rankFormat;
     private AdminGui adminGui;
     private InstanceAdminGui instanceAdminGui;
 
@@ -138,7 +141,9 @@ public class UltraHcPlugin extends JavaPlugin {
         guiPm.registerEvents(adminGui, this);
 
         // 4. Eventy i komendy
+        this.rankFormat = new RankFormat(this);
         getServer().getPluginManager().registerEvents(new ProfileListener(this), this);
+        getServer().getPluginManager().registerEvents(new ChatListener(this), this); // czat z ranga (obie role)
         var cmd = getCommand("uhc");
         if (cmd != null) {
             UhcCommand handler = new UhcCommand(this);
@@ -280,4 +285,5 @@ public class UltraHcPlugin extends JavaPlugin {
     public LobbyMenuGui menu() { return lobbyMenuGui; }
     public AdminGui adminGui() { return adminGui; }
     public InstanceAdminGui instanceAdminGui() { return instanceAdminGui; }
+    public RankFormat rankFormat() { return rankFormat; }
 }
