@@ -21,7 +21,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
 
     private static final List<String> SUBCOMMANDS = List.of(
             "balance", "reload", "givexp", "givepd", "resetseason", "join", "leave",
-            "forcestart", "forceend", "gameinfo", "classes", "class", "buyclass",
+            "forcestart", "forceend", "gameinfo", "menu", "classes", "class", "buyclass",
             "shop", "buyrecipe", "setnpc", "sethologram", "quests", "season", "stats", "setstat");
 
     private final UltraHcPlugin plugin;
@@ -50,6 +50,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
             case "forcestart" -> handleForce(sender, true);
             case "forceend" -> handleForce(sender, false);
             case "gameinfo" -> handleGameInfo(sender);
+            case "menu" -> { if (sender instanceof Player pl) plugin.menu().open(pl); else sender.sendMessage(msg.prefixed("general.players-only", null)); }
             case "classes" -> handleClassList(sender);
             case "class" -> handleClassSelect(sender, args);
             case "buyclass" -> handleClassBuy(sender, args);
@@ -248,7 +249,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
     private void handleClassSelect(CommandSender sender, String[] args) {
         MessagesManager msg = plugin.messages();
         if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
-        if (args.length < 2) { sender.sendMessage(msg.legacy("&cUzycie: /uhc class <id>")); return; }
+        if (args.length < 2) { plugin.classGui().open(player); return; } // bez argumentu -> GUI
         PlayerProfile p = plugin.profiles().get(player.getUniqueId());
         if (p == null) return;
         String id = args[1].toLowerCase();

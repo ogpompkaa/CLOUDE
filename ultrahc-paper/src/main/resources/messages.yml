@@ -112,6 +112,58 @@ class:
   locked: "&cTa klasa nie jest odblokowana."
   bought: "&aKupiono klase &e%class% &aza &e%price% %currency%&a."
   already-owned: "&ePosiadasz juz te klase."
+  gui-title: "&8Klasy"
+  price-line: "&7Cena: &e%price% XP"
+  status-selected: "&a▶ Wybrana"
+  status-owned: "&aPosiadana &7(kliknij, aby wybrac)"
+  status-locked: "&cZablokowana &7(kliknij, aby kupic)"
+  desc:
+    civil:
+      - "&7Kit: patyk + 8 chlebow"
+      - "&7Umiejetnosc: brak"
+    gornik:
+      - "&7Kit: kamienny kilof (Wydajnosc I) + 3 steaki"
+      - "&7Umiejetnosc: wiekszy drop surowcow i exp ze stone"
+    sniper:
+      - "&7Kit: luk AWP (Niezniszczalnosc II) + 8 strzal"
+      - "&7Umiejetnosc: Regeneracja I po trafieniu przeciwnika"
+    chef:
+      - "&7Kit: 8 steakow + 2 chleby"
+      - "&7Umiejetnosc: przepieczone mieso, wiecej jablek"
+    fisher:
+      - "&7Kit: wedka (Niezniszczalnosc III) + 3 ryby"
+      - "&7Umiejetnosc: buff w wodzie, ksiazki z lowienia"
+    yeti:
+      - "&7Kit: lopata (Wydajnosc II, Nieznisz. II) + 32 sniezki"
+      - "&7Umiejetnosc: Speed na sniegu/lodzie"
+    smith:
+      - "&7Kit: 1 sztabka + 1 surowe zelazo"
+      - "&7Umiejetnosc: surowce wypadaja przepalone"
+    guard:
+      - "&7Kit: 2 dodatkowe serduszka"
+      - "&7Umiejetnosc: Spowolnienie + Odpornosc po ciosie"
+
+# --------------------------- MENU / STATYSTYKI -----------------------
+menu:
+  title: "&8UltraHC — Menu"
+  play: "&a&lGRAJ"
+  play-lore: "&7Wybierz arene UHC i dolacz."
+  classes: "&b&lKLASY"
+  classes-lore: "&7Wybierz i kupuj klasy."
+  shop: "&6&lSKLEP"
+  shop-lore: "&7Kupuj receptury za XP."
+  quests: "&e&lQUESTY"
+  quests-lore: "&7Twoje zadania i nagrody."
+  stats: "&d&lSTATYSTYKI"
+  stats-lore: "&7Twoj postep i wyniki."
+
+stats:
+  gui-title: "&8Twoje statystyki"
+  xp: "&6XP (sklep): &e%value%"
+  level: "&bPoziom: &6%level% %star% &7(%current%/%required% PD)"
+  kills: "&cZabojstwa: &f%value%"
+  wins: "&aWygrane: &f%value%"
+  clazz: "&7Wybrana klasa: &e%value%"
 
 shop:
   bought-recipe: "&aKupiono recepture &e%recipe% &aza &e%price% %currency%&a."

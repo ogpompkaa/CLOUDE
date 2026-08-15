@@ -25,6 +25,6 @@ public class CompassLobbyListener implements Listener {
         ItemStack item = e.getItem();
         if (item == null || item.getType() != Material.COMPASS) return;
         e.setCancelled(true);
-        plugin.arenaSelect().open(e.getPlayer());
+        plugin.menu().open(e.getPlayer()); // Hub: Graj/Klasy/Sklep/Questy/Statystyki
     }
 }

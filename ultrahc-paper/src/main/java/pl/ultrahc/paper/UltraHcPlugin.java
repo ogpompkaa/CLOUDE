@@ -16,9 +16,12 @@ import pl.ultrahc.paper.listener.HeadListener;
 import pl.ultrahc.paper.listener.PandoraListener;
 import pl.ultrahc.paper.listener.ProfileListener;
 import pl.ultrahc.paper.gui.ArenaSelectGui;
+import pl.ultrahc.paper.gui.ClassGui;
+import pl.ultrahc.paper.gui.LobbyMenuGui;
 import pl.ultrahc.paper.gui.QuestGui;
 import pl.ultrahc.paper.gui.SeasonAdminGui;
 import pl.ultrahc.paper.gui.ShopGui;
+import pl.ultrahc.paper.gui.StatsGui;
 import pl.ultrahc.paper.hologram.DecentHologramsManager;
 import pl.ultrahc.paper.hologram.HologramManager;
 import pl.ultrahc.paper.npc.CitizensNpcManager;
@@ -76,6 +79,9 @@ public class UltraHcPlugin extends JavaPlugin {
     private SeasonAdminGui seasonAdminGui;
     private InstanceManager instanceManager;
     private ArenaSelectGui arenaSelectGui;
+    private ClassGui classGuiInstance;
+    private StatsGui statsGuiInstance;
+    private LobbyMenuGui lobbyMenuGui;
 
     @Override
     public void onEnable() {
@@ -107,10 +113,16 @@ public class UltraHcPlugin extends JavaPlugin {
         this.shopGui = new ShopGui(this);
         this.questGui = new QuestGui(this);
         this.seasonAdminGui = new SeasonAdminGui(this);
+        this.classGuiInstance = new ClassGui(this);
+        this.statsGuiInstance = new StatsGui(this);
+        this.lobbyMenuGui = new LobbyMenuGui(this);
         var guiPm = getServer().getPluginManager();
         guiPm.registerEvents(shopGui, this);
         guiPm.registerEvents(questGui, this);
         guiPm.registerEvents(seasonAdminGui, this);
+        guiPm.registerEvents(classGuiInstance, this);
+        guiPm.registerEvents(statsGuiInstance, this);
+        guiPm.registerEvents(lobbyMenuGui, this);
         this.instanceManager = new InstanceManager(this); // rejestr instancji (obie role)
 
         // 4. Eventy i komendy
@@ -245,4 +257,7 @@ public class UltraHcPlugin extends JavaPlugin {
     public SeasonAdminGui seasonGui() { return seasonAdminGui; }
     public InstanceManager instances() { return instanceManager; }
     public ArenaSelectGui arenaSelect() { return arenaSelectGui; }
+    public ClassGui classGui() { return classGuiInstance; }
+    public StatsGui statsGui() { return statsGuiInstance; }
+    public LobbyMenuGui menu() { return lobbyMenuGui; }
 }
