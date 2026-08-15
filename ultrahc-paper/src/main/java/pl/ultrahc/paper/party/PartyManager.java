@@ -132,6 +132,18 @@ public class PartyManager {
         }
     }
 
+    /** Czat party — wiadomosc tylko do czlonkow party. */
+    public void chat(Player player, String message) {
+        Party party = byMember.get(player.getUniqueId());
+        if (party == null) { player.sendMessage(msg().prefixed("party.not-in", null)); return; }
+        var comp = msg().legacy(msg().raw("party.chat-format",
+                Map.of("player", player.getName(), "message", message)));
+        for (UUID id : party.getMembers()) {
+            Player p = plugin.getServer().getPlayer(id);
+            if (p != null) p.sendMessage(comp);
+        }
+    }
+
     /** Online czlonkowie party gracza (do zabrania do gry przez lidera). */
     public List<Player> onlineMembers(UUID leader) {
         Party party = byMember.get(leader);

@@ -32,7 +32,7 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         var party = plugin.party();
-        if (args.length == 0) { party.list(player); return true; }
+        if (args.length == 0) { plugin.partyGui().open(player); return true; }
         switch (args[0].toLowerCase()) {
             case "invite", "add" -> {
                 if (args.length < 2) usage(player, "/party invite <nick>");

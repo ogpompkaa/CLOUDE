@@ -359,6 +359,11 @@ party:
   list-member: "&7- %player%"
   self-invite: "&cNie mozesz zaprosic samego siebie."
   warp: "&aLider rusza do gry — party dolacza."
+  chat-format: "&d[Party] &f%player%&7: &f%message%"
+  gui-title: "&8Party"
+  gui-leave: "&cOpusc party"
+  gui-disband: "&4Rozwiaz party (lider)"
+  gui-invite-hint: "&aZapros: &e/party invite <nick>"
 
 # --------------------------- ADMIN -----------------------------------
 admin:

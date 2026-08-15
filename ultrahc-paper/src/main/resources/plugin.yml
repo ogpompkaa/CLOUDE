@@ -19,6 +19,11 @@ commands:
     usage: /party
     permission: ultrahc.use
     permission-message: "Brak uprawnien."
+  pc:
+    description: Czat party.
+    usage: /pc <wiadomosc>
+    permission: ultrahc.use
+    permission-message: "Brak uprawnien."
 
 permissions:
   ultrahc.use:

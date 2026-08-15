@@ -97,6 +97,7 @@ public class UltraHcPlugin extends JavaPlugin {
     private pl.ultrahc.paper.manager.AmbientEffects ambientEffects;
     private SpectateGui spectateGui;
     private pl.ultrahc.paper.party.PartyManager partyManager;
+    private pl.ultrahc.paper.gui.PartyGui partyGui;
     private AdminGui adminGui;
     private InstanceAdminGui instanceAdminGui;
 
@@ -132,6 +133,7 @@ public class UltraHcPlugin extends JavaPlugin {
         this.questsManager = new QuestsManager(this, currencyManager, levelsManager); // questy (obie role)
         this.seasonManager = new SeasonManager(this, currencyManager);    // sezon (admin)
         this.partyManager = new pl.ultrahc.paper.party.PartyManager(this); // party (obie role)
+        this.partyGui = new pl.ultrahc.paper.gui.PartyGui(this);
         this.shopGui = new ShopGui(this);
         this.questGui = new QuestGui(this);
         this.seasonAdminGui = new SeasonAdminGui(this);
@@ -170,6 +172,9 @@ public class UltraHcPlugin extends JavaPlugin {
             partyCmd.setExecutor(ph);
             partyCmd.setTabCompleter(ph);
         }
+        var pcCmd = getCommand("pc");
+        if (pcCmd != null) pcCmd.setExecutor(new pl.ultrahc.paper.command.PartyChatCommand(this));
+        getServer().getPluginManager().registerEvents(partyGui, this);
 
         // 5. Managery zalezne od roli
         if (role == ServerRole.ARENA) {
@@ -316,4 +321,5 @@ public class UltraHcPlugin extends JavaPlugin {
     public ScoreboardService scoreboard() { return scoreboardService; }
     public SpectateGui spectateGui() { return spectateGui; }
     public pl.ultrahc.paper.party.PartyManager party() { return partyManager; }
+    public pl.ultrahc.paper.gui.PartyGui partyGui() { return partyGui; }
 }

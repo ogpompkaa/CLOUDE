@@ -153,7 +153,13 @@ public class CombatListener implements Listener {
         if (team == null) return;
         // Wyeliminowany -> spectator na arenie (nie wychodzi z gry).
         if (!team.isAlive(player.getUniqueId())) {
-            e.setRespawnLocation(game.world().getSpawnLocation());
+            // Auto-spectate: jesli druzyna ma zywego czlonka, obserwuj jego, inaczej spawn.
+            org.bukkit.Location respawn = game.world().getSpawnLocation();
+            for (java.util.UUID mate : team.getAlive()) {
+                Player mp = plugin.getServer().getPlayer(mate);
+                if (mp != null && mp.getWorld() == game.world()) { respawn = mp.getLocation(); break; }
+            }
+            e.setRespawnLocation(respawn);
             plugin.getServer().getScheduler().runTask(plugin, () -> {
                 player.setGameMode(GameMode.SPECTATOR);
                 player.sendMessage(plugin.messages().prefixed("spectate.hint", null));
