@@ -121,6 +121,12 @@ public class CombatListener implements Listener {
         // Wybuch czastek w miejscu smierci.
         pl.ultrahc.paper.util.Feedback.killParticles(victim.getLocation().add(0, 1, 0));
 
+        // Personalny title dla ofiary (kto zabil).
+        pl.ultrahc.paper.util.Feedback.title(victim,
+                plugin.messages().component("title.death-main", null),
+                plugin.messages().component("title.death-sub",
+                        java.util.Map.of("killer", killer != null ? killer.getName() : "-")));
+
         // Eliminacja + nagroda za zabojstwo (w GameInstance).
         game.handleElimination(victim.getUniqueId(), killerId);
         if (killer != null) {

@@ -71,5 +71,13 @@ public class DetectorListener implements Listener {
                 "player", nearest.getName(), "distance", String.valueOf((int) best)));
         player.showTitle(Title.title(main, Component.empty(),
                 Title.Times.times(Duration.ofMillis(300), Duration.ofSeconds(3), Duration.ofMillis(500))));
+
+        // Podswietlenie wykrytego gracza (Glowing).
+        var cfg = plugin.configManager().raw();
+        if (cfg.getBoolean("detector.glow-target", true)) {
+            int sec = cfg.getInt("detector.glow-seconds", 5);
+            nearest.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                    org.bukkit.potion.PotionEffectType.GLOWING, sec * 20, 0, false, false));
+        }
     }
 }

@@ -42,12 +42,21 @@ public class RewardManager {
     public void grantKill(UUID killer) {
         PlayerProfile p = plugin.profiles().get(killer);
         if (p == null) return;
-        currency.add(p, cfg().getLong("rewards.currency.per-kill", 100));
-        int gained = levels.addProgress(p, cfg().getLong("rewards.progress.per-kill", 30));
+        long xp = cfg().getLong("rewards.currency.per-kill", 100);
+        long pd = cfg().getLong("rewards.progress.per-kill", 30);
+        currency.add(p, xp);
+        int gained = levels.addProgress(p, pd);
         p.setKills(p.getKills() + 1);
         plugin.profiles().saveNow(p);
         notifyLevel(killer, gained);
         if (plugin.quests() != null) plugin.quests().increment(killer, QuestsManager.Objective.KILLS, 1);
+        // Popup nagrody na srodku ekranu.
+        Player online = plugin.getServer().getPlayer(killer);
+        if (online != null) {
+            pl.ultrahc.paper.util.Feedback.title(online,
+                    plugin.messages().component("title.kill-reward-main", Map.of("xp", String.valueOf(xp))),
+                    plugin.messages().component("title.kill-reward-sub", Map.of("pd", String.valueOf(pd))));
+        }
     }
 
     // ----------------------------------------------------------------- wygrana

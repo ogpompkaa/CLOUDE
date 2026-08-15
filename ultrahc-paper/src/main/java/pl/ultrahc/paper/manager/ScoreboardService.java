@@ -149,6 +149,13 @@ public class ScoreboardService {
                 "alive", String.valueOf(game.teams().alivePlayers()),
                 "size", NumberUtil.oneDecimalComma(game.world().getWorldBorder().getSize()),
                 "kills", String.valueOf(kills))));
+
+        // Ostrzezenie dzwiekowe przy niskim HP (tylko zywi w survivalu).
+        int lowHearts = plugin.configManager().raw().getInt("combat.low-health-hearts", 4);
+        if (lowHearts > 0 && player.getGameMode() == org.bukkit.GameMode.SURVIVAL
+                && player.getHealth() > 0 && player.getHealth() <= lowHearts * 2.0) {
+            player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 0.7f, 0.6f);
+        }
     }
 
     /** Koloruje nicki nad glowa z perspektywy widza: sojusznik zielony, wrog czerwony. */

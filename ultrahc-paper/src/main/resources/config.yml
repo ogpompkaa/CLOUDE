@@ -46,6 +46,7 @@ game:
 combat:
   tag-seconds: 10                 # okno przypisania zabojcy (combat-tag)
   killstreak-milestones: [3, 5, 7, 10]   # progi serii zabojstw (broadcast + title)
+  low-health-hearts: 4            # ponizej tylu serc ostrzezenie dzwiekowe (0 = wylaczone)
 
 # --------------------------- GRANICA MAPY ----------------------------
 # 3 fazy: normalna (10-30), przyspieszenie (30-45), arenka/sudden-death (45+).
@@ -200,6 +201,8 @@ classes:
 detector:
   cooldown-seconds: 60
   reveal-delay-seconds: 5
+  glow-target: true               # podswietl wykrytego gracza (Glowing)
+  glow-seconds: 5
 
 # Zaklinacz (receptura) — utrudniony dostep do enchantu.
 enchanter:

@@ -54,6 +54,10 @@ title:
   levelup-sub: "&ePoziom %level% %star%"
   quest-main: "&a&lQUEST!"
   quest-sub: "&e%name%"
+  kill-reward-main: "&a&l+%xp% XP"
+  kill-reward-sub: "&b+%pd% PD"
+  death-main: "&c&lZGINALES"
+  death-sub: "&7Zabil Cie: &e%killer%"
 
 help:
   header: "&6&lUltraHC &7— komendy:"
