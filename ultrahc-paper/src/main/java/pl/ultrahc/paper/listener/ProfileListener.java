@@ -28,5 +28,7 @@ public class ProfileListener implements Listener {
         plugin.profiles().saveAndUnloadAsync(uuid);
         if (plugin.quests() != null) plugin.quests().unload(uuid);
         if (plugin.compass() != null) plugin.compass().clear(uuid);
+        if (plugin.ranks() != null) plugin.ranks().cleanup(e.getPlayer());
+        if (plugin.scoreboard() != null) plugin.scoreboard().clear(uuid);
     }
 }

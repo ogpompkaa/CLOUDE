@@ -339,10 +339,14 @@ public class GameInstance {
 
     private Location randomSpread() {
         double size = world.getWorldBorder().getSize();
-        double half = size / 2.0 - 10;
         var center = world.getWorldBorder().getCenter();
-        int x = center.getBlockX() + ThreadLocalRandom.current().nextInt((int) -half, (int) half);
-        int z = center.getBlockZ() + ThreadLocalRandom.current().nextInt((int) -half, (int) half);
+        int half = (int) (size / 2.0 - 10);
+        if (half < 1) { // granica za mala na rozrzut — spawnuj na srodku
+            int cy = world.getHighestBlockYAt(center.getBlockX(), center.getBlockZ()) + 1;
+            return new Location(world, center.getBlockX() + 0.5, cy, center.getBlockZ() + 0.5);
+        }
+        int x = center.getBlockX() + ThreadLocalRandom.current().nextInt(-half, half);
+        int z = center.getBlockZ() + ThreadLocalRandom.current().nextInt(-half, half);
         int y = world.getHighestBlockYAt(x, z) + 1;
         return new Location(world, x + 0.5, y, z + 0.5);
     }

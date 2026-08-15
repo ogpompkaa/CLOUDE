@@ -53,6 +53,13 @@ public class RankService {
         if (!team.hasEntry(player.getName())) team.addEntry(player.getName());
     }
 
+    /** Sprzatanie przy wyjsciu gracza — usuwa jego team z glownego scoreboardu. */
+    public void cleanup(Player player) {
+        Scoreboard board = plugin.getServer().getScoreboardManager().getMainScoreboard();
+        Team team = board.getTeam("uhc_" + shortId(player));
+        if (team != null) team.unregister();
+    }
+
     private String shortId(Player player) {
         return player.getUniqueId().toString().substring(0, 12);
     }

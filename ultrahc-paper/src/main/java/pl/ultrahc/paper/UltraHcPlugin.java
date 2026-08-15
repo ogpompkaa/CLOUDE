@@ -299,5 +299,7 @@ public class UltraHcPlugin extends JavaPlugin {
     public AdminGui adminGui() { return adminGui; }
     public InstanceAdminGui instanceAdminGui() { return instanceAdminGui; }
     public RankFormat rankFormat() { return rankFormat; }
+    public RankService ranks() { return rankService; }
+    public ScoreboardService scoreboard() { return scoreboardService; }
     public SpectateGui spectateGui() { return spectateGui; }
 }

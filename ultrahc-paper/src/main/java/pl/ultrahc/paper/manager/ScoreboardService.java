@@ -64,6 +64,11 @@ public class ScoreboardService {
         if (animTask != null) { animTask.cancel(); animTask = null; }
     }
 
+    /** Sprzatanie przy wyjsciu gracza. */
+    public void clear(java.util.UUID uuid) {
+        lineCount.remove(uuid);
+    }
+
     /** Aktualny (animowany) tytul scoreboardu. */
     private net.kyori.adventure.text.Component currentTitle() {
         List<String> frames = plugin.messages().rawList("scoreboard.title-frames");
