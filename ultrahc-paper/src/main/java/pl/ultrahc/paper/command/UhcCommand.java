@@ -36,9 +36,68 @@ public class UhcCommand implements CommandExecutor {
             case "givexp" -> handleGive(sender, args, true);
             case "givepd" -> handleGive(sender, args, false);
             case "resetseason" -> handleResetSeason(sender);
+            case "join" -> handleJoin(sender);
+            case "leave" -> handleLeave(sender);
+            case "forcestart" -> handleForce(sender, true);
+            case "forceend" -> handleForce(sender, false);
+            case "gameinfo" -> handleGameInfo(sender);
             default -> sender.sendMessage(msg.prefixed("general.unknown-subcommand", null));
         }
         return true;
+    }
+
+    private void handleJoin(CommandSender sender) {
+        MessagesManager msg = plugin.messages();
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(msg.prefixed("general.players-only", null));
+            return;
+        }
+        if (plugin.games() == null) {
+            sender.sendMessage(msg.legacy("&cTen serwer nie jest arena (rola LOBBY)."));
+            return;
+        }
+        if (plugin.games().join(player)) {
+            var inst = plugin.games().current();
+            player.sendMessage(msg.prefixed("game.join-game",
+                    Map.of("instance", inst != null ? inst.world().getName() : "-")));
+        } else {
+            player.sendMessage(msg.legacy("&cNie mozna dolaczyc (gra w toku lub pelna)."));
+        }
+    }
+
+    private void handleLeave(CommandSender sender) {
+        if (!(sender instanceof Player player)) return;
+        if (plugin.games() != null) plugin.games().leave(player.getUniqueId());
+    }
+
+    private void handleForce(CommandSender sender, boolean start) {
+        MessagesManager msg = plugin.messages();
+        if (!sender.hasPermission("ultrahc.admin")) {
+            sender.sendMessage(msg.prefixed("general.no-permission", null));
+            return;
+        }
+        if (plugin.games() == null || plugin.games().current() == null) {
+            sender.sendMessage(msg.legacy("&cBrak aktywnej instancji (rola LOBBY?)."));
+            return;
+        }
+        if (start) {
+            plugin.games().current().forceStart();
+            sender.sendMessage(msg.prefixed("admin.force-start", null));
+        } else {
+            plugin.games().current().forceEnd();
+            sender.sendMessage(msg.prefixed("admin.force-end", null));
+        }
+    }
+
+    private void handleGameInfo(CommandSender sender) {
+        MessagesManager msg = plugin.messages();
+        if (plugin.games() == null) {
+            sender.sendMessage(msg.legacy("&7Rola LOBBY — brak instancji gry."));
+            return;
+        }
+        for (String line : plugin.games().describeState()) {
+            sender.sendMessage(msg.legacy("&7" + line));
+        }
     }
 
     private void handleBalance(CommandSender sender) {

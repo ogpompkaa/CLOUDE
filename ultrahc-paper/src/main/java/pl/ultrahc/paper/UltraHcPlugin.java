@@ -5,6 +5,7 @@ import pl.ultrahc.common.storage.Storage;
 import pl.ultrahc.paper.command.UhcCommand;
 import pl.ultrahc.paper.config.ConfigManager;
 import pl.ultrahc.paper.config.MessagesManager;
+import pl.ultrahc.paper.game.GameManager;
 import pl.ultrahc.paper.listener.ProfileListener;
 import pl.ultrahc.paper.manager.LevelsManager;
 import pl.ultrahc.paper.manager.ShopCurrencyManager;
@@ -26,6 +27,7 @@ public class UltraHcPlugin extends JavaPlugin {
     private ProfileService profileService;
     private ShopCurrencyManager currencyManager;
     private LevelsManager levelsManager;
+    private GameManager gameManager;
 
     @Override
     public void onEnable() {
@@ -58,13 +60,20 @@ public class UltraHcPlugin extends JavaPlugin {
             cmd.setExecutor(new UhcCommand(this));
         }
 
+        // 5. Managery zalezne od roli
+        if (role == ServerRole.ARENA) {
+            this.gameManager = new GameManager(this);
+            // Przygotowanie swiata blokuje watek glowny — robimy to po pelnym starcie serwera.
+            getServer().getScheduler().runTask(this, () -> gameManager.enableArena());
+        }
+
         getLogger().info("[UltraHC] Wlaczono. Rola serwera: " + role + ", magazyn: " + configManager.storageType() + ".");
-        // TODO(kolejne etapy): wg role uruchom GameManager/BorderManager (ARENA)
-        //                      albo NpcManager/ShopManager/Leaderboards (LOBBY).
+        // TODO(kolejne etapy): LOBBY -> NpcManager/ShopManager/Leaderboards; ARENA -> Border/Scoreboard/Drops.
     }
 
     @Override
     public void onDisable() {
+        if (gameManager != null) gameManager.shutdown();
         if (profileService != null) profileService.saveAll();
         if (storage != null) storage.close();
         getLogger().info("[UltraHC] Wylaczono. Profile zapisane.");
@@ -76,4 +85,5 @@ public class UltraHcPlugin extends JavaPlugin {
     public ProfileService profiles() { return profileService; }
     public ShopCurrencyManager currency() { return currencyManager; }
     public LevelsManager levels() { return levelsManager; }
+    public GameManager games() { return gameManager; }
 }
