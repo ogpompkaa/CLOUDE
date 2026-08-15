@@ -56,7 +56,23 @@ public class CombatListener implements Listener {
         if (!game.pvpEnabled()) {
             e.setCancelled(true);
             attacker.sendMessage(plugin.messages().legacy("&cPvP jeszcze nieaktywne."));
+            return;
         }
+        // Cios doszedl -> combat-tag (do kary za combat-log).
+        game.recordHit(victim.getUniqueId(), attacker.getUniqueId());
+    }
+
+    // ---------------------------------------------- reconnect (okno powrotu)
+    @EventHandler
+    public void onQuit(org.bukkit.event.player.PlayerQuitEvent e) {
+        GameInstance game = game();
+        if (game != null) game.onDisconnect(e.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void onJoin(org.bukkit.event.player.PlayerJoinEvent e) {
+        GameInstance game = game();
+        if (game != null) game.onReconnect(e.getPlayer().getUniqueId());
     }
 
     // ----------------------------------------- ochrona przed lawa/ogniem w no-PvP

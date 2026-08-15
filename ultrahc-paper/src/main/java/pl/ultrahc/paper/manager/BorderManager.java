@@ -74,15 +74,24 @@ public class BorderManager {
         border.setCenter(center);
         border.setSize(size); // natychmiastowy zacisk do arenki
 
-        // Teleport wszystkich zywych do srodka arenki.
+        // Tryb SCHEMATIC: generujemy plaska platforme-arenke (swiat jest losowy i
+        // regenerowany, wiec paste pliku wymagalby WorldEdit — dajemy niezalezna
+        // od pluginow plaska arene). BORDER_CLAMP zostawia teren bez zmian.
+        int floorY = center.getBlockY();
+        if ("SCHEMATIC".equalsIgnoreCase(mode)) {
+            floorY = buildPlatform(world, center.getBlockX(), center.getBlockZ(), (int) size);
+        }
+
+        // Teleport wszystkich zywych na srodek arenki.
         if (game.teams() != null) {
             for (Team team : game.teams().aliveTeams()) {
                 for (UUID id : team.getAlive()) {
                     Player p = plugin.getServer().getPlayer(id);
-                    if (p != null) {
-                        Location loc = world.getHighestBlockAt(center).getLocation().add(0.5, 1, 0.5);
-                        p.teleport(loc);
-                    }
+                    if (p == null) continue;
+                    Location loc = "SCHEMATIC".equalsIgnoreCase(mode)
+                            ? new Location(world, center.getBlockX() + 0.5, floorY + 1, center.getBlockZ() + 0.5)
+                            : world.getHighestBlockAt(center).getLocation().add(0.5, 1, 0.5);
+                    p.teleport(loc);
                 }
             }
         }
@@ -90,5 +99,21 @@ public class BorderManager {
         int minutes = Math.max(1, collapseTo - teleport);
         border.setSize(1, minutes * 60L);
         plugin.getLogger().info("[UltraHC] Arenka (" + mode + "): rozmiar " + size + ", kolaps do ~0 w " + minutes + " min.");
+    }
+
+    /** Buduje plaska kamienna platforme size x size wokol srodka; zwraca poziom podlogi. */
+    private int buildPlatform(World world, int cx, int cz, int size) {
+        int floorY = world.getHighestBlockYAt(cx, cz);
+        int half = size / 2;
+        for (int dx = -half; dx <= half; dx++) {
+            for (int dz = -half; dz <= half; dz++) {
+                int x = cx + dx, z = cz + dz;
+                world.getBlockAt(x, floorY, z).setType(org.bukkit.Material.STONE);
+                for (int dy = 1; dy <= 4; dy++) {
+                    world.getBlockAt(x, floorY + dy, z).setType(org.bukkit.Material.AIR);
+                }
+            }
+        }
+        return floorY;
     }
 }

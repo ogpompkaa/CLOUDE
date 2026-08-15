@@ -3,17 +3,26 @@ package pl.ultrahc.paper.command;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import pl.ultrahc.common.model.PlayerProfile;
 import pl.ultrahc.paper.UltraHcPlugin;
 import pl.ultrahc.paper.config.MessagesManager;
 import pl.ultrahc.paper.manager.ShopCurrencyManager;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-/** Komenda /uhc: info dla gracza + podstawowe akcje admina (szkielet). */
-public class UhcCommand implements CommandExecutor {
+/** Komenda /uhc: info dla gracza + akcje admina, z podpowiedziami (tab-complete). */
+public class UhcCommand implements CommandExecutor, TabCompleter {
+
+    private static final List<String> SUBCOMMANDS = List.of(
+            "balance", "reload", "givexp", "givepd", "resetseason", "join", "leave",
+            "forcestart", "forceend", "gameinfo", "classes", "class", "buyclass",
+            "shop", "buyrecipe", "setnpc", "sethologram", "quests", "season", "stats", "setstat");
 
     private final UltraHcPlugin plugin;
 
@@ -285,6 +294,37 @@ public class UhcCommand implements CommandExecutor {
         for (String line : plugin.games().describeState()) {
             sender.sendMessage(msg.legacy("&7" + line));
         }
+    }
+
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
+                                      @NotNull String alias, @NotNull String[] args) {
+        List<String> out = new ArrayList<>();
+        if (args.length == 1) {
+            return StringUtil.copyPartialMatches(args[0], SUBCOMMANDS, new ArrayList<>());
+        }
+        if (args.length == 2) {
+            List<String> pool = switch (args[0].toLowerCase()) {
+                case "class", "buyclass" -> plugin.classes().ids();
+                case "buyrecipe" -> plugin.shop().recipeIds();
+                case "givexp", "givepd", "stats", "setstat" -> onlineNames();
+                case "setnpc" -> List.of("mietek", "krzysiu", "sklepikarz");
+                case "sethologram" -> List.of("kills", "wins", "level");
+                case "season" -> List.of("start", "end");
+                default -> List.of();
+            };
+            return StringUtil.copyPartialMatches(args[1], pool, new ArrayList<>());
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("setstat")) {
+            return StringUtil.copyPartialMatches(args[2], List.of("xp", "pd", "level", "kills", "wins"), new ArrayList<>());
+        }
+        return out;
+    }
+
+    private List<String> onlineNames() {
+        List<String> names = new ArrayList<>();
+        for (Player p : plugin.getServer().getOnlinePlayers()) names.add(p.getName());
+        return names;
     }
 
     private void handleBalance(CommandSender sender) {

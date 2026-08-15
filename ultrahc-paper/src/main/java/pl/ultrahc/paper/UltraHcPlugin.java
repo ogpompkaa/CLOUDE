@@ -117,7 +117,9 @@ public class UltraHcPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ProfileListener(this), this);
         var cmd = getCommand("uhc");
         if (cmd != null) {
-            cmd.setExecutor(new UhcCommand(this));
+            UhcCommand handler = new UhcCommand(this);
+            cmd.setExecutor(handler);
+            cmd.setTabCompleter(handler);
         }
 
         // 5. Managery zalezne od roli

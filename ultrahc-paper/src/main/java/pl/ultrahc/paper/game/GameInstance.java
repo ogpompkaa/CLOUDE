@@ -34,6 +34,11 @@ public class GameInstance {
     private long startMillis;
     private boolean pvpEnabled;
 
+    // Reconnect (okno powrotu) i combat-tag (zabojca przy combat-logu).
+    private final Map<UUID, org.bukkit.scheduler.BukkitTask> pendingReconnect = new HashMap<>();
+    private final Map<UUID, UUID> lastAttacker = new HashMap<>();
+    private final Map<UUID, Long> lastHitTime = new HashMap<>();
+
     // Progi faz juz "odpalone" (zeby nie powtarzac broadcastow).
     private boolean pvpFired, shrinkFired, accelerateFired, compassFired, showdownFired;
 
@@ -75,10 +80,45 @@ public class GameInstance {
             participants.remove(uuid);
             return;
         }
-        // W trakcie gry: traktuj jak eliminacje (okno powrotu obsluzy DeathListener/etap 5).
+        // Jawne /uhc leave w trakcie gry = natychmiastowa eliminacja.
         if (state == GameState.RUNNING && teamManager != null) {
             handleElimination(uuid, null);
         }
+    }
+
+    // ------------------------------------------------------ reconnect / tag
+    /** Zapamietuje ostatniego napastnika (combat-tag) — do kary za combat-log. */
+    public void recordHit(UUID victim, UUID attacker) {
+        lastAttacker.put(victim, attacker);
+        lastHitTime.put(victim, System.currentTimeMillis());
+    }
+
+    private boolean combatTagged(UUID uuid) {
+        int tag = cfgInt("combat.tag-seconds", 10);
+        return System.currentTimeMillis() - lastHitTime.getOrDefault(uuid, 0L) <= tag * 1000L;
+    }
+
+    /** Rozlaczenie w trakcie gry: uruchamia okno powrotu; po nim eliminacja. */
+    public void onDisconnect(UUID uuid) {
+        if (state != GameState.RUNNING || teamManager == null) return;
+        Team team = teamManager.getTeam(uuid);
+        if (team == null || !team.isAlive(uuid)) return;
+        if (pendingReconnect.containsKey(uuid)) return;
+
+        int grace = cfgInt("game.reconnect-grace-seconds", 180);
+        var task = plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            pendingReconnect.remove(uuid);
+            // Combat-log: jesli byl otagowany, kill leci do napastnika.
+            UUID killer = combatTagged(uuid) ? lastAttacker.get(uuid) : null;
+            handleElimination(uuid, killer);
+        }, grace * 20L);
+        pendingReconnect.put(uuid, task);
+    }
+
+    /** Powrot gracza w oknie: anuluje zaplanowana eliminacje. */
+    public void onReconnect(UUID uuid) {
+        var task = pendingReconnect.remove(uuid);
+        if (task != null) task.cancel();
     }
 
     // ------------------------------------------------------------- countdown
@@ -301,6 +341,8 @@ public class GameInstance {
 
     public void shutdown() {
         stopTicker();
+        for (var task : pendingReconnect.values()) task.cancel();
+        pendingReconnect.clear();
     }
 
     // Broadcast tylko do uczestnikow tej gry.
