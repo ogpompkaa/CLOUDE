@@ -1,0 +1,157 @@
+package pl.ultrahc.paper.manager;
+
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
+import pl.ultrahc.common.model.PlayerProfile;
+import pl.ultrahc.paper.UltraHcPlugin;
+import pl.ultrahc.paper.game.GameInstance;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
+
+/**
+ * Nagrody XP (waluta sklepowa) i PD wg spec: za czas gry (progi rosnace),
+ * zabojstwa i wygrana. Ulamkowe stawki czasowe (np. 4.2 XP) sa akumulowane
+ * per-gracz i przenoszone do profilu calymi jednostkami (brak utraty ulamkow
+ * w obrebie gry). Wartosci w config (rewards.*).
+ */
+public class RewardManager {
+
+    private final UltraHcPlugin plugin;
+    private final ShopCurrencyManager currency;
+    private final LevelsManager levels;
+
+    // Akumulatory ulamkowe per-gracz: [0]=XP, [1]=PD.
+    private final Map<UUID, double[]> accum = new ConcurrentHashMap<>();
+    private BukkitTask xpTask, pdTask;
+
+    public RewardManager(UltraHcPlugin plugin, ShopCurrencyManager currency, LevelsManager levels) {
+        this.plugin = plugin;
+        this.currency = currency;
+        this.levels = levels;
+    }
+
+    private FileConfiguration cfg() { return plugin.configManager().raw(); }
+
+    // --------------------------------------------------------------- zabojstwo
+    public void grantKill(UUID killer) {
+        PlayerProfile p = plugin.profiles().get(killer);
+        if (p == null) return;
+        currency.add(p, cfg().getLong("rewards.currency.per-kill", 100));
+        int gained = levels.addProgress(p, cfg().getLong("rewards.progress.per-kill", 30));
+        p.setKills(p.getKills() + 1);
+        plugin.profiles().saveNow(p);
+        notifyLevel(killer, gained);
+    }
+
+    // ----------------------------------------------------------------- wygrana
+    public void grantWin(Iterable<UUID> winners) {
+        for (UUID id : winners) {
+            PlayerProfile p = plugin.profiles().get(id);
+            if (p == null) continue;
+            currency.add(p, cfg().getLong("rewards.currency.per-win", 1000));
+            int gained = levels.addProgress(p, cfg().getLong("rewards.progress.per-win", 250));
+            p.setWins(p.getWins() + 1);
+            plugin.profiles().saveNow(p);
+            notifyLevel(id, gained);
+        }
+    }
+
+    // ------------------------------------------------------- naliczanie czasowe
+    public void startAccrual(GameInstance game) {
+        stopAccrual();
+        accum.clear();
+        scheduleXp(game);
+        schedulePd(game);
+    }
+
+    public void stopAccrual() {
+        if (xpTask != null) { xpTask.cancel(); xpTask = null; }
+        if (pdTask != null) { pdTask.cancel(); pdTask = null; }
+    }
+
+    /** Zapisuje profile uczestnikow (flush po grze). */
+    public void saveParticipants(Iterable<UUID> participants) {
+        for (UUID id : participants) {
+            PlayerProfile p = plugin.profiles().get(id);
+            if (p != null) plugin.profiles().saveNow(p);
+        }
+    }
+
+    private void scheduleXp(GameInstance game) {
+        int min = cfg().getInt("rewards.currency.time.interval-min-min", 1);
+        int max = cfg().getInt("rewards.currency.time.interval-min-max", 2);
+        long delayTicks = 20L * 60L * ThreadLocalRandom.current().nextInt(Math.max(1, min), Math.max(min, max) + 1);
+        xpTask = plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            awardTime(game, "rewards.currency.time.tiers", true);
+            scheduleXp(game); // kolejny cykl z nowym losowym interwalem 1-2 min
+        }, delayTicks);
+    }
+
+    private void schedulePd(GameInstance game) {
+        int interval = cfg().getInt("rewards.progress.time.interval-min", 2);
+        long delayTicks = 20L * 60L * Math.max(1, interval);
+        pdTask = plugin.getServer().getScheduler().runTaskTimer(plugin, () ->
+                awardTime(game, "rewards.progress.time.tiers", false), delayTicks, delayTicks);
+    }
+
+    /** Przyznaje stawke z aktualnego progu wszystkim zywym uczestnikom. */
+    private void awardTime(GameInstance game, String tiersPath, boolean isCurrency) {
+        if (game.teams() == null) return;
+        int minutes = (int) (game.elapsedSeconds() / 60);
+        double amount = tierAmount(tiersPath, minutes);
+        if (amount <= 0) return;
+        for (UUID id : game.participants()) {
+            if (!isAlive(game, id)) continue;
+            accumulate(id, isCurrency ? amount : 0, isCurrency ? 0 : amount);
+        }
+    }
+
+    private boolean isAlive(GameInstance game, UUID id) {
+        var team = game.teams().getTeam(id);
+        return team != null && team.isAlive(id);
+    }
+
+    private void accumulate(UUID id, double xp, double pd) {
+        double[] a = accum.computeIfAbsent(id, k -> new double[2]);
+        a[0] += xp;
+        a[1] += pd;
+        PlayerProfile p = plugin.profiles().get(id);
+        if (p == null) return;
+        long wholeXp = (long) a[0];
+        if (wholeXp > 0) { currency.add(p, wholeXp); a[0] -= wholeXp; }
+        long wholePd = (long) a[1];
+        if (wholePd > 0) {
+            int gained = levels.addProgress(p, wholePd);
+            a[1] -= wholePd;
+            notifyLevel(id, gained);
+        }
+    }
+
+    /** Stawka z progu: pierwszy tier, dla ktorego minuty < to-min. */
+    private double tierAmount(String path, int minutes) {
+        List<Map<?, ?>> tiers = cfg().getMapList(path);
+        for (Map<?, ?> tier : tiers) {
+            int toMin = ((Number) tier.get("to-min")).intValue();
+            if (minutes < toMin) {
+                return ((Number) tier.get("amount")).doubleValue();
+            }
+        }
+        return tiers.isEmpty() ? 0 : ((Number) tiers.get(tiers.size() - 1).get("amount")).doubleValue();
+    }
+
+    private void notifyLevel(UUID id, int levelsGained) {
+        if (levelsGained <= 0) return;
+        Player p = plugin.getServer().getPlayer(id);
+        if (p == null) return;
+        PlayerProfile profile = plugin.profiles().get(id);
+        if (profile == null) return;
+        p.sendMessage(plugin.messages().prefixed("progress.level-up", Map.of(
+                "level", String.valueOf(profile.getLevel()),
+                "star", plugin.levels().starSymbol())));
+    }
+}

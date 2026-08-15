@@ -130,6 +130,7 @@ public class GameInstance {
         }
         int noPvpMin = cfgInt("game.no-pvp-seconds", 600) / 60;
         broadcast("game.started", Map.of("minutes", String.valueOf(noPvpMin)));
+        if (plugin.rewards() != null) plugin.rewards().startAccrual(this);
         startTicker(); // dziala tez przy force-starcie z WAITING
     }
 
@@ -205,7 +206,7 @@ public class GameInstance {
             Team killerTeam = teamManager.getTeam(killerOrNull);
             if (killerTeam != null && killerTeam != victimTeam) {
                 killerTeam.addKill();
-                // TODO(etap 5): nagrody za zabojstwo (XP+PD), glowka
+                if (plugin.rewards() != null) plugin.rewards().grantKill(killerOrNull);
             }
         }
         Player victimPlayer = plugin.getServer().getPlayer(victim);
@@ -220,14 +221,16 @@ public class GameInstance {
     public void endGame(Team winner) {
         if (state == GameState.ENDING) return;
         state = GameState.ENDING;
+        if (plugin.rewards() != null) plugin.rewards().stopAccrual();
         if (winner != null) {
             String key = cfgInt("game.team-size", 1) == 1 ? "game.win-solo" : "game.win-team";
             String nameKey = cfgInt("game.team-size", 1) == 1 ? "player" : "team";
             broadcast(key, Map.of(nameKey, winner.getName()));
-            // TODO(etap 5): nagroda za wygrana (XP+PD), wins++ dla czlonkow
+            if (plugin.rewards() != null) plugin.rewards().grantWin(winner.getMembers());
         } else {
             broadcast("game.death-generic", Map.of("victim", "-"));
         }
+        if (plugin.rewards() != null) plugin.rewards().saveParticipants(participants);
         stopTicker();
         // Sprzatanie zleci GameManager (kasowanie swiata + nowa instancja).
         plugin.games().onInstanceEnded(this);

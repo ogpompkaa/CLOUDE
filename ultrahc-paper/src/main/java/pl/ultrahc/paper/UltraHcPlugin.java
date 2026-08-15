@@ -6,9 +6,16 @@ import pl.ultrahc.paper.command.UhcCommand;
 import pl.ultrahc.paper.config.ConfigManager;
 import pl.ultrahc.paper.config.MessagesManager;
 import pl.ultrahc.paper.game.GameManager;
+import pl.ultrahc.paper.listener.CombatListener;
+import pl.ultrahc.paper.listener.CompassListener;
+import pl.ultrahc.paper.listener.DropsListener;
+import pl.ultrahc.paper.listener.HeadListener;
 import pl.ultrahc.paper.listener.ProfileListener;
 import pl.ultrahc.paper.manager.BorderManager;
+import pl.ultrahc.paper.manager.CompassManager;
+import pl.ultrahc.paper.manager.HeadManager;
 import pl.ultrahc.paper.manager.LevelsManager;
+import pl.ultrahc.paper.manager.RewardManager;
 import pl.ultrahc.paper.manager.ScoreboardService;
 import pl.ultrahc.paper.manager.ShopCurrencyManager;
 import pl.ultrahc.paper.profile.ProfileService;
@@ -32,6 +39,9 @@ public class UltraHcPlugin extends JavaPlugin {
     private GameManager gameManager;
     private BorderManager borderManager;
     private ScoreboardService scoreboardService;
+    private RewardManager rewardManager;
+    private HeadManager headManager;
+    private CompassManager compassManager;
 
     @Override
     public void onEnable() {
@@ -67,8 +77,18 @@ public class UltraHcPlugin extends JavaPlugin {
         // 5. Managery zalezne od roli
         if (role == ServerRole.ARENA) {
             this.borderManager = new BorderManager(this);
+            this.rewardManager = new RewardManager(this, currencyManager, levelsManager);
+            this.headManager = new HeadManager(this);
+            this.compassManager = new CompassManager(this);
             this.gameManager = new GameManager(this);
             this.scoreboardService = new ScoreboardService(this);
+
+            var pm = getServer().getPluginManager();
+            pm.registerEvents(new DropsListener(this), this);
+            pm.registerEvents(new CombatListener(this), this);
+            pm.registerEvents(new HeadListener(this), this);
+            pm.registerEvents(new CompassListener(this), this);
+
             // Przygotowanie swiata blokuje watek glowny — robimy to po pelnym starcie serwera.
             getServer().getScheduler().runTask(this, () -> {
                 gameManager.enableArena();
@@ -97,4 +117,7 @@ public class UltraHcPlugin extends JavaPlugin {
     public LevelsManager levels() { return levelsManager; }
     public GameManager games() { return gameManager; }
     public BorderManager border() { return borderManager; }
+    public RewardManager rewards() { return rewardManager; }
+    public HeadManager heads() { return headManager; }
+    public CompassManager compass() { return compassManager; }
 }

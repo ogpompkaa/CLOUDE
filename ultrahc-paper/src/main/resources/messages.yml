@@ -45,6 +45,12 @@ game:
 head:
   consumed: "&aZjadles glowke — otrzymujesz efekty."
 
+compass:
+  ally: "&aKompas: sojusznik &e%name% &7(%distance% kratek)"
+  enemy: "&cKompas: najblizszy przeciwnik &7(%distance% kratek)"   # nick ukryty
+  none: "&7Brak celu dla kompasu."
+  enemy-locked: "&7Tryb przeciwnika odblokuje sie po &e%minutes% min&7."
+
 detector:
   used: "&aWykrywacz aktywowany. Wynik za &e%seconds%s&a."
   result: "&e%player% &7- &e%distance% &7kratek"
