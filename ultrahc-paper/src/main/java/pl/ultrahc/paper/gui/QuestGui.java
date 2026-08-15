@@ -39,15 +39,20 @@ public class QuestGui implements Listener {
     public void open(Player player) {
         MessagesManager msg = plugin.messages();
         QuestHolder holder = new QuestHolder();
-        var defs = plugin.quests().defs();
-        int size = Math.max(9, ((defs.size() / 9) + 1) * 9);
-        Inventory inv = Bukkit.createInventory(holder, size, msg.component("quest.gui-title", null));
+        Inventory inv = Bukkit.createInventory(holder, 27, msg.component("quest.gui-title", null));
         holder.inv = inv;
 
-        int slot = 0;
-        for (QuestsManager.QuestDef def : defs.values()) {
+        // Rzedy wg typu: dzienne (0-8), tygodniowe (9-17), stale (18-26).
+        int[] next = {0, 9, 18};
+        for (QuestsManager.QuestDef def : plugin.quests().defs().values()) {
+            int row = switch (def.type()) {
+                case DAILY -> 0;
+                case WEEKLY -> 1;
+                case PERMANENT -> 2;
+            };
+            if (next[row] >= (row + 1) * 9) continue; // rzad pelny
             Storage.QuestRecord rec = plugin.quests().record(player.getUniqueId(), def);
-            inv.setItem(slot++, icon(def, rec, msg));
+            inv.setItem(next[row]++, icon(def, rec, msg));
         }
         player.openInventory(inv);
     }
@@ -71,6 +76,7 @@ public class QuestGui implements Listener {
             lore.add(LEGACY.deserialize(msg.raw("quest.progress", Map.of(
                     "progress", String.valueOf(rec.progress()),
                     "target", String.valueOf(def.target())))));
+            lore.add(LEGACY.deserialize(progressBar(rec.progress(), def.target(), msg)));
         }
         lore.add(LEGACY.deserialize(msg.raw("quest.reward-line", Map.of(
                 "xp", String.valueOf(def.rewardXp()),
@@ -80,6 +86,18 @@ public class QuestGui implements Listener {
         return item;
     }
 
+    /** Pasek postepu np. [▰▰▰▰▱▱▱▱▱▱] 40%. */
+    private String progressBar(long progress, long target, MessagesManager msg) {
+        int segments = 10;
+        int filled = target <= 0 ? segments : (int) Math.min(segments, Math.round((double) progress / target * segments));
+        int percent = target <= 0 ? 100 : (int) Math.min(100, Math.round((double) progress / target * 100));
+        String fill = msg.raw("quest-bar.filled");
+        String empty = msg.raw("quest-bar.empty");
+        StringBuilder bar = new StringBuilder();
+        for (int i = 0; i < segments; i++) bar.append(i < filled ? fill : empty);
+        return msg.raw("quest-bar.line", Map.of("bar", bar.toString(), "percent", String.valueOf(percent)));
+    }
+
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         if (e.getInventory().getHolder() instanceof QuestHolder) {
@@ -87,3 +105,4 @@ public class QuestGui implements Listener {
         }
     }
 }
+

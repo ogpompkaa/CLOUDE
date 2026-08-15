@@ -169,6 +169,33 @@ shop:
   bought-recipe: "&aKupiono recepture &e%recipe% &aza &e%price% %currency%&a."
   already-owned-recipe: "&ePosiadasz juz te recepture."
   title: "&8Sklep receptur"
+  price-line: "&7Cena: &e%price% XP"
+  status-owned: "&a✔ Posiadasz"
+  status-buy: "&eKliknij, aby kupic"
+  balance: "&6Twoje XP: &e%amount%"
+  balance-lore: "&7Wydawaj na receptury i klasy."
+  desc:
+    gornik-pickaxe:
+      - "&7Zelazny kilof: Wydajnosc III + Niezniszczalnosc III"
+    sharp-sword:
+      - "&7Zelazny miecz: Ostrosc II + Niezniszczalnosc I"
+    fire-sword:
+      - "&7Zelazny miecz: Ognisty Aspekt I"
+    hell-sword:
+      - "&7Diamentowy miecz: Ognisty Aspekt II"
+    enchanter:
+      - "&7Utrudniony crafting enchantu"
+    pandora-box:
+      - "&7Skrzynka: ksiazka z enchantem lub klatwa"
+    golden-head:
+      - "&7Regeneracja II + Szybkosc II + Absorbcja (8s)"
+    detector:
+      - "&7Pokazuje najblizszego gracza (cooldown 1 min)"
+
+quest-bar:
+  filled: "&a▰"
+  empty: "&8▰"
+  line: "&7[%bar%&7] &e%percent%%"
 
 # --------------------------- QUESTY / SEZON --------------------------
 quest:
