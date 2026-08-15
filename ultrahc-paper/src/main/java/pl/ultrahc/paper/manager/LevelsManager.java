@@ -1,6 +1,7 @@
 package pl.ultrahc.paper.manager;
 
 import org.bukkit.configuration.ConfigurationSection;
+import pl.ultrahc.common.game.LevelCurve;
 import pl.ultrahc.common.model.PlayerProfile;
 import pl.ultrahc.paper.config.ConfigManager;
 
@@ -18,10 +19,7 @@ public class LevelsManager {
 
     private final ConfigManager config;
 
-    private String mode;
-    private double slope, intercept;      // LINEAR
-    private double geomBase, geomGrowth;  // GEOMETRIC
-    private final Map<Integer, Long> overrides = new HashMap<>();
+    private LevelCurve curve;
     private String starSymbol;
 
     public LevelsManager(ConfigManager config) {
@@ -31,13 +29,9 @@ public class LevelsManager {
 
     public void reload() {
         var c = config.raw();
-        this.mode = c.getString("levels.mode", "LINEAR").toUpperCase();
-        this.slope = c.getDouble("levels.linear.slope", 2000);
-        this.intercept = c.getDouble("levels.linear.intercept", 500);
-        this.geomBase = c.getDouble("levels.geometric.base", 750);
-        this.geomGrowth = c.getDouble("levels.geometric.growth", 1.35);
-        this.starSymbol = c.getString("levels.star-symbol", "gwiazdka");
-        overrides.clear();
+        LevelCurve.Mode mode = "GEOMETRIC".equalsIgnoreCase(c.getString("levels.mode", "LINEAR"))
+                ? LevelCurve.Mode.GEOMETRIC : LevelCurve.Mode.LINEAR;
+        Map<Integer, Long> overrides = new HashMap<>();
         ConfigurationSection ov = c.getConfigurationSection("levels.overrides");
         if (ov != null) {
             for (String key : ov.getKeys(false)) {
@@ -47,16 +41,18 @@ public class LevelsManager {
                 }
             }
         }
+        this.curve = new LevelCurve(mode,
+                c.getDouble("levels.linear.slope", 2000),
+                c.getDouble("levels.linear.intercept", 500),
+                c.getDouble("levels.geometric.base", 750),
+                c.getDouble("levels.geometric.growth", 1.35),
+                overrides);
+        this.starSymbol = c.getString("levels.star-symbol", "gwiazdka");
     }
 
     /** Ile PD potrzeba, aby awansowac Z podanego poziomu na nastepny. */
     public long requiredForLevel(int level) {
-        Long override = overrides.get(level);
-        if (override != null) return override;
-        if ("GEOMETRIC".equals(mode)) {
-            return Math.round(geomBase * Math.pow(geomGrowth, level));
-        }
-        return Math.round(slope * level + intercept);
+        return curve.requiredForLevel(level);
     }
 
     /**

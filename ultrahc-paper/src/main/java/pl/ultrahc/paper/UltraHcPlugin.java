@@ -106,6 +106,9 @@ public class UltraHcPlugin extends JavaPlugin {
         this.messagesManager = new MessagesManager(this);
         messagesManager.load();
         this.role = configManager.role();
+        for (String warn : pl.ultrahc.paper.config.ConfigValidator.validate(configManager.raw())) {
+            getLogger().warning("[UltraHC] Config: " + warn);
+        }
 
         // 2. Magazyn danych (DAO)
         this.storage = StorageFactory.create(this, configManager);

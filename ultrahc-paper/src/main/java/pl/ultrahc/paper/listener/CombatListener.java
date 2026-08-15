@@ -72,7 +72,21 @@ public class CombatListener implements Listener {
     @EventHandler
     public void onJoin(org.bukkit.event.player.PlayerJoinEvent e) {
         GameInstance game = game();
-        if (game != null) game.onReconnect(e.getPlayer().getUniqueId());
+        if (game == null) return;
+        Player player = e.getPlayer();
+        game.onReconnect(player.getUniqueId());
+        // Jesli gracz wrocil do nieistniejacego/starego swiata (gra sie skonczyla,
+        // swiat areny skasowany) — przenies go do biezacej instancji.
+        if (player.getWorld() != game.world()) {
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+                if (!player.isOnline()) return;
+                player.teleport(game.world().getSpawnLocation());
+                if (game.state() == pl.ultrahc.paper.game.GameState.WAITING
+                        || game.state() == pl.ultrahc.paper.game.GameState.COUNTDOWN) {
+                    player.setGameMode(GameMode.ADVENTURE);
+                }
+            });
+        }
     }
 
     // ----------------------------------------- ochrona przed lawa/ogniem w no-PvP
