@@ -121,6 +121,18 @@ public class InstanceManager {
         }
     }
 
+    /** LOBBY: dolaczalne instancje dowolnego trybu (do matchmakingu party). */
+    public List<InstanceInfo> joinableAll() {
+        if (registry == null) return List.of();
+        long stale = plugin.configManager().raw().getInt("network.instance-stale-seconds", 10) * 1000L;
+        try {
+            return registry.listJoinableAny(stale);
+        } catch (Exception e) {
+            plugin.getLogger().warning("[UltraHC] Blad odczytu rejestru: " + e.getMessage());
+            return List.of();
+        }
+    }
+
     private String resolveInstanceId() {
         String configured = plugin.configManager().raw().getString("server.instance-name", "");
         if (configured != null && !configured.isBlank()) return configured;

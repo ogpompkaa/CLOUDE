@@ -118,6 +118,21 @@ public class InstanceRegistry {
         return out;
     }
 
+    /** Dolaczalne instancje dowolnego trybu (matchmaking wg rozmiaru party). */
+    public synchronized List<InstanceInfo> listJoinableAny(long maxAgeMillis) throws Exception {
+        long minHeartbeat = System.currentTimeMillis() - maxAgeMillis;
+        List<InstanceInfo> out = new ArrayList<>();
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT * FROM instances WHERE players < max_players " +
+                        "AND state IN ('WAITING','COUNTDOWN') AND heartbeat >= ? ORDER BY team_size, players DESC")) {
+            ps.setLong(1, minHeartbeat);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(read(rs));
+            }
+        }
+        return out;
+    }
+
     public synchronized List<InstanceInfo> listAll() throws Exception {
         List<InstanceInfo> out = new ArrayList<>();
         try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM instances ORDER BY id")) {

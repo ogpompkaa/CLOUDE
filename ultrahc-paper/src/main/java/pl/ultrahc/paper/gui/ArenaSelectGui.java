@@ -47,8 +47,17 @@ public class ArenaSelectGui implements Listener {
 
     public void open(Player player) {
         MessagesManager msg = plugin.messages();
-        int teamSize = plugin.configManager().raw().getInt("game.team-size", 1);
-        List<InstanceInfo> list = plugin.instances() == null ? List.of() : plugin.instances().joinable(teamSize);
+        // Matchmaking: pokazuj instancje dowolnego trybu, ale party widzi tylko takie,
+        // w ktore zmiesci sie w calosci (team_size >= rozmiar party).
+        int partySize = 1;
+        if (plugin.party() != null && plugin.party().get(player.getUniqueId()) != null) {
+            partySize = plugin.party().get(player.getUniqueId()).size();
+        }
+        final int need = partySize;
+        List<InstanceInfo> list = plugin.instances() == null ? List.of()
+                : plugin.instances().joinableAll().stream()
+                        .filter(i -> i.teamSize() >= need)
+                        .toList();
 
         Holder holder = new Holder();
         int size = Math.max(18, ((list.size() / 9) + 2) * 9);
@@ -81,6 +90,7 @@ public class ArenaSelectGui implements Listener {
         meta.displayName(LEGACY.deserialize(msg.raw("arena.instance", Map.of("id", info.id()))));
         List<Component> lore = new ArrayList<>();
         lore.add(LEGACY.deserialize(msg.raw("arena.lore-state", Map.of("state", info.state()))));
+        lore.add(LEGACY.deserialize(msg.raw("arena.lore-mode", Map.of("mode", info.mode()))));
         lore.add(LEGACY.deserialize(msg.raw("arena.lore-players", Map.of(
                 "players", String.valueOf(info.players()), "max", String.valueOf(info.maxPlayers())))));
         meta.lore(lore);
@@ -100,6 +110,14 @@ public class ArenaSelectGui implements Listener {
         if (target == null || target.isBlank()) return;
         player.sendMessage(plugin.messages().prefixed("arena.connecting", Map.of("id", target)));
         connectToServer(player, target);
+        // Party podaza za liderem na te sama arene.
+        if (plugin.party() != null && plugin.party().isLeader(player.getUniqueId())) {
+            for (Player mate : plugin.party().onlineMembers(player.getUniqueId())) {
+                if (mate.equals(player)) continue;
+                mate.sendMessage(plugin.messages().prefixed("arena.connecting", Map.of("id", target)));
+                connectToServer(mate, target);
+            }
+        }
         player.closeInventory();
     }
 
