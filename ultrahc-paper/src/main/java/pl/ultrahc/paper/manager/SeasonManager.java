@@ -70,6 +70,8 @@ public class SeasonManager {
         }
         plugin.getServer().getScheduler().runTask(plugin, () ->
                 plugin.getServer().broadcast(plugin.messages().prefixed("season.reward", Map.of(
-                        "rank", String.valueOf(rank), "xp", String.valueOf(amount), "player", name))));
+                        "rank", String.valueOf(rank),
+                        "xp", pl.ultrahc.paper.util.NumberUtil.grouped(amount),
+                        "player", name))));
     }
 }

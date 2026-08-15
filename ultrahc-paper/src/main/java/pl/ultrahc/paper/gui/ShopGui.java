@@ -113,15 +113,15 @@ public class ShopGui implements Listener {
         if (plugin.shop().buy(profile, id)) {
             player.sendMessage(msg.prefixed("shop.bought-recipe", Map.of(
                     "recipe", plugin.shop().displayName(id),
-                    "price", String.valueOf(price),
+                    "price", pl.ultrahc.paper.util.NumberUtil.grouped(price),
                     "currency", msg.raw("currency.name"))));
             pl.ultrahc.paper.util.Feedback.buy(player);
             open(player); // odswiez GUI (status)
         } else {
             player.sendMessage(msg.prefixed("currency.not-enough", Map.of(
                     "name", msg.raw("currency.name"),
-                    "need", String.valueOf(price),
-                    "have", String.valueOf(profile.getCredits()))));
+                    "need", pl.ultrahc.paper.util.NumberUtil.grouped(price),
+                    "have", pl.ultrahc.paper.util.NumberUtil.grouped(profile.getCredits()))));
             pl.ultrahc.paper.util.Feedback.error(player);
         }
     }

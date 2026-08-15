@@ -53,8 +53,8 @@ public class StatsGui implements Listener {
         lore.add(LEGACY.deserialize(msg.raw("stats.level", Map.of(
                 "level", String.valueOf(p.getLevel()),
                 "star", plugin.levels().starSymbol(),
-                "current", String.valueOf(p.getProgressPoints()),
-                "required", String.valueOf(plugin.levels().requiredForLevel(p.getLevel()))))));
+                "current", pl.ultrahc.paper.util.NumberUtil.grouped(p.getProgressPoints()),
+                "required", pl.ultrahc.paper.util.NumberUtil.grouped(plugin.levels().requiredForLevel(p.getLevel()))))));
         lore.add(LEGACY.deserialize(msg.raw("stats.kills", Map.of("value", String.valueOf(p.getKills())))));
         lore.add(LEGACY.deserialize(msg.raw("stats.wins", Map.of("value", String.valueOf(p.getWins())))));
         lore.add(LEGACY.deserialize(msg.raw("stats.clazz", Map.of("value", plugin.classes().displayName(p.getSelectedClass())))));

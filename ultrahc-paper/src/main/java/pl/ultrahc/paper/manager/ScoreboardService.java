@@ -197,7 +197,7 @@ public class ScoreboardService {
                     "count", String.valueOf(game.participants().size()),
                     "max", String.valueOf(plugin.configManager().raw().getInt("game.max-players", 100))))));
             lines.add("");
-            lines.add(legacy(msg.raw("scoreboard.currency-label", Map.of("amount", String.valueOf(currency)))));
+            lines.add(legacy(msg.raw("scoreboard.currency-label", Map.of("amount", NumberUtil.grouped(currency)))));
             lines.add(legacy(msg.raw("scoreboard.timer", Map.of("time", TimeUtil.hms(0)))));
             return lines;
         }
@@ -232,7 +232,7 @@ public class ScoreboardService {
         // Zlota liczba = aktualny rozmiar granicy.
         double borderSize = game.world().getWorldBorder().getSize();
         lines.add(legacy(msg.raw("scoreboard.border-line", Map.of("size", NumberUtil.oneDecimalComma(borderSize)))));
-        lines.add(legacy(msg.raw("scoreboard.currency-label", Map.of("amount", String.valueOf(currency)))));
+        lines.add(legacy(msg.raw("scoreboard.currency-label", Map.of("amount", NumberUtil.grouped(currency)))));
         lines.add(legacy(msg.raw("scoreboard.alive-label", Map.of("count", String.valueOf(teams.alivePlayers())))));
         lines.add("");
 

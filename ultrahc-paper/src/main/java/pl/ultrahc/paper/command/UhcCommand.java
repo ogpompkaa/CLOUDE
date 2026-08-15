@@ -146,7 +146,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         if (p == null) { loading(sender); return; }
         sender.sendMessage(msg.prefixed("admin.stats-header", Map.of("player", p.getName())));
         sender.sendMessage(msg.prefixed("admin.stats-line1", Map.of(
-                "xp", String.valueOf(p.getCredits()), "pd", String.valueOf(p.getProgressPoints()),
+                "xp", num(p.getCredits()), "pd", num(p.getProgressPoints()),
                 "level", String.valueOf(p.getLevel()))));
         sender.sendMessage(msg.prefixed("admin.stats-line2", Map.of(
                 "kills", String.valueOf(p.getKills()), "wins", String.valueOf(p.getWins()),
@@ -250,13 +250,13 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         if (plugin.shop().buy(p, id)) {
             player.sendMessage(msg.prefixed("shop.bought-recipe", Map.of(
                     "recipe", plugin.shop().displayName(id),
-                    "price", String.valueOf(price),
+                    "price", num(price),
                     "currency", msg.raw("currency.name"))));
         } else {
             player.sendMessage(msg.prefixed("currency.not-enough", Map.of(
                     "name", msg.raw("currency.name"),
-                    "need", String.valueOf(price),
-                    "have", String.valueOf(p.getCredits()))));
+                    "need", num(price),
+                    "have", num(p.getCredits()))));
         }
     }
 
@@ -307,13 +307,13 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         if (plugin.classes().buy(p, id)) {
             player.sendMessage(msg.prefixed("class.bought", Map.of(
                     "class", plugin.classes().displayName(id),
-                    "price", String.valueOf(price),
+                    "price", num(price),
                     "currency", msg.raw("currency.name"))));
         } else {
             player.sendMessage(msg.prefixed("currency.not-enough", Map.of(
                     "name", msg.raw("currency.name"),
-                    "need", String.valueOf(price),
-                    "have", String.valueOf(p.getCredits()))));
+                    "need", num(price),
+                    "have", num(p.getCredits()))));
         }
     }
 
@@ -367,6 +367,11 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(plugin.messages().prefixed("general.profile-loading", null));
     }
 
+    /** Liczba z separatorem tysiecy (spojne formatowanie walut). */
+    private String num(long v) {
+        return pl.ultrahc.paper.util.NumberUtil.grouped(v);
+    }
+
     private void handleHelp(CommandSender sender) {
         MessagesManager msg = plugin.messages();
         sender.sendMessage(msg.legacy(msg.raw("help.header")));
@@ -392,8 +397,8 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(msg.prefixed("progress.status", Map.of(
                 "level", String.valueOf(p.getLevel()),
                 "star", plugin.levels().starSymbol(),
-                "current", String.valueOf(p.getProgressPoints()),
-                "required", String.valueOf(plugin.levels().requiredForLevel(p.getLevel())))));
+                "current", num(p.getProgressPoints()),
+                "required", num(plugin.levels().requiredForLevel(p.getLevel())))));
     }
 
     private void handleReload(CommandSender sender) {
@@ -438,11 +443,11 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         if (currency) {
             plugin.currency().add(p, amount);
             sender.sendMessage(msg.prefixed("admin.currency-given",
-                    Map.of("amount", String.valueOf(amount), "player", target.getName())));
+                    Map.of("amount", num(amount), "player", target.getName())));
         } else {
             int gained = plugin.levels().addProgress(p, amount);
             sender.sendMessage(msg.prefixed("admin.pd-given",
-                    Map.of("amount", String.valueOf(amount), "player", target.getName())));
+                    Map.of("amount", num(amount), "player", target.getName())));
             if (gained > 0) {
                 target.sendMessage(msg.prefixed("progress.level-up",
                         Map.of("level", String.valueOf(p.getLevel()), "star", plugin.levels().starSymbol())));

@@ -110,14 +110,14 @@ public class ClassGui implements Listener {
                 plugin.classes().select(p, id);
                 player.sendMessage(msg.prefixed("class.bought", Map.of(
                         "class", plugin.classes().displayName(id),
-                        "price", String.valueOf(price),
+                        "price", pl.ultrahc.paper.util.NumberUtil.grouped(price),
                         "currency", msg.raw("currency.name"))));
                 pl.ultrahc.paper.util.Feedback.buy(player);
             } else {
                 player.sendMessage(msg.prefixed("currency.not-enough", Map.of(
                         "name", msg.raw("currency.name"),
-                        "need", String.valueOf(price),
-                        "have", String.valueOf(p.getCredits()))));
+                        "need", pl.ultrahc.paper.util.NumberUtil.grouped(price),
+                        "have", pl.ultrahc.paper.util.NumberUtil.grouped(p.getCredits()))));
                 pl.ultrahc.paper.util.Feedback.error(player);
             }
         }

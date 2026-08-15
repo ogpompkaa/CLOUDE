@@ -29,7 +29,7 @@ public class InstanceRegistry {
         this.logger = logger;
     }
 
-    public void init() throws Exception {
+    public synchronized void init() throws Exception {
         connection = (user == null || user.isBlank())
                 ? DriverManager.getConnection(jdbcUrl)
                 : DriverManager.getConnection(jdbcUrl, user, password);
@@ -49,7 +49,7 @@ public class InstanceRegistry {
     }
 
     /** Zadanie zamkniecia instancji (ustawiane przez lobby/admina, odbierane przez arene). */
-    public void requestClose(String id) throws Exception {
+    public synchronized void requestClose(String id) throws Exception {
         try (PreparedStatement ps = connection.prepareStatement(
                 "UPDATE instances SET close_requested = 1 WHERE id = ?")) {
             ps.setString(1, id);
@@ -58,7 +58,7 @@ public class InstanceRegistry {
     }
 
     /** Arena: sprawdza i czysci flage zamkniecia swojej instancji. */
-    public boolean consumeCloseRequest(String id) throws Exception {
+    public synchronized boolean consumeCloseRequest(String id) throws Exception {
         boolean requested = false;
         try (PreparedStatement ps = connection.prepareStatement(
                 "SELECT close_requested FROM instances WHERE id = ?")) {
@@ -78,7 +78,7 @@ public class InstanceRegistry {
     }
 
     /** Zapis/aktualizacja wiersza instancji wraz z heartbeatem. */
-    public void upsert(InstanceInfo info) throws Exception {
+    public synchronized void upsert(InstanceInfo info) throws Exception {
         try (PreparedStatement ps = connection.prepareStatement(
                 "INSERT INTO instances (id,state,players,max_players,team_size,mode,heartbeat) " +
                         "VALUES (?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET " +
@@ -95,7 +95,7 @@ public class InstanceRegistry {
         }
     }
 
-    public void remove(String id) throws Exception {
+    public synchronized void remove(String id) throws Exception {
         try (PreparedStatement ps = connection.prepareStatement("DELETE FROM instances WHERE id = ?")) {
             ps.setString(1, id);
             ps.executeUpdate();
@@ -103,7 +103,7 @@ public class InstanceRegistry {
     }
 
     /** Instancje, do ktorych mozna dolaczyc: stan WAITING/COUNTDOWN, jest miejsce, swiezy heartbeat. */
-    public List<InstanceInfo> listJoinable(int teamSize, long maxAgeMillis) throws Exception {
+    public synchronized List<InstanceInfo> listJoinable(int teamSize, long maxAgeMillis) throws Exception {
         long minHeartbeat = System.currentTimeMillis() - maxAgeMillis;
         List<InstanceInfo> out = new ArrayList<>();
         try (PreparedStatement ps = connection.prepareStatement(
@@ -118,7 +118,7 @@ public class InstanceRegistry {
         return out;
     }
 
-    public List<InstanceInfo> listAll() throws Exception {
+    public synchronized List<InstanceInfo> listAll() throws Exception {
         List<InstanceInfo> out = new ArrayList<>();
         try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM instances ORDER BY id")) {
             try (ResultSet rs = ps.executeQuery()) {
@@ -133,7 +133,7 @@ public class InstanceRegistry {
                 rs.getInt("max_players"), rs.getInt("team_size"), rs.getString("mode"), rs.getLong("heartbeat"));
     }
 
-    public void close() {
+    public synchronized void close() {
         try {
             if (connection != null) connection.close();
         } catch (Exception e) {
