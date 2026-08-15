@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import pl.corekit.CoreKitPlugin;
 import pl.corekit.command.CommandUtil;
 import pl.corekit.command.CoreKitCommand;
+import pl.corekit.feature.feedback.FeedbackService;
 import pl.corekit.lang.MessageService;
 
 import java.util.List;
@@ -33,11 +34,11 @@ public final class GameModeCommands implements CoreKitCommand {
             List.of("survival", "creative", "adventure", "spectator");
 
     private final CoreKitPlugin plugin;
-    private final MessageService messages;
+    private final FeedbackService feedback;
 
-    public GameModeCommands(CoreKitPlugin plugin, MessageService messages) {
+    public GameModeCommands(CoreKitPlugin plugin, FeedbackService feedback) {
         this.plugin = plugin;
-        this.messages = messages;
+        this.feedback = feedback;
     }
 
     @Override
@@ -80,16 +81,16 @@ public final class GameModeCommands implements CoreKitCommand {
     private int applySelf(CommandContext<CommandSourceStack> ctx, GameMode mode, String input) {
         CommandSender sender = ctx.getSource().getSender();
         if (mode == null) {
-            messages.send(sender, "gamemode.invalid", MessageService.placeholder("input", input));
+            feedback.error(sender, "gamemode.invalid", MessageService.placeholder("input", input));
             return 0;
         }
         Player self = CommandUtil.asPlayer(ctx);
         if (self == null) {
-            messages.send(sender, "players-only");
+            feedback.error(sender, "players-only");
             return 0;
         }
         self.setGameMode(mode);
-        messages.send(self, "gamemode.self", MessageService.placeholder("mode", label(mode)));
+        feedback.quick(self, true, "gamemode.self", MessageService.placeholder("mode", label(mode)));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -97,16 +98,16 @@ public final class GameModeCommands implements CoreKitCommand {
             throws CommandSyntaxException {
         CommandSender actor = ctx.getSource().getSender();
         if (mode == null) {
-            messages.send(actor, "gamemode.invalid", MessageService.placeholder("input", input));
+            feedback.error(actor, "gamemode.invalid", MessageService.placeholder("input", input));
             return 0;
         }
         Player target = CommandUtil.resolveTarget(ctx, "target");
         target.setGameMode(mode);
-        messages.send(actor, "gamemode.other",
+        feedback.success(actor, "gamemode.other",
                 MessageService.placeholder("target", target.getName()),
                 MessageService.placeholder("mode", label(mode)));
         if (!target.equals(actor)) {
-            messages.send(target, "gamemode.self", MessageService.placeholder("mode", label(mode)));
+            feedback.quick(target, true, "gamemode.self", MessageService.placeholder("mode", label(mode)));
         }
         return Command.SINGLE_SUCCESS;
     }

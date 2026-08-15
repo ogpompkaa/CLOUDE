@@ -13,7 +13,13 @@ public record Settings(
         boolean debug,
         String storageFile,
         int poolSize,
-        int defaultHomeLimit
+        int defaultHomeLimit,
+        int warmupSeconds,
+        int cooldownSeconds,
+        boolean cancelOnMove,
+        boolean cancelOnDamage,
+        boolean soundsEnabled,
+        boolean actionBarEnabled
 ) {
 
     static Settings from(FileConfiguration config) {
@@ -22,7 +28,13 @@ public record Settings(
                 config.getBoolean("settings.debug", false),
                 config.getString("storage.file", "data.db"),
                 Math.max(1, config.getInt("storage.pool-size", 4)),
-                Math.max(0, config.getInt("homes.default-limit", 1))
+                Math.max(0, config.getInt("homes.default-limit", 1)),
+                Math.max(0, config.getInt("teleport.warmup-seconds", 3)),
+                Math.max(0, config.getInt("teleport.cooldown-seconds", 5)),
+                config.getBoolean("teleport.cancel-on-move", true),
+                config.getBoolean("teleport.cancel-on-damage", true),
+                config.getBoolean("feedback.sounds", true),
+                config.getBoolean("feedback.action-bar", true)
         );
     }
 }

@@ -4,12 +4,12 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import pl.corekit.CoreKitPlugin;
 import pl.corekit.command.CommandUtil;
 import pl.corekit.command.CoreKitCommand;
+import pl.corekit.feature.feedback.FeedbackService;
 import pl.corekit.lang.MessageService;
 import pl.corekit.storage.PlayerProfile;
 
@@ -20,11 +20,13 @@ import java.util.List;
 public final class CoreCommand implements CoreKitCommand {
 
     private final CoreKitPlugin plugin;
+    private final FeedbackService feedback;
     private final MessageService messages;
 
-    public CoreCommand(CoreKitPlugin plugin, MessageService messages) {
+    public CoreCommand(CoreKitPlugin plugin, FeedbackService feedback) {
         this.plugin = plugin;
-        this.messages = messages;
+        this.feedback = feedback;
+        this.messages = feedback.messages();
     }
 
     @Override
@@ -51,7 +53,7 @@ public final class CoreCommand implements CoreKitCommand {
 
     private int reload(CommandContext<CommandSourceStack> context) {
         plugin.reload();
-        messages.send(context.getSource().getSender(), "command.reloaded");
+        feedback.success(context.getSource().getSender(), "command.reloaded");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -65,7 +67,7 @@ public final class CoreCommand implements CoreKitCommand {
         CommandSender sender = context.getSource().getSender();
         Player player = CommandUtil.asPlayer(context);
         if (player == null) {
-            messages.send(sender, "players-only");
+            feedback.error(sender, "players-only");
             return 0;
         }
 
@@ -82,8 +84,7 @@ public final class CoreCommand implements CoreKitCommand {
                 })
         ).exceptionally(throwable -> {
             plugin.getSLF4JLogger().warn("Failed to load profile for {}", player.getName(), throwable);
-            plugin.database().sync(() ->
-                    player.sendMessage(messages.render("command.error").color(NamedTextColor.RED)));
+            plugin.database().sync(() -> feedback.error(player, "command.error"));
             return null;
         });
         return Command.SINGLE_SUCCESS;

@@ -4,13 +4,16 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import pl.corekit.command.CommandRegistrar;
 import pl.corekit.config.ConfigManager;
+import pl.corekit.feature.feedback.FeedbackService;
 import pl.corekit.feature.god.GodService;
 import pl.corekit.feature.home.HomeService;
 import pl.corekit.feature.spawn.SpawnService;
+import pl.corekit.feature.teleport.TeleportService;
 import pl.corekit.lang.MessageService;
 import pl.corekit.listener.GodListener;
 import pl.corekit.listener.HomeCacheListener;
 import pl.corekit.listener.PlayerConnectionListener;
+import pl.corekit.listener.TeleportListener;
 import pl.corekit.storage.DatabaseManager;
 import pl.corekit.storage.HomeRepository;
 import pl.corekit.storage.PlayerProfileRepository;
@@ -35,6 +38,8 @@ public final class CoreKitPlugin extends JavaPlugin {
     private HomeService homes;
     private SpawnService spawn;
     private GodService god;
+    private FeedbackService feedback;
+    private TeleportService teleport;
 
     @Override
     public void onEnable() {
@@ -59,6 +64,8 @@ public final class CoreKitPlugin extends JavaPlugin {
         this.profiles = new PlayerProfileRepository(database);
 
         // 4. Feature services.
+        this.feedback = new FeedbackService(this, messages);
+        this.teleport = new TeleportService(this, feedback, messages);
         this.homes = new HomeService(this, new HomeRepository(database));
         this.spawn = new SpawnService(this);
         this.spawn.load();
@@ -69,7 +76,8 @@ public final class CoreKitPlugin extends JavaPlugin {
         pluginManager.registerEvents(new PlayerConnectionListener(this, profiles, messages), this);
         pluginManager.registerEvents(new HomeCacheListener(homes), this);
         pluginManager.registerEvents(new GodListener(god), this);
-        new CommandRegistrar(this, messages).register();
+        pluginManager.registerEvents(new TeleportListener(this, teleport), this);
+        new CommandRegistrar(this).register();
 
         getSLF4JLogger().info("CoreKit v{} enabled.", getPluginMeta().getVersion());
     }
@@ -77,6 +85,9 @@ public final class CoreKitPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         // Guard against a failed onEnable: any of these may be null.
+        if (teleport != null) {
+            teleport.cancelAll();
+        }
         if (database != null) {
             database.shutdown();
         }
@@ -120,5 +131,13 @@ public final class CoreKitPlugin extends JavaPlugin {
 
     public GodService god() {
         return god;
+    }
+
+    public FeedbackService feedback() {
+        return feedback;
+    }
+
+    public TeleportService teleport() {
+        return teleport;
     }
 }

@@ -8,7 +8,7 @@ import pl.corekit.command.commands.GameModeCommands;
 import pl.corekit.command.commands.HomeCommands;
 import pl.corekit.command.commands.PlayerUtilityCommands;
 import pl.corekit.command.commands.SpawnCommands;
-import pl.corekit.lang.MessageService;
+import pl.corekit.feature.feedback.FeedbackService;
 
 import java.util.List;
 
@@ -22,14 +22,15 @@ public final class CommandRegistrar {
     private final CoreKitPlugin plugin;
     private final List<CoreKitCommand> commands;
 
-    public CommandRegistrar(CoreKitPlugin plugin, MessageService messages) {
+    public CommandRegistrar(CoreKitPlugin plugin) {
         this.plugin = plugin;
+        FeedbackService feedback = plugin.feedback();
         this.commands = List.of(
-                new CoreCommand(plugin, messages),
-                new PlayerUtilityCommands(plugin, messages, plugin.god()),
-                new GameModeCommands(plugin, messages),
-                new HomeCommands(plugin, messages, plugin.homes()),
-                new SpawnCommands(plugin, messages, plugin.spawn())
+                new CoreCommand(plugin, feedback),
+                new PlayerUtilityCommands(plugin, feedback, plugin.god()),
+                new GameModeCommands(plugin, feedback),
+                new HomeCommands(plugin, feedback, plugin.homes(), plugin.teleport()),
+                new SpawnCommands(plugin, feedback, plugin.spawn(), plugin.teleport())
         );
     }
 

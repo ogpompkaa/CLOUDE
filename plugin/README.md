@@ -33,13 +33,29 @@ it is the clean, opinionated base you clone features onto.
 | `/fly [player]` | `corekit.fly` (+`.others`) | Toggle flight. |
 | `/god [player]` | `corekit.god` (+`.others`) | Toggle damage immunity (in-memory). |
 | `/gamemode <mode> [player]` (`/gm`, `/gmc /gms /gma /gmsp`) | `corekit.gamemode` (+`.others`) | Names, letters or 0-3 ids. |
-| `/sethome [name]` · `/home [name]` · `/delhome [name]` · `/homes` | `corekit.home` | Async SQLite; tab-completed names. |
-| `/spawn` · `/setspawn` | `corekit.spawn` · `corekit.setspawn` | Stored in `spawn.yml`. |
+| `/sethome [name]` · `/home [name]` · `/delhome [name]` · `/homes` | `corekit.home` | Async SQLite; tab-completed names; clickable `/homes` list. |
+| `/spawn` · `/setspawn` | `corekit.spawn` · `corekit.setspawn` | Warm-up teleport; stored in `spawn.yml`. |
 
 **Home limits** come from permissions: grant `corekit.homes.limit.<n>` (highest
 granted number wins) or `corekit.homes.unlimited`; the fallback is
 `homes.default-limit` in `config.yml`. `/heal`, `/feed`, `/fly`, `/god` and
 `/gamemode` default to OP; homes and `/spawn` are open to everyone.
+
+### Premium UX layer
+
+The touches that make the commands feel finished, all config-driven and
+reloadable:
+
+- **Warm-up teleports** — `/home` and `/spawn` show a boss-bar countdown
+  (`teleport.warmup-seconds`) that cancels on movement or damage, with a
+  post-teleport **cooldown** (`teleport.cooldown-seconds`). Bypass with
+  `corekit.teleport.bypass-warmup` / `-cooldown`.
+- **Feedback service** — success/error/teleport **sounds** (`feedback.sounds`)
+  and snappy **action-bar** confirmations for quick toggles
+  (`feedback.action-bar`); errors always land in chat.
+- **Clickable `/homes`** — each row carries `[▶ Teleport]` (runs `/home <name>`)
+  and `[✖ Delete]` (pre-fills `/delhome <name>`) with hover tooltips, built with
+  Adventure click/hover events.
 
 ## Build
 

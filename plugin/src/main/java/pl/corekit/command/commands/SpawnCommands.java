@@ -9,22 +9,26 @@ import org.bukkit.entity.Player;
 import pl.corekit.CoreKitPlugin;
 import pl.corekit.command.CommandUtil;
 import pl.corekit.command.CoreKitCommand;
+import pl.corekit.feature.feedback.FeedbackService;
 import pl.corekit.feature.spawn.SpawnService;
-import pl.corekit.lang.MessageService;
+import pl.corekit.feature.teleport.TeleportService;
 
 import java.util.List;
 
-/** {@code /spawn} and {@code /setspawn}. */
+/** {@code /spawn} (warm-up teleport) and {@code /setspawn}. */
 public final class SpawnCommands implements CoreKitCommand {
 
     private final CoreKitPlugin plugin;
-    private final MessageService messages;
+    private final FeedbackService feedback;
     private final SpawnService spawn;
+    private final TeleportService teleport;
 
-    public SpawnCommands(CoreKitPlugin plugin, MessageService messages, SpawnService spawn) {
+    public SpawnCommands(CoreKitPlugin plugin, FeedbackService feedback,
+                         SpawnService spawn, TeleportService teleport) {
         this.plugin = plugin;
-        this.messages = messages;
+        this.feedback = feedback;
         this.spawn = spawn;
+        this.teleport = teleport;
     }
 
     @Override
@@ -43,11 +47,10 @@ public final class SpawnCommands implements CoreKitCommand {
     private int teleportToSpawn(CommandContext<CommandSourceStack> ctx) {
         Player player = CommandUtil.asPlayer(ctx);
         if (player == null) {
-            messages.send(ctx.getSource().getSender(), "players-only");
+            feedback.error(ctx.getSource().getSender(), "players-only");
             return 0;
         }
-        messages.send(player, "spawn.teleporting");
-        player.teleportAsync(spawn.resolve());
+        teleport.request(player, spawn.resolve(), "spawn");
         return Command.SINGLE_SUCCESS;
     }
 
@@ -57,11 +60,11 @@ public final class SpawnCommands implements CoreKitCommand {
                 .executes(ctx -> {
                     Player player = CommandUtil.asPlayer(ctx);
                     if (player == null) {
-                        messages.send(ctx.getSource().getSender(), "players-only");
+                        feedback.error(ctx.getSource().getSender(), "players-only");
                         return 0;
                     }
                     spawn.setSpawn(player.getLocation());
-                    messages.send(player, "spawn.set");
+                    feedback.success(player, "spawn.set");
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();

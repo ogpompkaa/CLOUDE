@@ -54,3 +54,11 @@ permissions:
     default: true
   corekit.setspawn:
     default: op
+
+  # Teleport flow — skip the warm-up countdown and/or the cooldown.
+  corekit.teleport.bypass-warmup:
+    description: Teleport instantly, skipping the warm-up.
+    default: op
+  corekit.teleport.bypass-cooldown:
+    description: Teleport without waiting for the cooldown.
+    default: op

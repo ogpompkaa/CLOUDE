@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import pl.corekit.CoreKitPlugin;
 import pl.corekit.command.CommandUtil;
 import pl.corekit.command.CoreKitCommand;
+import pl.corekit.feature.feedback.FeedbackService;
 import pl.corekit.feature.god.GodService;
 import pl.corekit.lang.MessageService;
 
@@ -21,16 +22,20 @@ import pl.corekit.lang.MessageService;
  * {@code /god}. Each runs on the sender by default and, with a separate
  * {@code .others} permission, on a target player. The target is always notified
  * so effects applied to them are never silent.
+ *
+ * <p>Self actions confirm on the action bar with a subtle sound (via
+ * {@link FeedbackService#quick}) so quick toggles feel snappy and stay out of
+ * chat; cross-player actions use chat so both parties get a durable record.
  */
 public final class PlayerUtilityCommands implements CoreKitCommand {
 
     private final CoreKitPlugin plugin;
-    private final MessageService messages;
+    private final FeedbackService feedback;
     private final GodService god;
 
-    public PlayerUtilityCommands(CoreKitPlugin plugin, MessageService messages, GodService god) {
+    public PlayerUtilityCommands(CoreKitPlugin plugin, FeedbackService feedback, GodService god) {
         this.plugin = plugin;
-        this.messages = messages;
+        this.feedback = feedback;
         this.god = god;
     }
 
@@ -49,7 +54,7 @@ public final class PlayerUtilityCommands implements CoreKitCommand {
                 .requires(s -> s.getSender().hasPermission("corekit.heal"))
                 .executes(ctx -> selfAction(ctx, target -> {
                     applyHeal(target);
-                    messages.send(target, "heal.self");
+                    feedback.quick(target, true, "heal.self");
                 }))
                 .then(Commands.argument("target", ArgumentTypes.player())
                         .requires(s -> s.getSender().hasPermission("corekit.heal.others"))
@@ -73,7 +78,7 @@ public final class PlayerUtilityCommands implements CoreKitCommand {
                 .requires(s -> s.getSender().hasPermission("corekit.feed"))
                 .executes(ctx -> selfAction(ctx, target -> {
                     applyFeed(target);
-                    messages.send(target, "feed.self");
+                    feedback.quick(target, true, "feed.self");
                 }))
                 .then(Commands.argument("target", ArgumentTypes.player())
                         .requires(s -> s.getSender().hasPermission("corekit.feed.others"))
@@ -95,11 +100,11 @@ public final class PlayerUtilityCommands implements CoreKitCommand {
                 .executes(ctx -> {
                     Player self = CommandUtil.asPlayer(ctx);
                     if (self == null) {
-                        messages.send(ctx.getSource().getSender(), "players-only");
+                        feedback.error(ctx.getSource().getSender(), "players-only");
                         return 0;
                     }
                     boolean enabled = toggleFly(self);
-                    messages.send(self, enabled ? "fly.enabled" : "fly.disabled");
+                    feedback.quick(self, enabled, enabled ? "fly.enabled" : "fly.disabled");
                     return Command.SINGLE_SUCCESS;
                 })
                 .then(Commands.argument("target", ArgumentTypes.player())
@@ -113,10 +118,10 @@ public final class PlayerUtilityCommands implements CoreKitCommand {
         CommandSender actor = ctx.getSource().getSender();
         boolean enabled = toggleFly(target);
 
-        messages.send(actor, enabled ? "fly.other-enabled" : "fly.other-disabled",
+        feedback.success(actor, enabled ? "fly.other-enabled" : "fly.other-disabled",
                 MessageService.placeholder("target", target.getName()));
         if (!target.equals(actor)) {
-            messages.send(target, enabled ? "fly.notify-enabled" : "fly.notify-disabled",
+            feedback.quick(target, enabled, enabled ? "fly.notify-enabled" : "fly.notify-disabled",
                     MessageService.placeholder("actor", actor.getName()));
         }
         return Command.SINGLE_SUCCESS;
@@ -139,11 +144,11 @@ public final class PlayerUtilityCommands implements CoreKitCommand {
                 .executes(ctx -> {
                     Player self = CommandUtil.asPlayer(ctx);
                     if (self == null) {
-                        messages.send(ctx.getSource().getSender(), "players-only");
+                        feedback.error(ctx.getSource().getSender(), "players-only");
                         return 0;
                     }
                     boolean enabled = god.toggle(self.getUniqueId());
-                    messages.send(self, enabled ? "god.enabled" : "god.disabled");
+                    feedback.quick(self, enabled, enabled ? "god.enabled" : "god.disabled");
                     return Command.SINGLE_SUCCESS;
                 })
                 .then(Commands.argument("target", ArgumentTypes.player())
@@ -157,10 +162,10 @@ public final class PlayerUtilityCommands implements CoreKitCommand {
         CommandSender actor = ctx.getSource().getSender();
         boolean enabled = god.toggle(target.getUniqueId());
 
-        messages.send(actor, enabled ? "god.other-enabled" : "god.other-disabled",
+        feedback.success(actor, enabled ? "god.other-enabled" : "god.other-disabled",
                 MessageService.placeholder("target", target.getName()));
         if (!target.equals(actor)) {
-            messages.send(target, enabled ? "god.enabled" : "god.disabled");
+            feedback.quick(target, enabled, enabled ? "god.enabled" : "god.disabled");
         }
         return Command.SINGLE_SUCCESS;
     }
@@ -172,7 +177,7 @@ public final class PlayerUtilityCommands implements CoreKitCommand {
                            java.util.function.Consumer<Player> action) {
         Player self = CommandUtil.asPlayer(ctx);
         if (self == null) {
-            messages.send(ctx.getSource().getSender(), "players-only");
+            feedback.error(ctx.getSource().getSender(), "players-only");
             return 0;
         }
         action.accept(self);
@@ -186,9 +191,9 @@ public final class PlayerUtilityCommands implements CoreKitCommand {
         CommandSender actor = ctx.getSource().getSender();
         action.accept(target);
 
-        messages.send(actor, key + ".other", MessageService.placeholder("target", target.getName()));
+        feedback.success(actor, key + ".other", MessageService.placeholder("target", target.getName()));
         if (!target.equals(actor)) {
-            messages.send(target, key + ".notify", MessageService.placeholder("actor", actor.getName()));
+            feedback.success(target, key + ".notify", MessageService.placeholder("actor", actor.getName()));
         }
         return Command.SINGLE_SUCCESS;
     }

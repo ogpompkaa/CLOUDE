@@ -8,12 +8,17 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import pl.corekit.CoreKitPlugin;
 import pl.corekit.command.CommandUtil;
 import pl.corekit.command.CoreKitCommand;
+import pl.corekit.feature.feedback.FeedbackService;
 import pl.corekit.feature.home.HomeService;
+import pl.corekit.feature.teleport.TeleportService;
 import pl.corekit.lang.MessageService;
 import pl.corekit.storage.HomeRepository;
 
@@ -23,24 +28,29 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * The homes suite: {@code /sethome [name]}, {@code /home [name]},
- * {@code /delhome [name]}, {@code /homes}. All persistence is async; the only
- * work forced onto the main thread is resolving a {@link Location} and
- * teleporting, both of which must be.
+ * {@code /delhome [name]}, {@code /homes}. Persistence is async; {@code /home}
+ * routes through {@link TeleportService} for the warm-up/cooldown flow, and
+ * {@code /homes} renders each entry with clickable Teleport / Delete buttons.
  */
 public final class HomeCommands implements CoreKitCommand {
 
     private static final String DEFAULT_NAME = "home";
 
     private final CoreKitPlugin plugin;
+    private final FeedbackService feedback;
     private final MessageService messages;
     private final HomeService homes;
     private final HomeRepository repository;
+    private final TeleportService teleport;
 
-    public HomeCommands(CoreKitPlugin plugin, MessageService messages, HomeService homes) {
+    public HomeCommands(CoreKitPlugin plugin, FeedbackService feedback,
+                        HomeService homes, TeleportService teleport) {
         this.plugin = plugin;
-        this.messages = messages;
+        this.feedback = feedback;
+        this.messages = feedback.messages();
         this.homes = homes;
         this.repository = homes.repository();
+        this.teleport = teleport;
     }
 
     @Override
@@ -65,14 +75,14 @@ public final class HomeCommands implements CoreKitCommand {
     private int doSetHome(CommandContext<CommandSourceStack> ctx, String name) {
         Player player = CommandUtil.asPlayer(ctx);
         if (player == null) {
-            messages.send(ctx.getSource().getSender(), "players-only");
+            feedback.error(ctx.getSource().getSender(), "players-only");
             return 0;
         }
         String canonical = name.toLowerCase(Locale.ROOT);
         boolean isNew = !homes.cachedNames(player.getUniqueId()).contains(canonical);
         int limit = homes.homeLimit(player);
         if (isNew && homes.cachedNames(player.getUniqueId()).size() >= limit) {
-            messages.send(player, "home.limit-reached",
+            feedback.error(player, "home.limit-reached",
                     MessageService.placeholder("limit", String.valueOf(limit)));
             return 0;
         }
@@ -81,7 +91,7 @@ public final class HomeCommands implements CoreKitCommand {
         repository.save(player.getUniqueId(), name, location).thenRun(() ->
                 plugin.database().sync(() -> {
                     homes.rememberName(player.getUniqueId(), name);
-                    messages.send(player, "home.set", MessageService.placeholder("name", canonical));
+                    feedback.success(player, "home.set", MessageService.placeholder("name", canonical));
                 })
         ).exceptionally(logAndReport(player, "save home"));
         return Command.SINGLE_SUCCESS;
@@ -102,26 +112,24 @@ public final class HomeCommands implements CoreKitCommand {
     private int doHome(CommandContext<CommandSourceStack> ctx, String name) {
         Player player = CommandUtil.asPlayer(ctx);
         if (player == null) {
-            messages.send(ctx.getSource().getSender(), "players-only");
+            feedback.error(ctx.getSource().getSender(), "players-only");
             return 0;
         }
         String canonical = name.toLowerCase(Locale.ROOT);
         repository.find(player.getUniqueId(), name).thenAccept(optional ->
                 plugin.database().sync(() -> {
                     if (optional.isEmpty()) {
-                        messages.send(player, "home.not-found",
+                        feedback.error(player, "home.not-found",
                                 MessageService.placeholder("name", canonical));
                         return;
                     }
                     Location location = optional.get().toLocation();
                     if (location == null) {
-                        messages.send(player, "home.world-missing",
+                        feedback.error(player, "home.world-missing",
                                 MessageService.placeholder("name", canonical));
                         return;
                     }
-                    messages.send(player, "home.teleporting",
-                            MessageService.placeholder("name", canonical));
-                    player.teleportAsync(location);
+                    teleport.request(player, location, canonical);
                 })
         ).exceptionally(logAndReport(player, "load home"));
         return Command.SINGLE_SUCCESS;
@@ -142,7 +150,7 @@ public final class HomeCommands implements CoreKitCommand {
     private int doDelHome(CommandContext<CommandSourceStack> ctx, String name) {
         Player player = CommandUtil.asPlayer(ctx);
         if (player == null) {
-            messages.send(ctx.getSource().getSender(), "players-only");
+            feedback.error(ctx.getSource().getSender(), "players-only");
             return 0;
         }
         String canonical = name.toLowerCase(Locale.ROOT);
@@ -150,10 +158,10 @@ public final class HomeCommands implements CoreKitCommand {
                 plugin.database().sync(() -> {
                     if (removed) {
                         homes.forgetName(player.getUniqueId(), name);
-                        messages.send(player, "home.deleted",
+                        feedback.success(player, "home.deleted",
                                 MessageService.placeholder("name", canonical));
                     } else {
-                        messages.send(player, "home.not-found",
+                        feedback.error(player, "home.not-found",
                                 MessageService.placeholder("name", canonical));
                     }
                 })
@@ -169,26 +177,42 @@ public final class HomeCommands implements CoreKitCommand {
                 .executes(ctx -> {
                     Player player = CommandUtil.asPlayer(ctx);
                     if (player == null) {
-                        messages.send(ctx.getSource().getSender(), "players-only");
+                        feedback.error(ctx.getSource().getSender(), "players-only");
                         return 0;
                     }
                     int limit = homes.homeLimit(player);
                     repository.findAll(player.getUniqueId()).thenAccept(list ->
                             plugin.database().sync(() -> {
                                 if (list.isEmpty()) {
-                                    messages.send(player, "home.list-empty");
+                                    feedback.error(player, "home.list-empty");
                                     return;
                                 }
                                 messages.send(player, "home.list-header",
                                         MessageService.placeholder("count", String.valueOf(list.size())),
                                         MessageService.placeholder("limit", limitLabel(limit)));
-                                list.forEach(h -> messages.send(player, "home.list-entry",
-                                        MessageService.placeholder("name", h.name())));
+                                list.forEach(h -> feedback.raw(player, entryLine(h.name())));
                             })
                     ).exceptionally(logAndReport(player, "list homes"));
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();
+    }
+
+    /** Builds a single clickable list row: label + [Teleport] + [Delete]. */
+    private Component entryLine(String name) {
+        Component teleportButton = messages.render("home.button.tp")
+                .clickEvent(ClickEvent.runCommand("/home " + name))
+                .hoverEvent(HoverEvent.showText(
+                        messages.render("home.button.tp-hover", MessageService.placeholder("name", name))));
+
+        Component deleteButton = messages.render("home.button.del")
+                .clickEvent(ClickEvent.suggestCommand("/delhome " + name))
+                .hoverEvent(HoverEvent.showText(
+                        messages.render("home.button.del-hover", MessageService.placeholder("name", name))));
+
+        return messages.render("home.list-entry", MessageService.placeholder("name", name))
+                .append(Component.space()).append(teleportButton)
+                .append(Component.space()).append(deleteButton);
     }
 
     // --------------------------------------------------------------- helpers
@@ -213,7 +237,7 @@ public final class HomeCommands implements CoreKitCommand {
     private java.util.function.Function<Throwable, Void> logAndReport(Player player, String action) {
         return throwable -> {
             plugin.getSLF4JLogger().warn("Failed to {} for {}", action, player.getName(), throwable);
-            plugin.database().sync(() -> messages.send(player, "command.error"));
+            plugin.database().sync(() -> feedback.error(player, "command.error"));
             return null;
         };
     }

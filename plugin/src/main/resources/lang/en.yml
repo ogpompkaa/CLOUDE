@@ -48,7 +48,16 @@ messages:
     list-header: "<gray>Your homes <dark_gray>(<white><count></white>/<white><limit></white>)</dark_gray>:"
     list-empty: "<yellow>You have no homes yet. Set one with <white>/sethome</white>."
     list-entry: "<dark_gray>• <white><name></white>"
+    button:
+      tp: "<green>[▶ Teleport]</green>"
+      tp-hover: "<gray>Teleport to <white><name></white>"
+      del: "<red>[✖ Delete]</red>"
+      del-hover: "<gray>Click to type <white>/delhome <name></white>"
 
   spawn:
-    teleporting: "<gray>Teleporting to spawn…"
     set: "<green>Server spawn set to your location."
+
+  teleport:
+    warmup: "<gray>Teleporting to <white><name></white> in <white><seconds></white>s <dark_gray>· don't move"
+    cooldown: "<red>Please wait <white><time></white> before teleporting again."
+    cancelled: "<red>Teleport cancelled."
