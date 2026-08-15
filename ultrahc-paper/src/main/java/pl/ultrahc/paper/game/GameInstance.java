@@ -35,7 +35,7 @@ public class GameInstance {
     private boolean pvpEnabled;
 
     // Progi faz juz "odpalone" (zeby nie powtarzac broadcastow).
-    private boolean pvpFired, shrinkFired, compassFired, showdownFired;
+    private boolean pvpFired, shrinkFired, accelerateFired, compassFired, showdownFired;
 
     private BukkitTask ticker;
 
@@ -163,7 +163,12 @@ public class GameInstance {
         if (!shrinkFired && elapsed >= shrinkStart) {
             shrinkFired = true;
             broadcast("game.border-shrinking", Map.of());
-            // TODO(etap 4): BorderManager.startShrink(this)
+            if (plugin.border() != null) plugin.border().beginPhase1(this);
+        }
+        int accelerate = cfgInt("border.accelerate-min", 30) * 60;
+        if (!accelerateFired && elapsed >= accelerate) {
+            accelerateFired = true;
+            if (plugin.border() != null) plugin.border().beginPhase2(this);
         }
         int compass = cfgInt("game.enemy-compass-unlock-min", 18) * 60;
         if (!compassFired && elapsed >= compass) {
@@ -174,7 +179,7 @@ public class GameInstance {
         if (!showdownFired && elapsed >= showdown) {
             showdownFired = true;
             broadcast("game.showdown", Map.of());
-            // TODO(etap 4): teleport na arenke + zacisk granicy do 0
+            if (plugin.border() != null) plugin.border().beginShowdown(this);
         }
         int hardCap = cfgInt("game.hard-time-cap-min", 90) * 60;
         if (elapsed >= hardCap) {

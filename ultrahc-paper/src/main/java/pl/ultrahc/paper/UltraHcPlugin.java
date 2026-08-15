@@ -7,7 +7,9 @@ import pl.ultrahc.paper.config.ConfigManager;
 import pl.ultrahc.paper.config.MessagesManager;
 import pl.ultrahc.paper.game.GameManager;
 import pl.ultrahc.paper.listener.ProfileListener;
+import pl.ultrahc.paper.manager.BorderManager;
 import pl.ultrahc.paper.manager.LevelsManager;
+import pl.ultrahc.paper.manager.ScoreboardService;
 import pl.ultrahc.paper.manager.ShopCurrencyManager;
 import pl.ultrahc.paper.profile.ProfileService;
 import pl.ultrahc.paper.storage.StorageFactory;
@@ -28,6 +30,8 @@ public class UltraHcPlugin extends JavaPlugin {
     private ShopCurrencyManager currencyManager;
     private LevelsManager levelsManager;
     private GameManager gameManager;
+    private BorderManager borderManager;
+    private ScoreboardService scoreboardService;
 
     @Override
     public void onEnable() {
@@ -62,9 +66,14 @@ public class UltraHcPlugin extends JavaPlugin {
 
         // 5. Managery zalezne od roli
         if (role == ServerRole.ARENA) {
+            this.borderManager = new BorderManager(this);
             this.gameManager = new GameManager(this);
+            this.scoreboardService = new ScoreboardService(this);
             // Przygotowanie swiata blokuje watek glowny — robimy to po pelnym starcie serwera.
-            getServer().getScheduler().runTask(this, () -> gameManager.enableArena());
+            getServer().getScheduler().runTask(this, () -> {
+                gameManager.enableArena();
+                scoreboardService.start();
+            });
         }
 
         getLogger().info("[UltraHC] Wlaczono. Rola serwera: " + role + ", magazyn: " + configManager.storageType() + ".");
@@ -73,6 +82,7 @@ public class UltraHcPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (scoreboardService != null) scoreboardService.stop();
         if (gameManager != null) gameManager.shutdown();
         if (profileService != null) profileService.saveAll();
         if (storage != null) storage.close();
@@ -86,4 +96,5 @@ public class UltraHcPlugin extends JavaPlugin {
     public ShopCurrencyManager currency() { return currencyManager; }
     public LevelsManager levels() { return levelsManager; }
     public GameManager games() { return gameManager; }
+    public BorderManager border() { return borderManager; }
 }

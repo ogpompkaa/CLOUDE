@@ -60,6 +60,8 @@ scoreboard:
   currency-label: "&7Xp: &e%amount%"             # celowo 'Xp:' jak na zrzucie
   alive-label: "&7Zywi: &a%count%"
   timer: "&f%time%"                              # HH:MM:SS
+  waiting: "&7Gracze: &a%count%&7/&e%max%"       # widok przed startem
+  state-waiting: "&eOczekiwanie..."
   empty: ""
 
 # --------------------------- KLASY / SKLEP ---------------------------
