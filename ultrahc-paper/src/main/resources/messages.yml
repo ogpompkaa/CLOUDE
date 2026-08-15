@@ -92,17 +92,20 @@ pandora:
 # --------------------------- SCOREBOARD ------------------------------
 scoreboard:
   title: "&6&lULTRAHC"
-  # Animowany tytul — klatki cyklicznie (pusta lista = tytul statyczny powyzej).
+  # Animowany tytul — klatki cyklicznie (fala jasnosci po literach). Pusta lista = tytul statyczny.
   title-frames:
-    - "&6&lULTRAHC"
-    - "&e&lULTRAHC"
-    - "&f&lU&e&lLTRAHC"
-    - "&f&lUL&e&lTRAHC"
-    - "&f&lULT&e&lRAHC"
-    - "&f&lULTR&e&lAHC"
-    - "&f&lULTRA&e&lHC"
-    - "&f&lULTRAH&e&lC"
-    - "&e&lULTRAHC"
+    - "&f&lU&6&lLTRAHC"
+    - "&6&lU&f&lL&6&lTRAHC"
+    - "&6&lUL&f&lT&6&lRAHC"
+    - "&6&lULT&f&lR&6&lAHC"
+    - "&6&lULTR&f&lA&6&lHC"
+    - "&6&lULTRA&f&lH&6&lC"
+    - "&6&lULTRAH&f&lC"
+    - "&6&lULTRA&f&lH&6&lC"
+    - "&6&lULTR&f&lA&6&lHC"
+    - "&6&lULT&f&lR&6&lAHC"
+    - "&6&lUL&f&lT&6&lRAHC"
+    - "&6&lU&f&lL&6&lTRAHC"
   top-line: "&e%pos% %team% &7%kills%"          # Top 3 druzyny
   self-marker: "&a> %team% &7%kills%"            # marker druzyny gracza
   teammate: "&7- %name%"                         # wspoltowarzysz (znika w solo)

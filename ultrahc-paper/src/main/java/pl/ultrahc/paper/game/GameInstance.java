@@ -128,6 +128,7 @@ public class GameInstance {
         broadcast("game.countdown-started", Map.of(
                 "min", String.valueOf(cfgInt("game.min-players-to-countdown", 30)),
                 "seconds", String.valueOf(countdownRemaining)));
+        soundAll(org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f); // dzwiek startu odliczania
         startTicker();
     }
 
@@ -141,6 +142,12 @@ public class GameInstance {
         if (countdownRemaining == 120 || countdownRemaining == 60 || countdownRemaining == 30
                 || countdownRemaining == 10 || countdownRemaining <= 5) {
             broadcast("game.countdown", Map.of("seconds", String.valueOf(countdownRemaining)));
+            if (countdownRemaining <= 5) {
+                // Ostatnie sekundy: rosnacy pitch.
+                soundAll(org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f + (5 - countdownRemaining) * 0.15f);
+            } else {
+                soundAll(org.bukkit.Sound.BLOCK_NOTE_BLOCK_HAT, 1.0f);
+            }
         }
     }
 
@@ -175,6 +182,7 @@ public class GameInstance {
         }
         int noPvpMin = cfgInt("game.no-pvp-seconds", 600) / 60;
         broadcast("game.started", Map.of("minutes", String.valueOf(noPvpMin)));
+        soundAll(org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 2.0f); // jasny dzwiek startu gry
         if (plugin.rewards() != null) plugin.rewards().startAccrual(this);
         startTicker(); // dziala tez przy force-starcie z WAITING
     }
@@ -365,6 +373,14 @@ public class GameInstance {
         for (UUID id : participants) {
             Player p = plugin.getServer().getPlayer(id);
             if (p != null) p.sendMessage(comp);
+        }
+    }
+
+    // Dzwiek dla wszystkich uczestnikow.
+    private void soundAll(org.bukkit.Sound sound, float pitch) {
+        for (UUID id : participants) {
+            Player p = plugin.getServer().getPlayer(id);
+            if (p != null) p.playSound(p.getLocation(), sound, 1.0f, pitch);
         }
     }
 
