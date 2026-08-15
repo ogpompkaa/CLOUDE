@@ -35,6 +35,15 @@ public interface Storage {
     /** Zapisuje postep pojedynczego questa gracza. */
     void saveQuest(UUID uuid, QuestRecord record) throws Exception;
 
+    /** Party (cross-server): zapisuje przynaleznosc gracza do party. */
+    void setPartyMember(UUID uuid, String partyId) throws Exception;
+
+    /** Party: usuwa gracza z party. */
+    void clearPartyMember(UUID uuid) throws Exception;
+
+    /** Party: id party dla podanych graczy (do grupowania druzyn na arenie). */
+    java.util.Map<UUID, String> loadPartyIds(java.util.Collection<UUID> uuids) throws Exception;
+
     /** Zamknięcie zasobów. */
     void close();
 

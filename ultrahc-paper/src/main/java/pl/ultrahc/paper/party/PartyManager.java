@@ -50,6 +50,7 @@ public class PartyManager {
         if (party == null) { // auto-zaloz party
             party = new Party(leader.getUniqueId());
             byMember.put(leader.getUniqueId(), party);
+            dbSet(leader.getUniqueId(), party.getId().toString());
             leader.sendMessage(msg().prefixed("party.created", null));
         } else if (!party.isLeader(leader.getUniqueId())) {
             leader.sendMessage(msg().prefixed("party.not-leader", null));
@@ -76,6 +77,7 @@ public class PartyManager {
 
         party.getMembers().add(target.getUniqueId());
         byMember.put(target.getUniqueId(), party);
+        dbSet(target.getUniqueId(), party.getId().toString());
         broadcast(party, "party.joined", Map.of("player", target.getName()));
     }
 
@@ -88,6 +90,7 @@ public class PartyManager {
         Party party = byMember.remove(player.getUniqueId());
         if (party == null) { player.sendMessage(msg().prefixed("party.not-in", null)); return; }
         party.getMembers().remove(player.getUniqueId());
+        dbClear(player.getUniqueId());
         if (party.isLeader(player.getUniqueId())) {
             disbandInternal(party, "party.leader-left");
         } else {
@@ -105,6 +108,7 @@ public class PartyManager {
         if (targetId == null || !party.getMembers().contains(targetId)) { leader.sendMessage(msg().prefixed("party.target-in-party", null)); return; }
         party.getMembers().remove(targetId);
         byMember.remove(targetId);
+        dbClear(targetId);
         broadcast(party, "party.kicked", Map.of("player", target.getName()));
         target.sendMessage(msg().prefixed("party.kicked", Map.of("player", target.getName())));
     }
@@ -155,10 +159,26 @@ public class PartyManager {
     private void disbandInternal(Party party, String reasonKey) {
         for (UUID id : new java.util.ArrayList<>(party.getMembers())) {
             byMember.remove(id);
+            dbClear(id);
             Player p = plugin.getServer().getPlayer(id);
             if (p != null) p.sendMessage(msg().prefixed(reasonKey, null));
         }
         party.getMembers().clear();
+    }
+
+    // Persystencja skladu party do DB (cross-server: arena czyta przy starcie gry).
+    private void dbSet(UUID uuid, String partyId) {
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            try { plugin.profiles().storage().setPartyMember(uuid, partyId); }
+            catch (Exception e) { plugin.getLogger().warning("[UltraHC] Blad zapisu party: " + e.getMessage()); }
+        });
+    }
+
+    private void dbClear(UUID uuid) {
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            try { plugin.profiles().storage().clearPartyMember(uuid); }
+            catch (Exception e) { plugin.getLogger().warning("[UltraHC] Blad usuwania party: " + e.getMessage()); }
+        });
     }
 
     private boolean checkEnabled(Player p) {

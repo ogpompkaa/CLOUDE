@@ -74,6 +74,10 @@ public class MysqlStorage implements Storage {
                             "PRIMARY KEY (uuid, quest_id))")) {
                 ps.executeUpdate();
             }
+            try (PreparedStatement ps = c.prepareStatement(
+                    "CREATE TABLE IF NOT EXISTS party_members (uuid VARCHAR(36) PRIMARY KEY, party_id VARCHAR(36) NOT NULL)")) {
+                ps.executeUpdate();
+            }
         }
         logger.info("[UltraHC] Magazyn MySQL zainicjalizowany: " + host + ":" + port + "/" + database);
     }
@@ -180,6 +184,44 @@ public class MysqlStorage implements Storage {
             ps.setInt(5, r.completed() ? 1 : 0);
             ps.executeUpdate();
         }
+    }
+
+    @Override
+    public void setPartyMember(UUID uuid, String partyId) throws Exception {
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(
+                     "INSERT INTO party_members (uuid, party_id) VALUES (?,?) " +
+                             "ON DUPLICATE KEY UPDATE party_id=VALUES(party_id)")) {
+            ps.setString(1, uuid.toString());
+            ps.setString(2, partyId);
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public void clearPartyMember(UUID uuid) throws Exception {
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement("DELETE FROM party_members WHERE uuid = ?")) {
+            ps.setString(1, uuid.toString());
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public java.util.Map<UUID, String> loadPartyIds(java.util.Collection<UUID> uuids) throws Exception {
+        java.util.Map<UUID, String> out = new java.util.HashMap<>();
+        if (uuids.isEmpty()) return out;
+        String placeholders = String.join(",", java.util.Collections.nCopies(uuids.size(), "?"));
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(
+                     "SELECT uuid, party_id FROM party_members WHERE uuid IN (" + placeholders + ")")) {
+            int i = 1;
+            for (UUID u : uuids) ps.setString(i++, u.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.put(UUID.fromString(rs.getString("uuid")), rs.getString("party_id"));
+            }
+        }
+        return out;
     }
 
     @Override

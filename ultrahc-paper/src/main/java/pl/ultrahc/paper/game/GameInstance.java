@@ -166,8 +166,15 @@ public class GameInstance {
             Player p = plugin.getServer().getPlayer(id);
             if (p != null) names.put(id, p.getName());
         }
-        teamManager.buildTeams(new ArrayList<>(participants), names,
-                id -> plugin.party() != null ? plugin.party().groupKey(id) : null);
+        // Sklad party czytany z DB (dziala tez cross-server: party z lobby, gra na arenie).
+        Map<UUID, String> partyMap;
+        try {
+            partyMap = plugin.profiles().storage().loadPartyIds(participants);
+        } catch (Exception e) {
+            plugin.getLogger().warning("[UltraHC] Blad odczytu party: " + e.getMessage());
+            partyMap = Map.of();
+        }
+        teamManager.buildTeams(new ArrayList<>(participants), names, partyMap::get);
 
         // Rozrzuc graczy po mapie i przywroc tryb przetrwania.
         for (UUID id : participants) {

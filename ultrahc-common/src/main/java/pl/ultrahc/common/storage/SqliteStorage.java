@@ -58,6 +58,10 @@ public class SqliteStorage implements Storage {
                         "PRIMARY KEY(uuid, quest_id))")) {
             ps.executeUpdate();
         }
+        try (PreparedStatement ps = connection.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS party_members (uuid TEXT PRIMARY KEY, party_id TEXT NOT NULL)")) {
+            ps.executeUpdate();
+        }
         logger.info("[UltraHC] Magazyn SQLite zainicjalizowany: " + jdbcUrl);
     }
 
@@ -168,6 +172,41 @@ public class SqliteStorage implements Storage {
             ps.executeUpdate();
         }
         logger.info("[UltraHC] Reset sezonu wykonany (poziomy, PD i receptury wyzerowane).");
+    }
+
+    @Override
+    public void setPartyMember(UUID uuid, String partyId) throws Exception {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "INSERT INTO party_members (uuid, party_id) VALUES (?,?) " +
+                        "ON CONFLICT(uuid) DO UPDATE SET party_id=excluded.party_id")) {
+            ps.setString(1, uuid.toString());
+            ps.setString(2, partyId);
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public void clearPartyMember(UUID uuid) throws Exception {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM party_members WHERE uuid = ?")) {
+            ps.setString(1, uuid.toString());
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public java.util.Map<UUID, String> loadPartyIds(java.util.Collection<UUID> uuids) throws Exception {
+        java.util.Map<UUID, String> out = new java.util.HashMap<>();
+        if (uuids.isEmpty()) return out;
+        String placeholders = String.join(",", java.util.Collections.nCopies(uuids.size(), "?"));
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT uuid, party_id FROM party_members WHERE uuid IN (" + placeholders + ")")) {
+            int i = 1;
+            for (UUID u : uuids) ps.setString(i++, u.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.put(UUID.fromString(rs.getString("uuid")), rs.getString("party_id"));
+            }
+        }
+        return out;
     }
 
     @Override

@@ -44,6 +44,12 @@ public class TeamManager {
             else parties.computeIfAbsent(key, k -> new ArrayList<>()).add(uuid);
         }
 
+        // Party z jednym czlonkiem w grze = traktuj jak solo (nie osobna 1-os. druzyna w DUO/SQUAD).
+        parties.values().removeIf(group -> {
+            if (group.size() == 1) { solos.add(group.get(0)); return true; }
+            return false;
+        });
+
         int[] teamId = {1};
         for (List<UUID> group : parties.values()) chunkIntoTeams(group, names, teamId); // party razem
         chunkIntoTeams(solos, names, teamId);                                           // solo wspolnie
