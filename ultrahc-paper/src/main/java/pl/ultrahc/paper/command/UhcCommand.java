@@ -22,7 +22,8 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
     private static final List<String> SUBCOMMANDS = List.of(
             "balance", "reload", "givexp", "givepd", "resetseason", "join", "leave",
             "forcestart", "forceend", "gameinfo", "menu", "classes", "class", "buyclass",
-            "shop", "buyrecipe", "setnpc", "sethologram", "quests", "season", "stats", "setstat");
+            "shop", "buyrecipe", "setnpc", "sethologram", "quests", "season", "stats", "setstat",
+            "admin", "instances");
 
     private final UltraHcPlugin plugin;
 
@@ -62,6 +63,8 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
             case "season" -> handleSeason(sender, args);
             case "stats" -> handleStats(sender, args);
             case "setstat" -> handleSetStat(sender, args);
+            case "admin" -> handleAdminPanel(sender);
+            case "instances" -> handleInstances(sender);
             default -> sender.sendMessage(msg.prefixed("general.unknown-subcommand", null));
         }
         return true;
@@ -201,6 +204,20 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
             cfg.set(path + ".pitch", (double) loc.getPitch());
         }
         plugin.saveConfig();
+    }
+
+    private void handleAdminPanel(CommandSender sender) {
+        MessagesManager msg = plugin.messages();
+        if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
+        if (sender instanceof Player player) plugin.adminGui().open(player);
+        else sender.sendMessage(msg.prefixed("general.players-only", null));
+    }
+
+    private void handleInstances(CommandSender sender) {
+        MessagesManager msg = plugin.messages();
+        if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
+        if (sender instanceof Player player) plugin.instanceAdminGui().open(player);
+        else sender.sendMessage(msg.prefixed("general.players-only", null));
     }
 
     private void handleShop(CommandSender sender) {

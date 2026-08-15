@@ -35,16 +35,46 @@ public class InstanceRegistry {
                 : DriverManager.getConnection(jdbcUrl, user, password);
         try (PreparedStatement ps = connection.prepareStatement(
                 "CREATE TABLE IF NOT EXISTS instances (" +
-                        "id TEXT PRIMARY KEY," +
-                        "state TEXT NOT NULL," +
+                        "id VARCHAR(64) PRIMARY KEY," +          // VARCHAR: zgodne z SQLite i MySQL
+                        "state VARCHAR(16) NOT NULL," +
                         "players INTEGER NOT NULL DEFAULT 0," +
                         "max_players INTEGER NOT NULL DEFAULT 100," +
                         "team_size INTEGER NOT NULL DEFAULT 1," +
-                        "mode TEXT NOT NULL DEFAULT 'SOLO'," +
-                        "heartbeat INTEGER NOT NULL DEFAULT 0)")) {
+                        "mode VARCHAR(16) NOT NULL DEFAULT 'SOLO'," +
+                        "heartbeat BIGINT NOT NULL DEFAULT 0," +
+                        "close_requested INTEGER NOT NULL DEFAULT 0)")) {
             ps.executeUpdate();
         }
         logger.info("[UltraHC] Rejestr instancji gotowy.");
+    }
+
+    /** Zadanie zamkniecia instancji (ustawiane przez lobby/admina, odbierane przez arene). */
+    public void requestClose(String id) throws Exception {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "UPDATE instances SET close_requested = 1 WHERE id = ?")) {
+            ps.setString(1, id);
+            ps.executeUpdate();
+        }
+    }
+
+    /** Arena: sprawdza i czysci flage zamkniecia swojej instancji. */
+    public boolean consumeCloseRequest(String id) throws Exception {
+        boolean requested = false;
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT close_requested FROM instances WHERE id = ?")) {
+            ps.setString(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) requested = rs.getInt("close_requested") != 0;
+            }
+        }
+        if (requested) {
+            try (PreparedStatement ps = connection.prepareStatement(
+                    "UPDATE instances SET close_requested = 0 WHERE id = ?")) {
+                ps.setString(1, id);
+                ps.executeUpdate();
+            }
+        }
+        return requested;
     }
 
     /** Zapis/aktualizacja wiersza instancji wraz z heartbeatem. */

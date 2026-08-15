@@ -84,6 +84,7 @@ detector:
 pandora:
   reward: "&aPuszka Pandory: wypada &e%item%&a!"
   curse: "&cPuszka Pandory: dopadla cie klatwa!"
+  placed: "&7Puszka Pandory postawiona — kliknij PPM, aby otworzyc."
 
 # --------------------------- SCOREBOARD ------------------------------
 scoreboard:
@@ -240,6 +241,15 @@ season:
 
 # --------------------------- ADMIN -----------------------------------
 admin:
+  panel-title: "&8Panel admina"
+  panel-season: "&6Zarzadzanie sezonem"
+  panel-instances: "&bInstancje gier"
+  instances-title: "&8Instancje gier"
+  instance-state: "&7Stan: &e%state%"
+  instance-players: "&7Gracze: &e%players%&7/&e%max%"
+  instance-close-hint: "&cKliknij, aby zamknac instancje"
+  instance-close-requested: "&aWyslano zadanie zamkniecia &e%id%&a."
+  instances-empty: "&7Brak zarejestrowanych instancji."
   currency-given: "&aDodano &e%amount% XP &agraczowi &e%player%&a."
   pd-given: "&aDodano &e%amount% PD &agraczowi &e%player%&a."
   season-reset: "&aSezon zresetowany (poziomy, PD, receptury). Klasy zachowane."

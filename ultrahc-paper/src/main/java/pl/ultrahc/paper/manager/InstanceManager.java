@@ -77,10 +77,35 @@ public class InstanceManager {
         String state = game == null ? "WAITING" : game.state().name();
         int players = game == null ? 0 : game.participants().size();
         try {
+            // Zdalne zadanie zamkniecia (np. z panelu admina w lobby) -> zakoncz gre.
+            if (registry.consumeCloseRequest(instanceId) && game != null) {
+                game.forceEnd();
+            }
             registry.upsert(new InstanceInfo(instanceId, state, players, maxPlayers, teamSize,
                     modeName(teamSize), System.currentTimeMillis()));
         } catch (Exception e) {
             plugin.getLogger().warning("[UltraHC] Blad heartbeatu instancji: " + e.getMessage());
+        }
+    }
+
+    /** Lista wszystkich zarejestrowanych instancji (panel admina). */
+    public List<InstanceInfo> listAll() {
+        if (registry == null) return List.of();
+        try {
+            return registry.listAll();
+        } catch (Exception e) {
+            plugin.getLogger().warning("[UltraHC] Blad listy instancji: " + e.getMessage());
+            return List.of();
+        }
+    }
+
+    /** Zadanie zamkniecia instancji (arena odbierze przy heartbeacie). */
+    public void requestClose(String id) {
+        if (registry == null) return;
+        try {
+            registry.requestClose(id);
+        } catch (Exception e) {
+            plugin.getLogger().warning("[UltraHC] Blad zadania zamkniecia " + id + ": " + e.getMessage());
         }
     }
 
