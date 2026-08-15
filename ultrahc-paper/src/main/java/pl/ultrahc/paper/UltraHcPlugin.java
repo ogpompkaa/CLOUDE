@@ -20,6 +20,7 @@ import pl.ultrahc.paper.gui.AdminGui;
 import pl.ultrahc.paper.gui.ArenaSelectGui;
 import pl.ultrahc.paper.gui.ClassGui;
 import pl.ultrahc.paper.gui.InstanceAdminGui;
+import pl.ultrahc.paper.gui.LeaderboardGui;
 import pl.ultrahc.paper.gui.LobbyMenuGui;
 import pl.ultrahc.paper.gui.QuestGui;
 import pl.ultrahc.paper.gui.SeasonAdminGui;
@@ -89,6 +90,7 @@ public class UltraHcPlugin extends JavaPlugin {
     private ClassGui classGuiInstance;
     private StatsGui statsGuiInstance;
     private LobbyMenuGui lobbyMenuGui;
+    private LeaderboardGui leaderboardGuiInstance;
     private BossBarService bossBarService;
     private RankService rankService;
     private RankFormat rankFormat;
@@ -129,6 +131,7 @@ public class UltraHcPlugin extends JavaPlugin {
         this.classGuiInstance = new ClassGui(this);
         this.statsGuiInstance = new StatsGui(this);
         this.lobbyMenuGui = new LobbyMenuGui(this);
+        this.leaderboardGuiInstance = new LeaderboardGui(this);
         this.instanceManager = new InstanceManager(this); // rejestr instancji (obie role)
         this.instanceAdminGui = new InstanceAdminGui(this);
         this.adminGui = new AdminGui(this);
@@ -139,6 +142,7 @@ public class UltraHcPlugin extends JavaPlugin {
         guiPm.registerEvents(classGuiInstance, this);
         guiPm.registerEvents(statsGuiInstance, this);
         guiPm.registerEvents(lobbyMenuGui, this);
+        guiPm.registerEvents(leaderboardGuiInstance, this);
         guiPm.registerEvents(instanceAdminGui, this);
         guiPm.registerEvents(adminGui, this);
 
@@ -287,6 +291,7 @@ public class UltraHcPlugin extends JavaPlugin {
     public ClassGui classGui() { return classGuiInstance; }
     public StatsGui statsGui() { return statsGuiInstance; }
     public LobbyMenuGui menu() { return lobbyMenuGui; }
+    public LeaderboardGui leaderboardGui() { return leaderboardGuiInstance; }
     public AdminGui adminGui() { return adminGui; }
     public InstanceAdminGui instanceAdminGui() { return instanceAdminGui; }
     public RankFormat rankFormat() { return rankFormat; }

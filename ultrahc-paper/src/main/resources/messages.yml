@@ -34,6 +34,20 @@ title:
   win-sub: "&7Gratulacje"
   levelup-main: "&6&lAWANS"
   levelup-sub: "&ePoziom %level% %star%"
+  quest-main: "&a&lQUEST!"
+  quest-sub: "&e%name%"
+
+help:
+  header: "&6&lUltraHC &7— komendy:"
+  lines:
+    - "&e/uhc menu &7- menu glowne (lobby)"
+    - "&e/uhc classes &7- wybor i kupno klas"
+    - "&e/uhc shop &7- sklep receptur"
+    - "&e/uhc quests &7- twoje questy"
+    - "&e/uhc join &7- dolacz do gry (arena)"
+    - "&e/uhc spectate &7- obserwuj zywych (po smierci)"
+    - "&e/uhc balance &7- twoje XP i poziom"
+  admin: "&c[admin] &7/uhc admin, forcestart, forceend, givexp, givepd, season, stats, setstat, instances, setnpc, sethologram, reload"
 
 general:
   no-permission: "&cNie masz uprawnien do tej komendy."
@@ -208,6 +222,14 @@ menu:
   quests-lore: "&7Twoje zadania i nagrody."
   stats: "&d&lSTATYSTYKI"
   stats-lore: "&7Twoj postep i wyniki."
+  leaderboards: "&c&lTOPKI"
+  leaderboards-lore: "&7Najlepsi gracze."
+
+leaderboard-gui:
+  title: "&8Topki"
+  kills-icon: "&c&lTOP ZABOJSTW"
+  wins-icon: "&a&lTOP WYGRANYCH"
+  level-icon: "&b&lTOP POZIOMOW"
 
 stats:
   gui-title: "&8Twoje statystyki"

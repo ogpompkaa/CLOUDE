@@ -52,6 +52,10 @@ public class RecipeManager implements Listener {
 
     /** Rejestruje wszystkie przepisy w serwerze (ARENA). */
     public void registerAll() {
+        // Zaklinacz: utrudniony enchant -> wylaczamy zwykly przepis na stol do zaklec.
+        if (plugin.configManager().raw().getBoolean("enchanter.disable-vanilla-table", true)) {
+            plugin.getServer().removeRecipe(org.bukkit.NamespacedKey.minecraft("enchanting_table"));
+        }
         register("gornik-pickaxe", buildResult("gornik-pickaxe"), Material.IRON_PICKAXE, Material.DIAMOND);
         register("sharp-sword", buildResult("sharp-sword"), Material.IRON_SWORD, Material.IRON_INGOT, Material.IRON_INGOT);
         register("fire-sword", buildResult("fire-sword"), Material.IRON_SWORD, Material.BLAZE_POWDER);

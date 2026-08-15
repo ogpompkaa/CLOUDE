@@ -21,7 +21,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
 
     private static final List<String> SUBCOMMANDS = List.of(
             "balance", "reload", "givexp", "givepd", "resetseason", "join", "leave",
-            "forcestart", "forceend", "gameinfo", "menu", "spectate", "classes", "class", "buyclass",
+            "help", "forcestart", "forceend", "gameinfo", "menu", "spectate", "classes", "class", "buyclass",
             "shop", "buyrecipe", "setnpc", "sethologram", "quests", "season", "stats", "setstat",
             "admin", "instances");
 
@@ -41,6 +41,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         }
 
         switch (args[0].toLowerCase()) {
+            case "help" -> handleHelp(sender);
             case "balance", "xp" -> handleBalance(sender);
             case "reload" -> handleReload(sender);
             case "givexp" -> handleGive(sender, args, true);
@@ -351,6 +352,13 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         List<String> names = new ArrayList<>();
         for (Player p : plugin.getServer().getOnlinePlayers()) names.add(p.getName());
         return names;
+    }
+
+    private void handleHelp(CommandSender sender) {
+        MessagesManager msg = plugin.messages();
+        sender.sendMessage(msg.legacy(msg.raw("help.header")));
+        for (String line : msg.rawList("help.lines")) sender.sendMessage(msg.legacy(line));
+        if (sender.hasPermission("ultrahc.admin")) sender.sendMessage(msg.legacy(msg.raw("help.admin")));
     }
 
     private void handleBalance(CommandSender sender) {

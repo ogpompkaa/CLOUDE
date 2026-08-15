@@ -40,11 +40,12 @@ public class LobbyMenuGui implements Listener {
         Holder holder = new Holder();
         Inventory inv = Bukkit.createInventory(holder, 9, msg.component("menu.title", null));
         holder.inv = inv;
-        inv.setItem(0, tile("play", Material.COMPASS, msg.raw("menu.play"), msg.raw("menu.play-lore")));
+        inv.setItem(1, tile("play", Material.COMPASS, msg.raw("menu.play"), msg.raw("menu.play-lore")));
         inv.setItem(2, tile("classes", Material.IRON_CHESTPLATE, msg.raw("menu.classes"), msg.raw("menu.classes-lore")));
-        inv.setItem(4, tile("shop", Material.EMERALD, msg.raw("menu.shop"), msg.raw("menu.shop-lore")));
-        inv.setItem(6, tile("quests", Material.WRITABLE_BOOK, msg.raw("menu.quests"), msg.raw("menu.quests-lore")));
-        inv.setItem(8, tile("stats", Material.PLAYER_HEAD, msg.raw("menu.stats"), msg.raw("menu.stats-lore")));
+        inv.setItem(3, tile("shop", Material.EMERALD, msg.raw("menu.shop"), msg.raw("menu.shop-lore")));
+        inv.setItem(5, tile("quests", Material.WRITABLE_BOOK, msg.raw("menu.quests"), msg.raw("menu.quests-lore")));
+        inv.setItem(6, tile("stats", Material.PLAYER_HEAD, msg.raw("menu.stats"), msg.raw("menu.stats-lore")));
+        inv.setItem(7, tile("leaderboards", Material.NETHER_STAR, msg.raw("menu.leaderboards"), msg.raw("menu.leaderboards-lore")));
         player.openInventory(inv);
     }
 
@@ -74,6 +75,7 @@ public class LobbyMenuGui implements Listener {
             case "shop" -> plugin.shopGui().open(player);
             case "quests" -> plugin.questGui().open(player);
             case "stats" -> plugin.statsGui().open(player);
+            case "leaderboards" -> plugin.leaderboardGui().open(player);
             default -> {}
         }
     }

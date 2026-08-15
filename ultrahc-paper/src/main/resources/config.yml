@@ -196,6 +196,10 @@ detector:
   cooldown-seconds: 60
   reveal-delay-seconds: 5
 
+# Zaklinacz (receptura) — utrudniony dostep do enchantu.
+enchanter:
+  disable-vanilla-table: true   # wylacza zwykly przepis na stol do zaklec (wymusza Zaklinacza)
+
 # --------------------------- LOBBY: TOPKI I NPC ----------------------
 # Pozycje ustawiasz in-game: /uhc sethologram <kills|wins|level>, /uhc setnpc <id>.
 lobby:

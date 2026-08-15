@@ -125,6 +125,10 @@ public class QuestsManager {
                     "name", def.name(),
                     "xp", String.valueOf(def.rewardXp()),
                     "pd", String.valueOf(def.rewardPd()))));
+            pl.ultrahc.paper.util.Feedback.title(online,
+                    plugin.messages().component("title.quest-main", null),
+                    plugin.messages().component("title.quest-sub", Map.of("name", def.name())));
+            pl.ultrahc.paper.util.Feedback.levelUp(online);
         }
     }
 
