@@ -236,6 +236,12 @@ public class GameInstance {
             broadcast("game.death-generic", Map.of("victim", "-"));
         }
         if (plugin.rewards() != null) plugin.rewards().saveParticipants(participants);
+        // Quest: rozegrana gra dla wszystkich uczestnikow.
+        if (plugin.quests() != null) {
+            for (UUID id : participants) {
+                plugin.quests().increment(id, pl.ultrahc.paper.manager.QuestsManager.Objective.GAMES_PLAYED, 1);
+            }
+        }
         stopTicker();
         // Sprzatanie zleci GameManager (kasowanie swiata + nowa instancja).
         plugin.games().onInstanceEnded(this);

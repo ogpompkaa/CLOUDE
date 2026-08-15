@@ -48,6 +48,16 @@ public class SqliteStorage implements Storage {
                         "selected_class TEXT NOT NULL DEFAULT '" + DEFAULT_CLASS + "')")) {
             ps.executeUpdate();
         }
+        try (PreparedStatement ps = connection.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS quest_progress (" +
+                        "uuid TEXT NOT NULL," +
+                        "quest_id TEXT NOT NULL," +
+                        "period TEXT NOT NULL DEFAULT ''," +
+                        "progress INTEGER NOT NULL DEFAULT 0," +
+                        "completed INTEGER NOT NULL DEFAULT 0," +
+                        "PRIMARY KEY(uuid, quest_id))")) {
+            ps.executeUpdate();
+        }
         logger.info("[UltraHC] Magazyn SQLite zainicjalizowany: " + jdbcUrl);
     }
 
@@ -108,15 +118,46 @@ public class SqliteStorage implements Storage {
         String order = type == LeaderboardType.LEVEL ? "level DESC, progress_points DESC" : column + " DESC";
         List<LeaderboardEntry> out = new ArrayList<>();
         try (PreparedStatement ps = connection.prepareStatement(
-                "SELECT name, " + column + " AS v FROM players ORDER BY " + order + " LIMIT ?")) {
+                "SELECT uuid, name, " + column + " AS v FROM players ORDER BY " + order + " LIMIT ?")) {
             ps.setInt(1, limit);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    out.add(new LeaderboardEntry(rs.getString("name"), rs.getLong("v")));
+                    out.add(new LeaderboardEntry(UUID.fromString(rs.getString("uuid")), rs.getString("name"), rs.getLong("v")));
                 }
             }
         }
         return out;
+    }
+
+    @Override
+    public List<QuestRecord> loadQuests(UUID uuid) throws Exception {
+        List<QuestRecord> out = new ArrayList<>();
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT quest_id, period, progress, completed FROM quest_progress WHERE uuid = ?")) {
+            ps.setString(1, uuid.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    out.add(new QuestRecord(rs.getString("quest_id"), rs.getString("period"),
+                            rs.getLong("progress"), rs.getInt("completed") != 0));
+                }
+            }
+        }
+        return out;
+    }
+
+    @Override
+    public void saveQuest(UUID uuid, QuestRecord r) throws Exception {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "INSERT INTO quest_progress (uuid, quest_id, period, progress, completed) VALUES (?,?,?,?,?) " +
+                        "ON CONFLICT(uuid, quest_id) DO UPDATE SET " +
+                        "period=excluded.period, progress=excluded.progress, completed=excluded.completed")) {
+            ps.setString(1, uuid.toString());
+            ps.setString(2, r.questId());
+            ps.setString(3, r.period());
+            ps.setLong(4, r.progress());
+            ps.setInt(5, r.completed() ? 1 : 0);
+            ps.executeUpdate();
+        }
     }
 
     @Override

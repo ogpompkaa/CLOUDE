@@ -48,6 +48,10 @@ public class UhcCommand implements CommandExecutor {
             case "buyrecipe" -> handleBuyRecipe(sender, args);
             case "setnpc" -> handleSetNpc(sender, args);
             case "sethologram" -> handleSetHologram(sender, args);
+            case "quests" -> handleQuests(sender);
+            case "season" -> handleSeason(sender, args);
+            case "stats" -> handleStats(sender, args);
+            case "setstat" -> handleSetStat(sender, args);
             default -> sender.sendMessage(msg.prefixed("general.unknown-subcommand", null));
         }
         return true;
@@ -94,6 +98,64 @@ public class UhcCommand implements CommandExecutor {
             plugin.games().current().forceEnd();
             sender.sendMessage(msg.prefixed("admin.force-end", null));
         }
+    }
+
+    private void handleQuests(CommandSender sender) {
+        MessagesManager msg = plugin.messages();
+        if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
+        plugin.questGui().open(player);
+    }
+
+    private void handleSeason(CommandSender sender, String[] args) {
+        MessagesManager msg = plugin.messages();
+        if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
+        if (args.length >= 2) {
+            switch (args[1].toLowerCase()) {
+                case "start" -> plugin.season().startSeason(sender);
+                case "end" -> plugin.season().endSeason(sender);
+                default -> sender.sendMessage(msg.legacy("&cUzycie: /uhc season [start|end]"));
+            }
+            return;
+        }
+        if (sender instanceof Player player) plugin.seasonGui().open(player);
+        else sender.sendMessage(msg.legacy("&cUzycie: /uhc season <start|end>"));
+    }
+
+    private void handleStats(CommandSender sender, String[] args) {
+        MessagesManager msg = plugin.messages();
+        if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
+        if (args.length < 2) { sender.sendMessage(msg.legacy("&cUzycie: /uhc stats <gracz>")); return; }
+        Player target = plugin.getServer().getPlayerExact(args[1]);
+        if (target == null) { sender.sendMessage(msg.prefixed("admin.player-not-found", Map.of("player", args[1]))); return; }
+        PlayerProfile p = plugin.profiles().get(target.getUniqueId());
+        if (p == null) { sender.sendMessage(msg.legacy("&cProfil sie laduje.")); return; }
+        sender.sendMessage(msg.legacy("&6Statystyki &e" + p.getName() + "&6:"));
+        sender.sendMessage(msg.legacy("&7XP: &e" + p.getCredits() + " &8| &7PD: &b" + p.getProgressPoints()
+                + " &8| &7Poziom: &6" + p.getLevel()));
+        sender.sendMessage(msg.legacy("&7Kille: &e" + p.getKills() + " &8| &7Wygrane: &a" + p.getWins()
+                + " &8| &7Klasa: &e" + p.getSelectedClass()));
+    }
+
+    private void handleSetStat(CommandSender sender, String[] args) {
+        MessagesManager msg = plugin.messages();
+        if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
+        if (args.length < 4) { sender.sendMessage(msg.legacy("&cUzycie: /uhc setstat <gracz> <xp|pd|level|kills|wins> <wartosc>")); return; }
+        Player target = plugin.getServer().getPlayerExact(args[1]);
+        if (target == null) { sender.sendMessage(msg.prefixed("admin.player-not-found", Map.of("player", args[1]))); return; }
+        PlayerProfile p = plugin.profiles().get(target.getUniqueId());
+        if (p == null) { sender.sendMessage(msg.legacy("&cProfil sie laduje.")); return; }
+        long value;
+        try { value = Long.parseLong(args[3]); } catch (NumberFormatException ex) { sender.sendMessage(msg.legacy("&cNiepoprawna liczba.")); return; }
+        switch (args[2].toLowerCase()) {
+            case "xp" -> p.setCredits(value);
+            case "pd" -> p.setProgressPoints(value);
+            case "level" -> p.setLevel((int) value);
+            case "kills" -> p.setKills((int) value);
+            case "wins" -> p.setWins((int) value);
+            default -> { sender.sendMessage(msg.legacy("&cNieznane pole.")); return; }
+        }
+        plugin.profiles().saveNow(p);
+        sender.sendMessage(msg.legacy("&aUstawiono &e" + args[2] + " &adla &e" + p.getName() + " &ana &e" + value));
     }
 
     private void handleSetNpc(CommandSender sender, String[] args) {

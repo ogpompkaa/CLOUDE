@@ -29,6 +29,12 @@ public interface Storage {
     /** Reset sezonu: zeruje poziomy, PD i odblokowane receptury WSZYSTKIM. Klasy zostają. */
     void resetSeason() throws Exception;
 
+    /** Wczytuje postep questow gracza. */
+    List<QuestRecord> loadQuests(UUID uuid) throws Exception;
+
+    /** Zapisuje postep pojedynczego questa gracza. */
+    void saveQuest(UUID uuid, QuestRecord record) throws Exception;
+
     /** Zamknięcie zasobów. */
     void close();
 
@@ -36,5 +42,8 @@ public interface Storage {
     enum LeaderboardType { KILLS, WINS, LEVEL }
 
     /** Pojedynczy wiersz topki. */
-    record LeaderboardEntry(String name, long value) {}
+    record LeaderboardEntry(UUID uuid, String name, long value) {}
+
+    /** Postep questa: okres (klucz dzienny/tygodniowy), ile zrobione, czy odebrane. */
+    record QuestRecord(String questId, String period, long progress, boolean completed) {}
 }

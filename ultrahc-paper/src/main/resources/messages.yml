@@ -107,6 +107,23 @@ shop:
   already-owned-recipe: "&ePosiadasz juz te recepture."
   title: "&8Sklep receptur"
 
+# --------------------------- QUESTY / SEZON --------------------------
+quest:
+  gui-title: "&8Questy — Krzysiu"
+  progress: "&7Postep: &e%progress%&7/&e%target%"
+  done: "&aUkonczono!"
+  reward-line: "&7Nagroda: &6%xp% XP&7, &b%pd% PD"
+  type-daily: "&aDzienny"
+  type-weekly: "&dTygodniowy"
+  type-permanent: "&eStaly"
+  completed: "&aQuest ukonczony: &e%name% &7(+%xp% XP, +%pd% PD)"
+
+season:
+  started: "&aSezon rozpoczety! Powodzenia."
+  ended: "&aSezon zakonczony — nagrody Top 3 wyplacone, poziomy i receptury zresetowane (klasy zostaja)."
+  reward: "&6Nagroda sezonowa &7(#%rank%)&6: &e%xp% XP &7dla &e%player%"
+  gui-title: "&8Zarzadzanie sezonem"
+
 # --------------------------- ADMIN -----------------------------------
 admin:
   currency-given: "&aDodano &e%amount% XP &agraczowi &e%player%&a."

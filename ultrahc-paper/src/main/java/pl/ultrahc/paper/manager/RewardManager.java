@@ -6,6 +6,7 @@ import org.bukkit.scheduler.BukkitTask;
 import pl.ultrahc.common.model.PlayerProfile;
 import pl.ultrahc.paper.UltraHcPlugin;
 import pl.ultrahc.paper.game.GameInstance;
+import pl.ultrahc.paper.manager.QuestsManager;
 
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ public class RewardManager {
         p.setKills(p.getKills() + 1);
         plugin.profiles().saveNow(p);
         notifyLevel(killer, gained);
+        if (plugin.quests() != null) plugin.quests().increment(killer, QuestsManager.Objective.KILLS, 1);
     }
 
     // ----------------------------------------------------------------- wygrana
@@ -58,6 +60,7 @@ public class RewardManager {
             p.setWins(p.getWins() + 1);
             plugin.profiles().saveNow(p);
             notifyLevel(id, gained);
+            if (plugin.quests() != null) plugin.quests().increment(id, QuestsManager.Objective.WINS, 1);
         }
     }
 
@@ -105,9 +108,14 @@ public class RewardManager {
         int minutes = (int) (game.elapsedSeconds() / 60);
         double amount = tierAmount(tiersPath, minutes);
         if (amount <= 0) return;
+        long playMinutes = cfg().getInt("rewards.progress.time.interval-min", 2);
         for (UUID id : game.participants()) {
             if (!isAlive(game, id)) continue;
             accumulate(id, isCurrency ? amount : 0, isCurrency ? 0 : amount);
+            // Postep questa czasowego licz w takcie PD (co interval-min minut).
+            if (!isCurrency && plugin.quests() != null) {
+                plugin.quests().increment(id, QuestsManager.Objective.PLAY_MINUTES, playMinutes);
+            }
         }
     }
 

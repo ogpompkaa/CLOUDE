@@ -208,6 +208,39 @@ lobby:
     krzysiu: {}
     sklepikarz: {}
 
+# --------------------------- QUESTY (Krzysiu) ------------------------
+# objective: KILLS | WINS | GAMES_PLAYED | PLAY_MINUTES ; type: DAILY | WEEKLY | PERMANENT
+quests:
+  definitions:
+    daily_kill:
+      type: DAILY
+      objective: KILLS
+      target: 5
+      name: "Zabij 5 graczy"
+      reward-xp: 500
+      reward-pd: 100
+    daily_play:
+      type: DAILY
+      objective: PLAY_MINUTES
+      target: 30
+      name: "Zagraj 30 minut"
+      reward-xp: 300
+      reward-pd: 60
+    weekly_win:
+      type: WEEKLY
+      objective: WINS
+      target: 3
+      name: "Wygraj 3 gry w tygodniu"
+      reward-xp: 2500
+      reward-pd: 500
+    perm_games:
+      type: PERMANENT
+      objective: GAMES_PLAYED
+      target: 50
+      name: "Rozegraj 50 gier"
+      reward-xp: 5000
+      reward-pd: 1000
+
 # --------------------------- SEZON -----------------------------------
 season:
   top-rewards:                    # nagrody Top 3 wg poziomu (XP sklepowe)

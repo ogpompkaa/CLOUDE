@@ -14,6 +14,8 @@ import pl.ultrahc.paper.listener.DetectorListener;
 import pl.ultrahc.paper.listener.HeadListener;
 import pl.ultrahc.paper.listener.PandoraListener;
 import pl.ultrahc.paper.listener.ProfileListener;
+import pl.ultrahc.paper.gui.QuestGui;
+import pl.ultrahc.paper.gui.SeasonAdminGui;
 import pl.ultrahc.paper.gui.ShopGui;
 import pl.ultrahc.paper.hologram.DecentHologramsManager;
 import pl.ultrahc.paper.hologram.HologramManager;
@@ -26,9 +28,11 @@ import pl.ultrahc.paper.manager.ClassesManager;
 import pl.ultrahc.paper.manager.CompassManager;
 import pl.ultrahc.paper.manager.HeadManager;
 import pl.ultrahc.paper.manager.LevelsManager;
+import pl.ultrahc.paper.manager.QuestsManager;
 import pl.ultrahc.paper.manager.RecipeManager;
 import pl.ultrahc.paper.manager.RewardManager;
 import pl.ultrahc.paper.manager.ScoreboardService;
+import pl.ultrahc.paper.manager.SeasonManager;
 import pl.ultrahc.paper.manager.ShopCurrencyManager;
 import pl.ultrahc.paper.manager.ShopManager;
 import pl.ultrahc.paper.profile.ProfileService;
@@ -63,6 +67,10 @@ public class UltraHcPlugin extends JavaPlugin {
     private HologramManager hologramManager;
     private NpcManager npcManager;
     private LeaderboardsManager leaderboardsManager;
+    private QuestsManager questsManager;
+    private SeasonManager seasonManager;
+    private QuestGui questGui;
+    private SeasonAdminGui seasonAdminGui;
 
     @Override
     public void onEnable() {
@@ -89,11 +97,18 @@ public class UltraHcPlugin extends JavaPlugin {
         this.levelsManager = new LevelsManager(configManager);
         this.classesManager = new ClassesManager(this, currencyManager); // buy/select w LOBBY, kit w ARENA
         this.shopManager = new ShopManager(this, currencyManager);        // kupno receptur (obie role)
+        this.questsManager = new QuestsManager(this, currencyManager, levelsManager); // questy (obie role)
+        this.seasonManager = new SeasonManager(this, currencyManager);    // sezon (admin)
         this.shopGui = new ShopGui(this);
-        getServer().getPluginManager().registerEvents(shopGui, this);
+        this.questGui = new QuestGui(this);
+        this.seasonAdminGui = new SeasonAdminGui(this);
+        var guiPm = getServer().getPluginManager();
+        guiPm.registerEvents(shopGui, this);
+        guiPm.registerEvents(questGui, this);
+        guiPm.registerEvents(seasonAdminGui, this);
 
         // 4. Eventy i komendy
-        getServer().getPluginManager().registerEvents(new ProfileListener(profileService), this);
+        getServer().getPluginManager().registerEvents(new ProfileListener(this), this);
         var cmd = getCommand("uhc");
         if (cmd != null) {
             cmd.setExecutor(new UhcCommand(this));
@@ -150,8 +165,7 @@ public class UltraHcPlugin extends JavaPlugin {
         npcManager.removeAll();
         spawnNpc("mietek", "Mietek",
                 p -> messagesManager.rawList("npc.mietek-info").forEach(l -> p.sendMessage(messagesManager.legacy(l))));
-        spawnNpc("krzysiu", "Krzysiu",
-                p -> p.sendMessage(messagesManager.legacy(messagesManager.raw("npc.krzysiu-info"))));
+        spawnNpc("krzysiu", "Krzysiu", p -> questGui.open(p));
         spawnNpc("sklepikarz", "Sklepikarz", p -> shopGui.open(p));
     }
 
@@ -210,4 +224,8 @@ public class UltraHcPlugin extends JavaPlugin {
     public HologramManager holograms() { return hologramManager; }
     public NpcManager npcs() { return npcManager; }
     public LeaderboardsManager leaderboards() { return leaderboardsManager; }
+    public QuestsManager quests() { return questsManager; }
+    public SeasonManager season() { return seasonManager; }
+    public QuestGui questGui() { return questGui; }
+    public SeasonAdminGui seasonGui() { return seasonAdminGui; }
 }
