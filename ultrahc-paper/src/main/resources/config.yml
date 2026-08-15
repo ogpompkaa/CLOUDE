@@ -194,6 +194,20 @@ detector:
   cooldown-seconds: 60
   reveal-delay-seconds: 5
 
+# --------------------------- LOBBY: TOPKI I NPC ----------------------
+# Pozycje ustawiasz in-game: /uhc sethologram <kills|wins|level>, /uhc setnpc <id>.
+lobby:
+  leaderboards:
+    refresh-seconds: 60
+    holograms:
+      kills: {}     # {world, x, y, z} — puste = nieustawione
+      wins: {}
+      level: {}
+  npcs:
+    mietek: {}      # {world, x, y, z, yaw, pitch}
+    krzysiu: {}
+    sklepikarz: {}
+
 # --------------------------- SEZON -----------------------------------
 season:
   top-rewards:                    # nagrody Top 3 wg poziomu (XP sklepowe)

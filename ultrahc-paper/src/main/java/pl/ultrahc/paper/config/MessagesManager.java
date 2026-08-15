@@ -48,6 +48,11 @@ public class MessagesManager {
         return raw(path, null);
     }
 
+    /** Lista surowych linii (np. dialog NPC). */
+    public java.util.List<String> rawList(String path) {
+        return cfg.getStringList(path);
+    }
+
     /** Komponent z prefiksem (do wiadomosci czatu). */
     public Component prefixed(String path, Map<String, String> placeholders) {
         return LEGACY.deserialize(prefix + raw(path, placeholders));

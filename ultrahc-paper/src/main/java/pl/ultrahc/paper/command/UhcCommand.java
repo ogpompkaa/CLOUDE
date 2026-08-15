@@ -46,6 +46,8 @@ public class UhcCommand implements CommandExecutor {
             case "buyclass" -> handleClassBuy(sender, args);
             case "shop" -> handleShop(sender);
             case "buyrecipe" -> handleBuyRecipe(sender, args);
+            case "setnpc" -> handleSetNpc(sender, args);
+            case "sethologram" -> handleSetHologram(sender, args);
             default -> sender.sendMessage(msg.prefixed("general.unknown-subcommand", null));
         }
         return true;
@@ -92,6 +94,41 @@ public class UhcCommand implements CommandExecutor {
             plugin.games().current().forceEnd();
             sender.sendMessage(msg.prefixed("admin.force-end", null));
         }
+    }
+
+    private void handleSetNpc(CommandSender sender, String[] args) {
+        MessagesManager msg = plugin.messages();
+        if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
+        if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
+        if (args.length < 2) { sender.sendMessage(msg.legacy("&cUzycie: /uhc setnpc <mietek|krzysiu|sklepikarz>")); return; }
+        String id = args[1].toLowerCase();
+        writeLocation("lobby.npcs." + id, player.getLocation(), true);
+        plugin.reloadLobbyNpcs();
+        sender.sendMessage(msg.prefixed("npc.set", Map.of("id", id)));
+    }
+
+    private void handleSetHologram(CommandSender sender, String[] args) {
+        MessagesManager msg = plugin.messages();
+        if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
+        if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
+        if (args.length < 2) { sender.sendMessage(msg.legacy("&cUzycie: /uhc sethologram <kills|wins|level>")); return; }
+        String id = args[1].toLowerCase();
+        writeLocation("lobby.leaderboards.holograms." + id, player.getLocation(), false);
+        if (plugin.leaderboards() != null) plugin.leaderboards().refresh();
+        sender.sendMessage(msg.prefixed("npc.hologram-set", Map.of("id", id)));
+    }
+
+    private void writeLocation(String path, org.bukkit.Location loc, boolean withRotation) {
+        var cfg = plugin.getConfig();
+        cfg.set(path + ".world", loc.getWorld().getName());
+        cfg.set(path + ".x", loc.getX());
+        cfg.set(path + ".y", loc.getY());
+        cfg.set(path + ".z", loc.getZ());
+        if (withRotation) {
+            cfg.set(path + ".yaw", (double) loc.getYaw());
+            cfg.set(path + ".pitch", (double) loc.getPitch());
+        }
+        plugin.saveConfig();
     }
 
     private void handleShop(CommandSender sender) {

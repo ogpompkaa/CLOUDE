@@ -75,6 +75,26 @@ scoreboard:
   state-waiting: "&eOczekiwanie..."
   empty: ""
 
+# --------------------------- TOPKI (hologramy) -----------------------
+leaderboard:
+  title-kills: "&c&lTOP 10 ZABOJSTW"
+  title-wins: "&a&lTOP 10 WYGRANYCH"
+  title-level: "&b&lTOP 10 POZIOMOW"
+  entry: "&e%pos%. &f%name% &7- &6%value%"
+  empty: "&7---"
+
+# --------------------------- NPC -------------------------------------
+npc:
+  mietek-info:
+    - "&6Mietek: &7Witaj w UltraHC!"
+    - "&7Brak PvP przez 10 min, potem walka do ostatniej druzyny."
+    - "&7Kop kamien po surowce, granica kurczy sie od 10 min."
+    - "&7Kup klasy i receptury za XP u Sklepikarza."
+  krzysiu-info: "&6Krzysiu: &7System questow bedzie tutaj."
+  set: "&aUstawiono NPC &e%id% &aw tym miejscu."
+  hologram-set: "&aUstawiono hologram &e%id% &aw tym miejscu."
+  not-configured: "&eNPC/hologram &6%id% &niema ustawionej pozycji."
+
 # --------------------------- KLASY / SKLEP ---------------------------
 class:
   selected: "&aWybrano klase: &e%class%&a."

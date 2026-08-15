@@ -15,7 +15,12 @@ import pl.ultrahc.paper.listener.HeadListener;
 import pl.ultrahc.paper.listener.PandoraListener;
 import pl.ultrahc.paper.listener.ProfileListener;
 import pl.ultrahc.paper.gui.ShopGui;
+import pl.ultrahc.paper.hologram.DecentHologramsManager;
+import pl.ultrahc.paper.hologram.HologramManager;
+import pl.ultrahc.paper.npc.CitizensNpcManager;
+import pl.ultrahc.paper.npc.NpcManager;
 import pl.ultrahc.paper.manager.AbilityScheduler;
+import pl.ultrahc.paper.manager.LeaderboardsManager;
 import pl.ultrahc.paper.manager.BorderManager;
 import pl.ultrahc.paper.manager.ClassesManager;
 import pl.ultrahc.paper.manager.CompassManager;
@@ -55,6 +60,9 @@ public class UltraHcPlugin extends JavaPlugin {
     private ShopManager shopManager;
     private ShopGui shopGui;
     private RecipeManager recipeManager;
+    private HologramManager hologramManager;
+    private NpcManager npcManager;
+    private LeaderboardsManager leaderboardsManager;
 
     @Override
     public void onEnable() {
@@ -121,12 +129,61 @@ public class UltraHcPlugin extends JavaPlugin {
             });
         }
 
+        if (role == ServerRole.LOBBY) {
+            this.hologramManager = new DecentHologramsManager(this);
+            this.npcManager = new CitizensNpcManager(this);
+            this.leaderboardsManager = new LeaderboardsManager(this);
+            // Po pelnym starcie: odswiez topki i postaw NPC (swiat lobby musi byc zaladowany).
+            getServer().getScheduler().runTask(this, () -> {
+                leaderboardsManager.start();
+                spawnLobbyNpcs();
+            });
+        }
+
         getLogger().info("[UltraHC] Wlaczono. Rola serwera: " + role + ", magazyn: " + configManager.storageType() + ".");
         // TODO(kolejne etapy): LOBBY -> NpcManager/ShopManager/Leaderboards; ARENA -> Border/Scoreboard/Drops.
     }
 
+    /** Stawia NPC lobby (Mietek/Krzysiu/Sklepikarz) wg pozycji z config. */
+    private void spawnLobbyNpcs() {
+        if (npcManager == null || !npcManager.available()) return;
+        npcManager.removeAll();
+        spawnNpc("mietek", "Mietek",
+                p -> messagesManager.rawList("npc.mietek-info").forEach(l -> p.sendMessage(messagesManager.legacy(l))));
+        spawnNpc("krzysiu", "Krzysiu",
+                p -> p.sendMessage(messagesManager.legacy(messagesManager.raw("npc.krzysiu-info"))));
+        spawnNpc("sklepikarz", "Sklepikarz", p -> shopGui.open(p));
+    }
+
+    /** Publiczne przeladowanie NPC lobby (po zmianie pozycji przez admina). */
+    public void reloadLobbyNpcs() {
+        spawnLobbyNpcs();
+    }
+
+    private void spawnNpc(String id, String name, java.util.function.Consumer<org.bukkit.entity.Player> action) {
+        org.bukkit.Location loc = readLoc("lobby.npcs." + id);
+        if (loc == null) {
+            getLogger().info("[UltraHC] NPC " + id + " bez pozycji — ustaw /uhc setnpc " + id + ".");
+            return;
+        }
+        npcManager.spawn(id, name, loc, action);
+    }
+
+    /** Odczyt lokalizacji z config (world,x,y,z[,yaw,pitch]); null gdy nieustawiona. */
+    public org.bukkit.Location readLoc(String path) {
+        var s = configManager.raw().getConfigurationSection(path);
+        if (s == null || !s.contains("world")) return null;
+        var world = getServer().getWorld(s.getString("world"));
+        if (world == null) return null;
+        return new org.bukkit.Location(world, s.getDouble("x"), s.getDouble("y"), s.getDouble("z"),
+                (float) s.getDouble("yaw", 0), (float) s.getDouble("pitch", 0));
+    }
+
     @Override
     public void onDisable() {
+        if (hologramManager != null) hologramManager.removeAll();
+        if (npcManager != null) npcManager.removeAll();
+        if (leaderboardsManager != null) leaderboardsManager.stop();
         if (abilityScheduler != null) abilityScheduler.stop();
         if (scoreboardService != null) scoreboardService.stop();
         if (gameManager != null) gameManager.shutdown();
@@ -150,4 +207,7 @@ public class UltraHcPlugin extends JavaPlugin {
     public ShopManager shop() { return shopManager; }
     public ShopGui shopGui() { return shopGui; }
     public RecipeManager recipes() { return recipeManager; }
+    public HologramManager holograms() { return hologramManager; }
+    public NpcManager npcs() { return npcManager; }
+    public LeaderboardsManager leaderboards() { return leaderboardsManager; }
 }
