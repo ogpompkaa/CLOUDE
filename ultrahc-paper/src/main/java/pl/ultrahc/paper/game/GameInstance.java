@@ -38,6 +38,7 @@ public class GameInstance {
     private final Map<UUID, org.bukkit.scheduler.BukkitTask> pendingReconnect = new HashMap<>();
     private final Map<UUID, UUID> lastAttacker = new HashMap<>();
     private final Map<UUID, Long> lastHitTime = new HashMap<>();
+    private final Map<UUID, Integer> killStreak = new HashMap<>();
 
     // Progi faz juz "odpalone" (zeby nie powtarzac broadcastow).
     private boolean pvpFired, shrinkFired, accelerateFired, compassFired, showdownFired;
@@ -257,6 +258,7 @@ public class GameInstance {
         Team victimTeam = teamManager.getTeam(victim);
         if (victimTeam == null || !victimTeam.isAlive(victim)) return;
         victimTeam.markDead(victim);
+        killStreak.remove(victim); // koniec serii ofiary
 
         if (killerOrNull != null) {
             Team killerTeam = teamManager.getTeam(killerOrNull);
@@ -265,6 +267,7 @@ public class GameInstance {
                 if (plugin.rewards() != null) plugin.rewards().grantKill(killerOrNull);
                 Player killerPlayer = plugin.getServer().getPlayer(killerOrNull);
                 if (killerPlayer != null) pl.ultrahc.paper.util.Feedback.kill(killerPlayer);
+                checkKillStreak(killerOrNull);
             }
         }
         Player victimPlayer = plugin.getServer().getPlayer(victim);
@@ -381,6 +384,19 @@ public class GameInstance {
             Player p = plugin.getServer().getPlayer(id);
             if (p != null) p.sendMessage(comp);
         }
+    }
+
+    /** Zlicza serie zabojstw i przy progu robi broadcast + title dla zabojcy. */
+    private void checkKillStreak(UUID killer) {
+        int streak = killStreak.merge(killer, 1, Integer::sum);
+        var milestones = plugin.configManager().raw().getIntegerList("combat.killstreak-milestones");
+        if (!milestones.contains(streak)) return;
+        Player p = plugin.getServer().getPlayer(killer);
+        if (p == null) return;
+        broadcast("killstreak.broadcast", Map.of("player", p.getName(), "streak", String.valueOf(streak)));
+        pl.ultrahc.paper.util.Feedback.title(p,
+                plugin.messages().component("killstreak.title-main", Map.of("streak", String.valueOf(streak))),
+                plugin.messages().component("killstreak.title-sub", Map.of()));
     }
 
     // Dzwiek dla wszystkich uczestnikow.

@@ -166,7 +166,16 @@ scoreboard:
   timer: "&f%time%"                              # HH:MM:SS
   waiting: "&7Gracze: &a%count%&7/&e%max%"       # widok przed startem
   state-waiting: "&eOczekiwanie..."
+  footer: "&eULTRAHC"                             # linia stopki (pusta = brak)
   empty: ""
+
+actionbar:
+  hud: "&aZywi: &f%alive% &8• &6Granica: &f%size% &8• &cKille druzyny: &f%kills%"
+
+killstreak:
+  broadcast: "&c⚔ &e%player% &7ma serie &c%streak% &7zabojstw!"
+  title-main: "&c&lSERIA x%streak%"
+  title-sub: "&7Nie do zatrzymania!"
 
 # --------------------------- TOPKI (hologramy) -----------------------
 leaderboard:

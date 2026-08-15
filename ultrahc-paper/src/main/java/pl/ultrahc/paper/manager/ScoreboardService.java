@@ -137,6 +137,18 @@ public class ScoreboardService {
         lineCount.put(player.getUniqueId(), size);
 
         colorNametags(player, game, board);
+        actionBar(player, game, msg);
+    }
+
+    /** HUD na action barze podczas gry: zywi, granica, kille druzyny. */
+    private void actionBar(Player player, GameInstance game, MessagesManager msg) {
+        if (game.state() != GameState.RUNNING || game.teams() == null) return;
+        var myTeam = game.teams().getTeam(player.getUniqueId());
+        int kills = myTeam != null ? myTeam.getKills() : 0;
+        player.sendActionBar(msg.component("actionbar.hud", Map.of(
+                "alive", String.valueOf(game.teams().alivePlayers()),
+                "size", NumberUtil.oneDecimalComma(game.world().getWorldBorder().getSize()),
+                "kills", String.valueOf(kills))));
     }
 
     /** Koloruje nicki nad glowa z perspektywy widza: sojusznik zielony, wrog czerwony. */
@@ -219,6 +231,12 @@ public class ScoreboardService {
 
         // Timer HH:MM:SS.
         lines.add(legacy(msg.raw("scoreboard.timer", Map.of("time", TimeUtil.hms(game.elapsedSeconds())))));
+        // Opcjonalna stopka (branding).
+        String footer = msg.raw("scoreboard.footer");
+        if (footer != null && !footer.isBlank()) {
+            lines.add("");
+            lines.add(legacy(footer));
+        }
         return lines;
     }
 
