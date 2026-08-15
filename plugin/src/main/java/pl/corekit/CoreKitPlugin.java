@@ -6,9 +6,11 @@ import pl.corekit.command.CommandRegistrar;
 import pl.corekit.config.ConfigManager;
 import pl.corekit.feature.feedback.FeedbackService;
 import pl.corekit.feature.god.GodService;
+import pl.corekit.feature.home.HomeGui;
 import pl.corekit.feature.home.HomeService;
 import pl.corekit.feature.spawn.SpawnService;
 import pl.corekit.feature.teleport.TeleportService;
+import pl.corekit.gui.MenuListener;
 import pl.corekit.lang.MessageService;
 import pl.corekit.listener.GodListener;
 import pl.corekit.listener.HomeCacheListener;
@@ -36,6 +38,7 @@ public final class CoreKitPlugin extends JavaPlugin {
     private DatabaseManager database;
     private PlayerProfileRepository profiles;
     private HomeService homes;
+    private HomeGui homeGui;
     private SpawnService spawn;
     private GodService god;
     private FeedbackService feedback;
@@ -67,6 +70,7 @@ public final class CoreKitPlugin extends JavaPlugin {
         this.feedback = new FeedbackService(this, messages);
         this.teleport = new TeleportService(this, feedback, messages);
         this.homes = new HomeService(this, new HomeRepository(database));
+        this.homeGui = new HomeGui(this, feedback, homes, teleport);
         this.spawn = new SpawnService(this);
         this.spawn.load();
         this.god = new GodService();
@@ -77,6 +81,7 @@ public final class CoreKitPlugin extends JavaPlugin {
         pluginManager.registerEvents(new HomeCacheListener(homes), this);
         pluginManager.registerEvents(new GodListener(god), this);
         pluginManager.registerEvents(new TeleportListener(this, teleport), this);
+        pluginManager.registerEvents(new MenuListener(), this);
         new CommandRegistrar(this).register();
 
         getSLF4JLogger().info("CoreKit v{} enabled.", getPluginMeta().getVersion());
@@ -123,6 +128,10 @@ public final class CoreKitPlugin extends JavaPlugin {
 
     public HomeService homes() {
         return homes;
+    }
+
+    public HomeGui homeGui() {
+        return homeGui;
     }
 
     public SpawnService spawn() {

@@ -8,15 +8,13 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import pl.corekit.CoreKitPlugin;
 import pl.corekit.command.CommandUtil;
 import pl.corekit.command.CoreKitCommand;
 import pl.corekit.feature.feedback.FeedbackService;
+import pl.corekit.feature.home.HomeGui;
 import pl.corekit.feature.home.HomeService;
 import pl.corekit.feature.teleport.TeleportService;
 import pl.corekit.lang.MessageService;
@@ -30,7 +28,8 @@ import java.util.concurrent.CompletableFuture;
  * The homes suite: {@code /sethome [name]}, {@code /home [name]},
  * {@code /delhome [name]}, {@code /homes}. Persistence is async; {@code /home}
  * routes through {@link TeleportService} for the warm-up/cooldown flow, and
- * {@code /homes} renders each entry with clickable Teleport / Delete buttons.
+ * {@code /homes} opens the {@link HomeGui} chest menu (teleport / delete with
+ * confirmation).
  */
 public final class HomeCommands implements CoreKitCommand {
 
@@ -38,19 +37,19 @@ public final class HomeCommands implements CoreKitCommand {
 
     private final CoreKitPlugin plugin;
     private final FeedbackService feedback;
-    private final MessageService messages;
     private final HomeService homes;
     private final HomeRepository repository;
     private final TeleportService teleport;
+    private final HomeGui gui;
 
     public HomeCommands(CoreKitPlugin plugin, FeedbackService feedback,
-                        HomeService homes, TeleportService teleport) {
+                        HomeService homes, TeleportService teleport, HomeGui gui) {
         this.plugin = plugin;
         this.feedback = feedback;
-        this.messages = feedback.messages();
         this.homes = homes;
         this.repository = homes.repository();
         this.teleport = teleport;
+        this.gui = gui;
     }
 
     @Override
@@ -180,39 +179,10 @@ public final class HomeCommands implements CoreKitCommand {
                         feedback.error(ctx.getSource().getSender(), "players-only");
                         return 0;
                     }
-                    int limit = homes.homeLimit(player);
-                    repository.findAll(player.getUniqueId()).thenAccept(list ->
-                            plugin.database().sync(() -> {
-                                if (list.isEmpty()) {
-                                    feedback.error(player, "home.list-empty");
-                                    return;
-                                }
-                                messages.send(player, "home.list-header",
-                                        MessageService.placeholder("count", String.valueOf(list.size())),
-                                        MessageService.placeholder("limit", limitLabel(limit)));
-                                list.forEach(h -> feedback.raw(player, entryLine(h.name())));
-                            })
-                    ).exceptionally(logAndReport(player, "list homes"));
+                    gui.open(player); // handles the empty case and async fetch itself
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();
-    }
-
-    /** Builds a single clickable list row: label + [Teleport] + [Delete]. */
-    private Component entryLine(String name) {
-        Component teleportButton = messages.render("home.button.tp")
-                .clickEvent(ClickEvent.runCommand("/home " + name))
-                .hoverEvent(HoverEvent.showText(
-                        messages.render("home.button.tp-hover", MessageService.placeholder("name", name))));
-
-        Component deleteButton = messages.render("home.button.del")
-                .clickEvent(ClickEvent.suggestCommand("/delhome " + name))
-                .hoverEvent(HoverEvent.showText(
-                        messages.render("home.button.del-hover", MessageService.placeholder("name", name))));
-
-        return messages.render("home.list-entry", MessageService.placeholder("name", name))
-                .append(Component.space()).append(teleportButton)
-                .append(Component.space()).append(deleteButton);
     }
 
     // --------------------------------------------------------------- helpers
@@ -227,10 +197,6 @@ public final class HomeCommands implements CoreKitCommand {
                     .forEach(builder::suggest);
         }
         return builder.buildFuture();
-    }
-
-    private static String limitLabel(int limit) {
-        return limit == Integer.MAX_VALUE ? "∞" : String.valueOf(limit);
     }
 
     /** Logs a failed async DB op and tells the player something went wrong. */

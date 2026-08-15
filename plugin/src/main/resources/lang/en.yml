@@ -45,14 +45,22 @@ messages:
     teleporting: "<gray>Teleporting to <white><name></white>…"
     world-missing: "<red>The world for home <white><name></white> no longer exists."
     limit-reached: "<red>Home limit reached (<white><limit></white>). Delete one or overwrite an existing home."
-    list-header: "<gray>Your homes <dark_gray>(<white><count></white>/<white><limit></white>)</dark_gray>:"
     list-empty: "<yellow>You have no homes yet. Set one with <white>/sethome</white>."
-    list-entry: "<dark_gray>• <white><name></white>"
-    button:
-      tp: "<green>[▶ Teleport]</green>"
-      tp-hover: "<gray>Teleport to <white><name></white>"
-      del: "<red>[✖ Delete]</red>"
-      del-hover: "<gray>Click to type <white>/delhome <name></white>"
+
+  gui:
+    homes:
+      title: "<dark_gray>Your Homes"
+      entry-name: "<green><bold><name></bold>"
+      entry-tp: "<gray>▶ Left-click to <white>teleport</white>"
+      entry-del: "<gray>✖ Right-click to <red>delete</red>"
+    confirm:
+      title: "<dark_red>Delete '<name>'?"
+      info-name: "<red><bold><name></bold>"
+      info-lore: "<gray>This home will be permanently removed."
+      yes: "<green><bold>✔ Confirm</bold>"
+      yes-lore: "<gray>Delete this home."
+      no: "<red><bold>✖ Cancel</bold>"
+      no-lore: "<gray>Keep it and go back."
 
   spawn:
     set: "<green>Server spawn set to your location."

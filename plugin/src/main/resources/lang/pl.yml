@@ -45,14 +45,22 @@ messages:
     teleporting: "<gray>Teleportacja do <white><name></white>…"
     world-missing: "<red>Świat domu <white><name></white> już nie istnieje."
     limit-reached: "<red>Osiągnięto limit domów (<white><limit></white>). Usuń któryś lub nadpisz istniejący."
-    list-header: "<gray>Twoje domy <dark_gray>(<white><count></white>/<white><limit></white>)</dark_gray>:"
     list-empty: "<yellow>Nie masz jeszcze domów. Ustaw jeden przez <white>/sethome</white>."
-    list-entry: "<dark_gray>• <white><name></white>"
-    button:
-      tp: "<green>[▶ Teleportuj]</green>"
-      tp-hover: "<gray>Teleportacja do <white><name></white>"
-      del: "<red>[✖ Usuń]</red>"
-      del-hover: "<gray>Kliknij, aby wpisać <white>/delhome <name></white>"
+
+  gui:
+    homes:
+      title: "<dark_gray>Twoje domy"
+      entry-name: "<green><bold><name></bold>"
+      entry-tp: "<gray>▶ Lewy klik, aby <white>teleportować</white>"
+      entry-del: "<gray>✖ Prawy klik, aby <red>usunąć</red>"
+    confirm:
+      title: "<dark_red>Usunąć '<name>'?"
+      info-name: "<red><bold><name></bold>"
+      info-lore: "<gray>Ten dom zostanie trwale usunięty."
+      yes: "<green><bold>✔ Potwierdź</bold>"
+      yes-lore: "<gray>Usuń ten dom."
+      no: "<red><bold>✖ Anuluj</bold>"
+      no-lore: "<gray>Zostaw i wróć."
 
   spawn:
     set: "<green>Ustawiono spawn serwera na Twoją pozycję."

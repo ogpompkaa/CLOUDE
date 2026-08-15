@@ -22,6 +22,7 @@ it is the clean, opinionated base you clone features onto.
 | Data access | `storage/PlayerProfileRepository` | `CompletableFuture` DAO — the template for new tables. |
 | Events | `listener/PlayerConnectionListener` | Async join/quit persistence; no main-thread I/O. |
 | Commands | `command/CommandRegistrar` + `command/commands/*` | Coordinator + one class per feature. |
+| GUI | `gui/Menu` + `gui/MenuListener` + `feature/home/HomeGui` | Holder-based chest menus with theft-proof click handling. |
 
 ## Commands
 
@@ -33,7 +34,7 @@ it is the clean, opinionated base you clone features onto.
 | `/fly [player]` | `corekit.fly` (+`.others`) | Toggle flight. |
 | `/god [player]` | `corekit.god` (+`.others`) | Toggle damage immunity (in-memory). |
 | `/gamemode <mode> [player]` (`/gm`, `/gmc /gms /gma /gmsp`) | `corekit.gamemode` (+`.others`) | Names, letters or 0-3 ids. |
-| `/sethome [name]` · `/home [name]` · `/delhome [name]` · `/homes` | `corekit.home` | Async SQLite; tab-completed names; clickable `/homes` list. |
+| `/sethome [name]` · `/home [name]` · `/delhome [name]` · `/homes` | `corekit.home` | Async SQLite; tab-completed names; `/homes` opens a chest-menu GUI. |
 | `/spawn` · `/setspawn` | `corekit.spawn` · `corekit.setspawn` | Warm-up teleport; stored in `spawn.yml`. |
 
 **Home limits** come from permissions: grant `corekit.homes.limit.<n>` (highest
@@ -53,9 +54,12 @@ reloadable:
 - **Feedback service** — success/error/teleport **sounds** (`feedback.sounds`)
   and snappy **action-bar** confirmations for quick toggles
   (`feedback.action-bar`); errors always land in chat.
-- **Clickable `/homes`** — each row carries `[▶ Teleport]` (runs `/home <name>`)
-  and `[✖ Delete]` (pre-fills `/delhome <name>`) with hover tooltips, built with
-  Adventure click/hover events.
+- **Homes GUI** — `/homes` opens a chest menu (`gui/Menu` + `MenuListener`,
+  identified by `InventoryHolder`, all interactions cancelled so items can't be
+  stolen). Left-click a home to teleport, right-click to delete — which opens a
+  **Confirm / Cancel** menu; only Confirm runs the async delete, then the list
+  re-queries and reopens. New menus are opened one tick later to avoid
+  click-event desync.
 
 ## Build
 

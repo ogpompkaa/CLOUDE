@@ -29,7 +29,7 @@ public final class CommandRegistrar {
                 new CoreCommand(plugin, feedback),
                 new PlayerUtilityCommands(plugin, feedback, plugin.god()),
                 new GameModeCommands(plugin, feedback),
-                new HomeCommands(plugin, feedback, plugin.homes(), plugin.teleport()),
+                new HomeCommands(plugin, feedback, plugin.homes(), plugin.teleport(), plugin.homeGui()),
                 new SpawnCommands(plugin, feedback, plugin.spawn(), plugin.teleport())
         );
     }
