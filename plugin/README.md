@@ -36,6 +36,8 @@ it is the clean, opinionated base you clone features onto.
 | `/gamemode <mode> [player]` (`/gm`, `/gmc /gms /gma /gmsp`) | `corekit.gamemode` (+`.others`) | Names, letters or 0-3 ids. |
 | `/sethome [name]` · `/home [name]` · `/delhome [name]` · `/homes` | `corekit.home` | Async SQLite; tab-completed names; `/homes` opens a chest-menu GUI. |
 | `/spawn` · `/setspawn` | `corekit.spawn` · `corekit.setspawn` | Warm-up teleport; stored in `spawn.yml`. |
+| `/tpa <p>` · `/tpahere <p>` · `/tpaccept [p]` · `/tpdeny [p]` | `corekit.tpa` · `corekit.tpahere` | Request system with expiry; clickable Accept/Deny. |
+| `/back` | `corekit.back` | Return to previous location / death point. |
 
 **Home limits** come from permissions: grant `corekit.homes.limit.<n>` (highest
 granted number wins) or `corekit.homes.unlimited`; the fallback is

@@ -75,3 +75,26 @@ messages:
     warmup: "<gray>Teleportacja do <white><name></white> za <white><seconds></white>s <dark_gray>· nie ruszaj się"
     cooldown: "<red>Poczekaj <white><time></white> przed kolejną teleportacją."
     cancelled: "<red>Teleportacja anulowana."
+
+  tpa:
+    self: "<red>Nie możesz wysłać prośby o teleport do siebie."
+    sent: "<green>Wysłano prośbę do <white><target></white>. <gray>Wkrótce wygaśnie."
+    received-go: "<white><sender></white> <gray>chce się do Ciebie teleportować."
+    received-summon: "<white><sender></white> <gray>chce, żebyś się do niego teleportował."
+    prompt: "<gray>Wygasa za <white><seconds></white>s ·"
+    accepted-self: "<green>Zaakceptowano prośbę gracza <white><player></white>."
+    accepted-other: "<green><white><player></white> zaakceptował Twoją prośbę."
+    denied-self: "<yellow>Odrzucono prośbę."
+    denied-other: "<red><white><player></white> odrzucił Twoją prośbę."
+    expired: "<yellow>Prośba o teleport wygasła."
+    none: "<red>Nie masz oczekujących próśb o teleport."
+    no-such: "<red>Brak oczekującej prośby od <white><player></white>."
+    offline: "<red>Ten gracz nie jest już online."
+    button:
+      accept: "<green>[✔ Akceptuj]</green>"
+      accept-hover: "<gray>Zaakceptuj prośbę"
+      deny: "<red>[✖ Odrzuć]</red>"
+      deny-hover: "<gray>Odrzuć prośbę"
+
+  back:
+    none: "<red>Nie masz dokąd wrócić."

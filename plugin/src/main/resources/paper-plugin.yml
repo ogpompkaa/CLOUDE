@@ -55,6 +55,17 @@ permissions:
   corekit.setspawn:
     default: op
 
+  # Teleport requests and /back.
+  corekit.tpa:
+    description: Use /tpa, /tpaccept and /tpdeny.
+    default: true
+  corekit.tpahere:
+    description: Use /tpahere.
+    default: true
+  corekit.back:
+    description: Use /back.
+    default: true
+
   # Teleport flow — skip the warm-up countdown and/or the cooldown.
   corekit.teleport.bypass-warmup:
     description: Teleport instantly, skipping the warm-up.

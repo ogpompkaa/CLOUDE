@@ -7,6 +7,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.entity.Player;
 import pl.corekit.CoreKitPlugin;
+import pl.corekit.feature.teleport.TeleportRequestService;
 import pl.corekit.feature.teleport.TeleportService;
 
 /**
@@ -20,10 +21,13 @@ public final class TeleportListener implements Listener {
 
     private final CoreKitPlugin plugin;
     private final TeleportService teleport;
+    private final TeleportRequestService requests;
 
-    public TeleportListener(CoreKitPlugin plugin, TeleportService teleport) {
+    public TeleportListener(CoreKitPlugin plugin, TeleportService teleport,
+                            TeleportRequestService requests) {
         this.plugin = plugin;
         this.teleport = teleport;
+        this.requests = requests;
     }
 
     @EventHandler
@@ -54,5 +58,6 @@ public final class TeleportListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         teleport.forget(event.getPlayer().getUniqueId());
+        requests.handleQuit(event.getPlayer().getUniqueId());
     }
 }

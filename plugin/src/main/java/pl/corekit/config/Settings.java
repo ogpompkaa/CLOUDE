@@ -18,6 +18,8 @@ public record Settings(
         int cooldownSeconds,
         boolean cancelOnMove,
         boolean cancelOnDamage,
+        int requestExpirySeconds,
+        boolean backOnDeath,
         boolean soundsEnabled,
         boolean actionBarEnabled
 ) {
@@ -33,6 +35,8 @@ public record Settings(
                 Math.max(0, config.getInt("teleport.cooldown-seconds", 5)),
                 config.getBoolean("teleport.cancel-on-move", true),
                 config.getBoolean("teleport.cancel-on-damage", true),
+                Math.max(5, config.getInt("teleport.request-expiry-seconds", 60)),
+                config.getBoolean("back.on-death", true),
                 config.getBoolean("feedback.sounds", true),
                 config.getBoolean("feedback.action-bar", true)
         );

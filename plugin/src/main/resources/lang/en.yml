@@ -75,3 +75,26 @@ messages:
     warmup: "<gray>Teleporting to <white><name></white> in <white><seconds></white>s <dark_gray>· don't move"
     cooldown: "<red>Please wait <white><time></white> before teleporting again."
     cancelled: "<red>Teleport cancelled."
+
+  tpa:
+    self: "<red>You can't send a teleport request to yourself."
+    sent: "<green>Request sent to <white><target></white>. <gray>It expires soon."
+    received-go: "<white><sender></white> <gray>would like to teleport to you."
+    received-summon: "<white><sender></white> <gray>would like you to teleport to them."
+    prompt: "<gray>Expires in <white><seconds></white>s ·"
+    accepted-self: "<green>Accepted <white><player></white>'s request."
+    accepted-other: "<green><white><player></white> accepted your request."
+    denied-self: "<yellow>Request denied."
+    denied-other: "<red><white><player></white> denied your request."
+    expired: "<yellow>The teleport request expired."
+    none: "<red>You have no pending teleport request."
+    no-such: "<red>No pending request from <white><player></white>."
+    offline: "<red>That player is no longer online."
+    button:
+      accept: "<green>[✔ Accept]</green>"
+      accept-hover: "<gray>Accept the request"
+      deny: "<red>[✖ Deny]</red>"
+      deny-hover: "<gray>Deny the request"
+
+  back:
+    none: "<red>You have nowhere to go back to."

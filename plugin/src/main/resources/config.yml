@@ -31,6 +31,12 @@ teleport:
   # Cancel the warmup if the player moves to another block / takes damage.
   cancel-on-move: true
   cancel-on-damage: true
+  # How long a /tpa or /tpahere request stays valid before expiring.
+  request-expiry-seconds: 60
+
+back:
+  # Also remember the death location, so /back returns to where you died.
+  on-death: true
 
 feedback:
   # Play subtle UI sounds on success, errors and teleports.
