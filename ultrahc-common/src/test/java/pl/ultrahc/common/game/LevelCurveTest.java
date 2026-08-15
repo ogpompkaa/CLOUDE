@@ -34,6 +34,35 @@ class LevelCurveTest {
     }
 
     @Test
+    void applyProgressSingleLevel() {
+        LevelCurve c = specCurve();
+        // Z poziomu 0 (prog 750) dodaj dokladnie 750 -> awans na 1, reszta 0.
+        LevelCurve.Progress r = c.applyProgress(0, 0, 750);
+        assertEquals(1, r.level());
+        assertEquals(0, r.remaining());
+        assertEquals(1, r.gained());
+    }
+
+    @Test
+    void applyProgressMultiLevelWithRemainder() {
+        LevelCurve c = specCurve();
+        // 750 (0->1) + 2800 (1->2) + 100 reszty = 3650 z poziomu 0.
+        LevelCurve.Progress r = c.applyProgress(0, 0, 3650);
+        assertEquals(2, r.level());
+        assertEquals(100, r.remaining());
+        assertEquals(2, r.gained());
+    }
+
+    @Test
+    void applyProgressNoLevelKeepsProgress() {
+        LevelCurve c = specCurve();
+        LevelCurve.Progress r = c.applyProgress(0, 100, 200); // 300 < 750
+        assertEquals(0, r.level());
+        assertEquals(300, r.remaining());
+        assertEquals(0, r.gained());
+    }
+
+    @Test
     void geometricUsesFormula() {
         LevelCurve c = new LevelCurve(LevelCurve.Mode.GEOMETRIC, 2000, 500, 750, 2.0, Map.of());
         assertEquals(750, c.requiredForLevel(0));   // 750 * 2^0

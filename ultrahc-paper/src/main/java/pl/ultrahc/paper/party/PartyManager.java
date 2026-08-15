@@ -32,12 +32,6 @@ public class PartyManager {
 
     public Party get(UUID uuid) { return byMember.get(uuid); }
 
-    /** Klucz grupujacy do druzyny: id party (gdy >1 czlonek), inaczej null (solo). */
-    public String groupKey(UUID uuid) {
-        Party p = byMember.get(uuid);
-        return (p != null && p.size() > 1) ? p.getId().toString() : null;
-    }
-
     // ----------------------------------------------------------- komendy
     public void invite(Player leader, String targetName) {
         if (!checkEnabled(leader)) return;

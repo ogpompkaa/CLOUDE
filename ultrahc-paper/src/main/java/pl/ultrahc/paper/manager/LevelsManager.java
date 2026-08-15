@@ -60,17 +60,10 @@ public class LevelsManager {
      * @return liczba zdobytych poziomow (0 gdy brak awansu)
      */
     public int addProgress(PlayerProfile profile, long amount) {
-        long progress = profile.getProgressPoints() + Math.max(0, amount);
-        int levelsGained = 0;
-        long required = requiredForLevel(profile.getLevel());
-        while (progress >= required) {
-            progress -= required;
-            profile.setLevel(profile.getLevel() + 1);
-            levelsGained++;
-            required = requiredForLevel(profile.getLevel());
-        }
-        profile.setProgressPoints(progress);
-        return levelsGained;
+        LevelCurve.Progress result = curve.applyProgress(profile.getLevel(), profile.getProgressPoints(), amount);
+        profile.setLevel(result.level());
+        profile.setProgressPoints(result.remaining());
+        return result.gained();
     }
 
     /** Etykieta poziomu, np. "3 gwiazdka". */

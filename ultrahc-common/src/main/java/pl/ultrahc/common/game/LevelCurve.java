@@ -28,6 +28,23 @@ public class LevelCurve {
         this.overrides = overrides;
     }
 
+    /** Wynik naliczenia PD: nowy poziom, pozostale PD w poziomie, liczba zdobytych poziomow. */
+    public record Progress(int level, long remaining, int gained) {}
+
+    /** Dodaje PD, obslugujac wielokrotny awans (czysta, testowalna logika). */
+    public Progress applyProgress(int level, long progress, long amount) {
+        long p = progress + Math.max(0, amount);
+        int gained = 0;
+        long req = requiredForLevel(level);
+        while (p >= req) {
+            p -= req;
+            level++;
+            gained++;
+            req = requiredForLevel(level);
+        }
+        return new Progress(level, p, gained);
+    }
+
     /** Ile PD potrzeba, aby awansowac Z podanego poziomu na nastepny. */
     public long requiredForLevel(int level) {
         Long override = overrides.get(level);
