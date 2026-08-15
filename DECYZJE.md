@@ -16,13 +16,12 @@ W kodzie istnieją **trzy całkowicie odrębne systemy**, nigdy nie mieszane:
 | Punkty progresji | „PD" | `ProgressPoints` / `LevelsManager` | `PD`, poziomy = „gwiazdki" | poziomy gwiazdek, sezony |
 | Natywny exp MC | „doświadczenie" | *nietykane* — tylko odczyt w recepturze `Zaklinacz` | — | vanilla enchanting |
 
-**Rekomendacja nazwy waluty sklepowej:** zamiast „XP" proponuję **`Kredyty`**
-(kod: `credits`). Nazwa wyświetlana jest wyciągnięta do **jednej stałej**
-`CurrencyManager.DISPLAY_NAME` + klucza `messages.yml → currency.name`, więc
-zmiana na „Coiny"/„Punkty"/cokolwiek = jedna edycja. Scoreboard używa osobnej
-etykiety `scoreboard.currency_label` (domyślnie `Xp:`, żeby odwzorować zrzut
-z gry) — celowo rozłączona od nazwy waluty, żeby wygląd 1:1 nie wymuszał nazwy
-w kodzie.
+**Nazwa waluty sklepowej (DECYZJA: „XP"):** wyświetlana jako **`XP`**. W kodzie
+system pozostaje **osobny i jednoznacznie nazwany** (`ShopCurrencyManager`, pole
+`shopXp`/`credits`, kolumna DB `credits`), żeby nigdy nie mylić go z natywnym
+expem MC. Nazwa wyświetlana = jedna stała `ShopCurrencyManager.DISPLAY_NAME =
+"XP"` + klucz `messages.yml → currency.name`. Scoreboard: `scoreboard.currency_label`
+(domyślnie `Xp:`). Zmiana nazwy w przyszłości = jedna edycja stałej.
 
 > Uwaga: to jedyne miejsce, gdzie „Xp" na ekranie ≠ waluta sklepowa w kodzie.
 > W bazie danych kolumna nazywa się `credits`, nigdy `xp`.
@@ -104,28 +103,41 @@ Generacja 1000×1000 jest droga. Dlatego:
 
 ---
 
-## 2. Kurczenie granicy mapy
+## 2. Kurczenie granicy mapy (DECYZJA: 3 fazy + arenka)
 
-Punkt odniesienia ze zrzutu: ~29 min → ~549 ⇒ ~24 bloki/min. Cel: gra 30–50 min,
-najwyższy próg nagród to „powyżej 30 min".
+Punkt odniesienia ze zrzutu: ~29 min → ~549 ⇒ ~24 bloki/min. Trzy fazy:
 
-| Klucz config | Wartość | Znaczenie |
+| Faza | Kiedy | Zachowanie |
 |---|---|---|
-| `border.start` | `1000` | startowa średnica (blok) |
-| `border.shrink_start_min` | `10` | od której minuty kurczy |
-| `border.blocks_per_min` | `24` | tempo (bok/min) |
-| `border.final_size` | `50` | finałowa średnica (stop) |
-| `border.center` | `spawn` | środek = spawn świata |
+| **1 — normalna** | min 10 → 30 | kurczenie 24 bloki/min |
+| **2 — przyspieszenie** | min 30 → 45 | kurczenie `blocks_per_min_fast` (30/min) |
+| **3 — arenka (sudden-death)** | min 45 | teleport wszystkich żywych na małą arenkę |
 
-**Wyliczenie stopu:** (1000 − 50) / 24 ≈ 39,6 min kurczenia → granica zatrzymuje
-się na **~50. minucie** gry przy rozmiarze **50×50**. To trafia w docelowe
-30–50 min i utrzymuje grywalny finałowy ring (nie 40 bloków resztek).
-Sanity-check ze zrzutem: min 29 → 1000 − 24·(29−10) = 1000 − 456 = **544** ≈ 549 ✔
+```yaml
+border:
+  start: 1000
+  shrink_start_min: 10
+  blocks_per_min: 24            # faza 1
+  accelerate_min: 30           # start fazy 2
+  blocks_per_min_fast: 30      # faza 2
+  center: spawn
+arena_showdown:
+  teleport_min: 45             # start fazy 3 (sudden-death)
+  mode: BORDER_CLAMP           # BORDER_CLAMP | SCHEMATIC
+  size: 40                     # rozmiar arenki (średnica bordera)
+  collapse_to_min: 60          # arenka zaciska się do 0 do tej minuty (dobija remis)
+```
 
-Implementacja: Paper `WorldBorder.setSize(final_size, sekundy)` z płynną
-interpolacją; `sekundy = (start − final_size)/blocks_per_min · 60`. Scoreboard
-pokazuje bieżącą wartość z jednym miejscem po przecinku, separator „," (PL):
-np. `549,2`.
+**Przebieg liczb:** min 30 → 1000 − 24·20 = **520**; min 45 → 520 − 30·15 = **70**
+(tuż przed teleportem). O 45. min wszyscy żywi lądują na arence (`BORDER_CLAMP`:
+recenter bordera na spawn + twardy zacisk do `size=40` + TP graczy do środka).
+Arenka dalej się zaciska do 0 (`collapse_to_min=60`), więc sudden-death **zawsze
+się rozstrzyga** — ostatnia żywa drużyna wygrywa. Sanity-check ze zrzutem:
+min 29 → 1000 − 24·(29−10) = **544** ≈ 549 ✔.
+
+Implementacja faz przez `WorldBorder.setSize(target, sekundy)`; scoreboard
+pokazuje bieżący rozmiar z jednym miejscem po przecinku, separator „," (PL):
+`549,2`. `SCHEMATIC` (wklejenie gotowej budowli arenki) — opcja na później.
 
 ---
 
@@ -181,13 +193,15 @@ levels:
   (Kredyty + PD), `wins += 1`.
 - Solo = drużyna 1-osobowa (ta sama ścieżka kodu).
 
-### Remis / wymuszony koniec
-- Twardy limit gry `game.hard_time_cap_min` (domyślnie 90) + zamknięcie granicy
-  mogą zakończyć grę z >1 żywą drużyną.
-- Tiebreak (kolejno): **więcej killi → więcej pozostałych serc → drużyna, która
-  wcześniej osiągnęła dany stan**. Jeśli nadal remis → **współdzielona wygrana**
-  (obie drużyny dostają nagrodę i +1 win). Konfigurowalne
-  (`game.tie_shared_win: true`).
+### Remis / wymuszony koniec (DECYZJA: sudden-death)
+- **Nie ma współdzielonej wygranej.** Przy >1 żywej drużynie rozstrzyga
+  **sudden-death na arence**: o 45. min wszyscy żywi są teleportowani na arenkę,
+  która zaciska się do 0 (`arena_showdown.collapse_to_min`). Zamykająca się
+  granica dobija pozostałych → zostaje jedna drużyna = wygrany.
+- Twardy bezpiecznik `game.hard_time_cap_min` (domyślnie 90) na wypadek patologii
+  — jeśli mimo wszystko >1 drużyna żywa w tym momencie, o wygranej decyduje
+  kolejno: **więcej killi → więcej pozostałych serc** (czysty tiebreak, bez
+  dzielenia nagrody).
 
 ---
 
@@ -219,26 +233,18 @@ world:
 
 ## 6. Zależności — rekomendacje (wybrane, uzasadnione)
 
-### NPC (Mietek / Krzysiu / Sklepikarz) → **wariant BEZ zależności**
-- NPC żyją **tylko w statycznym lobby** (nie w efemerycznych arenach), a
-  funkcja to „klik → GUI z inventory". To trywialne bez biblioteki.
-- Implementacja: trwała, niewrażliwa encja z wyłączonym AI (lub packet-mob),
-  `PlayerInteractEntityEvent` → cancel → otwarcie GUI. Cała obsługa za
-  interfejsem `NpcManager`, więc podmiana na **Citizens** (jeśli zechcesz skiny
-  w modelu gracza) to swap implementacji, nie przepisywanie.
-- **Dlaczego nie Citizens domyślnie:** unikamy ciężkiej zależności dla prostej
-  funkcji; zgodnie z „nie dokładaj bez potrzeby". Skiny „gracza" wymagają
-  packetów/ProtocolLib lub Citizens — jeśli to must-have, włączymy później za
-  interfejsem.
+### NPC (Mietek / Krzysiu / Sklepikarz) → **Citizens** (DECYZJA)
+- Impl `CitizensNpcManager` za interfejsem `NpcManager`. Skiny w modelu gracza,
+  trwałość NPC, kliknięcie → GUI (`NPCRightClickEvent`). NPC tylko w lobby.
+- `plugin.yml: softdepend: [Citizens]`; jeśli Citizens brak → log ostrzeżenia po
+  PL i graceful-skip rejestracji NPC (reszta pluginu działa).
+- Interfejs zachowany, więc ewentualny powrót do wariantu bez zależności = swap.
 
-### Hologramy topek → **natywne `TextDisplay` (1.20.2+)**
-- Jesteśmy na 1.21, `TextDisplay` renderuje się client-side, bez pluginu.
-  Trzy statyczne holo (Top 10 Kille / Wygrane / Poziomy) w lobby.
-- Za interfejsem `HologramManager` (swap na **DecentHolograms** trywialny, gdy
-  zechcesz edycję in-game przez ich komendy). Nasze holo edytujemy własnym
-  GUI admina (spec tego wymaga).
-- **Dlaczego nie DecentHolograms domyślnie:** znów zero zależności; natywne
-  wystarcza dla statycznych topek.
+### Hologramy topek → **DecentHolograms** (DECYZJA)
+- Impl `DecentHologramsManager` za interfejsem `HologramManager`. Trzy holo w
+  lobby (Top 10 Kille / Wygrane / Poziomy), odświeżane z `LeaderboardsManager`.
+- `plugin.yml: softdepend: [DecentHolograms]`; brak → log PL + skip holo.
+- Edycja pozycji przez GUI admina (spec wymaga) mapowana na API DecentHolograms.
 
 ---
 
@@ -305,13 +311,12 @@ zostają**. Wszystko manualne — brak triggerów czasowych.
 
 ---
 
-## Do potwierdzenia przez Ciebie
+## Decyzje ZATWIERDZONE (2026-08-15)
 
-1. **Nazwa waluty sklepowej:** `Kredyty` (kod `credits`) — OK czy inna?
-2. **Finał granicy:** stop na **50×50 w ~50. min** — pasuje do 30–50 min?
-3. **NPC bez zależności** + **hologramy natywny TextDisplay** — akceptujesz,
-   czy wolisz Citizens / DecentHolograms od razu?
-4. **Produkcja = MySQL, dev = SQLite** za jedną flagą — OK?
-5. **1 arena-serwer = 1 gra**, pula pre-generowanych światów — akceptujesz ten
-   model skalowania?
-6. Remis → **współdzielona wygrana** po tiebreakach — OK czy sudden-death?
+1. **Waluta sklepowa = „XP"** (wyświetlana), w kodzie osobny `ShopCurrencyManager`.
+2. **Granica 3-fazowa:** 24/min (10–30), przyspieszenie 30/min (30–45), o 45 min
+   **teleport na arenkę** zaciskaną do 0 → sudden-death.
+3. **Citizens** (NPC) + **DecentHolograms** (topki), za interfejsami.
+4. **SQLite teraz**, MySQL później — ta sama warstwa DAO.
+5. **1 arena-serwer = 1 gra** + pula pre-generowanych światów — przyjęte.
+6. Remis → **sudden-death** (arenka), bez współdzielonej wygranej.

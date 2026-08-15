@@ -1,0 +1,84 @@
+# =====================================================================
+#  UltraHC — messages.yml (PL)
+#  WSZYSTKIE komunikaty do graczy + etykiety scoreboardu. Nic na sztywno w kodzie.
+#  Kolory: uzywaj kodow & (np. &6). Placeholdery: %nazwa%.
+# =====================================================================
+
+prefix: "&8[&6UltraHC&8] &7"
+
+general:
+  no-permission: "&cNie masz uprawnien do tej komendy."
+  players-only: "&cTa komenda jest tylko dla graczy."
+  reloaded: "&aKonfiguracja przeladowana."
+  unknown-subcommand: "&cNieznana podkomenda. Uzyj &e/uhc help&c."
+
+currency:
+  name: "XP"                       # nazwa waluty sklepowej (jedno miejsce)
+  balance: "&7Twoje &6%name%&7: &e%amount%"
+  added: "&aDodano &e%amount% %name%&a. Stan: &e%balance%"
+  not-enough: "&cMasz za malo %name% (potrzeba &e%need%&c, masz &e%have%&c)."
+
+progress:
+  name: "PD"
+  gained: "&b+%amount% PD"
+  level-up: "&6Awans! &eOsiagnales poziom &6%level% %star%&e!"
+  status: "&7Poziom &6%level% %star% &7(&b%current%&7/&b%required% PD&7)"
+
+game:
+  waiting: "&7Oczekiwanie na graczy... &e%count%&7/&e%min%"
+  countdown-started: "&aZebrano %min% graczy! Start za &e%seconds%s&a."
+  countdown: "&eStart gry za &6%seconds%&e sekund."
+  started: "&aGra rozpoczeta! &7Brak PvP przez &e%minutes% min&7."
+  pvp-enabled: "&cPvP wlaczone! Walcz!"
+  border-shrinking: "&cGranica mapy zaczela sie kurczyc!"
+  compass-enemy-unlocked: "&6Kompas moze teraz wskazywac najblizszego przeciwnika."
+  showdown: "&4Sudden-death! &cWszyscy zywi trafiaja na arenke!"
+  kill: "&e%victim% &7zostal wyeliminowany przez &c%killer%&7."
+  death-generic: "&e%victim% &7zostal wyeliminowany."
+  team-eliminated: "&7Druzyna &e%team% &7zostala wyeliminowana."
+  win-team: "&6Wygrywa druzyna &e%team%&6!"
+  win-solo: "&6Wygrywa &e%player%&6!"
+  players-alive: "&7Zywych graczy: &a%count%"
+  join-game: "&aDolaczono do gry &e%instance%&a."
+  reconnect-window: "&eMasz &6%seconds%s &ena powrot do gry."
+
+head:
+  consumed: "&aZjadles glowke — otrzymujesz efekty."
+
+detector:
+  used: "&aWykrywacz aktywowany. Wynik za &e%seconds%s&a."
+  result: "&e%player% &7- &e%distance% &7kratek"
+  cooldown: "&cWykrywacz na cooldownie: &e%seconds%s&c."
+
+# --------------------------- SCOREBOARD ------------------------------
+scoreboard:
+  title: "&6&lULTRAHC"
+  top-line: "&e%pos% %team% &7%kills%"          # Top 3 druzyny
+  self-marker: "&a> %team% &7%kills%"            # marker druzyny gracza
+  teammate: "&7- %name%"                         # wspoltowarzysz (znika w solo)
+  border-line: "&6%size%"                        # zlota liczba = rozmiar granicy
+  currency-label: "&7Xp: &e%amount%"             # celowo 'Xp:' jak na zrzucie
+  alive-label: "&7Zywi: &a%count%"
+  timer: "&f%time%"                              # HH:MM:SS
+  empty: ""
+
+# --------------------------- KLASY / SKLEP ---------------------------
+class:
+  selected: "&aWybrano klase: &e%class%&a."
+  locked: "&cTa klasa nie jest odblokowana."
+  bought: "&aKupiono klase &e%class% &aza &e%price% %currency%&a."
+  already-owned: "&ePosiadasz juz te klase."
+
+shop:
+  bought-recipe: "&aKupiono recepture &e%recipe% &aza &e%price% %currency%&a."
+  already-owned-recipe: "&ePosiadasz juz te recepture."
+  title: "&8Sklep receptur"
+
+# --------------------------- ADMIN -----------------------------------
+admin:
+  currency-given: "&aDodano &e%amount% XP &agraczowi &e%player%&a."
+  pd-given: "&aDodano &e%amount% PD &agraczowi &e%player%&a."
+  season-reset: "&aSezon zresetowany (poziomy, PD, receptury). Klasy zachowane."
+  force-start: "&aWymuszono start gry."
+  force-end: "&aWymuszono koniec gry."
+  player-not-found: "&cNie znaleziono gracza &e%player%&c."

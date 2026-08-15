@@ -1,0 +1,24 @@
+name: UltraHC
+version: ${project.version}
+main: pl.ultrahc.paper.UltraHcPlugin
+api-version: '1.21'
+authors: [UltraHC]
+description: Niestandardowy tryb UHC (lobby + areny) dla sieci Paper/Velocity.
+
+# Zaleznosci opcjonalne — brak nie blokuje startu (graceful skip odpowiednich modulow)
+softdepend: [Citizens, DecentHolograms]
+
+commands:
+  uhc:
+    description: Komendy UltraHC (info, admin).
+    usage: /uhc
+    permission: ultrahc.use
+    permission-message: "Brak uprawnien."
+
+permissions:
+  ultrahc.use:
+    description: Podstawowy dostep do komend UltraHC.
+    default: true
+  ultrahc.admin:
+    description: Pelne uprawnienia administracyjne UltraHC.
+    default: op

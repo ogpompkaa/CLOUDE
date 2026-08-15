@@ -1,0 +1,181 @@
+# =====================================================================
+#  UltraHC — config.yml
+#  WSZYSTKIE wartosci balansu tutaj. Nic nie jest hardkodowane w kodzie.
+#  Tuning bez rekompilacji. Liczby startowe zgodne z DECYZJE.md i spec.
+# =====================================================================
+
+# Rola tej instancji serwera: LOBBY albo ARENA (patrz DECYZJE, sekcja 1).
+server:
+  role: LOBBY            # LOBBY | ARENA
+  instance-name: ""      # puste = auto (nazwa z proxy/hosta)
+
+# Magazyn danych. SQLITE teraz, MYSQL na produkcje — ta sama warstwa DAO.
+storage:
+  type: SQLITE          # SQLITE | MYSQL
+  sqlite:
+    file: "ultrahc.db"  # w folderze pluginu
+  mysql:                # uzywane dopiero po przelaczeniu type: MYSQL
+    host: "127.0.0.1"
+    port: 3306
+    database: "ultrahc"
+    user: "ultrahc"
+    password: "zmien_mnie"
+    pool-size: 10
+
+# Sieć (koordynacja instancji miedzy serwerami).
+network:
+  registry-poll-ms: 1500   # co ile lobby odpytuje rejestr instancji
+  redis:
+    enabled: false         # opcjonalny upgrade (pub/sub); domyslnie MySQL-polling
+    host: "127.0.0.1"
+    port: 6379
+
+# --------------------------- CYKL GRY --------------------------------
+game:
+  team-size: 1                    # 1=SOLO, 2=DUO, 3=TRIO, 4=SQUAD (parametr)
+  min-players-to-countdown: 30    # 30. gracz uruchamia odliczanie
+  max-players: 100
+  countdown-seconds: 180          # 3 min po zebraniu 30
+  no-pvp-seconds: 600             # 10 min bez PvP
+  enemy-compass-unlock-min: 18    # kompas widzi wroga po 18 min
+  reconnect-grace-seconds: 180    # okno powrotu po rozlaczeniu
+  hard-time-cap-min: 90           # twardy bezpiecznik konca gry
+
+combat:
+  tag-seconds: 10                 # okno przypisania zabojcy (combat-tag)
+
+# --------------------------- GRANICA MAPY ----------------------------
+# 3 fazy: normalna (10-30), przyspieszenie (30-45), arenka/sudden-death (45+).
+border:
+  start: 1000
+  shrink-start-min: 10
+  blocks-per-min: 24              # faza 1
+  accelerate-min: 30              # start fazy 2
+  blocks-per-min-fast: 30         # faza 2
+  center: spawn
+
+arena-showdown:
+  teleport-min: 45                # start fazy 3 (sudden-death)
+  mode: BORDER_CLAMP              # BORDER_CLAMP | SCHEMATIC
+  size: 40                        # rozmiar arenki (srednica bordera)
+  collapse-to-min: 60             # arenka zaciska sie do 0 do tej minuty
+
+# --------------------------- SWIAT / GENERACJA -----------------------
+world:
+  pool-size: 1                    # ile gotowych swiatow trzymac na arena-serwerze
+  pregen-async: true              # pre-generacja w tle w trakcie biezacej gry
+  delete-after-game: true         # kasowanie swiata po grze
+  generation:
+    require-biomes:
+      enabled: true               # gwarancja zimnych biomow przez wybor seeda (Yeti)
+      biomes: [SNOWY_PLAINS, SNOWY_TAIGA, ICE_SPIKES, FROZEN_RIVER]
+      search-radius: 500
+      max-seed-attempts: 40
+
+# --------------------------- POZIOMY (PD) ----------------------------
+# Override 0-2 = dokladnie ze spec; reszta ze wzoru. Sanity: lvl33 -> 66500.
+levels:
+  mode: LINEAR                    # LINEAR | GEOMETRIC
+  linear:
+    slope: 2000                   # required(n) = slope*n + intercept  (n>=3)
+    intercept: 500
+  geometric:
+    base: 750
+    growth: 1.35                  # required(n) = base * growth^n
+  overrides:
+    0: 750
+    1: 2800
+    2: 4500
+  star-symbol: "gwiazdka"         # etykieta poziomu (np. "3 gwiazdka")
+
+# --------------------------- NAGRODY ---------------------------------
+rewards:
+  currency:                       # XP sklepowe (waluta sklepowa)
+    per-kill: 100
+    per-win: 1000
+    time:
+      interval-min-min: 1         # nagroda co losowo 1-2 min
+      interval-min-max: 2
+      tiers:                      # do ktorej minuty obowiazuje dana stawka
+        - { to-min: 5,   amount: 4.2 }
+        - { to-min: 15,  amount: 5.8 }
+        - { to-min: 30,  amount: 7.7 }
+        - { to-min: 999, amount: 9.3 }
+  progress:                       # PD (poziomy gwiazdek)
+    per-kill: 30
+    per-win: 250
+    time:
+      interval-min: 2
+      tiers:
+        - { to-min: 5,   amount: 3.06 }
+        - { to-min: 15,  amount: 4.24 }
+        - { to-min: 30,  amount: 5.62 }
+        - { to-min: 999, amount: 6.8 }
+
+# --------------------------- DROPY -----------------------------------
+# Szanse w procentach (spec). Bonusy klasowe dokladane osobno przez ClassesManager.
+drops:
+  stone:
+    diamond: 0.75
+    iron: 4.0
+    coal: 7.0
+    gold: 1.5
+    redstone: 5.0
+    quartz: 2.0
+    lapis: 5.0
+    emerald: 2.5
+  leaves:
+    apple: 6.0
+
+# --------------------------- GLOWKI ----------------------------------
+heads:
+  normal:                         # zwykla glowka gracza (konsumowalna)
+    duration-seconds: 10
+    effects:
+      - { type: REGENERATION, amplifier: 0 }   # Regeneracja I
+      - { type: SPEED,        amplifier: 0 }   # Szybkosc I
+  golden:                         # Pozlacana Glowka (receptura)
+    duration-seconds: 8
+    effects:
+      - { type: REGENERATION, amplifier: 1 }   # Regeneracja II
+      - { type: SPEED,        amplifier: 1 }   # Szybkosc II
+      - { type: ABSORPTION,   amplifier: 0 }   # Absorbcja
+
+# --------------------------- SKLEP: RECEPTURY (ceny w XP) -------------
+shop:
+  recipes:
+    gornik-pickaxe:   { price: 5500 }
+    sharp-sword:      { price: 4800 }
+    fire-sword:       { price: 4300 }
+    hell-sword:       { price: 6666 }
+    enchanter:        { price: 5000 }
+    pandora-box:      { price: 6350 }
+    golden-head:      { price: 9099 }
+    detector:         { price: 5550 }
+
+# --------------------------- KLASY (ceny w XP) -----------------------
+classes:
+  civil:    { price: 0 }
+  gornik:   { price: 21750 }
+  sniper:   { price: 29000 }
+  chef:     { price: 14999 }
+  fisher:   { price: 25000 }
+  yeti:     { price: 20000 }
+  smith:    { price: 24000 }
+  guard:    { price: 28000 }
+
+# Wykrywacz (receptura) — cooldown w sekundach.
+detector:
+  cooldown-seconds: 60
+  reveal-delay-seconds: 5
+
+# --------------------------- SEZON -----------------------------------
+season:
+  top-rewards:                    # nagrody Top 3 wg poziomu (XP sklepowe)
+    1: 50000
+    2: 30000
+    3: 15000
+  prefixes:                       # prefixy przy nicku dla podium
+    1: "#1 UHC"
+    2: "#2 UHC"
+    3: "#3 UHC"
