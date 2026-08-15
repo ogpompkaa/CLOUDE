@@ -55,6 +55,8 @@ border:
   accelerate-min: 30              # start fazy 2
   blocks-per-min-fast: 30         # faza 2
   center: spawn
+  warning-blocks: 30              # od ilu blokow od granicy czerwony ekran
+  warning-seconds: 5              # ostrzezenie gdy granica dojdzie w tylu sekundach
 
 arena-showdown:
   teleport-min: 45                # start fazy 3 (sudden-death)

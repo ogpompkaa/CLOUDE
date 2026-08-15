@@ -128,19 +128,38 @@ Cały balans jest w `config.yml` (nic nie jest zahardkodowane). Najważniejsze:
 - `drops.*`, `heads.*` — szanse dropów i efekty główek.
 - `classes.*`, `shop.recipes.*` — ceny i parametry umiejętności/receptur.
 - `quests.definitions.*`, `season.*` — questy i nagrody sezonowe.
+- `effects.*` — dźwięki (klucze Minecraft) i cząstki (enum) dla zdarzeń.
+- `enchanter.disable-vanilla-table` — wyłącza zwykły stół do zaklęć (wymusza recepturę Zaklinacza).
+- `world.pregen.*` — async pre-generacja mapy przez Chunky.
+- `border.warning-blocks` / `warning-seconds` — czerwony ekran przy kurczeniu.
 
-Wszystkie komunikaty do graczy i etykiety scoreboardu: `messages.yml` (PL).
+Wszystkie komunikaty do graczy i etykiety scoreboardu: `messages.yml` (PL) — nic
+nie jest zahardkodowane w kodzie.
 
-## Komendy admina (`ultrahc.admin`)
+## Komendy
 
-`/uhc forcestart` · `forceend` · `givexp <gracz> <ile>` · `givepd <gracz> <ile>` ·
-`resetseason` · `season [start|end]` · `stats <gracz>` · `setstat <gracz> <pole> <wartość>` ·
-`setnpc <id>` · `sethologram <id>` · `reload`.
+**Gracz:** `/uhc help` · `menu` (Hub) · `classes` / `class [id]` · `buyclass <id>` ·
+`shop` / `buyrecipe <id>` · `quests` · `balance` · `join` / `leave` · `spectate` (po śmierci).
+
+**Admin (`ultrahc.admin`):** `/uhc admin` (panel) · `instances` · `forcestart` · `forceend` ·
+`givexp <gracz> <ile>` · `givepd <gracz> <ile>` · `resetseason` · `season [start|end]` ·
+`stats <gracz>` · `setstat <gracz> <pole> <wartość>` · `setnpc <id>` · `sethologram <id>` · `reload`.
+Wszystkie z tab-completion.
+
+## GUI
+
+Hub (menu główne), Klasy, Sklep, Statystyki, Questy (paski postępu), Topki, Obserwator
+(spectate), Panel admina, Zarządzanie instancjami, Zarządzanie sezonem.
+
+## Testy
+
+`mvn test` — testy jednostkowe czystej logiki: krzywa poziomów (tabela ze spec),
+progi nagród, matematyka granicy (sanity min29≈544), formatery czasu/liczb.
 
 ## Uwagi
 
-- Integracje **Citizens/DecentHolograms** są przez reflection (softdepend) — plugin
-  działa też bez nich (topki/NPC po prostu nieaktywne). Warstwę tę należy przetestować
-  na serwerze z tymi pluginami.
-- Generacja świata 1000×1000 blokuje wątek główny — pula pre-generowanych światów
-  łagodzi to między grami (patrz `DECYZJE.md`).
+- Integracje **Citizens / DecentHolograms / Chunky** są przez reflection (softdepend) —
+  plugin działa też bez nich (odpowiednie funkcje po prostu nieaktywne). Warstwę tę
+  należy przetestować na serwerze z tymi pluginami.
+- Generacja świata 1000×1000 blokuje wątek główny — pula pre-generowanych światów +
+  async pre-gen (Chunky) łagodzą to między grami (patrz `DECYZJE.md`).

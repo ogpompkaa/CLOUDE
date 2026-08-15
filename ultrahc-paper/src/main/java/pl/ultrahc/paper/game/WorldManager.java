@@ -96,6 +96,8 @@ public class WorldManager {
         var border = world.getWorldBorder();
         border.setCenter(world.getSpawnLocation());
         border.setSize(start);
+        border.setWarningDistance(config.raw().getInt("border.warning-blocks", 30));
+        border.setWarningTime(config.raw().getInt("border.warning-seconds", 5));
     }
 
     /**

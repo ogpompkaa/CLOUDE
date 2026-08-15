@@ -92,3 +92,28 @@ ultrahc-paper/src/main/resources/
 11. Velocity: transfery + routing instancji (skala 10 gier).
 
 Po każdym systemie: krótka lista „co i jak przetestować na serwerze".
+
+## Aktualizacja — stan bieżący (po implementacji)
+
+Względem szkicu doszło:
+
+- `ultrahc-common/game/` — czysta, testowana logika bez Bukkita:
+  `LevelCurve`, `RewardTiers`, `BorderCurve` (+ testy JUnit w `src/test`).
+- `ultrahc-common/instances/` — `InstanceRegistry`, `InstanceInfo` (rejestr sieciowy,
+  SQLite/MySQL); `storage/MysqlStorage` (HikariCP).
+- `paper/gui/` — pełne GUI: `LobbyMenuGui` (Hub), `ClassGui`, `ShopGui`, `StatsGui`,
+  `QuestGui`, `LeaderboardGui`, `SpectateGui`, `AdminGui`, `InstanceAdminGui`,
+  `SeasonAdminGui`, `ArenaSelectGui`.
+- `paper/hologram/` (`HologramManager`+DecentHolograms) i `paper/npc/`
+  (`NpcManager`+Citizens) — integracje przez reflection (softdepend).
+- `paper/manager/` — doszły m.in.: `RewardManager`, `ScoreboardService` (bez migotania,
+  kolory drużyn), `BossBarService`, `RankService`+`RankFormat`, `CompassManager`,
+  `HeadManager`, `AbilityScheduler`, `LeaderboardsManager`, `QuestsManager`,
+  `SeasonManager`, `ShopManager`, `RecipeManager`, `InstanceManager`, `ClassesManager`.
+- `paper/util/` — `Feedback` (title/dźwięki/cząstki, config-driven), `TimeUtil`,
+  `NumberUtil` (+ testy).
+- `paper/config/` — `ConfigValidator` (walidacja wartości).
+- `paper/listener/` — m.in. `CombatListener` (PvP, śmierć, reconnect+combat-tag),
+  `DropsListener`, `ClassAbilityListener`, `HeadListener`, `CompassListener`,
+  `CompassLobbyListener`, `ChatListener` (czat z rangą), `DetectorListener`,
+  `PandoraListener` (stawiana skrzynka), `ProfileListener`.
