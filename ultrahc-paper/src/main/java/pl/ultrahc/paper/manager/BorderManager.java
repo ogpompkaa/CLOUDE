@@ -29,35 +29,37 @@ public class BorderManager {
 
     private ConfigManager cfg() { return plugin.configManager(); }
 
+    /** Buduje krzywa granicy z config (wspoldzielona, testowana matematyka). */
+    private pl.ultrahc.common.game.BorderCurve curve() {
+        var c = cfg().raw();
+        return new pl.ultrahc.common.game.BorderCurve(
+                c.getDouble("border.start", 1000),
+                c.getInt("border.shrink-start-min", 10),
+                c.getDouble("border.blocks-per-min", 24),
+                c.getInt("border.accelerate-min", 30),
+                c.getDouble("border.blocks-per-min-fast", 30));
+    }
+
     /** Faza 1 (od shrink-start-min): kurczenie tempem blocks-per-min do accelerate-min. */
     public void beginPhase1(GameInstance game) {
         var c = cfg().raw();
-        double start = c.getDouble("border.start", 1000);
-        double perMin = c.getDouble("border.blocks-per-min", 24);
         int shrinkStart = c.getInt("border.shrink-start-min", 10);
         int accelerate = c.getInt("border.accelerate-min", 30);
-
         int minutes = Math.max(1, accelerate - shrinkStart);
-        double target = Math.max(1, start - perMin * minutes);
+        double target = curve().sizeAt(accelerate);
         game.world().getWorldBorder().setSize(target, minutes * 60L);
-        plugin.getLogger().info("[UltraHC] Granica faza 1: " + start + " -> " + target + " w " + minutes + " min.");
+        plugin.getLogger().info("[UltraHC] Granica faza 1 -> " + target + " w " + minutes + " min.");
     }
 
     /** Faza 2 (od accelerate-min): przyspieszone tempo blocks-per-min-fast do teleport-min. */
     public void beginPhase2(GameInstance game) {
         var c = cfg().raw();
-        double start = c.getDouble("border.start", 1000);
-        double perMin = c.getDouble("border.blocks-per-min", 24);
-        double perMinFast = c.getDouble("border.blocks-per-min-fast", 30);
-        int shrinkStart = c.getInt("border.shrink-start-min", 10);
         int accelerate = c.getInt("border.accelerate-min", 30);
         int teleport = c.getInt("arena-showdown.teleport-min", 45);
-
-        double sizeAtAccelerate = Math.max(1, start - perMin * (accelerate - shrinkStart));
         int minutes = Math.max(1, teleport - accelerate);
-        double target = Math.max(1, sizeAtAccelerate - perMinFast * minutes);
+        double target = curve().sizeAt(teleport);
         game.world().getWorldBorder().setSize(target, minutes * 60L);
-        plugin.getLogger().info("[UltraHC] Granica faza 2 (przyspieszenie): -> " + target + " w " + minutes + " min.");
+        plugin.getLogger().info("[UltraHC] Granica faza 2 (przyspieszenie) -> " + target + " w " + minutes + " min.");
     }
 
     /** Faza 3 (od teleport-min): arenka — recenter na spawn, zacisk do rozmiaru arenki, TP zywych, kolaps do ~0. */

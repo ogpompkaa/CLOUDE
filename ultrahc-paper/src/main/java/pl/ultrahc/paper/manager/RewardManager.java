@@ -140,16 +140,15 @@ public class RewardManager {
         }
     }
 
-    /** Stawka z progu: pierwszy tier, dla ktorego minuty < to-min. */
+    /** Stawka z progu — delegacja do czystej (testowanej) logiki RewardTiers. */
     private double tierAmount(String path, int minutes) {
-        List<Map<?, ?>> tiers = cfg().getMapList(path);
-        for (Map<?, ?> tier : tiers) {
-            int toMin = ((Number) tier.get("to-min")).intValue();
-            if (minutes < toMin) {
-                return ((Number) tier.get("amount")).doubleValue();
-            }
+        List<pl.ultrahc.common.game.RewardTiers.Tier> tiers = new java.util.ArrayList<>();
+        for (Map<?, ?> tier : cfg().getMapList(path)) {
+            tiers.add(new pl.ultrahc.common.game.RewardTiers.Tier(
+                    ((Number) tier.get("to-min")).intValue(),
+                    ((Number) tier.get("amount")).doubleValue()));
         }
-        return tiers.isEmpty() ? 0 : ((Number) tiers.get(tiers.size() - 1).get("amount")).doubleValue();
+        return pl.ultrahc.common.game.RewardTiers.amountFor(tiers, minutes);
     }
 
     private void notifyLevel(UUID id, int levelsGained) {
