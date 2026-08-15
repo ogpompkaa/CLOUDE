@@ -50,6 +50,7 @@ public class GameInstance {
     }
 
     public GameState state() { return state; }
+    public int countdownRemaining() { return countdownRemaining; }
     public World world() { return world; }
     public boolean pvpEnabled() { return pvpEnabled; }
     public TeamManager teams() { return teamManager; }

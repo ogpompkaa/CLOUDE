@@ -134,7 +134,10 @@ public class CombatListener implements Listener {
         // Wyeliminowany -> spectator na arenie (nie wychodzi z gry).
         if (!team.isAlive(player.getUniqueId())) {
             e.setRespawnLocation(game.world().getSpawnLocation());
-            plugin.getServer().getScheduler().runTask(plugin, () -> player.setGameMode(GameMode.SPECTATOR));
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+                player.setGameMode(GameMode.SPECTATOR);
+                player.sendMessage(plugin.messages().prefixed("spectate.hint", null));
+            });
         }
     }
 

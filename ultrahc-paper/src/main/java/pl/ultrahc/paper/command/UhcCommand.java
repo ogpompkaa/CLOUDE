@@ -21,7 +21,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
 
     private static final List<String> SUBCOMMANDS = List.of(
             "balance", "reload", "givexp", "givepd", "resetseason", "join", "leave",
-            "forcestart", "forceend", "gameinfo", "menu", "classes", "class", "buyclass",
+            "forcestart", "forceend", "gameinfo", "menu", "spectate", "classes", "class", "buyclass",
             "shop", "buyrecipe", "setnpc", "sethologram", "quests", "season", "stats", "setstat",
             "admin", "instances");
 
@@ -52,6 +52,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
             case "forceend" -> handleForce(sender, false);
             case "gameinfo" -> handleGameInfo(sender);
             case "menu" -> { if (sender instanceof Player pl) plugin.menu().open(pl); else sender.sendMessage(msg.prefixed("general.players-only", null)); }
+            case "spectate" -> handleSpectate(sender);
             case "classes" -> handleClassList(sender);
             case "class" -> handleClassSelect(sender, args);
             case "buyclass" -> handleClassBuy(sender, args);
@@ -218,6 +219,13 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
         if (sender instanceof Player player) plugin.instanceAdminGui().open(player);
         else sender.sendMessage(msg.prefixed("general.players-only", null));
+    }
+
+    private void handleSpectate(CommandSender sender) {
+        MessagesManager msg = plugin.messages();
+        if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
+        if (plugin.spectateGui() == null) { sender.sendMessage(msg.legacy("&cNiedostepne (rola LOBBY).")); return; }
+        plugin.spectateGui().open(player);
     }
 
     private void handleShop(CommandSender sender) {

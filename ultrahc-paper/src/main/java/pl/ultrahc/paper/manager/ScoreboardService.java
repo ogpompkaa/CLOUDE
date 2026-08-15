@@ -5,9 +5,11 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import pl.ultrahc.common.model.PlayerProfile;
 import pl.ultrahc.paper.UltraHcPlugin;
@@ -34,7 +36,17 @@ public class ScoreboardService {
     private BukkitTask task;
     private BukkitTask animTask;
     private int frame;
+    private final java.util.Map<java.util.UUID, Integer> lineCount = new java.util.HashMap<>();
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacyAmpersand();
+    private static final LegacyComponentSerializer SECTION = LegacyComponentSerializer.legacySection();
+
+    /** Stale, niewidzialne kotwice-wpisy (po jednej na linie) — nie zmieniaja sie, wiec brak migotania. */
+    private static final String[] ENTRIES;
+    static {
+        ChatColor[] colors = ChatColor.values();
+        ENTRIES = new String[colors.length];
+        for (int i = 0; i < colors.length; i++) ENTRIES[i] = colors[i].toString() + ChatColor.RESET;
+    }
 
     public ScoreboardService(UltraHcPlugin plugin) {
         this.plugin = plugin;
@@ -97,17 +109,55 @@ public class ScoreboardService {
         } else {
             obj.displayName(currentTitle());
         }
-        // Wyczysc poprzednie wpisy.
-        for (String entry : new ArrayList<>(board.getEntries())) {
-            board.resetScores(entry);
-        }
 
+        // Wzorzec bez migotania: stale niewidzialne wpisy (kotwice) + zmienny prefiks teamu.
         List<String> lines = buildLines(player, game, msg);
-        int score = lines.size();
-        for (int i = 0; i < lines.size(); i++) {
-            String unique = uniquify(lines.get(i), i);
-            obj.getScore(unique).setScore(score--);
+        int size = lines.size();
+        for (int i = 0; i < size && i < ENTRIES.length; i++) {
+            String entry = ENTRIES[i];
+            org.bukkit.scoreboard.Team team = board.getTeam("l" + i);
+            if (team == null) {
+                team = board.registerNewTeam("l" + i);
+                team.addEntry(entry);
+            }
+            team.prefix(SECTION.deserialize(lines.get(i)));
+            Score sc = obj.getScore(entry);
+            if (!sc.isScoreSet() || sc.getScore() != size - i) sc.setScore(size - i);
         }
+        // Ukryj nadmiarowe linie (tylko gdy liczba linii zmalala).
+        int prev = lineCount.getOrDefault(player.getUniqueId(), 0);
+        for (int i = size; i < prev && i < ENTRIES.length; i++) {
+            board.resetScores(ENTRIES[i]);
+        }
+        lineCount.put(player.getUniqueId(), size);
+
+        colorNametags(player, game, board);
+    }
+
+    /** Koloruje nicki nad glowa z perspektywy widza: sojusznik zielony, wrog czerwony. */
+    private void colorNametags(Player viewer, GameInstance game, Scoreboard board) {
+        if (game.teams() == null) return;
+        org.bukkit.scoreboard.Team mates = teamColored(board, "mates", net.kyori.adventure.text.format.NamedTextColor.GREEN);
+        org.bukkit.scoreboard.Team foes = teamColored(board, "foes", net.kyori.adventure.text.format.NamedTextColor.RED);
+        var myTeam = game.teams().getTeam(viewer.getUniqueId());
+        for (Player other : game.world().getPlayers()) {
+            if (other.equals(viewer)) continue;
+            var ot = game.teams().getTeam(other.getUniqueId());
+            boolean ally = myTeam != null && ot == myTeam;
+            org.bukkit.scoreboard.Team target = ally ? mates : foes;
+            org.bukkit.scoreboard.Team opposite = ally ? foes : mates;
+            opposite.removeEntry(other.getName());
+            if (!target.hasEntry(other.getName())) target.addEntry(other.getName());
+        }
+    }
+
+    private org.bukkit.scoreboard.Team teamColored(Scoreboard board, String name, net.kyori.adventure.text.format.NamedTextColor color) {
+        org.bukkit.scoreboard.Team team = board.getTeam(name);
+        if (team == null) {
+            team = board.registerNewTeam(name);
+            team.color(color);
+        }
+        return team;
     }
 
     private List<String> buildLines(Player player, GameInstance game, MessagesManager msg) {
@@ -179,10 +229,4 @@ public class ScoreboardService {
         return LEGACY.serialize(LEGACY.deserialize(withAmpersand));
     }
 
-    /** Zapewnia unikalnosc wpisow (scoreboard nie znosi duplikatow) niewidzialnym sufiksem-kodem. */
-    private String uniquify(String line, int index) {
-        var codes = org.bukkit.ChatColor.values();
-        String candidate = line + codes[index % codes.length];
-        return candidate.length() > 64 ? candidate.substring(0, 64) : candidate;
-    }
 }

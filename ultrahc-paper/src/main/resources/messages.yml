@@ -17,6 +17,8 @@ chat:
   separator: "&7: &f"
 
 bossbar:
+  waiting: "&aOczekiwanie na graczy: &e%count%&7/&e%min%"
+  countdown: "&eStart gry za: &6%time%"
   no-pvp: "&aBrak PvP: &e%time%"
   pvp: "&cPvP aktywne"
   shrink-soon: "&eGranica kurczy sie za: &6%time%"
@@ -73,6 +75,12 @@ game:
 
 head:
   consumed: "&aZjadles glowke — otrzymujesz efekty."
+
+spectate:
+  title: "&8Obserwuj gracza"
+  hint: "&7Zginales. Uzyj &e/uhc spectate &7aby obserwowac zywych."
+  teleported: "&aObserwujesz &e%player%&a."
+  not-spectator: "&cTa opcja jest dla obserwatorow."
 
 compass:
   ally: "&aKompas: sojusznik &e%name% &7(%distance% kratek)"

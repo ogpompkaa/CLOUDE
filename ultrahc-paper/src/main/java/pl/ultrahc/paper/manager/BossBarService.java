@@ -39,15 +39,38 @@ public class BossBarService {
 
     private void tick() {
         GameInstance game = plugin.games() == null ? null : plugin.games().current();
-        if (game == null || game.state() != GameState.RUNNING) {
+        if (game == null || game.state() == GameState.ENDING) {
             clearViewers();
             return;
         }
-        update(game);
+        switch (game.state()) {
+            case WAITING -> updateWaiting(game);
+            case COUNTDOWN -> updateCountdown(game);
+            case RUNNING -> update(game);
+            default -> { clearViewers(); return; }
+        }
         // Pokaz bossbar wszystkim w swiecie gry.
         for (Player p : game.world().getPlayers()) {
             if (viewers.add(p.getUniqueId())) p.showBossBar(bar);
         }
+    }
+
+    private void updateWaiting(GameInstance game) {
+        int min = plugin.configManager().raw().getInt("game.min-players-to-countdown", 30);
+        int count = game.participants().size();
+        bar.name(plugin.messages().legacy(plugin.messages().raw("bossbar.waiting", Map.of(
+                "count", String.valueOf(count), "min", String.valueOf(min)))));
+        bar.progress(clamp((float) count / Math.max(1, min)));
+        bar.color(BossBar.Color.BLUE);
+    }
+
+    private void updateCountdown(GameInstance game) {
+        int total = plugin.configManager().raw().getInt("game.countdown-seconds", 180);
+        int left = game.countdownRemaining();
+        bar.name(plugin.messages().legacy(plugin.messages().raw("bossbar.countdown", Map.of(
+                "time", TimeUtil.ms(left)))));
+        bar.progress(clamp((float) left / Math.max(1, total)));
+        bar.color(BossBar.Color.YELLOW);
     }
 
     private void update(GameInstance game) {

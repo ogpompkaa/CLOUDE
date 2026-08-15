@@ -24,6 +24,7 @@ import pl.ultrahc.paper.gui.LobbyMenuGui;
 import pl.ultrahc.paper.gui.QuestGui;
 import pl.ultrahc.paper.gui.SeasonAdminGui;
 import pl.ultrahc.paper.gui.ShopGui;
+import pl.ultrahc.paper.gui.SpectateGui;
 import pl.ultrahc.paper.gui.StatsGui;
 import pl.ultrahc.paper.hologram.DecentHologramsManager;
 import pl.ultrahc.paper.hologram.HologramManager;
@@ -91,6 +92,7 @@ public class UltraHcPlugin extends JavaPlugin {
     private BossBarService bossBarService;
     private RankService rankService;
     private RankFormat rankFormat;
+    private SpectateGui spectateGui;
     private AdminGui adminGui;
     private InstanceAdminGui instanceAdminGui;
 
@@ -172,6 +174,8 @@ public class UltraHcPlugin extends JavaPlugin {
             pm.registerEvents(recipeManager, this);
             pm.registerEvents(new DetectorListener(this), this);
             pm.registerEvents(new PandoraListener(this), this);
+            this.spectateGui = new SpectateGui(this);
+            pm.registerEvents(spectateGui, this);
 
             // Przygotowanie swiata blokuje watek glowny — robimy to po pelnym starcie serwera.
             getServer().getScheduler().runTask(this, () -> {
@@ -286,4 +290,5 @@ public class UltraHcPlugin extends JavaPlugin {
     public AdminGui adminGui() { return adminGui; }
     public InstanceAdminGui instanceAdminGui() { return instanceAdminGui; }
     public RankFormat rankFormat() { return rankFormat; }
+    public SpectateGui spectateGui() { return spectateGui; }
 }
