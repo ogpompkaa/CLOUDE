@@ -95,6 +95,17 @@ npc:
   hologram-set: "&aUstawiono hologram &e%id% &aw tym miejscu."
   not-configured: "&eNPC/hologram &6%id% &niema ustawionej pozycji."
 
+# --------------------------- WYBOR ARENY (lobby) ---------------------
+arena:
+  gui-title: "&8Wybor areny UHC"
+  instance: "&aArena %id%"
+  lore-state: "&7Stan: &e%state%"
+  lore-players: "&7Gracze: &e%players%&7/&e%max%"
+  none: "&7Brak dostepnych aren — sprobuj za chwile."
+  connecting: "&aLaczenie z &e%id%&a..."
+  quick: "&6&lSzybkie dolaczenie"
+  quick-lore: "&7Dolacz do najlepszej dostepnej areny."
+
 # --------------------------- KLASY / SKLEP ---------------------------
 class:
   selected: "&aWybrano klase: &e%class%&a."

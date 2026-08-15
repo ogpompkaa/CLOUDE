@@ -19,5 +19,10 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>${sqlite.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>9.1.0</version>
+        </dependency>
     </dependencies>
 </project>

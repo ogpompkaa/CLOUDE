@@ -11,9 +11,11 @@ import pl.ultrahc.paper.listener.CombatListener;
 import pl.ultrahc.paper.listener.CompassListener;
 import pl.ultrahc.paper.listener.DropsListener;
 import pl.ultrahc.paper.listener.DetectorListener;
+import pl.ultrahc.paper.listener.CompassLobbyListener;
 import pl.ultrahc.paper.listener.HeadListener;
 import pl.ultrahc.paper.listener.PandoraListener;
 import pl.ultrahc.paper.listener.ProfileListener;
+import pl.ultrahc.paper.gui.ArenaSelectGui;
 import pl.ultrahc.paper.gui.QuestGui;
 import pl.ultrahc.paper.gui.SeasonAdminGui;
 import pl.ultrahc.paper.gui.ShopGui;
@@ -27,6 +29,7 @@ import pl.ultrahc.paper.manager.BorderManager;
 import pl.ultrahc.paper.manager.ClassesManager;
 import pl.ultrahc.paper.manager.CompassManager;
 import pl.ultrahc.paper.manager.HeadManager;
+import pl.ultrahc.paper.manager.InstanceManager;
 import pl.ultrahc.paper.manager.LevelsManager;
 import pl.ultrahc.paper.manager.QuestsManager;
 import pl.ultrahc.paper.manager.RecipeManager;
@@ -71,6 +74,8 @@ public class UltraHcPlugin extends JavaPlugin {
     private SeasonManager seasonManager;
     private QuestGui questGui;
     private SeasonAdminGui seasonAdminGui;
+    private InstanceManager instanceManager;
+    private ArenaSelectGui arenaSelectGui;
 
     @Override
     public void onEnable() {
@@ -106,6 +111,7 @@ public class UltraHcPlugin extends JavaPlugin {
         guiPm.registerEvents(shopGui, this);
         guiPm.registerEvents(questGui, this);
         guiPm.registerEvents(seasonAdminGui, this);
+        this.instanceManager = new InstanceManager(this); // rejestr instancji (obie role)
 
         // 4. Eventy i komendy
         getServer().getPluginManager().registerEvents(new ProfileListener(this), this);
@@ -141,6 +147,7 @@ public class UltraHcPlugin extends JavaPlugin {
                 gameManager.enableArena();
                 scoreboardService.start();
                 abilityScheduler.start();
+                instanceManager.startArena(); // heartbeat stanu instancji do rejestru
             });
         }
 
@@ -148,6 +155,11 @@ public class UltraHcPlugin extends JavaPlugin {
             this.hologramManager = new DecentHologramsManager(this);
             this.npcManager = new CitizensNpcManager(this);
             this.leaderboardsManager = new LeaderboardsManager(this);
+            this.arenaSelectGui = new ArenaSelectGui(this);
+            getServer().getMessenger().registerOutgoingPluginChannel(this, ArenaSelectGui.BUNGEE_CHANNEL);
+            getServer().getPluginManager().registerEvents(arenaSelectGui, this);
+            getServer().getPluginManager().registerEvents(new CompassLobbyListener(this), this);
+            instanceManager.startLobby();
             // Po pelnym starcie: odswiez topki i postaw NPC (swiat lobby musi byc zaladowany).
             getServer().getScheduler().runTask(this, () -> {
                 leaderboardsManager.start();
@@ -195,6 +207,7 @@ public class UltraHcPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (instanceManager != null) instanceManager.shutdown();
         if (hologramManager != null) hologramManager.removeAll();
         if (npcManager != null) npcManager.removeAll();
         if (leaderboardsManager != null) leaderboardsManager.stop();
@@ -228,4 +241,6 @@ public class UltraHcPlugin extends JavaPlugin {
     public SeasonManager season() { return seasonManager; }
     public QuestGui questGui() { return questGui; }
     public SeasonAdminGui seasonGui() { return seasonAdminGui; }
+    public InstanceManager instances() { return instanceManager; }
+    public ArenaSelectGui arenaSelect() { return arenaSelectGui; }
 }

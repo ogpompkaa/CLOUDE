@@ -24,9 +24,11 @@ storage:
 
 # Sieć (koordynacja instancji miedzy serwerami).
 network:
-  registry-poll-ms: 1500   # co ile lobby odpytuje rejestr instancji
+  registry-poll-ms: 1500       # co ile lobby odpytuje rejestr instancji
+  heartbeat-seconds: 3         # co ile arena-serwer odswieza swoj wiersz
+  instance-stale-seconds: 10   # po tylu s bez heartbeatu instancja jest ignorowana
   redis:
-    enabled: false         # opcjonalny upgrade (pub/sub); domyslnie MySQL-polling
+    enabled: false             # opcjonalny upgrade (pub/sub); domyslnie MySQL-polling
     host: "127.0.0.1"
     port: 6379
 

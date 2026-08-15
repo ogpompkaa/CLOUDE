@@ -14,6 +14,7 @@
     <modules>
         <module>ultrahc-common</module>
         <module>ultrahc-paper</module>
+        <module>ultrahc-velocity</module>
     </modules>
 
     <properties>
