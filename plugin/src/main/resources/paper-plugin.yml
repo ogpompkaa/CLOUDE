@@ -1,0 +1,20 @@
+name: CoreKit
+version: '${version}'
+main: pl.corekit.CoreKitPlugin
+bootstrapper: pl.corekit.bootstrap.CoreKitBootstrap
+api-version: '${apiVersion}'
+description: Production-grade foundation for Paper plugins.
+website: https://github.com/ogpompkaa/cloude
+authors:
+  - Igor
+
+# Commands are registered programmatically via Brigadier (see CommandRegistrar);
+# paper-plugin.yml intentionally has no `commands` block.
+
+permissions:
+  corekit.command:
+    description: Access to the base /corekit command.
+    default: true
+  corekit.command.reload:
+    description: Reload CoreKit configuration and language files.
+    default: op

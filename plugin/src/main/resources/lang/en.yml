@@ -1,0 +1,13 @@
+# CoreKit — English messages. MiniMessage format: https://docs.advntr.dev/minimessage/format
+messages:
+  prefix: "<gradient:#5e9bff:#8f6bff><bold>CoreKit</bold></gradient> <dark_gray>»</dark_gray> "
+  command:
+    usage: "<gray>Usage: <white>/corekit <reload|info|profile></white>"
+    reloaded: "<green>Configuration and language files reloaded."
+    info: "<gray>Running CoreKit <white>v<version></white>."
+    players-only: "<red>This command can only be used by a player."
+    error: "Something went wrong while processing your request."
+    profile:
+      none: "<yellow>No stored profile found for you yet."
+      header: "<gray>─── <white>Your profile</white> ───"
+      playtime: "<gray>Playtime: <white><playtime></white>"

@@ -1,0 +1,13 @@
+# CoreKit — polskie komunikaty. Format MiniMessage: https://docs.advntr.dev/minimessage/format
+messages:
+  prefix: "<gradient:#5e9bff:#8f6bff><bold>CoreKit</bold></gradient> <dark_gray>»</dark_gray> "
+  command:
+    usage: "<gray>Użycie: <white>/corekit <reload|info|profile></white>"
+    reloaded: "<green>Przeładowano konfigurację i pliki językowe."
+    info: "<gray>Działa CoreKit <white>v<version></white>."
+    players-only: "<red>Tej komendy może użyć tylko gracz."
+    error: "Coś poszło nie tak podczas przetwarzania żądania."
+    profile:
+      none: "<yellow>Nie masz jeszcze zapisanego profilu."
+      header: "<gray>─── <white>Twój profil</white> ───"
+      playtime: "<gray>Czas gry: <white><playtime></white>"

@@ -1,0 +1,18 @@
+# ┌────────────────────────────────────────────────────────────┐
+# │  CoreKit — configuration                                     │
+# │  Do not remove `config-version`; it drives upgrade warnings. │
+# └────────────────────────────────────────────────────────────┘
+config-version: 1
+
+settings:
+  # Language file to load from the lang/ folder (e.g. "en", "pl").
+  language: en
+  # Verbose logging for troubleshooting.
+  debug: false
+
+storage:
+  # SQLite database file, relative to the plugin data folder.
+  file: data.db
+  # Connection pool size. SQLite serialises writes, so a small pool is ideal;
+  # WAL mode (enabled automatically) lets reads run concurrently.
+  pool-size: 4
