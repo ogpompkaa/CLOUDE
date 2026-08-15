@@ -14,6 +14,11 @@ commands:
     usage: /uhc
     permission: ultrahc.use
     permission-message: "Brak uprawnien."
+  party:
+    description: System party (DUO/TRIO/SQUAD).
+    usage: /party
+    permission: ultrahc.use
+    permission-message: "Brak uprawnien."
 
 permissions:
   ultrahc.use:

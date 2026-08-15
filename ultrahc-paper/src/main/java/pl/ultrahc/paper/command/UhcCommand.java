@@ -86,6 +86,17 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
             var inst = plugin.games().current();
             player.sendMessage(msg.prefixed("game.join-game",
                     Map.of("instance", inst != null ? inst.world().getName() : "-")));
+            // Lider zabiera online czlonkow party do tej samej instancji.
+            if (plugin.party() != null && plugin.party().isLeader(player.getUniqueId())) {
+                player.sendMessage(msg.prefixed("party.warp", null));
+                for (Player mate : plugin.party().onlineMembers(player.getUniqueId())) {
+                    if (mate.equals(player)) continue;
+                    if (plugin.games().join(mate)) {
+                        mate.sendMessage(msg.prefixed("game.join-game",
+                                Map.of("instance", inst != null ? inst.world().getName() : "-")));
+                    }
+                }
+            }
         } else {
             player.sendMessage(msg.prefixed("game.join-failed", null));
         }

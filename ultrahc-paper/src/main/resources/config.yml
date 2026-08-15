@@ -33,6 +33,12 @@ network:
     port: 6379
 
 # --------------------------- CYKL GRY --------------------------------
+# Party (grupowanie graczy do wspolnej druzyny przed gra).
+party:
+  enabled: true
+  max-size: 4                     # max czlonkow party (4 = SQUAD)
+  invite-expiry-seconds: 60
+
 game:
   team-size: 1                    # 1=SOLO, 2=DUO, 3=TRIO, 4=SQUAD (parametr)
   min-players-to-countdown: 30    # 30. gracz uruchamia odliczanie

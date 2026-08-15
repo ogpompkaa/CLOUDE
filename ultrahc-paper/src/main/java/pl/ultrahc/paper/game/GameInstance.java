@@ -166,7 +166,8 @@ public class GameInstance {
             Player p = plugin.getServer().getPlayer(id);
             if (p != null) names.put(id, p.getName());
         }
-        teamManager.buildTeams(new ArrayList<>(participants), names);
+        teamManager.buildTeams(new ArrayList<>(participants), names,
+                id -> plugin.party() != null ? plugin.party().groupKey(id) : null);
 
         // Rozrzuc graczy po mapie i przywroc tryb przetrwania.
         for (UUID id : participants) {

@@ -334,6 +334,31 @@ season:
   reward: "&6Nagroda sezonowa &7(#%rank%)&6: &e%xp% XP &7dla &e%player%"
   gui-title: "&8Zarzadzanie sezonem"
 
+# --------------------------- PARTY -----------------------------------
+party:
+  created: "&aZalozyles party. Zapros graczy: &e/party invite <nick>&a."
+  disabled: "&cSystem party jest wylaczony."
+  already-in: "&cJestes juz w party."
+  not-in: "&cNie jestes w party."
+  not-leader: "&cTylko lider moze to zrobic."
+  full: "&cParty jest pelne (max %max%)."
+  invited: "&aZaproszono &e%player% &ado party."
+  invite-received: "&e%player% &7zaprasza Cie do party. &a/party accept &7lub &c/party deny&7."
+  invite-none: "&cBrak aktywnego zaproszenia."
+  invite-expired: "&cZaproszenie wygaslo."
+  target-in-party: "&cTen gracz jest juz w party."
+  target-offline: "&cGracza nie ma online."
+  joined: "&a%player% &7dolaczyl do party."
+  left: "&7%player% &7opuscil party."
+  kicked: "&c%player% &7zostal wyrzucony z party."
+  disbanded: "&cParty rozwiazane."
+  leader-left: "&cLider opuscil party — rozwiazane."
+  list-header: "&6Party &7(%count%/%max%)&6:"
+  list-leader: "&e★ %player% &7(lider)"
+  list-member: "&7- %player%"
+  self-invite: "&cNie mozesz zaprosic samego siebie."
+  warp: "&aLider rusza do gry — party dolacza."
+
 # --------------------------- ADMIN -----------------------------------
 admin:
   panel-title: "&8Panel admina"
