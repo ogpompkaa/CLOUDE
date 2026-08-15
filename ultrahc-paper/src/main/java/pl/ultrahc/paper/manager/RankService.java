@@ -8,6 +8,8 @@ import org.bukkit.scoreboard.Team;
 import pl.ultrahc.common.model.PlayerProfile;
 import pl.ultrahc.paper.UltraHcPlugin;
 
+import java.util.Map;
+
 /**
  * Wyswietla poziom gracza (gwiazdka) jako prefiks przy nicku w TAB i nad glowa,
  * oraz oznaczenia podium (#1/#2/#3 UHC) dla Top 3 wg poziomu. Dziala w lobby.
@@ -41,8 +43,12 @@ public class RankService {
 
         String prefix = plugin.rankFormat().prefix(player.getUniqueId());
 
-        // TAB.
+        // TAB — nick z ranga + naglowek/stopka.
         player.playerListName(LEGACY.deserialize(prefix + "&f" + player.getName()));
+        player.sendPlayerListHeaderAndFooter(
+                LEGACY.deserialize(plugin.messages().raw("tablist.header")),
+                LEGACY.deserialize(plugin.messages().raw("tablist.footer",
+                        Map.of("online", String.valueOf(plugin.getServer().getOnlinePlayers().size())))));
 
         // Nametag nad glowa (druzyna na glownym scoreboardzie).
         Scoreboard board = plugin.getServer().getScoreboardManager().getMainScoreboard();

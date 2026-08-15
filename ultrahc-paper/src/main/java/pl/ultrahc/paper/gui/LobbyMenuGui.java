@@ -46,7 +46,7 @@ public class LobbyMenuGui implements Listener {
         inv.setItem(5, tile("quests", Material.WRITABLE_BOOK, msg.raw("menu.quests"), msg.raw("menu.quests-lore")));
         inv.setItem(6, tile("stats", Material.PLAYER_HEAD, msg.raw("menu.stats"), msg.raw("menu.stats-lore")));
         inv.setItem(7, tile("leaderboards", Material.NETHER_STAR, msg.raw("menu.leaderboards"), msg.raw("menu.leaderboards-lore")));
-        player.openInventory(inv);
+        GuiUtil.open(player, inv);
     }
 
     private ItemStack tile(String action, Material mat, String name, String lore) {

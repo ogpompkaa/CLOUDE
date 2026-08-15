@@ -62,7 +62,7 @@ public class ClassGui implements Listener {
         for (String id : ids) {
             inv.setItem(slot++, icon(id, p, msg));
         }
-        player.openInventory(inv);
+        GuiUtil.open(player, inv);
     }
 
     private ItemStack icon(String id, PlayerProfile p, MessagesManager msg) {
@@ -75,7 +75,7 @@ public class ClassGui implements Listener {
         List<Component> lore = new ArrayList<>();
         for (String line : msg.rawList("class.desc." + id)) lore.add(LEGACY.deserialize(line));
         lore.add(Component.empty());
-        if (!owned) lore.add(LEGACY.deserialize(msg.raw("class.price-line", Map.of("price", String.valueOf(plugin.classes().price(id))))));
+        if (!owned) lore.add(LEGACY.deserialize(msg.raw("class.price-line", Map.of("price", pl.ultrahc.paper.util.NumberUtil.grouped(plugin.classes().price(id))))));
         lore.add(LEGACY.deserialize(selected ? msg.raw("class.status-selected")
                 : owned ? msg.raw("class.status-owned") : msg.raw("class.status-locked")));
         meta.lore(lore);

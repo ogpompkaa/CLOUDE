@@ -54,7 +54,7 @@ public class QuestGui implements Listener {
             Storage.QuestRecord rec = plugin.quests().record(player.getUniqueId(), def);
             inv.setItem(next[row]++, icon(def, rec, msg));
         }
-        player.openInventory(inv);
+        GuiUtil.open(player, inv);
     }
 
     private ItemStack icon(QuestsManager.QuestDef def, Storage.QuestRecord rec, MessagesManager msg) {

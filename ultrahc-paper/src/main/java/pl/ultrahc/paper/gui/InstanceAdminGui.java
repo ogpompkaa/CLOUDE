@@ -53,7 +53,7 @@ public class InstanceAdminGui implements Listener {
             if (slot >= inv.getSize()) break;
             inv.setItem(slot++, icon(info, msg));
         }
-        player.openInventory(inv);
+        GuiUtil.open(player, inv);
     }
 
     private ItemStack icon(InstanceInfo info, MessagesManager msg) {

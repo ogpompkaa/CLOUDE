@@ -17,14 +17,30 @@ public class ProfileListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        var uuid = e.getPlayer().getUniqueId();
-        plugin.profiles().loadAsync(uuid, e.getPlayer().getName());
+        var player = e.getPlayer();
+        var uuid = player.getUniqueId();
+        plugin.profiles().loadAsync(uuid, player.getName());
         if (plugin.quests() != null) plugin.quests().loadAsync(uuid);
+
+        // Kosmetyka: sformatowany komunikat wejscia + powitanie (w lobby).
+        e.joinMessage(plugin.messages().component("join-message",
+                java.util.Map.of("player", player.getName())));
+        if (plugin.role() == pl.ultrahc.paper.ServerRole.LOBBY) {
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                if (!player.isOnline()) return;
+                pl.ultrahc.paper.util.Feedback.title(player,
+                        plugin.messages().component("welcome.main", null),
+                        plugin.messages().component("welcome.sub",
+                                java.util.Map.of("player", player.getName())));
+            }, 15L);
+        }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         var uuid = e.getPlayer().getUniqueId();
+        e.quitMessage(plugin.messages().component("quit-message",
+                java.util.Map.of("player", e.getPlayer().getName())));
         plugin.profiles().saveAndUnloadAsync(uuid);
         if (plugin.quests() != null) plugin.quests().unload(uuid);
         if (plugin.compass() != null) plugin.compass().clear(uuid);

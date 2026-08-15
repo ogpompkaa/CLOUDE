@@ -72,7 +72,7 @@ public class ArenaSelectGui implements Listener {
             if (slot >= inv.getSize()) break;
             inv.setItem(slot++, instanceIcon(info, msg));
         }
-        player.openInventory(inv);
+        GuiUtil.open(player, inv);
     }
 
     private ItemStack instanceIcon(InstanceInfo info, MessagesManager msg) {

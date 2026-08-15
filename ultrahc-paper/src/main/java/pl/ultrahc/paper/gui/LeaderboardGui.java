@@ -41,7 +41,7 @@ public class LeaderboardGui implements Listener {
         inv.setItem(2, icon(Material.DIAMOND_SWORD, "leaderboard-gui.kills-icon", Storage.LeaderboardType.KILLS));
         inv.setItem(4, icon(Material.GOLDEN_APPLE, "leaderboard-gui.wins-icon", Storage.LeaderboardType.WINS));
         inv.setItem(6, icon(Material.NETHER_STAR, "leaderboard-gui.level-icon", Storage.LeaderboardType.LEVEL));
-        player.openInventory(inv);
+        GuiUtil.open(player, inv);
     }
 
     private ItemStack icon(Material mat, String titleKey, Storage.LeaderboardType type) {

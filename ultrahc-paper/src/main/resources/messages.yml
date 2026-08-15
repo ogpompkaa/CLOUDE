@@ -6,6 +6,18 @@
 
 prefix: "&8[&6UltraHC&8] &7"
 
+# --------------------------- WEJSCIE / TABLIST -----------------------
+join-message: "&8[&a+&8] &e%player%"
+quit-message: "&8[&c-&8] &e%player%"
+
+tablist:
+  header: "&6&lULTRAHC\n&7Sezonowy tryb UHC\n"
+  footer: "\n&7Graczy online: &e%online%"
+
+welcome:
+  main: "&6&lULTRAHC"
+  sub: "&7Witaj, &e%player%&7!"
+
 # --------------------------- RANGI / BOSSBAR / TITLE -----------------
 rank:
   prefix: "&7[&6%level%✪&7] "        # przy nicku w TAB i nad glowa

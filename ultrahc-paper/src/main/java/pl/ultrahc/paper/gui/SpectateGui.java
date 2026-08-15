@@ -54,7 +54,7 @@ public class SpectateGui implements Listener {
                 inv.setItem(slot++, head(target));
             }
         }
-        player.openInventory(inv);
+        GuiUtil.open(player, inv);
     }
 
     private ItemStack head(Player target) {

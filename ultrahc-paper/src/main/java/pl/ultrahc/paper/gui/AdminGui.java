@@ -38,7 +38,7 @@ public class AdminGui implements Listener {
         holder.inv = inv;
         inv.setItem(2, tile("season", Material.GOLD_BLOCK, plugin.messages().raw("admin.panel-season")));
         inv.setItem(6, tile("instances", Material.COMMAND_BLOCK, plugin.messages().raw("admin.panel-instances")));
-        player.openInventory(inv);
+        GuiUtil.open(player, inv);
     }
 
     private ItemStack tile(String action, Material mat, String name) {

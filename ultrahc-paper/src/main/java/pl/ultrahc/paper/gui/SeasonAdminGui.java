@@ -34,7 +34,7 @@ public class SeasonAdminGui implements Listener {
         holder.inv = inv;
         inv.setItem(2, button(Material.LIME_CONCRETE, "&aRozpocznij sezon"));
         inv.setItem(6, button(Material.RED_CONCRETE, "&cZakoncz sezon (wyplata Top 3 + reset)"));
-        player.openInventory(inv);
+        GuiUtil.open(player, inv);
     }
 
     private ItemStack button(Material mat, String name) {

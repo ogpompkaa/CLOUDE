@@ -388,7 +388,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         String currencyName = msg.raw("currency.name");
         player.sendMessage(msg.prefixed("currency.balance", Map.of(
                 "name", currencyName,
-                "amount", String.valueOf(p.getCredits()))));
+                "amount", pl.ultrahc.paper.util.NumberUtil.grouped(p.getCredits()))));
         player.sendMessage(msg.prefixed("progress.status", Map.of(
                 "level", String.valueOf(p.getLevel()),
                 "star", plugin.levels().starSymbol(),

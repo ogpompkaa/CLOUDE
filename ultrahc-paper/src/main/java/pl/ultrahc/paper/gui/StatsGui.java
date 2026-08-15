@@ -49,7 +49,7 @@ public class StatsGui implements Listener {
         meta.setOwningPlayer(player);
         meta.displayName(LEGACY.deserialize("&e" + player.getName()));
         List<Component> lore = new ArrayList<>();
-        lore.add(LEGACY.deserialize(msg.raw("stats.xp", Map.of("value", String.valueOf(p.getCredits())))));
+        lore.add(LEGACY.deserialize(msg.raw("stats.xp", Map.of("value", pl.ultrahc.paper.util.NumberUtil.grouped(p.getCredits())))));
         lore.add(LEGACY.deserialize(msg.raw("stats.level", Map.of(
                 "level", String.valueOf(p.getLevel()),
                 "star", plugin.levels().starSymbol(),
@@ -61,7 +61,7 @@ public class StatsGui implements Listener {
         meta.lore(lore);
         head.setItemMeta(meta);
         inv.setItem(4, head);
-        player.openInventory(inv);
+        GuiUtil.open(player, inv);
     }
 
     @EventHandler

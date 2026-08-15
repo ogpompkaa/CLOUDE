@@ -9,4 +9,9 @@ public final class NumberUtil {
     public static String oneDecimalComma(double value) {
         return String.format("%.1f", value).replace('.', ',');
     }
+
+    /** Liczba z separatorem tysiecy (spacja, styl PL): np. 21 750. */
+    public static String grouped(long value) {
+        return String.format("%,d", value).replace(',', ' ');
+    }
 }

@@ -67,12 +67,12 @@ public class ShopGui implements Listener {
         long xp = profile != null ? profile.getCredits() : 0;
         ItemStack balance = new ItemStack(Material.GOLD_NUGGET);
         ItemMeta bm = balance.getItemMeta();
-        bm.displayName(LEGACY.deserialize(msg.raw("shop.balance", Map.of("amount", String.valueOf(xp)))));
+        bm.displayName(LEGACY.deserialize(msg.raw("shop.balance", Map.of("amount", pl.ultrahc.paper.util.NumberUtil.grouped(xp)))));
         bm.lore(List.of(LEGACY.deserialize(msg.raw("shop.balance-lore"))));
         balance.setItemMeta(bm);
         inv.setItem(22, balance);
 
-        player.openInventory(inv);
+        GuiUtil.open(player, inv);
     }
 
     private ItemStack icon(String id, String name, long price, boolean owned, MessagesManager msg) {
@@ -82,7 +82,7 @@ public class ShopGui implements Listener {
         List<net.kyori.adventure.text.Component> lore = new ArrayList<>();
         for (String line : msg.rawList("shop.desc." + id)) lore.add(LEGACY.deserialize(line));
         lore.add(net.kyori.adventure.text.Component.empty());
-        lore.add(LEGACY.deserialize(msg.raw("shop.price-line", Map.of("price", String.valueOf(price)))));
+        lore.add(LEGACY.deserialize(msg.raw("shop.price-line", Map.of("price", pl.ultrahc.paper.util.NumberUtil.grouped(price)))));
         lore.add(LEGACY.deserialize(owned ? msg.raw("shop.status-owned") : msg.raw("shop.status-buy")));
         meta.lore(lore);
         if (owned) meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);
