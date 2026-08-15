@@ -61,6 +61,8 @@ game:
   compass-enemy-unlocked: "&6Kompas moze teraz wskazywac najblizszego przeciwnika."
   showdown: "&4Sudden-death! &cWszyscy zywi trafiaja na arenke!"
   kill: "&e%victim% &7zostal wyeliminowany przez &c%killer%&7."
+  kill-weapon: "&c☠ &e%victim% &7zostal zabity przez &c%killer% &7(&f%weapon%&7)"
+  weapon-fist: "gole rece"
   death-generic: "&e%victim% &7zostal wyeliminowany."
   team-eliminated: "&7Druzyna &e%team% &7zostala wyeliminowana."
   win-team: "&6Wygrywa druzyna &e%team%&6!"

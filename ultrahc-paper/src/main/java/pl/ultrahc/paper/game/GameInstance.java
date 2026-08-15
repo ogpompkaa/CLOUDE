@@ -291,6 +291,7 @@ public class GameInstance {
                             plugin.messages().component("title.win-main", null),
                             plugin.messages().component("title.win-sub", null));
                     pl.ultrahc.paper.util.Feedback.win(wp);
+                    pl.ultrahc.paper.util.Feedback.winParticles(wp);
                 }
             }
         } else {

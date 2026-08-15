@@ -104,11 +104,18 @@ public class CombatListener implements Listener {
         if (plugin.heads() != null) {
             e.getDrops().add(plugin.heads().createHead(victim, "normal"));
         }
+        // Wybuch czastek w miejscu smierci.
+        pl.ultrahc.paper.util.Feedback.killParticles(victim.getLocation().add(0, 1, 0));
+
         // Eliminacja + nagroda za zabojstwo (w GameInstance).
         game.handleElimination(victim.getUniqueId(), killerId);
         if (killer != null) {
-            plugin.getServer().broadcast(plugin.messages().prefixed("game.kill",
-                    java.util.Map.of("victim", victim.getName(), "killer", killer.getName())));
+            plugin.getServer().broadcast(plugin.messages().prefixed("game.kill-weapon",
+                    java.util.Map.of("victim", victim.getName(), "killer", killer.getName(),
+                            "weapon", weaponName(killer))));
+        } else {
+            plugin.getServer().broadcast(plugin.messages().prefixed("game.death-generic",
+                    java.util.Map.of("victim", victim.getName())));
         }
 
         // Auto-respawn w nastepnym ticku (bez ekranu smierci) -> obsluze onRespawn.
@@ -129,6 +136,19 @@ public class CombatListener implements Listener {
             e.setRespawnLocation(game.world().getSpawnLocation());
             plugin.getServer().getScheduler().runTask(plugin, () -> player.setGameMode(GameMode.SPECTATOR));
         }
+    }
+
+    /** Czytelna nazwa broni w rece zabojcy (nazwa wlasna albo material). */
+    private String weaponName(Player killer) {
+        org.bukkit.inventory.ItemStack hand = killer.getInventory().getItemInMainHand();
+        if (hand == null || hand.getType().isAir()) {
+            return plugin.messages().raw("game.weapon-fist");
+        }
+        if (hand.hasItemMeta() && hand.getItemMeta().hasDisplayName()) {
+            return net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
+                    .serialize(hand.getItemMeta().displayName());
+        }
+        return hand.getType().name().toLowerCase(java.util.Locale.ROOT).replace('_', ' ');
     }
 
     private Player resolveAttacker(EntityDamageByEntityEvent e) {
