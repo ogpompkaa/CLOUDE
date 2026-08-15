@@ -6,12 +6,15 @@ import pl.ultrahc.paper.command.UhcCommand;
 import pl.ultrahc.paper.config.ConfigManager;
 import pl.ultrahc.paper.config.MessagesManager;
 import pl.ultrahc.paper.game.GameManager;
+import pl.ultrahc.paper.listener.ClassAbilityListener;
 import pl.ultrahc.paper.listener.CombatListener;
 import pl.ultrahc.paper.listener.CompassListener;
 import pl.ultrahc.paper.listener.DropsListener;
 import pl.ultrahc.paper.listener.HeadListener;
 import pl.ultrahc.paper.listener.ProfileListener;
+import pl.ultrahc.paper.manager.AbilityScheduler;
 import pl.ultrahc.paper.manager.BorderManager;
+import pl.ultrahc.paper.manager.ClassesManager;
 import pl.ultrahc.paper.manager.CompassManager;
 import pl.ultrahc.paper.manager.HeadManager;
 import pl.ultrahc.paper.manager.LevelsManager;
@@ -42,6 +45,8 @@ public class UltraHcPlugin extends JavaPlugin {
     private RewardManager rewardManager;
     private HeadManager headManager;
     private CompassManager compassManager;
+    private ClassesManager classesManager;
+    private AbilityScheduler abilityScheduler;
 
     @Override
     public void onEnable() {
@@ -66,6 +71,7 @@ public class UltraHcPlugin extends JavaPlugin {
         this.profileService = new ProfileService(this, storage);
         this.currencyManager = new ShopCurrencyManager();
         this.levelsManager = new LevelsManager(configManager);
+        this.classesManager = new ClassesManager(this, currencyManager); // buy/select w LOBBY, kit w ARENA
 
         // 4. Eventy i komendy
         getServer().getPluginManager().registerEvents(new ProfileListener(profileService), this);
@@ -82,17 +88,20 @@ public class UltraHcPlugin extends JavaPlugin {
             this.compassManager = new CompassManager(this);
             this.gameManager = new GameManager(this);
             this.scoreboardService = new ScoreboardService(this);
+            this.abilityScheduler = new AbilityScheduler(this);
 
             var pm = getServer().getPluginManager();
             pm.registerEvents(new DropsListener(this), this);
             pm.registerEvents(new CombatListener(this), this);
             pm.registerEvents(new HeadListener(this), this);
             pm.registerEvents(new CompassListener(this), this);
+            pm.registerEvents(new ClassAbilityListener(this), this);
 
             // Przygotowanie swiata blokuje watek glowny — robimy to po pelnym starcie serwera.
             getServer().getScheduler().runTask(this, () -> {
                 gameManager.enableArena();
                 scoreboardService.start();
+                abilityScheduler.start();
             });
         }
 
@@ -102,6 +111,7 @@ public class UltraHcPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (abilityScheduler != null) abilityScheduler.stop();
         if (scoreboardService != null) scoreboardService.stop();
         if (gameManager != null) gameManager.shutdown();
         if (profileService != null) profileService.saveAll();
@@ -120,4 +130,5 @@ public class UltraHcPlugin extends JavaPlugin {
     public RewardManager rewards() { return rewardManager; }
     public HeadManager heads() { return headManager; }
     public CompassManager compass() { return compassManager; }
+    public ClassesManager classes() { return classesManager; }
 }

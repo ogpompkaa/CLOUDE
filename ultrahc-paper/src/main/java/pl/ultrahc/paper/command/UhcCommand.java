@@ -41,6 +41,9 @@ public class UhcCommand implements CommandExecutor {
             case "forcestart" -> handleForce(sender, true);
             case "forceend" -> handleForce(sender, false);
             case "gameinfo" -> handleGameInfo(sender);
+            case "classes" -> handleClassList(sender);
+            case "class" -> handleClassSelect(sender, args);
+            case "buyclass" -> handleClassBuy(sender, args);
             default -> sender.sendMessage(msg.prefixed("general.unknown-subcommand", null));
         }
         return true;
@@ -86,6 +89,61 @@ public class UhcCommand implements CommandExecutor {
         } else {
             plugin.games().current().forceEnd();
             sender.sendMessage(msg.prefixed("admin.force-end", null));
+        }
+    }
+
+    private void handleClassList(CommandSender sender) {
+        MessagesManager msg = plugin.messages();
+        if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
+        PlayerProfile p = plugin.profiles().get(player.getUniqueId());
+        if (p == null) return;
+        sender.sendMessage(msg.legacy("&6Klasy:"));
+        for (String id : plugin.classes().ids()) {
+            boolean owned = plugin.classes().isUnlocked(p, id);
+            boolean sel = id.equals(p.getSelectedClass());
+            sender.sendMessage(msg.legacy("&7- &e" + plugin.classes().displayName(id)
+                    + " &7(" + plugin.classes().price(id) + " XP) "
+                    + (sel ? "&a[wybrana]" : owned ? "&a[posiadana]" : "&c[zablokowana]")));
+        }
+    }
+
+    private void handleClassSelect(CommandSender sender, String[] args) {
+        MessagesManager msg = plugin.messages();
+        if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
+        if (args.length < 2) { sender.sendMessage(msg.legacy("&cUzycie: /uhc class <id>")); return; }
+        PlayerProfile p = plugin.profiles().get(player.getUniqueId());
+        if (p == null) return;
+        String id = args[1].toLowerCase();
+        if (plugin.classes().select(p, id)) {
+            player.sendMessage(msg.prefixed("class.selected", Map.of("class", plugin.classes().displayName(id))));
+        } else {
+            player.sendMessage(msg.prefixed("class.locked", null));
+        }
+    }
+
+    private void handleClassBuy(CommandSender sender, String[] args) {
+        MessagesManager msg = plugin.messages();
+        if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
+        if (args.length < 2) { sender.sendMessage(msg.legacy("&cUzycie: /uhc buyclass <id>")); return; }
+        PlayerProfile p = plugin.profiles().get(player.getUniqueId());
+        if (p == null) return;
+        String id = args[1].toLowerCase();
+        if (!plugin.classes().exists(id)) { sender.sendMessage(msg.legacy("&cNie ma takiej klasy.")); return; }
+        if (plugin.classes().isUnlocked(p, id)) {
+            player.sendMessage(msg.prefixed("class.already-owned", null));
+            return;
+        }
+        long price = plugin.classes().price(id);
+        if (plugin.classes().buy(p, id)) {
+            player.sendMessage(msg.prefixed("class.bought", Map.of(
+                    "class", plugin.classes().displayName(id),
+                    "price", String.valueOf(price),
+                    "currency", msg.raw("currency.name"))));
+        } else {
+            player.sendMessage(msg.prefixed("currency.not-enough", Map.of(
+                    "name", msg.raw("currency.name"),
+                    "need", String.valueOf(price),
+                    "have", String.valueOf(p.getCredits()))));
         }
     }
 

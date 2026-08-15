@@ -127,6 +127,11 @@ public class GameInstance {
             p.setGameMode(GameMode.SURVIVAL);
             p.setHealth(20.0);
             p.setFoodLevel(20);
+            // Kit startowy wybranej klasy.
+            if (plugin.classes() != null) {
+                var prof = plugin.profiles().get(id);
+                plugin.classes().applyKit(p, prof != null ? prof.getSelectedClass() : "civil");
+            }
         }
         int noPvpMin = cfgInt("game.no-pvp-seconds", 600) / 60;
         broadcast("game.started", Map.of("minutes", String.valueOf(noPvpMin)));

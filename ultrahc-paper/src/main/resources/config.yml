@@ -153,16 +153,41 @@ shop:
     golden-head:      { price: 9099 }
     detector:         { price: 5550 }
 
-# --------------------------- KLASY (ceny w XP) -----------------------
+# --------------------------- KLASY (ceny w XP + parametry umiejetnosci) ------
 classes:
-  civil:    { price: 0 }
-  gornik:   { price: 21750 }
-  sniper:   { price: 29000 }
-  chef:     { price: 14999 }
-  fisher:   { price: 25000 }
-  yeti:     { price: 20000 }
-  smith:    { price: 24000 }
-  guard:    { price: 28000 }
+  civil:
+    price: 0
+  gornik:
+    price: 21750
+    ability:
+      extra-drop-chance: 0.125   # % dodatkowego dropu surowca ze stone (0.100-0.125)
+      extra-xp-orbs: 2           # dodatkowy natywny exp ze stone
+  sniper:
+    price: 29000
+    ability:
+      regen-seconds: 2           # Regeneracja I po trafieniu przeciwnika (1-2 s)
+  chef:
+    price: 14999
+    ability:
+      apple-bonus-chance: 3.0    # dodatkowa szansa (%) na jablko z lisci
+  fisher:
+    price: 25000
+    ability:
+      water-interval-seconds: 12 # co ile w wodzie dostaje buff
+      buff-seconds: 2            # czas Regen I + Speed I
+      book-protection-chance: 1.0    # % na ksiazke Ochrona I z lowienia
+      book-sharpness-chance: 0.65    # % na ksiazke Ostrosc I z lowienia
+  yeti:
+    price: 20000
+    ability:
+      speed-seconds: 2           # Speed I na sniegu/lodzie
+  smith:
+    price: 24000
+  guard:
+    price: 28000
+    ability:
+      extra-hearts: 2            # dodatkowe serduszka (kit)
+      slowness-seconds: 3        # Spowolnienie I + Odpornosc po otrzymaniu ciosu
 
 # Wykrywacz (receptura) — cooldown w sekundach.
 detector:
