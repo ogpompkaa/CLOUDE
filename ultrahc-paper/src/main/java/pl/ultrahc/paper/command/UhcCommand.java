@@ -44,6 +44,8 @@ public class UhcCommand implements CommandExecutor {
             case "classes" -> handleClassList(sender);
             case "class" -> handleClassSelect(sender, args);
             case "buyclass" -> handleClassBuy(sender, args);
+            case "shop" -> handleShop(sender);
+            case "buyrecipe" -> handleBuyRecipe(sender, args);
             default -> sender.sendMessage(msg.prefixed("general.unknown-subcommand", null));
         }
         return true;
@@ -89,6 +91,34 @@ public class UhcCommand implements CommandExecutor {
         } else {
             plugin.games().current().forceEnd();
             sender.sendMessage(msg.prefixed("admin.force-end", null));
+        }
+    }
+
+    private void handleShop(CommandSender sender) {
+        MessagesManager msg = plugin.messages();
+        if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
+        plugin.shopGui().open(player);
+    }
+
+    private void handleBuyRecipe(CommandSender sender, String[] args) {
+        MessagesManager msg = plugin.messages();
+        if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
+        if (args.length < 2) { sender.sendMessage(msg.legacy("&cUzycie: /uhc buyrecipe <id>")); return; }
+        PlayerProfile p = plugin.profiles().get(player.getUniqueId());
+        if (p == null) return;
+        String id = args[1].toLowerCase();
+        if (plugin.shop().owns(p, id)) { player.sendMessage(msg.prefixed("shop.already-owned-recipe", null)); return; }
+        long price = plugin.shop().price(id);
+        if (plugin.shop().buy(p, id)) {
+            player.sendMessage(msg.prefixed("shop.bought-recipe", Map.of(
+                    "recipe", plugin.shop().displayName(id),
+                    "price", String.valueOf(price),
+                    "currency", msg.raw("currency.name"))));
+        } else {
+            player.sendMessage(msg.prefixed("currency.not-enough", Map.of(
+                    "name", msg.raw("currency.name"),
+                    "need", String.valueOf(price),
+                    "have", String.valueOf(p.getCredits()))));
         }
     }
 

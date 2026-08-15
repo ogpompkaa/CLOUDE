@@ -10,17 +10,22 @@ import pl.ultrahc.paper.listener.ClassAbilityListener;
 import pl.ultrahc.paper.listener.CombatListener;
 import pl.ultrahc.paper.listener.CompassListener;
 import pl.ultrahc.paper.listener.DropsListener;
+import pl.ultrahc.paper.listener.DetectorListener;
 import pl.ultrahc.paper.listener.HeadListener;
+import pl.ultrahc.paper.listener.PandoraListener;
 import pl.ultrahc.paper.listener.ProfileListener;
+import pl.ultrahc.paper.gui.ShopGui;
 import pl.ultrahc.paper.manager.AbilityScheduler;
 import pl.ultrahc.paper.manager.BorderManager;
 import pl.ultrahc.paper.manager.ClassesManager;
 import pl.ultrahc.paper.manager.CompassManager;
 import pl.ultrahc.paper.manager.HeadManager;
 import pl.ultrahc.paper.manager.LevelsManager;
+import pl.ultrahc.paper.manager.RecipeManager;
 import pl.ultrahc.paper.manager.RewardManager;
 import pl.ultrahc.paper.manager.ScoreboardService;
 import pl.ultrahc.paper.manager.ShopCurrencyManager;
+import pl.ultrahc.paper.manager.ShopManager;
 import pl.ultrahc.paper.profile.ProfileService;
 import pl.ultrahc.paper.storage.StorageFactory;
 
@@ -47,6 +52,9 @@ public class UltraHcPlugin extends JavaPlugin {
     private CompassManager compassManager;
     private ClassesManager classesManager;
     private AbilityScheduler abilityScheduler;
+    private ShopManager shopManager;
+    private ShopGui shopGui;
+    private RecipeManager recipeManager;
 
     @Override
     public void onEnable() {
@@ -72,6 +80,9 @@ public class UltraHcPlugin extends JavaPlugin {
         this.currencyManager = new ShopCurrencyManager();
         this.levelsManager = new LevelsManager(configManager);
         this.classesManager = new ClassesManager(this, currencyManager); // buy/select w LOBBY, kit w ARENA
+        this.shopManager = new ShopManager(this, currencyManager);        // kupno receptur (obie role)
+        this.shopGui = new ShopGui(this);
+        getServer().getPluginManager().registerEvents(shopGui, this);
 
         // 4. Eventy i komendy
         getServer().getPluginManager().registerEvents(new ProfileListener(profileService), this);
@@ -89,6 +100,7 @@ public class UltraHcPlugin extends JavaPlugin {
             this.gameManager = new GameManager(this);
             this.scoreboardService = new ScoreboardService(this);
             this.abilityScheduler = new AbilityScheduler(this);
+            this.recipeManager = new RecipeManager(this);
 
             var pm = getServer().getPluginManager();
             pm.registerEvents(new DropsListener(this), this);
@@ -96,9 +108,13 @@ public class UltraHcPlugin extends JavaPlugin {
             pm.registerEvents(new HeadListener(this), this);
             pm.registerEvents(new CompassListener(this), this);
             pm.registerEvents(new ClassAbilityListener(this), this);
+            pm.registerEvents(recipeManager, this);
+            pm.registerEvents(new DetectorListener(this), this);
+            pm.registerEvents(new PandoraListener(this), this);
 
             // Przygotowanie swiata blokuje watek glowny — robimy to po pelnym starcie serwera.
             getServer().getScheduler().runTask(this, () -> {
+                recipeManager.registerAll();
                 gameManager.enableArena();
                 scoreboardService.start();
                 abilityScheduler.start();
@@ -131,4 +147,7 @@ public class UltraHcPlugin extends JavaPlugin {
     public HeadManager heads() { return headManager; }
     public CompassManager compass() { return compassManager; }
     public ClassesManager classes() { return classesManager; }
+    public ShopManager shop() { return shopManager; }
+    public ShopGui shopGui() { return shopGui; }
+    public RecipeManager recipes() { return recipeManager; }
 }

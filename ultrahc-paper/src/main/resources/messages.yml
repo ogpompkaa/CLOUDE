@@ -55,6 +55,11 @@ detector:
   used: "&aWykrywacz aktywowany. Wynik za &e%seconds%s&a."
   result: "&e%player% &7- &e%distance% &7kratek"
   cooldown: "&cWykrywacz na cooldownie: &e%seconds%s&c."
+  none: "&7Wykrywacz nie znalazl nikogo w poblizu."
+
+pandora:
+  reward: "&aPuszka Pandory: wypada &e%item%&a!"
+  curse: "&cPuszka Pandory: dopadla cie klatwa!"
 
 # --------------------------- SCOREBOARD ------------------------------
 scoreboard:
