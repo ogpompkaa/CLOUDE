@@ -75,6 +75,7 @@ public class WorldManager {
             if (world == null) continue;
             setupBorder(world);
             if (!requireBiomes || hasRequiredBiomes(world, gen)) {
+                startPregen(world);
                 return world;
             }
             plugin.getLogger().warning("[UltraHC] Swiat " + name + " nie ma wymaganych biomow — generuje kolejny.");
@@ -95,6 +96,24 @@ public class WorldManager {
         var border = world.getWorldBorder();
         border.setCenter(world.getSpawnLocation());
         border.setSize(start);
+    }
+
+    /**
+     * Uruchamia asynchroniczna pre-generacje reszty mapy przez Chunky (jesli obecny).
+     * Odciaza watek glowny w trakcie gry — chunki sa gotowe zanim gracze do nich dojda.
+     */
+    private void startPregen(World world) {
+        if (!config.raw().getBoolean("world.pregen.enabled", true)) return;
+        if (plugin.getServer().getPluginManager().getPlugin("Chunky") == null) return;
+        int radius = (int) (config.raw().getDouble("border.start", 1000) / 2
+                + config.raw().getInt("world.pregen.pad", 32));
+        var console = plugin.getServer().getConsoleSender();
+        var loc = world.getSpawnLocation();
+        plugin.getServer().dispatchCommand(console, "chunky world " + world.getName());
+        plugin.getServer().dispatchCommand(console, "chunky center " + loc.getBlockX() + " " + loc.getBlockZ());
+        plugin.getServer().dispatchCommand(console, "chunky radius " + radius);
+        plugin.getServer().dispatchCommand(console, "chunky start");
+        plugin.getLogger().info("[UltraHC] Chunky: pre-generacja " + world.getName() + " (promien " + radius + ").");
     }
 
     /** Kasuje swiat: rozladunek + usuniecie folderu z dysku. */

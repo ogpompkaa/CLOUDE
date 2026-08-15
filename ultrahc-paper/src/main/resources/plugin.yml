@@ -6,7 +6,7 @@ authors: [UltraHC]
 description: Niestandardowy tryb UHC (lobby + areny) dla sieci Paper/Velocity.
 
 # Zaleznosci opcjonalne — brak nie blokuje startu (graceful skip odpowiednich modulow)
-softdepend: [Citizens, DecentHolograms]
+softdepend: [Citizens, DecentHolograms, Chunky]
 
 commands:
   uhc:

@@ -65,8 +65,10 @@ arena-showdown:
 # --------------------------- SWIAT / GENERACJA -----------------------
 world:
   pool-size: 1                    # ile gotowych swiatow trzymac na arena-serwerze
-  pregen-async: true              # pre-generacja w tle w trakcie biezacej gry
   delete-after-game: true         # kasowanie swiata po grze
+  pregen:
+    enabled: true                 # pre-generacja reszty mapy w tle przez Chunky (jesli obecny)
+    pad: 32                       # dodatkowe bloki poza granica
   generation:
     require-biomes:
       enabled: true               # gwarancja zimnych biomow przez wybor seeda (Yeti)
@@ -246,6 +248,18 @@ quests:
       name: "Rozegraj 50 gier"
       reward-xp: 5000
       reward-pd: 1000
+
+# --------------------------- EFEKTY (dzwieki / czastki) --------------
+effects:
+  particles:                      # nazwy enuma org.bukkit.Particle
+    kill: CRIT
+    win: FIREWORK
+  sounds:                         # klucze Minecraft (z kropkami)
+    level-up: "entity.player.levelup"
+    buy: "entity.experience_orb.pickup"
+    kill: "entity.arrow.hit_player"
+    win: "ui.toast.challenge_complete"
+    error: "entity.villager.no"
 
 # --------------------------- SEZON -----------------------------------
 season:
