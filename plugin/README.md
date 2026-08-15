@@ -54,12 +54,13 @@ reloadable:
 - **Feedback service** — success/error/teleport **sounds** (`feedback.sounds`)
   and snappy **action-bar** confirmations for quick toggles
   (`feedback.action-bar`); errors always land in chat.
-- **Homes GUI** — `/homes` opens a chest menu (`gui/Menu` + `MenuListener`,
-  identified by `InventoryHolder`, all interactions cancelled so items can't be
-  stolen). Left-click a home to teleport, right-click to delete — which opens a
-  **Confirm / Cancel** menu; only Confirm runs the async delete, then the list
-  re-queries and reopens. New menus are opened one tick later to avoid
-  click-event desync.
+- **Homes GUI** — `/homes` opens a **paginated** chest menu (`gui/Menu` +
+  `MenuListener`, identified by `InventoryHolder`, all interactions cancelled so
+  items can't be stolen). Each home is the player's **head** with world/coord
+  lore; left-click teleports, right-click opens a **Confirm / Cancel** menu.
+  Only Confirm runs the async delete, then the list re-queries and reopens on
+  the same clamped page. 45 homes per page with a bottom nav row (‹ / page X/Y /
+  ›); new menus open one tick later to avoid click-event desync.
 
 ## Build
 

@@ -49,10 +49,16 @@ messages:
 
   gui:
     homes:
-      title: "<dark_gray>Twoje domy"
+      title: "<dark_gray>Twoje domy <gray>(<page>/<pages>)"
       entry-name: "<green><bold><name></bold>"
+      entry-world: "<dark_gray>Świat: <gray><world>"
+      entry-coords: "<dark_gray>X <gray><x>  <dark_gray>Y <gray><y>  <dark_gray>Z <gray><z>"
       entry-tp: "<gray>▶ Lewy klik, aby <white>teleportować</white>"
       entry-del: "<gray>✖ Prawy klik, aby <red>usunąć</red>"
+    nav:
+      prev: "<yellow>« Poprzednia strona"
+      next: "<yellow>Następna strona »"
+      page: "<gray>Strona <white><page></white> <dark_gray>/</dark_gray> <white><pages></white>"
     confirm:
       title: "<dark_red>Usunąć '<name>'?"
       info-name: "<red><bold><name></bold>"

@@ -17,15 +17,23 @@ import pl.corekit.storage.HomeRepository;
 import java.util.List;
 
 /**
- * GUI front-end for homes.
+ * Paginated GUI front-end for homes.
  *
- * <p>{@code /homes} opens a chest menu of the player's homes: left-click a home
- * to teleport, right-click to delete. Deletion never happens on a single click —
- * it opens a dedicated confirmation menu (Confirm / Cancel), and only Confirm
- * performs the async delete. After a delete the list is re-queried and reopened
- * so the menu always reflects live state.
+ * <p>{@code /homes} opens a chest menu of the player's homes rendered as their
+ * own player head, with world/coordinate lore. Left-click teleports (via the
+ * warm-up flow), right-click opens a Confirm/Cancel menu; only Confirm performs
+ * the async delete, after which the list is re-queried and reopened on the same
+ * (clamped) page. A bottom navigation row carries the page indicator and
+ * previous/next arrows.
  */
 public final class HomeGui {
+
+    /** Content slots per page: the top five rows; the sixth is navigation. */
+    private static final int PAGE_SIZE = 45;
+    private static final int MENU_SIZE = 54;
+    private static final int SLOT_PREV = 45;
+    private static final int SLOT_INFO = 49;
+    private static final int SLOT_NEXT = 53;
 
     private final CoreKitPlugin plugin;
     private final FeedbackService feedback;
@@ -44,10 +52,14 @@ public final class HomeGui {
         this.teleport = teleport;
     }
 
-    /** Fetches the player's homes off-thread, then opens the menu on the main thread. */
     public void open(Player player) {
+        open(player, 0);
+    }
+
+    /** Fetches the player's homes off-thread, then opens {@code page} on the main thread. */
+    public void open(Player player, int page) {
         repository.findAll(player.getUniqueId()).thenAccept(list ->
-                plugin.database().sync(() -> showHomes(player, list))
+                plugin.database().sync(() -> showHomes(player, list, page))
         ).exceptionally(throwable -> {
             plugin.getSLF4JLogger().warn("Failed to open homes GUI for {}", player.getName(), throwable);
             plugin.database().sync(() -> feedback.error(player, "command.error"));
@@ -55,35 +67,75 @@ public final class HomeGui {
         });
     }
 
-    private void showHomes(Player player, List<Home> list) {
+    private void showHomes(Player player, List<Home> list, int requestedPage) {
         if (list.isEmpty()) {
             player.closeInventory();
             feedback.error(player, "home.list-empty");
             return;
         }
 
-        int rows = Math.min(6, Math.max(1, (list.size() + 8) / 9));
-        Menu menu = new Menu(messages.render("gui.homes.title"), rows * 9);
+        int totalPages = (list.size() + PAGE_SIZE - 1) / PAGE_SIZE;
+        int page = Math.max(0, Math.min(requestedPage, totalPages - 1));
 
-        int slot = 0;
-        for (Home home : list) {
-            if (slot >= rows * 9) {
-                break;
-            }
-            ItemStack icon = Icons.of(Material.RED_BED,
-                    messages.render("gui.homes.entry-name", MessageService.placeholder("name", home.name())),
-                    List.of(
-                            messages.render("gui.homes.entry-tp"),
-                            messages.render("gui.homes.entry-del")));
-            menu.setButton(slot++, icon, event -> {
+        Menu menu = new Menu(messages.render("gui.homes.title",
+                MessageService.placeholder("page", String.valueOf(page + 1)),
+                MessageService.placeholder("pages", String.valueOf(totalPages))), MENU_SIZE);
+
+        int start = page * PAGE_SIZE;
+        int end = Math.min(start + PAGE_SIZE, list.size());
+        for (int i = start; i < end; i++) {
+            Home home = list.get(i);
+            menu.setButton(i - start, homeIcon(player, home), event -> {
                 if (event.isRightClick()) {
-                    later(() -> showConfirm(player, home.name()));
+                    later(() -> showConfirm(player, home.name(), page));
                 } else {
                     teleportTo(player, home);
                 }
             });
         }
+
+        buildNavigation(menu, player, list, page, totalPages);
         menu.open(player);
+    }
+
+    private ItemStack homeIcon(Player player, Home home) {
+        Component name = messages.render("gui.homes.entry-name",
+                MessageService.placeholder("name", home.name()));
+        List<Component> lore = List.of(
+                messages.render("gui.homes.entry-world",
+                        MessageService.placeholder("world", home.world())),
+                messages.render("gui.homes.entry-coords",
+                        MessageService.placeholder("x", String.valueOf((int) Math.floor(home.x()))),
+                        MessageService.placeholder("y", String.valueOf((int) Math.floor(home.y()))),
+                        MessageService.placeholder("z", String.valueOf((int) Math.floor(home.z())))),
+                Component.empty(),
+                messages.render("gui.homes.entry-tp"),
+                messages.render("gui.homes.entry-del"));
+        return Icons.head(player, name, lore);
+    }
+
+    private void buildNavigation(Menu menu, Player player, List<Home> list, int page, int totalPages) {
+        ItemStack filler = Icons.of(Material.GRAY_STAINED_GLASS_PANE, Component.empty(), List.of());
+        for (int slot = PAGE_SIZE; slot < MENU_SIZE; slot++) {
+            menu.setButton(slot, filler, null);
+        }
+
+        menu.setButton(SLOT_INFO, Icons.of(Material.PAPER,
+                messages.render("gui.nav.page",
+                        MessageService.placeholder("page", String.valueOf(page + 1)),
+                        MessageService.placeholder("pages", String.valueOf(totalPages))),
+                List.of()), null);
+
+        if (page > 0) {
+            menu.setButton(SLOT_PREV, Icons.of(Material.ARROW,
+                            messages.render("gui.nav.prev"), List.of()),
+                    event -> later(() -> showHomes(player, list, page - 1)));
+        }
+        if (page < totalPages - 1) {
+            menu.setButton(SLOT_NEXT, Icons.of(Material.ARROW,
+                            messages.render("gui.nav.next"), List.of()),
+                    event -> later(() -> showHomes(player, list, page + 1)));
+        }
     }
 
     private void teleportTo(Player player, Home home) {
@@ -97,11 +149,10 @@ public final class HomeGui {
         teleport.request(player, location, home.name());
     }
 
-    private void showConfirm(Player player, String name) {
+    private void showConfirm(Player player, String name, int page) {
         Menu menu = new Menu(
                 messages.render("gui.confirm.title", MessageService.placeholder("name", name)), 27);
 
-        // Filler glass around the choice for a cleaner look.
         ItemStack filler = Icons.of(Material.GRAY_STAINED_GLASS_PANE, Component.empty(), List.of());
         for (int i = 0; i < 27; i++) {
             menu.setButton(i, filler, null);
@@ -112,19 +163,19 @@ public final class HomeGui {
                 List.of(messages.render("gui.confirm.info-lore"))), null);
 
         menu.setButton(11, Icons.of(Material.LIME_WOOL,
-                messages.render("gui.confirm.yes"),
-                List.of(messages.render("gui.confirm.yes-lore"))),
-                event -> confirmDelete(player, name));
+                        messages.render("gui.confirm.yes"),
+                        List.of(messages.render("gui.confirm.yes-lore"))),
+                event -> confirmDelete(player, name, page));
 
         menu.setButton(15, Icons.of(Material.RED_WOOL,
-                messages.render("gui.confirm.no"),
-                List.of(messages.render("gui.confirm.no-lore"))),
-                event -> later(() -> open(player)));
+                        messages.render("gui.confirm.no"),
+                        List.of(messages.render("gui.confirm.no-lore"))),
+                event -> later(() -> open(player, page)));
 
         menu.open(player);
     }
 
-    private void confirmDelete(Player player, String name) {
+    private void confirmDelete(Player player, String name, int page) {
         repository.delete(player.getUniqueId(), name).thenAccept(removed ->
                 plugin.database().sync(() -> {
                     if (removed) {
@@ -135,7 +186,7 @@ public final class HomeGui {
                         feedback.error(player, "home.not-found",
                                 MessageService.placeholder("name", name));
                     }
-                    open(player); // refresh the list (closes the menu if now empty)
+                    open(player, page); // refresh; showHomes clamps the page if it shrank
                 })
         ).exceptionally(throwable -> {
             plugin.getSLF4JLogger().warn("Failed to delete home for {}", player.getName(), throwable);
