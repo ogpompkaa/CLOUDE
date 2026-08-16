@@ -87,9 +87,17 @@ public class ChatListener implements Listener {
     }
 
     // ---------------------------------------------------- formaty kanalow
+    /** Kolory w tresci dla graczy z perkiem (ultrahc.chat.color) — reszta pisze zwykly tekst. */
+    private Component effectiveMessage(Player src, Component original) {
+        if (src.hasPermission("ultrahc.chat.color")) {
+            return LEGACY.deserialize(PLAIN.serialize(original));
+        }
+        return original;
+    }
+
     private Component globalLine(Player src, Component message, net.kyori.adventure.audience.Audience viewer) {
         Component name = interactiveName(src);
-        Component line = name.append(LEGACY.deserialize(plugin.messages().raw("chat.separator"))).append(message);
+        Component line = name.append(LEGACY.deserialize(plugin.messages().raw("chat.separator"))).append(effectiveMessage(src, message));
         // Podswietlenie wzmianki nicku widza.
         if (viewer instanceof Player vp) {
             line = line.replaceText(b -> b.matchLiteral(vp.getName())
@@ -102,7 +110,7 @@ public class ChatListener implements Listener {
         // W kanale (Druzyna/Martwi) tylko sam prefiks rangi — kanal ma juz swoja etykiete.
         Component header = LEGACY.deserialize(plugin.messages().raw(key,
                 Map.of("prefix", plugin.groups().groupPrefix(src), "name", src.getName())));
-        return header.append(message.colorIfAbsent(bodyColor));
+        return header.append(effectiveMessage(src, message).colorIfAbsent(bodyColor));
     }
 
     /** Nick wg szablonu (ranga + poziom): hover = statystyki, klik = podpowiedz /msg. */

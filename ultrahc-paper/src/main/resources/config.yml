@@ -48,6 +48,7 @@ chat:
   cooldown-ms: 1500              # min. odstep miedzy wiadomosciami (0 = wylaczone)
   block-repeat: true             # blokuj powtarzanie tej samej wiadomosci
   ad-filter: true                # blokuj adresy/domeny (reklama innych serwerow)
+  msg-sound: "entity.experience_orb.pickup"   # dzwiek odebrania prywatnej wiadomosci (/msg)
 
 # Rangi serwerowe (czat/TAB/nametag). Nadawaj uprawnienia np. LuckPermsem:
 #   /lp user <gracz> permission set ultrahc.rank.vip true

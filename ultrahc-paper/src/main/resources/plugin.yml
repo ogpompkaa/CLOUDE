@@ -24,6 +24,14 @@ commands:
     usage: /pc <wiadomosc>
     permission: ultrahc.use
     permission-message: "Brak uprawnien."
+  msg:
+    description: Prywatna wiadomosc do gracza.
+    usage: /msg <gracz> <wiadomosc>
+    aliases: [pm, whisper]
+  r:
+    description: Odpowiedz na ostatnia prywatna wiadomosc.
+    usage: /r <wiadomosc>
+    aliases: [odp]
 
 permissions:
   ultrahc.use:
@@ -34,6 +42,9 @@ permissions:
     default: op
   ultrahc.chat.bypass:
     description: Pomija anty-spam i filtr reklam na czacie.
+    default: op
+  ultrahc.chat.color:
+    description: Pozwala uzywac kodow koloru (&) w wiadomosciach czatu.
     default: op
   ultrahc.build:
     description: Pozwala budowac w chronionym lobby/poczekalni.

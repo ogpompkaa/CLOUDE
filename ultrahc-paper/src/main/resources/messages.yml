@@ -52,6 +52,16 @@ chat:
   repeat: "&cNie powtarzaj tej samej wiadomosci."
   ad-blocked: "&cReklama innych serwerow/linki sa zabronione."
 
+# Prywatne wiadomosci (/msg, /r). format-* bez prefiksu (wlasny naglowek), reszta z prefiksem.
+msg:
+  format-out: "&8[&bTy &7→ &b%player%&8] &f"
+  format-in: "&8[&b%player% &7→ &bTy&8] &f"
+  usage: "&cUzycie: /msg <gracz> <wiadomosc>"
+  usage-reply: "&cUzycie: /r <wiadomosc>"
+  no-target: "&cNie ma takiego gracza online."
+  no-reply: "&cNie masz komu odpowiedziec."
+  self: "&cNie mozesz napisac do siebie."
+
 bossbar:
   waiting: "&aOczekiwanie na graczy: &e%count%&7/&e%min%"
   countdown: "&eStart gry za: &6%time%"

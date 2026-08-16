@@ -181,6 +181,12 @@ public class UltraHcPlugin extends JavaPlugin {
         }
         var pcCmd = getCommand("pc");
         if (pcCmd != null) pcCmd.setExecutor(new pl.ultrahc.paper.command.PartyChatCommand(this));
+        // Prywatne wiadomosci /msg + /r (wspolny handler = wspolna pamiec rozmow).
+        var pmHandler = new pl.ultrahc.paper.command.PrivateMessageCommand(this);
+        var msgCmd = getCommand("msg");
+        if (msgCmd != null) { msgCmd.setExecutor(pmHandler); msgCmd.setTabCompleter(pmHandler); }
+        var rCmd = getCommand("r");
+        if (rCmd != null) { rCmd.setExecutor(pmHandler); rCmd.setTabCompleter(pmHandler); }
         getServer().getPluginManager().registerEvents(partyGui, this);
 
         // 5. Managery zalezne od roli
