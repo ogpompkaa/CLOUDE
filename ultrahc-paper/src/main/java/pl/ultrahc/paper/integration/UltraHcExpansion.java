@@ -38,6 +38,8 @@ public class UltraHcExpansion extends PlaceholderExpansion {
             case "class" -> p.getSelectedClass() == null ? "" : p.getSelectedClass();
             case "star" -> plugin.levels().starLabel(p);
             case "rank" -> plugin.messages().legacyStrip(plugin.rankFormat().prefix(player.getUniqueId()));
+            case "group" -> plugin.groups() != null && player.isOnline()
+                    ? plugin.groups().of(player.getPlayer()).id() : "gracz";
             case "party_size" -> String.valueOf(partySize(player));
             case "party_leader" -> String.valueOf(plugin.party() != null && plugin.party().isLeader(player.getUniqueId()));
             default -> null; // null = placeholder nieznany (PAPI zostawi surowy tekst)

@@ -41,10 +41,11 @@ public class RankService {
         PlayerProfile profile = plugin.profiles().get(player.getUniqueId());
         if (profile == null) return;
 
-        String prefix = plugin.rankFormat().prefix(player.getUniqueId());
+        String prefix = plugin.groups().fullPrefix(player);           // ranga serwerowa + poziom/podium
+        String nameColor = plugin.groups().nameColor(player);
 
         // TAB — nick z ranga + naglowek/stopka.
-        player.playerListName(LEGACY.deserialize(prefix + "&f" + player.getName()));
+        player.playerListName(LEGACY.deserialize(prefix + nameColor + player.getName()));
         player.sendPlayerListHeaderAndFooter(
                 LEGACY.deserialize(plugin.messages().raw("tablist.header")),
                 LEGACY.deserialize(plugin.messages().raw("tablist.footer",

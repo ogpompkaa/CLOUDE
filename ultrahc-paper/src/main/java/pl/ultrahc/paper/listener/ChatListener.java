@@ -99,22 +99,23 @@ public class ChatListener implements Listener {
     }
 
     private Component channelLine(String key, Player src, Component message, NamedTextColor bodyColor) {
-        String prefix = plugin.rankFormat().prefix(src.getUniqueId());
+        String prefix = plugin.groups().fullPrefix(src); // ranga serwerowa + poziom/podium
         Component header = LEGACY.deserialize(plugin.messages().raw(key,
                 Map.of("prefix", prefix, "name", src.getName())));
         return header.append(message.colorIfAbsent(bodyColor));
     }
 
-    /** Nick z ranga: hover = statystyki, klik = podpowiedz /msg. */
+    /** Nick z ranga (serwerowa + poziom): hover = statystyki, klik = podpowiedz /msg. */
     private Component interactiveName(Player src) {
-        String prefix = plugin.rankFormat().prefix(src.getUniqueId());
+        String prefix = plugin.groups().fullPrefix(src);
+        String nameColor = plugin.groups().nameColor(src);
         PlayerProfile p = plugin.profiles().get(src.getUniqueId());
         Component hover = LEGACY.deserialize(plugin.messages().raw("chat.hover", Map.of(
                 "player", src.getName(),
                 "level", String.valueOf(p != null ? p.getLevel() : 0),
                 "kills", String.valueOf(p != null ? p.getKills() : 0),
                 "wins", String.valueOf(p != null ? p.getWins() : 0))));
-        return LEGACY.deserialize(prefix + "&f" + src.getName())
+        return LEGACY.deserialize(prefix + nameColor + src.getName())
                 .hoverEvent(HoverEvent.showText(hover))
                 .clickEvent(ClickEvent.suggestCommand("/msg " + src.getName() + " "));
     }

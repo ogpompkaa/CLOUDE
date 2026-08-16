@@ -49,6 +49,19 @@ chat:
   block-repeat: true             # blokuj powtarzanie tej samej wiadomosci
   ad-filter: true                # blokuj adresy/domeny (reklama innych serwerow)
 
+# Rangi serwerowe (czat/TAB/nametag). Nadawaj uprawnienia np. LuckPermsem:
+#   /lp user <gracz> permission set ultrahc.rank.vip true
+# Gracz dostaje range o najwyzszej wadze, do ktorej ma uprawnienie; GRACZ = domyslna.
+ranks:
+  groups:
+    owner:  { weight: 100, permission: "ultrahc.rank.owner",  prefix: "&4[OWNER] ",  name-color: "&4" }
+    admin:  { weight: 90,  permission: "ultrahc.rank.admin",  prefix: "&c[ADMIN] ",  name-color: "&c" }
+    mod:    { weight: 80,  permission: "ultrahc.rank.mod",    prefix: "&2[MOD] ",    name-color: "&2" }
+    helper: { weight: 70,  permission: "ultrahc.rank.helper", prefix: "&a[HELPER] ", name-color: "&a" }
+    svip:   { weight: 60,  permission: "ultrahc.rank.svip",   prefix: "&b[SVIP] ",   name-color: "&b" }
+    vip:    { weight: 50,  permission: "ultrahc.rank.vip",    prefix: "&6[VIP] ",    name-color: "&6" }
+    gracz:  { weight: 0,   permission: "",                    prefix: "&7",          name-color: "&7" }
+
 game:
   team-size: 1                    # 1=SOLO, 2=DUO, 3=TRIO, 4=SQUAD (parametr)
   min-players-to-countdown: 30    # 30. gracz uruchamia odliczanie

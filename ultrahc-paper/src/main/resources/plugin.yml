@@ -32,3 +32,24 @@ permissions:
   ultrahc.admin:
     description: Pelne uprawnienia administracyjne UltraHC.
     default: op
+  ultrahc.chat.bypass:
+    description: Pomija anty-spam i filtr reklam na czacie.
+    default: op
+  ultrahc.rank.owner:
+    description: Ranga OWNER (prefiks na czacie/TAB/nametag).
+    default: false
+  ultrahc.rank.admin:
+    description: Ranga ADMIN.
+    default: false
+  ultrahc.rank.mod:
+    description: Ranga MOD.
+    default: false
+  ultrahc.rank.helper:
+    description: Ranga HELPER.
+    default: false
+  ultrahc.rank.svip:
+    description: Ranga SVIP.
+    default: false
+  ultrahc.rank.vip:
+    description: Ranga VIP.
+    default: false

@@ -433,6 +433,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         plugin.configManager().load();
         plugin.messages().load();
         plugin.levels().reload();
+        if (plugin.groups() != null) plugin.groups().reload();
         sender.sendMessage(msg.prefixed("general.reloaded", null));
     }
 

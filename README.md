@@ -171,6 +171,18 @@ Wszystkie z tab-completion.
 Hub (menu główne), Klasy, Sklep, Statystyki, Questy (paski postępu), Topki, Obserwator
 (spectate), Panel admina, Zarządzanie instancjami, Zarządzanie sezonem.
 
+## Rangi serwerowe
+
+Rangi **OWNER / ADMIN / MOD / HELPER / SVIP / VIP / GRACZ** (prefiks na czacie, TAB i nad
+głową) oparte na uprawnieniach — konfigurowalne w `config.yml` (`ranks.groups`: prefiks,
+kolor nicku, waga, węzeł uprawnienia). Gracz dostaje rangę o najwyższej wadze, do której
+ma uprawnienie; **GRACZ** to domyślny fallback. Nadawaj np. LuckPermsem:
+```
+/lp user <gracz> permission set ultrahc.rank.vip true
+```
+System jest niezależny od poziomu „gwiazdki" — pełny prefiks łączy rangę serwerową
+z prefiksem poziomu/podium.
+
 ## PlaceholderAPI
 
 Gdy obecne PlaceholderAPI, plugin rejestruje ekspansję `ultrahc`:

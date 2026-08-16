@@ -96,6 +96,7 @@ public class UltraHcPlugin extends JavaPlugin {
     private BossBarService bossBarService;
     private RankService rankService;
     private RankFormat rankFormat;
+    private pl.ultrahc.paper.manager.GroupManager groupManager;
     private pl.ultrahc.paper.manager.AmbientEffects ambientEffects;
     private SpectateGui spectateGui;
     private pl.ultrahc.paper.party.PartyManager partyManager;
@@ -159,6 +160,7 @@ public class UltraHcPlugin extends JavaPlugin {
 
         // 4. Eventy i komendy
         this.rankFormat = new RankFormat(this);
+        this.groupManager = new pl.ultrahc.paper.manager.GroupManager(this); // rangi serwerowe (OWNER..GRACZ)
         getServer().getPluginManager().registerEvents(new ProfileListener(this), this);
         getServer().getPluginManager().registerEvents(new ChatListener(this), this); // czat z ranga (obie role)
         getServer().getPluginManager().registerEvents(new pl.ultrahc.paper.listener.MotdListener(this), this);
@@ -337,6 +339,7 @@ public class UltraHcPlugin extends JavaPlugin {
     public AdminGui adminGui() { return adminGui; }
     public InstanceAdminGui instanceAdminGui() { return instanceAdminGui; }
     public RankFormat rankFormat() { return rankFormat; }
+    public pl.ultrahc.paper.manager.GroupManager groups() { return groupManager; }
     public RankService ranks() { return rankService; }
     public ScoreboardService scoreboard() { return scoreboardService; }
     public SpectateGui spectateGui() { return spectateGui; }
