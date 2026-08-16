@@ -39,7 +39,7 @@ chat:
   # Uklad nicku (czat + TAB). Placeholdery: %podium% %group% %level% %namecolor% %name%.
   # Domyslnie: ranga z przodu, poziom subtelnie po nicku (bez podwojnych nawiasow).
   name-format: "%podium%%group%%namecolor%%name% %level%"
-  level-tag: "&8[&e%level%✦&8]"
+  level-tag: "&7%level%&8✦"
   hover: "&e%player%\n&7Poziom: &b%level%\n&7Kille: &c%kills%\n&7Wygrane: &a%wins%\n&8(klik = /msg)"
   team-format: "&2[Druzyna] %prefix%&f%name%&7: "
   spectator-format: "&8[Martwi] %prefix%&7%name%&8: "

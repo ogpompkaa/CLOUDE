@@ -55,12 +55,12 @@ chat:
 ranks:
   op-is-owner: true              # fallback bez LuckPerms: gracz z op dostaje range OWNER
   groups:
-    owner:  { weight: 100, permission: "ultrahc.rank.owner",  prefix: "&4[OWNER] ",  name-color: "&4" }
-    admin:  { weight: 90,  permission: "ultrahc.rank.admin",  prefix: "&c[ADMIN] ",  name-color: "&c" }
-    mod:    { weight: 80,  permission: "ultrahc.rank.mod",    prefix: "&2[MOD] ",    name-color: "&2" }
-    helper: { weight: 70,  permission: "ultrahc.rank.helper", prefix: "&a[HELPER] ", name-color: "&a" }
-    svip:   { weight: 60,  permission: "ultrahc.rank.svip",   prefix: "&b[SVIP] ",   name-color: "&b" }
-    vip:    { weight: 50,  permission: "ultrahc.rank.vip",    prefix: "&6[VIP] ",    name-color: "&6" }
+    owner:  { weight: 100, permission: "ultrahc.rank.owner",  prefix: "&4&lOWNER ",  name-color: "&4" }
+    admin:  { weight: 90,  permission: "ultrahc.rank.admin",  prefix: "&c&lADMIN ",  name-color: "&c" }
+    mod:    { weight: 80,  permission: "ultrahc.rank.mod",    prefix: "&2&lMOD ",    name-color: "&2" }
+    helper: { weight: 70,  permission: "ultrahc.rank.helper", prefix: "&a&lHELPER ", name-color: "&a" }
+    svip:   { weight: 60,  permission: "ultrahc.rank.svip",   prefix: "&bSVIP ",     name-color: "&b" }
+    vip:    { weight: 50,  permission: "ultrahc.rank.vip",    prefix: "&6VIP ",      name-color: "&6" }
     gracz:  { weight: 0,   permission: "",                    prefix: "&7",          name-color: "&7" }
 
 game:
