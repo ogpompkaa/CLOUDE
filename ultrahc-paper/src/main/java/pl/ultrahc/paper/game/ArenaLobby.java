@@ -41,5 +41,6 @@ public class ArenaLobby {
         player.teleport(spawn());
         player.setGameMode(GameMode.ADVENTURE);
         if (plugin.arenaLobbyListener() != null) plugin.arenaLobbyListener().giveHubItem(player);
+        pl.ultrahc.paper.util.Feedback.joinRing(player); // efekt wejscia do poczekalni
     }
 }

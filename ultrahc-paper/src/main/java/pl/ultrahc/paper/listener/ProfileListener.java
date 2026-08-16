@@ -32,6 +32,7 @@ public class ProfileListener implements Listener {
                         plugin.messages().component("welcome.main", null),
                         plugin.messages().component("welcome.sub",
                                 java.util.Map.of("player", player.getName())));
+                pl.ultrahc.paper.util.Feedback.joinRing(player); // efekt wejscia do huba
                 // Przedmiot menu w hotbarze (kompas otwiera Hub).
                 var compass = new org.bukkit.inventory.ItemStack(org.bukkit.Material.COMPASS);
                 var cm = compass.getItemMeta();

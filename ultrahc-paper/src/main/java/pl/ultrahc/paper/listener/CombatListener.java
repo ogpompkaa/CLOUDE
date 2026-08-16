@@ -62,6 +62,18 @@ public class CombatListener implements Listener {
         game.recordHit(victim.getUniqueId(), attacker.getUniqueId());
     }
 
+    /** Feedback trafien + liczby obrazen (po pelnej walidacji; nie odpala sie dla anulowanych ciosow). */
+    @EventHandler(priority = org.bukkit.event.EventPriority.MONITOR, ignoreCancelled = true)
+    public void onHitFeedback(EntityDamageByEntityEvent e) {
+        if (!(e.getEntity() instanceof org.bukkit.entity.LivingEntity victim)) return;
+        Player attacker = resolveAttacker(e);
+        if (attacker == null) return;
+        boolean crit = attacker.getFallDistance() > 0f && !attacker.isOnGround()
+                && !attacker.isInWater() && attacker.getVehicle() == null;
+        pl.ultrahc.paper.util.Feedback.damageIndicator(plugin, victim, e.getFinalDamage(), crit);
+        pl.ultrahc.paper.util.Feedback.hitEffect(attacker, victim, crit);
+    }
+
     // ---------------------------------------------- reconnect (okno powrotu)
     @EventHandler
     public void onQuit(org.bukkit.event.player.PlayerQuitEvent e) {

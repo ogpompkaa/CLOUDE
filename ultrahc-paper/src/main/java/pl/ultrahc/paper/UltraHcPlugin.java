@@ -225,9 +225,11 @@ public class UltraHcPlugin extends JavaPlugin {
                 abilityScheduler.start();
                 bossBarService.start();
                 instanceManager.startArena(); // heartbeat stanu instancji do rejestru
-                // Wizualia poczekalni: topki na hologramach + NPC (jesli ustawione pozycje).
+                // Wizualia poczekalni: topki na hologramach + NPC + ambient (jesli ustawione pozycje).
                 leaderboardsManager.start();
                 spawnLobbyNpcs();
+                this.ambientEffects = new pl.ultrahc.paper.manager.AmbientEffects(this);
+                ambientEffects.start();
             });
         }
 

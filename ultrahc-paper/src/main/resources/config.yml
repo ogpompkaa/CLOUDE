@@ -333,6 +333,11 @@ effects:
   win:                            # pokaz fajerwerkow nad zwyciezcami
     firework-shots: 6             # ile salw
     firework-interval-ticks: 12   # odstep miedzy salwami (20 tickow = 1s)
+  damage-numbers: true            # wyskakujace liczby obrazen nad trafionym (TextDisplay)
+  damage-numbers-ttl: 16          # jak dlugo widoczne (ticki)
+  hit-feedback: true              # czastki + dzwiek przy ciosie (mocniejsze przy krytyku)
+  levelup-celebration: true       # spirala czastek + fajerwerk przy awansie
+  join-ring: true                 # pierscien czastek + dzwiek przy wejsciu do lobby/poczekalni
 
 # --------------------------- SEZON -----------------------------------
 season:

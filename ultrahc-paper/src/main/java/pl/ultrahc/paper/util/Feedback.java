@@ -1,17 +1,25 @@
 package pl.ultrahc.paper.util;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
+import org.bukkit.plugin.Plugin;
 
 import java.time.Duration;
 import java.util.Locale;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Efekty dla graczy: tytuly, dzwieki i czastki. Dzwieki/czastki sa konfigurowalne
@@ -77,6 +85,72 @@ public final class Feedback {
         Location loc = p.getLocation().add(0, 1, 0);
         p.getWorld().spawnParticle(par("win", Particle.FIREWORK), loc, 60, 0.5, 1.0, 0.5, 0.1);
         p.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, loc, 30, 0.5, 1.0, 0.5, 0.0);
+    }
+
+    /** Wyskakujaca liczba obrazen nad ofiara (TextDisplay, znika po chwili). */
+    public static void damageIndicator(Plugin plugin, LivingEntity victim, double dmg, boolean crit) {
+        if (cfg != null && !cfg.getBoolean("effects.damage-numbers", true)) return;
+        var w = victim.getWorld();
+        if (w == null) return;
+        double ox = (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.6;
+        double oz = (ThreadLocalRandom.current().nextDouble() - 0.5) * 0.6;
+        Location loc = victim.getEyeLocation().add(ox, 0.35, oz);
+        String txt = (crit ? "✹ " : "") + fmtDamage(dmg);
+        TextDisplay td = w.spawn(loc, TextDisplay.class, d -> {
+            d.text(Component.text(txt, crit ? NamedTextColor.GOLD : NamedTextColor.RED));
+            d.setBillboard(Display.Billboard.CENTER);
+            d.setBackgroundColor(Color.fromARGB(0, 0, 0, 0)); // przezroczyste tlo
+            d.setShadowed(true);
+            d.setSeeThrough(false);
+        });
+        int ttl = cfg == null ? 16 : cfg.getInt("effects.damage-numbers-ttl", 16);
+        plugin.getServer().getScheduler().runTaskLater(plugin, td::remove, ttl);
+    }
+
+    /** Czastki i dzwiek przy zadaniu ciosu (mocniejsze przy krytyku). */
+    public static void hitEffect(Player attacker, Entity victim, boolean crit) {
+        if (cfg != null && !cfg.getBoolean("effects.hit-feedback", true)) return;
+        var w = victim.getWorld();
+        Location loc = victim.getLocation().add(0, 1.0, 0);
+        w.spawnParticle(par("hit", Particle.DAMAGE_INDICATOR), loc, crit ? 12 : 6, 0.2, 0.3, 0.2, 0.0);
+        if (crit) w.spawnParticle(Particle.ENCHANTED_HIT, loc, 16, 0.3, 0.3, 0.3, 0.1);
+        attacker.playSound(attacker.getLocation(),
+                crit ? Sound.ENTITY_PLAYER_ATTACK_CRIT : Sound.ENTITY_PLAYER_ATTACK_STRONG, 1.0f, 1.0f);
+    }
+
+    /** Efekt awansu: spirala czastek + fajerwerk wokol gracza. */
+    public static void levelUpCelebration(Plugin plugin, Player p) {
+        if (cfg != null && !cfg.getBoolean("effects.levelup-celebration", true)) return;
+        var w = p.getWorld();
+        for (int i = 0; i < 20; i++) {
+            final int step = i;
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                if (!p.isOnline()) return;
+                double angle = step * Math.PI / 5.0;
+                Location l = p.getLocation().add(Math.cos(angle) * 0.8, step * 0.12, Math.sin(angle) * 0.8);
+                w.spawnParticle(Particle.HAPPY_VILLAGER, l, 2, 0.05, 0.05, 0.05, 0);
+                w.spawnParticle(Particle.END_ROD, l, 1, 0, 0, 0, 0.01);
+            }, i);
+        }
+        launchFirework(p.getLocation().add(0, 1, 0));
+    }
+
+    /** Pierscien czastek + dzwiek przy wejsciu do lobby/poczekalni. */
+    public static void joinRing(Player p) {
+        if (cfg != null && !cfg.getBoolean("effects.join-ring", true)) return;
+        var w = p.getWorld();
+        Location c = p.getLocation();
+        for (int i = 0; i < 16; i++) {
+            double a = i * Math.PI / 8.0;
+            w.spawnParticle(Particle.HAPPY_VILLAGER, c.clone().add(Math.cos(a), 0.2, Math.sin(a)), 1, 0, 0, 0, 0);
+        }
+        p.playSound(c, Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.6f);
+    }
+
+    private static String fmtDamage(double dmg) {
+        return dmg == Math.floor(dmg)
+                ? "-" + (int) dmg
+                : "-" + String.format(Locale.US, "%.1f", dmg);
     }
 
     /** Wystrzeliwuje fajerwerk (efekt zwyciestwa). */

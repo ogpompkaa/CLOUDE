@@ -175,5 +175,6 @@ public class RewardManager {
                 msg.component("title.levelup-sub", Map.of(
                         "level", String.valueOf(profile.getLevel()), "star", plugin.levels().starSymbol())));
         pl.ultrahc.paper.util.Feedback.levelUp(p);
+        pl.ultrahc.paper.util.Feedback.levelUpCelebration(plugin, p);
     }
 }
