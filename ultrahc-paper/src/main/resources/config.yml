@@ -24,6 +24,7 @@ storage:
 
 # Sieć (koordynacja instancji miedzy serwerami).
 network:
+  hub-server: "lobby"          # nazwa serwera huba w Velocity (powrot z poczekalni areny)
   registry-poll-ms: 1500       # co ile lobby odpytuje rejestr instancji
   heartbeat-seconds: 3         # co ile arena-serwer odswieza swoj wiersz
   instance-stale-seconds: 10   # po tylu s bez heartbeatu instancja jest ignorowana

@@ -189,6 +189,7 @@ public class GameInstance {
             if (p == null) continue;
             p.teleport(randomSpread());
             p.setGameMode(GameMode.SURVIVAL);
+            p.getInventory().clear();   // czysty start UHC (usuwa m.in. przedmiot huba z poczekalni)
             p.setHealth(20.0);
             p.setFoodLevel(20);
             // Kit startowy wybranej klasy.

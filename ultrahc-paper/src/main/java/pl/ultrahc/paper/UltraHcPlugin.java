@@ -69,6 +69,7 @@ public class UltraHcPlugin extends JavaPlugin {
     private LevelsManager levelsManager;
     private GameManager gameManager;
     private pl.ultrahc.paper.game.ArenaLobby arenaLobby;
+    private pl.ultrahc.paper.listener.ArenaLobbyListener arenaLobbyListener;
     private BorderManager borderManager;
     private ScoreboardService scoreboardService;
     private RewardManager rewardManager;
@@ -205,6 +206,11 @@ public class UltraHcPlugin extends JavaPlugin {
             pm.registerEvents(new PandoraListener(this), this);
             this.spectateGui = new SpectateGui(this);
             pm.registerEvents(spectateGui, this);
+            // Powrot do huba z poczekalni (przedmiot + transfer BungeeCord).
+            this.arenaLobbyListener = new pl.ultrahc.paper.listener.ArenaLobbyListener(this);
+            pm.registerEvents(arenaLobbyListener, this);
+            getServer().getMessenger().registerOutgoingPluginChannel(this,
+                    pl.ultrahc.paper.listener.ArenaLobbyListener.BUNGEE_CHANNEL);
 
             // Przygotowanie swiata blokuje watek glowny — robimy to po pelnym starcie serwera.
             getServer().getScheduler().runTask(this, () -> {
@@ -306,6 +312,7 @@ public class UltraHcPlugin extends JavaPlugin {
     public LevelsManager levels() { return levelsManager; }
     public GameManager games() { return gameManager; }
     public pl.ultrahc.paper.game.ArenaLobby arenaLobby() { return arenaLobby; }
+    public pl.ultrahc.paper.listener.ArenaLobbyListener arenaLobbyListener() { return arenaLobbyListener; }
     public BorderManager border() { return borderManager; }
     public RewardManager rewards() { return rewardManager; }
     public HeadManager heads() { return headManager; }

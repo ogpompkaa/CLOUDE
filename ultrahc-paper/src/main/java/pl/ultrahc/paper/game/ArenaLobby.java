@@ -36,9 +36,10 @@ public class ArenaLobby {
         return loc != null ? loc : world().getSpawnLocation();
     }
 
-    /** Przenosi gracza do poczekalni w trybie przygotowania. */
+    /** Przenosi gracza do poczekalni w trybie przygotowania (z przedmiotem powrotu do huba). */
     public void send(Player player) {
         player.teleport(spawn());
         player.setGameMode(GameMode.ADVENTURE);
+        if (plugin.arenaLobbyListener() != null) plugin.arenaLobbyListener().giveHubItem(player);
     }
 }

@@ -212,6 +212,8 @@ arena:
   quick: "&6&lSzybkie dolaczenie"
   quick-lore: "&7Dolacz do najlepszej dostepnej areny."
   lobby-spawn-set: "&aUstawiono spawn poczekalni areny w swiecie &e%world%&a."
+  hub-item: "&c&lPowrot do huba &7(PPM)"
+  returning-hub: "&7Powrot do huba..."
 
 # --------------------------- KLASY / SKLEP ---------------------------
 class:

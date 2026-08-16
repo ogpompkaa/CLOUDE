@@ -106,6 +106,8 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
     private void handleLeave(CommandSender sender) {
         if (!(sender instanceof Player player)) return;
         if (plugin.games() != null) plugin.games().leave(player.getUniqueId());
+        // Na arenie: wyjscie z gry = powrot na hub (jesli skonfigurowany transfer).
+        if (plugin.arenaLobbyListener() != null) plugin.arenaLobbyListener().connectHub(player);
     }
 
     private void handleForce(CommandSender sender, boolean start) {
