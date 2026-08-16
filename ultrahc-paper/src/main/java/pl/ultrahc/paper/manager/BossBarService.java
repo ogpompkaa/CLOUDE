@@ -49,9 +49,10 @@ public class BossBarService {
             case RUNNING -> update(game);
             default -> { clearViewers(); return; }
         }
-        // Pokaz bossbar wszystkim w swiecie gry.
-        for (Player p : game.world().getPlayers()) {
-            if (viewers.add(p.getUniqueId())) p.showBossBar(bar);
+        // Pokaz bossbar wszystkim uczestnikom (dziala i w poczekalni, i na mapie meczu).
+        for (UUID id : game.participants()) {
+            Player p = plugin.getServer().getPlayer(id);
+            if (p != null && viewers.add(p.getUniqueId())) p.showBossBar(bar);
         }
     }
 

@@ -211,6 +211,7 @@ arena:
   connecting: "&aLaczenie z &e%id%&a..."
   quick: "&6&lSzybkie dolaczenie"
   quick-lore: "&7Dolacz do najlepszej dostepnej areny."
+  lobby-spawn-set: "&aUstawiono spawn poczekalni areny w swiecie &e%world%&a."
 
 # --------------------------- KLASY / SKLEP ---------------------------
 class:

@@ -75,6 +75,15 @@ arena-showdown:
   collapse-to-min: 60             # arenka zaciska sie do 0 do tej minuty
 
 # --------------------------- SWIAT / GENERACJA -----------------------
+# --------------------------- POCZEKALNIA ARENY ----------------------
+# Trwaly swiat, w ktorym gracze czekaja przed meczem (z hologramami/NPC/topkami).
+# Mecz rozgrywa sie w OSOBNYM, kasowanym swiecie (world.* nizej).
+arena:
+  lobby:
+    world: ""                     # nazwa swiata poczekalni; puste = glowny swiat serwera (level-name)
+    auto-join: true               # wchodzacy gracz automatycznie dolacza do gry w stanie WAITING
+    spawn: {}                     # {world,x,y,z,yaw,pitch} — ustaw in-game: /uhc setlobbyspawn
+
 world:
   pool-size: 1                    # ile gotowych swiatow trzymac na arena-serwerze
   delete-after-game: true         # kasowanie swiata po grze

@@ -67,8 +67,13 @@ public class GameInstance {
         if (participants.contains(player.getUniqueId())) return false;
 
         participants.add(player.getUniqueId());
-        player.teleport(world.getSpawnLocation());
-        player.setGameMode(GameMode.ADVENTURE); // poczekalnia przed startem
+        // Poczekalnia przed startem: trwaly swiat lobby areny (nie swiat meczu).
+        if (plugin.arenaLobby() != null) {
+            plugin.arenaLobby().send(player);
+        } else {
+            player.teleport(world.getSpawnLocation());
+            player.setGameMode(GameMode.ADVENTURE);
+        }
         int min = cfgInt("game.min-players-to-countdown", 30);
         broadcast("game.waiting", Map.of("count", String.valueOf(participants.size()), "min", String.valueOf(min)));
 

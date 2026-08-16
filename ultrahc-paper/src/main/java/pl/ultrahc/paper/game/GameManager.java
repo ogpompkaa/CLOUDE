@@ -29,6 +29,16 @@ public class GameManager {
     public void enableArena() {
         worldManager.ensurePool();
         startNewInstance();
+        autoJoinLobby(); // gracze juz obecni w poczekalni dolaczaja do WAITING
+    }
+
+    /** Dolacza do biezacej gry (WAITING) wszystkich graczy stojacych w poczekalni. */
+    public void autoJoinLobby() {
+        if (current == null || plugin.arenaLobby() == null) return;
+        if (!plugin.configManager().raw().getBoolean("arena.lobby.auto-join", true)) return;
+        for (Player p : plugin.arenaLobby().world().getPlayers()) {
+            current.addPlayer(p);
+        }
     }
 
     private void startNewInstance() {
@@ -57,18 +67,21 @@ public class GameManager {
             World oldWorld = ended.world();
             ended.shutdown();
             startNewInstance();
-            // Przenies pozostalych graczy na nowy swiat, potem skasuj stary.
-            World newWorld = current.world();
+            // Przenies pozostalych graczy z powrotem do poczekalni, potem skasuj stary swiat.
             for (UUID id : new ArrayList<>(ended.participants())) {
                 Player p = plugin.getServer().getPlayer(id);
-                if (p != null) {
-                    p.teleport(newWorld.getSpawnLocation());
+                if (p == null) continue;
+                if (plugin.arenaLobby() != null) {
+                    plugin.arenaLobby().send(p);
+                } else {
+                    p.teleport(current.world().getSpawnLocation());
                     p.setGameMode(GameMode.ADVENTURE);
                 }
             }
             if (plugin.configManager().raw().getBoolean("world.delete-after-game", true)) {
                 worldManager.deleteWorld(oldWorld);
             }
+            autoJoinLobby(); // gracze w poczekalni dolaczaja do nowej instancji
         }, delay);
     }
 

@@ -82,7 +82,7 @@ public class ScoreboardService {
         GameInstance game = plugin.games().current();
         if (game == null) return;
         var title = currentTitle();
-        for (Player player : game.world().getPlayers()) {
+        for (Player player : participantsOnline(game)) {
             var board = player.getScoreboard();
             if (board == null) continue;
             Objective obj = board.getObjective("uhc");
@@ -94,9 +94,19 @@ public class ScoreboardService {
         if (plugin.games() == null) return;
         GameInstance game = plugin.games().current();
         if (game == null) return;
-        for (Player player : game.world().getPlayers()) {
+        for (Player player : participantsOnline(game)) {
             updateFor(player, game);
         }
+    }
+
+    /** Uczestnicy gry, ktorzy sa online (dziala i w poczekalni, i na mapie meczu). */
+    private List<Player> participantsOnline(GameInstance game) {
+        List<Player> out = new ArrayList<>();
+        for (UUID id : game.participants()) {
+            Player p = plugin.getServer().getPlayer(id);
+            if (p != null) out.add(p);
+        }
+        return out;
     }
 
     private void updateFor(Player player, GameInstance game) {

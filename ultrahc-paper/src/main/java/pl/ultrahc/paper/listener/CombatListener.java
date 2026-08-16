@@ -72,21 +72,36 @@ public class CombatListener implements Listener {
     @EventHandler
     public void onJoin(org.bukkit.event.player.PlayerJoinEvent e) {
         GameInstance game = game();
-        if (game == null) return;
         Player player = e.getPlayer();
-        game.onReconnect(player.getUniqueId());
-        // Jesli gracz wrocil do nieistniejacego/starego swiata (gra sie skonczyla,
-        // swiat areny skasowany) — przenies go do biezacej instancji.
-        if (player.getWorld() != game.world()) {
-            plugin.getServer().getScheduler().runTask(plugin, () -> {
-                if (!player.isOnline()) return;
-                player.teleport(game.world().getSpawnLocation());
-                if (game.state() == pl.ultrahc.paper.game.GameState.WAITING
-                        || game.state() == pl.ultrahc.paper.game.GameState.COUNTDOWN) {
-                    player.setGameMode(GameMode.ADVENTURE);
-                }
-            });
+        // Brak gry — do poczekalni areny.
+        if (game == null) {
+            toLobby(player);
+            return;
         }
+        boolean participant = game.participants().contains(player.getUniqueId());
+        if (participant) {
+            // Reconnect uczestnika trwajacej gry — anuluj eliminacje i wroc na mape meczu.
+            game.onReconnect(player.getUniqueId());
+            if (player.getWorld() != game.world() && game.state() == pl.ultrahc.paper.game.GameState.RUNNING) {
+                plugin.getServer().getScheduler().runTask(plugin, () -> {
+                    if (player.isOnline()) player.teleport(game.world().getSpawnLocation());
+                });
+            }
+            return;
+        }
+        // Swiezy przybysz — do poczekalni i auto-dolaczenie (jesli gra czeka na graczy).
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            if (!player.isOnline()) return;
+            toLobby(player);
+            if (plugin.configManager().raw().getBoolean("arena.lobby.auto-join", true)) {
+                plugin.games().join(player); // addPlayer przeniesie do spawnu poczekalni
+            }
+        });
+    }
+
+    /** Przenosi gracza do poczekalni areny (spawn lobby + tryb przygotowania). */
+    private void toLobby(Player player) {
+        if (plugin.arenaLobby() != null) plugin.arenaLobby().send(player);
     }
 
     // ----------------------------------------- ochrona przed lawa/ogniem w no-PvP

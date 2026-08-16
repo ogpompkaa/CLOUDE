@@ -22,7 +22,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
     private static final List<String> SUBCOMMANDS = List.of(
             "balance", "reload", "givexp", "givepd", "resetseason", "join", "leave",
             "help", "forcestart", "forceend", "gameinfo", "menu", "spectate", "classes", "class", "buyclass",
-            "shop", "buyrecipe", "setnpc", "sethologram", "quests", "season", "stats", "setstat",
+            "shop", "buyrecipe", "setnpc", "sethologram", "setlobbyspawn", "quests", "season", "stats", "setstat",
             "admin", "instances");
 
     private final UltraHcPlugin plugin;
@@ -61,6 +61,7 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
             case "buyrecipe" -> handleBuyRecipe(sender, args);
             case "setnpc" -> handleSetNpc(sender, args);
             case "sethologram" -> handleSetHologram(sender, args);
+            case "setlobbyspawn" -> handleSetLobbySpawn(sender);
             case "quests" -> handleQuests(sender);
             case "season" -> handleSeason(sender, args);
             case "stats" -> handleStats(sender, args);
@@ -207,6 +208,15 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         writeLocation("lobby.leaderboards.holograms." + id, player.getLocation(), false);
         if (plugin.leaderboards() != null) plugin.leaderboards().refresh();
         sender.sendMessage(msg.prefixed("npc.hologram-set", Map.of("id", id)));
+    }
+
+    private void handleSetLobbySpawn(CommandSender sender) {
+        MessagesManager msg = plugin.messages();
+        if (!sender.hasPermission("ultrahc.admin")) { sender.sendMessage(msg.prefixed("general.no-permission", null)); return; }
+        if (!(sender instanceof Player player)) { sender.sendMessage(msg.prefixed("general.players-only", null)); return; }
+        writeLocation("arena.lobby.spawn", player.getLocation(), true);
+        sender.sendMessage(msg.prefixed("arena.lobby-spawn-set",
+                Map.of("world", player.getWorld().getName())));
     }
 
     private void writeLocation(String path, org.bukkit.Location loc, boolean withRotation) {

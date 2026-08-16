@@ -107,6 +107,13 @@ server:
 ```
 Każdy heartbeatuje swój stan do tabeli `instances`; lobby i proxy z niej czytają.
 
+**Poczekalnia areny.** Po transferze gracz ląduje w **trwałym świecie-poczekalni**
+areny (domyślnie główny świat serwera; `arena.lobby.world`) — tam są hologramy topek
+i NPC, gracze czekają na zebranie się grupy. Po odliczaniu plugin przenosi ich do
+**świeżo wygenerowanego świata meczu**, a po grze — z powrotem do poczekalni. Ustaw
+spawn poczekalni stojąc w miejscu: `/uhc setlobbyspawn`. Wizualia (`/uhc setnpc`,
+`/uhc sethologram`) ustawiasz w świecie poczekalni tak samo jak w hubie.
+
 ### 4. Lobby
 
 ```yaml

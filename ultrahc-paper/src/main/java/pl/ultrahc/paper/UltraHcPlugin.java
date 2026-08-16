@@ -68,6 +68,7 @@ public class UltraHcPlugin extends JavaPlugin {
     private ShopCurrencyManager currencyManager;
     private LevelsManager levelsManager;
     private GameManager gameManager;
+    private pl.ultrahc.paper.game.ArenaLobby arenaLobby;
     private BorderManager borderManager;
     private ScoreboardService scoreboardService;
     private RewardManager rewardManager;
@@ -183,10 +184,15 @@ public class UltraHcPlugin extends JavaPlugin {
             this.headManager = new HeadManager(this);
             this.compassManager = new CompassManager(this);
             this.gameManager = new GameManager(this);
+            this.arenaLobby = new pl.ultrahc.paper.game.ArenaLobby(this);
             this.scoreboardService = new ScoreboardService(this);
             this.abilityScheduler = new AbilityScheduler(this);
             this.bossBarService = new BossBarService(this);
             this.recipeManager = new RecipeManager(this);
+            // Poczekalnia areny ma te same wizualia co hub: hologramy, NPC, topki.
+            this.hologramManager = new DecentHologramsManager(this);
+            this.npcManager = new CitizensNpcManager(this);
+            this.leaderboardsManager = new LeaderboardsManager(this);
 
             var pm = getServer().getPluginManager();
             pm.registerEvents(new DropsListener(this), this);
@@ -208,6 +214,9 @@ public class UltraHcPlugin extends JavaPlugin {
                 abilityScheduler.start();
                 bossBarService.start();
                 instanceManager.startArena(); // heartbeat stanu instancji do rejestru
+                // Wizualia poczekalni: topki na hologramach + NPC (jesli ustawione pozycje).
+                leaderboardsManager.start();
+                spawnLobbyNpcs();
             });
         }
 
@@ -296,6 +305,7 @@ public class UltraHcPlugin extends JavaPlugin {
     public ShopCurrencyManager currency() { return currencyManager; }
     public LevelsManager levels() { return levelsManager; }
     public GameManager games() { return gameManager; }
+    public pl.ultrahc.paper.game.ArenaLobby arenaLobby() { return arenaLobby; }
     public BorderManager border() { return borderManager; }
     public RewardManager rewards() { return rewardManager; }
     public HeadManager heads() { return headManager; }
