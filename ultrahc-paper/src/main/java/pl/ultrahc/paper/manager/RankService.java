@@ -41,11 +41,8 @@ public class RankService {
         PlayerProfile profile = plugin.profiles().get(player.getUniqueId());
         if (profile == null) return;
 
-        String prefix = plugin.groups().fullPrefix(player);           // ranga serwerowa + poziom/podium
-        String nameColor = plugin.groups().nameColor(player);
-
-        // TAB — nick z ranga + naglowek/stopka.
-        player.playerListName(LEGACY.deserialize(prefix + nameColor + player.getName()));
+        // TAB — nick wg szablonu (ten sam co na czacie) + naglowek/stopka.
+        player.playerListName(LEGACY.deserialize(plugin.groups().displayName(player)));
         player.sendPlayerListHeaderAndFooter(
                 LEGACY.deserialize(plugin.messages().raw("tablist.header")),
                 LEGACY.deserialize(plugin.messages().raw("tablist.footer",
@@ -56,7 +53,7 @@ public class RankService {
         String teamName = "uhc_" + shortId(player);
         Team team = board.getTeam(teamName);
         if (team == null) team = board.registerNewTeam(teamName);
-        team.prefix(LEGACY.deserialize(prefix));
+        team.prefix(LEGACY.deserialize(plugin.groups().groupPrefix(player))); // krotki prefiks rangi nad glowa
         if (!team.hasEntry(player.getName())) team.addEntry(player.getName());
     }
 

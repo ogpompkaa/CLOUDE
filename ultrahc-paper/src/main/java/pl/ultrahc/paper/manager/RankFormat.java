@@ -28,6 +28,11 @@ public class RankFormat {
         return podiumTag(uuid) + plugin.messages().raw("rank.prefix", Map.of("level", String.valueOf(level)));
     }
 
+    /** Sam znacznik podium (#1/#2/#3 UHC) albo pusty — do budowy formatu nicku. */
+    public String podium(UUID uuid) {
+        return podiumTag(uuid);
+    }
+
     private String podiumTag(UUID uuid) {
         if (plugin.leaderboards() == null) return "";
         List<Storage.LeaderboardEntry> top = plugin.leaderboards().top(Storage.LeaderboardType.LEVEL);

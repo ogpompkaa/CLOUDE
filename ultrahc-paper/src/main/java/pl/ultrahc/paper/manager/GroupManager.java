@@ -2,10 +2,12 @@ package pl.ultrahc.paper.manager;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import pl.ultrahc.common.model.PlayerProfile;
 import pl.ultrahc.paper.UltraHcPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Rangi serwerowe (OWNER/ADMIN/MOD/HELPER/SVIP/VIP/GRACZ) — oparte na
@@ -74,7 +76,31 @@ public class GroupManager {
 
     public String nameColor(Player player) { return of(player).nameColor(); }
 
-    /** Pelny prefiks do wyswietlenia: ranga serwerowa + prefiks poziomu/podium. */
+    /** Sam prefiks rangi serwerowej (np. "&6[VIP] ") — do nametagow/kanalow. */
+    public String groupPrefix(Player player) { return of(player).prefix(); }
+
+    /**
+     * Pelny nick do wyswietlenia (czat/TAB) wg konfigurowalnego szablonu
+     * chat.name-format z placeholderami %podium% %group% %level% %namecolor% %name%.
+     * Dzieki temu uklad rang/poziomu jest w pelni edytowalny (bez podwojnych nawiasow).
+     */
+    public String displayName(Player player) {
+        var msg = plugin.messages();
+        Group g = of(player);
+        PlayerProfile prof = plugin.profiles().get(player.getUniqueId());
+        int level = prof != null ? prof.getLevel() : 0;
+        // Poziom 0 (nowy gracz) — bez znacznika, zeby nie zasmiecac nicku.
+        String levelTag = level > 0 ? msg.raw("chat.level-tag", Map.of("level", String.valueOf(level))) : "";
+        return msg.raw("chat.name-format")
+                .replace("%podium%", plugin.rankFormat().podium(player.getUniqueId()))
+                .replace("%group%", g.prefix())
+                .replace("%level%", levelTag)
+                .replace("%namecolor%", g.nameColor())
+                .replace("%name%", player.getName())
+                .trim();
+    }
+
+    /** Pelny prefiks (ranga + poziom/podium) — zachowane dla zgodnosci. */
     public String fullPrefix(Player player) {
         return of(player).prefix() + plugin.rankFormat().prefix(player.getUniqueId());
     }
