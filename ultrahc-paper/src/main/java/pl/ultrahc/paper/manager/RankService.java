@@ -41,12 +41,16 @@ public class RankService {
         PlayerProfile profile = plugin.profiles().get(player.getUniqueId());
         if (profile == null) return;
 
-        // TAB — nick wg szablonu (ten sam co na czacie) + naglowek/stopka.
+        // TAB — nick wg szablonu (ten sam co na czacie) + naglowek/stopka ze statystykami.
         player.playerListName(LEGACY.deserialize(plugin.groups().displayName(player)));
+        String rank = plugin.groups().groupPrefix(player);
         player.sendPlayerListHeaderAndFooter(
                 LEGACY.deserialize(plugin.messages().raw("tablist.header")),
-                LEGACY.deserialize(plugin.messages().raw("tablist.footer",
-                        Map.of("online", String.valueOf(plugin.getServer().getOnlinePlayers().size())))));
+                LEGACY.deserialize(plugin.messages().raw("tablist.footer", Map.of(
+                        "rank", rank,
+                        "level", String.valueOf(profile.getLevel()),
+                        "xp", pl.ultrahc.paper.util.NumberUtil.grouped(profile.getCredits()),
+                        "online", String.valueOf(plugin.getServer().getOnlinePlayers().size())))));
 
         // Nametag nad glowa (druzyna na glownym scoreboardzie).
         Scoreboard board = plugin.getServer().getScoreboardManager().getMainScoreboard();

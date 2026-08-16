@@ -151,18 +151,46 @@ public class ScoreboardService {
         healthBelowName(board, game);
         colorNametags(player, game, board);
         actionBar(player, game, msg);
-        gameTablist(player, game, msg);
+        tablist(player, game, msg);
     }
 
-    /** Naglowek/stopka listy graczy (TAB) podczas meczu: brand + zywi + faza + czas. */
-    private void gameTablist(Player player, GameInstance game, MessagesManager msg) {
-        if (game.state() != GameState.RUNNING || game.teams() == null) return;
+    /** Naglowek/stopka listy graczy (TAB): osobny widok dla poczekalni i dla meczu. */
+    private void tablist(Player player, GameInstance game, MessagesManager msg) {
+        long credits = 0;
+        PlayerProfile prof = plugin.profiles().get(player.getUniqueId());
+        if (prof != null) credits = prof.getCredits();
+
+        if (game.state() == GameState.RUNNING && game.teams() != null) {
+            var myTeam = game.teams().getTeam(player.getUniqueId());
+            int kills = myTeam != null ? myTeam.getKills() : 0;
+            player.sendPlayerListHeaderAndFooter(
+                    LEGACY.deserialize(msg.raw("tablist.game-header", Map.of(
+                            "alive", String.valueOf(game.teams().alivePlayers()),
+                            "phase", phaseLabel(game, msg),
+                            "time", TimeUtil.hms(game.elapsedSeconds())))),
+                    LEGACY.deserialize(msg.raw("tablist.game-footer", Map.of(
+                            "xp", NumberUtil.grouped(credits),
+                            "kills", String.valueOf(kills)))));
+            return;
+        }
+
+        // Poczekalnia: nick z ranga (RankService nie dziala na arenie) + info o grze.
+        if (plugin.groups() != null) {
+            player.playerListName(LEGACY.deserialize(plugin.groups().displayName(player)));
+        }
+        var cfg = plugin.configManager().raw();
+        String mode = pl.ultrahc.paper.manager.InstanceManager.modeName(cfg.getInt("game.team-size", 1));
+        int min = cfg.getInt("game.min-players-to-countdown", 30);
+        String countdown = game.state() == GameState.COUNTDOWN
+                ? msg.raw("tablist.lobby-countdown", Map.of("time", TimeUtil.ms(game.countdownRemaining())))
+                : "";
         player.sendPlayerListHeaderAndFooter(
-                LEGACY.deserialize(msg.raw("tablist.game-header", Map.of(
-                        "alive", String.valueOf(game.teams().alivePlayers()),
-                        "phase", phaseLabel(game, msg),
-                        "time", TimeUtil.hms(game.elapsedSeconds())))),
-                LEGACY.deserialize(msg.raw("tablist.game-footer")));
+                LEGACY.deserialize(msg.raw("tablist.lobby-header")),
+                LEGACY.deserialize(msg.raw("tablist.lobby-footer", Map.of(
+                        "mode", mode,
+                        "count", String.valueOf(game.participants().size()),
+                        "min", String.valueOf(min),
+                        "countdown", countdown))));
     }
 
     /** Liczba serc pod nickiem kazdego gracza (klasyka UHC). Sterowane configiem. */

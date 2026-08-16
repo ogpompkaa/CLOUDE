@@ -11,11 +11,16 @@ join-message: "&8[&a+&8] %rank%&e%player%"
 quit-message: "&8[&c-&8] %rank%&e%player%"
 
 tablist:
-  header: "&6&lULTRAHC\n&7Sezonowy tryb UHC\n"
-  footer: "\n&7Graczy online: &e%online%"
-  # TAB podczas meczu (naglowek/stopka nad lista graczy na arenie).
-  game-header: "\n&6&lULTRAHC\n&7Zywi: &a%alive% &8• &7Faza: &e%phase%\n&7Czas: &f%time%\n"
-  game-footer: "\n&8Trzymaj sie do konca!\n"
+  # Hub (lobby): branding + Twoje statystyki. Separator = &m na spacjach.
+  header: "&8&m                        &r\n&6&lULTRAHC\n&7Sezonowy tryb UHC\n&8&m                        "
+  footer: "&8&m                        &r\n&7Ranga: %rank%&r  &8•  &7Poziom: &b%level%✦\n&7Xp: &e%xp%  &8•  &7Online: &a%online%\n&8&m                        "
+  # Poczekalnia areny (przed startem meczu).
+  lobby-header: "&8&m                        &r\n&6&lULTRAHC &7Poczekalnia\n&8&m                        "
+  lobby-footer: "&7Tryb: &e%mode%  &8•  &7Gracze: &a%count%&7/&e%min%\n%countdown%&8&m                        "
+  lobby-countdown: "&7Start za: &e%time%\n"
+  # TAB podczas meczu.
+  game-header: "&8&m                        &r\n&6&lULTRAHC\n&7Zywi: &a%alive%  &8•  &7Faza: &e%phase%\n&7Czas: &f%time%\n&8&m                        "
+  game-footer: "&8&m                        &r\n&7Xp: &e%xp%  &8•  &7Kille druzyny: &c%kills%\n&8Trzymaj sie do konca!"
 
 welcome:
   main: "&6&lULTRAHC"
