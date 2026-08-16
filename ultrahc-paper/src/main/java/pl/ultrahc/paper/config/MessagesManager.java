@@ -27,8 +27,8 @@ public class MessagesManager {
     }
 
     public void load() {
-        plugin.saveResource("messages.yml", false);
         File file = new File(plugin.getDataFolder(), "messages.yml");
+        if (!file.exists()) plugin.saveResource("messages.yml", false); // bez zbednego WARN przy kolejnych startach
         this.cfg = YamlConfiguration.loadConfiguration(file);
         this.prefix = cfg.getString("prefix", "");
     }
