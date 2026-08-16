@@ -207,6 +207,7 @@ public class UltraHcPlugin extends JavaPlugin {
             pm.registerEvents(new DetectorListener(this), this);
             pm.registerEvents(new PandoraListener(this), this);
             pm.registerEvents(new pl.ultrahc.paper.listener.OldPvpListener(this), this); // PvP 1.8
+            pm.registerEvents(new pl.ultrahc.paper.listener.WorldRestrictionListener(this), this); // brak Nether/End
             this.spectateGui = new SpectateGui(this);
             pm.registerEvents(spectateGui, this);
             // Powrot do huba z poczekalni (przedmiot + transfer BungeeCord).

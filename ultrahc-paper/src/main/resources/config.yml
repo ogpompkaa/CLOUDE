@@ -113,6 +113,8 @@ arena:
 world:
   pool-size: 1                    # ile gotowych swiatow trzymac na arena-serwerze
   delete-after-game: true         # kasowanie swiata po grze
+  disable-nether: true            # brak Netheru: portale nie powstaja i nie przenosza
+  disable-end: true               # brak Endu: portal koncowy nieaktywny (blok oka endera)
   rules:                          # RDZEN UHC — reguly gry per-swiat areny
     difficulty: HARD              # UHC wymaga HARD (glod rani, wieksze obrazenia)
     natural-regeneration: false   # KLUCZOWE: brak samoistnego regenu; leczenie tylko zlote jablka/mikstury/klasy
