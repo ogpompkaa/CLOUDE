@@ -1,10 +1,13 @@
 package pl.ultrahc.paper.listener;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPortalEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.world.PortalCreateEvent;
@@ -48,6 +51,18 @@ public class WorldRestrictionListener implements Listener {
         if (netherOff() && (e.getReason() == PortalCreateEvent.CreateReason.FIRE
                 || e.getReason() == PortalCreateEvent.CreateReason.NETHER_PAIR)) {
             e.setCancelled(true);
+        }
+    }
+
+    /** Blokada skrzyni Endera (brak wspoldzielonego/bezpiecznego schowka miedzy smierciami). */
+    @EventHandler(ignoreCancelled = true)
+    public void onEnderChest(InventoryOpenEvent e) {
+        if (!plugin.configManager().raw().getBoolean("game.disable-enderchest", true)) return;
+        if (e.getInventory().getType() == InventoryType.ENDER_CHEST) {
+            e.setCancelled(true);
+            if (e.getPlayer() instanceof Player p) {
+                p.sendMessage(plugin.messages().prefixed("game.enderchest-blocked", null));
+            }
         }
     }
 

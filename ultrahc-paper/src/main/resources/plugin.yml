@@ -35,6 +35,9 @@ permissions:
   ultrahc.chat.bypass:
     description: Pomija anty-spam i filtr reklam na czacie.
     default: op
+  ultrahc.build:
+    description: Pozwala budowac w chronionym lobby/poczekalni.
+    default: op
   ultrahc.rank.owner:
     description: Ranga OWNER (prefiks na czacie/TAB/nametag).
     default: false

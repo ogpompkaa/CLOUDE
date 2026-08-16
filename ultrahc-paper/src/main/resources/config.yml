@@ -65,6 +65,7 @@ ranks:
 
 game:
   team-size: 1                    # 1=SOLO, 2=DUO, 3=TRIO, 4=SQUAD (parametr)
+  disable-enderchest: true        # blokada skrzyni Endera (brak schowka miedzy smierciami)
   min-players-to-countdown: 30    # 30. gracz uruchamia odliczanie
   max-players: 100
   countdown-seconds: 180          # 3 min po zebraniu 30
@@ -115,6 +116,7 @@ world:
   delete-after-game: true         # kasowanie swiata po grze
   disable-nether: true            # brak Netheru: portale nie powstaja i nie przenosza
   disable-end: true               # brak Endu: portal koncowy nieaktywny (blok oka endera)
+  lobby-protection: true          # anti-grief w lobby/poczekalni (bez niszczenia/obrazen/glodu; ekipa: ultrahc.build)
   rules:                          # RDZEN UHC — reguly gry per-swiat areny
     difficulty: HARD              # UHC wymaga HARD (glod rani, wieksze obrazenia)
     natural-regeneration: false   # KLUCZOWE: brak samoistnego regenu; leczenie tylko zlote jablka/mikstury/klasy

@@ -164,6 +164,7 @@ public class UltraHcPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ProfileListener(this), this);
         getServer().getPluginManager().registerEvents(new ChatListener(this), this); // czat z ranga (obie role)
         getServer().getPluginManager().registerEvents(new pl.ultrahc.paper.listener.MotdListener(this), this);
+        getServer().getPluginManager().registerEvents(new pl.ultrahc.paper.listener.LobbyProtectionListener(this), this); // anti-grief lobby
         var cmd = getCommand("uhc");
         if (cmd != null) {
             UhcCommand handler = new UhcCommand(this);

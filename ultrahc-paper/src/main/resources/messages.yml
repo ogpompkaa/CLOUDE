@@ -133,6 +133,7 @@ game:
   reconnect-window: "&eMasz &6%seconds%s &ena powrot do gry."
   join-failed: "&cNie mozna dolaczyc (gra w toku lub pelna)."
   pvp-not-active: "&cPvP jeszcze nieaktywne."
+  enderchest-blocked: "&cSkrzynia Endera jest wylaczona."
 
 head:
   consumed: "&aZjadles glowke — otrzymujesz efekty."
