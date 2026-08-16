@@ -199,26 +199,27 @@ scoreboard:
     - "&6&lULT&f&lR&6&lAHC"
     - "&6&lUL&f&lT&6&lRAHC"
     - "&6&lU&f&lL&6&lTRAHC"
-  top-line: "&e%pos% %team% &7%kills%"          # Top 3 druzyny
-  self-marker: "&a> %team% &7%kills%"            # marker druzyny gracza
-  teammate: "&7- %name%"                         # wspoltowarzysz (znika w solo)
-  border-line: "&6%size%"                        # zlota liczba = rozmiar granicy
-  currency-label: "&7Xp: &e%amount%"             # celowo 'Xp:' jak na zrzucie
-  alive-label: "&7Zywi: &a%count%"
-  timer: "&f%time%"                              # HH:MM:SS
+  sep: "&8&m               &r"                    # linia separatora (pusta = brak)
+  top-line: "&e%pos% &f%team% &8⚔ &7%kills%"     # Top 3 druzyny
+  self-marker: "&a▶ &f%team% &8⚔ &7%kills%"      # marker druzyny gracza
+  teammate: "&7 • %name%"                        # wspoltowarzysz (znika w solo)
+  border-line: "&6⬡ Granica: &l%size%"           # zlota liczba = rozmiar granicy
+  currency-label: "&b✦ &7Xp: &e%amount%"         # celowo 'Xp:' jak na zrzucie
+  alive-label: "&c❤ &7Zywi: &a%count%"
+  timer: "&e⏱ &f%time%"                          # HH:MM:SS
   waiting: "&7Gracze: &a%count%&7/&e%max%"       # widok przed startem
   state-waiting: "&eOczekiwanie..."
-  footer: "&eULTRAHC"                             # linia stopki (pusta = brak)
+  footer: "&6&lplay.twojserwer.pl"               # linia stopki (pusta = brak)
   empty: ""
   # --- Osobny widok POCZEKALNI (przed startem meczu) ---
   lobby-state: "&e&lPOCZEKALNIA"
   lobby-mode: "&7Tryb: &e%mode%"
   lobby-players: "&7Gracze: &a%count%&7/&e%min%"
-  lobby-countdown: "&7Start za: &e%time%"
-  lobby-stats: "&6Twoje statystyki:"
-  lobby-level: "&7Poziom: &b%level%"
-  lobby-kills: "&7Zabojstwa: &c%kills%"
-  lobby-wins: "&7Wygrane: &a%wins%"
+  lobby-countdown: "&e⏱ &7Start za: &e%time%"
+  lobby-stats: "&6✦ Twoje statystyki:"
+  lobby-level: "&7 Poziom: &b%level%✦"
+  lobby-kills: "&7 Zabojstwa: &c%kills%"
+  lobby-wins: "&7 Wygrane: &a%wins%"
 
 actionbar:
   hud: "&e%phase% &8• &aZywi: &f%alive% &8• &6Granica: &f%size% &8• &cKille: &f%kills%"

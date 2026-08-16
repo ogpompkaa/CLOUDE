@@ -290,6 +290,7 @@ public class ScoreboardService {
             int kills = profile != null ? profile.getKills() : 0;
             int wins = profile != null ? profile.getWins() : 0;
 
+            addSep(lines, msg);
             lines.add(legacy(msg.raw("scoreboard.lobby-state")));
             lines.add(legacy(msg.raw("scoreboard.lobby-mode", Map.of("mode", mode))));
             lines.add(legacy(msg.raw("scoreboard.lobby-players", Map.of(
@@ -305,13 +306,14 @@ public class ScoreboardService {
             lines.add(legacy(msg.raw("scoreboard.lobby-kills", Map.of("kills", String.valueOf(kills)))));
             lines.add(legacy(msg.raw("scoreboard.lobby-wins", Map.of("wins", String.valueOf(wins)))));
             String lobbyFooter = msg.raw("scoreboard.footer");
-            if (lobbyFooter != null && !lobbyFooter.isBlank()) { lines.add(""); lines.add(legacy(lobbyFooter)); }
+            if (lobbyFooter != null && !lobbyFooter.isBlank()) { addSep(lines, msg); lines.add(legacy(lobbyFooter)); }
             return lines;
         }
 
         var teams = game.teams();
         Team myTeam = teams.getTeam(player.getUniqueId());
 
+        addSep(lines, msg);
         // Top 3 druzyny wg killi.
         int pos = 1;
         for (Team t : teams.topByKills(3)) {
@@ -348,10 +350,16 @@ public class ScoreboardService {
         // Opcjonalna stopka (branding).
         String footer = msg.raw("scoreboard.footer");
         if (footer != null && !footer.isBlank()) {
-            lines.add("");
+            addSep(lines, msg);
             lines.add(legacy(footer));
         }
         return lines;
+    }
+
+    /** Dodaje linie separatora (scoreboard.sep); pusta gdy klucz pusty. */
+    private void addSep(List<String> lines, MessagesManager msg) {
+        String s = msg.raw("scoreboard.sep");
+        lines.add(s == null || s.isBlank() ? "" : legacy(s));
     }
 
     private String nameOf(UUID uuid) {
