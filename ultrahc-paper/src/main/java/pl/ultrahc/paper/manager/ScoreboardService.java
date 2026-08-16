@@ -171,6 +171,7 @@ public class ScoreboardService {
         var myTeam = game.teams().getTeam(player.getUniqueId());
         int kills = myTeam != null ? myTeam.getKills() : 0;
         player.sendActionBar(msg.component("actionbar.hud", Map.of(
+                "phase", phaseLabel(game, msg),
                 "alive", String.valueOf(game.teams().alivePlayers()),
                 "size", NumberUtil.oneDecimalComma(game.world().getWorldBorder().getSize()),
                 "kills", String.valueOf(kills))));
@@ -181,6 +182,25 @@ public class ScoreboardService {
                 && player.getHealth() > 0 && player.getHealth() <= lowHearts * 2.0) {
             player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 0.7f, 0.6f);
         }
+    }
+
+    /** Etykieta biezacej fazy gry na action barze (odliczanie PvP / kurczenia / arenka). */
+    private String phaseLabel(GameInstance game, MessagesManager msg) {
+        var cfg = plugin.configManager().raw();
+        long elapsed = game.elapsedSeconds();
+        int noPvp = cfg.getInt("game.no-pvp-seconds", 600);
+        int shrinkStart = cfg.getInt("border.shrink-start-min", 10) * 60;
+        int showdown = cfg.getInt("arena-showdown.teleport-min", 45) * 60;
+        if (elapsed < noPvp) {
+            return msg.raw("actionbar.phase-pvp", Map.of("time", TimeUtil.ms(noPvp - elapsed)));
+        }
+        if (elapsed < shrinkStart) {
+            return msg.raw("actionbar.phase-shrink-soon", Map.of("time", TimeUtil.ms(shrinkStart - elapsed)));
+        }
+        if (elapsed < showdown) {
+            return msg.raw("actionbar.phase-shrinking", Map.of());
+        }
+        return msg.raw("actionbar.phase-showdown", Map.of());
     }
 
     /** Koloruje nicki nad glowa z perspektywy widza: sojusznik zielony, wrog czerwony. */
@@ -220,14 +240,30 @@ public class ScoreboardService {
         if (profile != null) currency = profile.getCredits();
 
         if (game.state() == GameState.WAITING || game.state() == GameState.COUNTDOWN || game.teams() == null) {
-            // Widok przed startem — ten sam szkielet, ale bez druzyn.
-            lines.add(legacy(msg.raw("scoreboard.state-waiting")));
-            lines.add(legacy(msg.raw("scoreboard.waiting", Map.of(
-                    "count", String.valueOf(game.participants().size()),
-                    "max", String.valueOf(plugin.configManager().raw().getInt("game.max-players", 100))))));
+            // Osobny widok POCZEKALNI: info o grze + statystyki gracza (nie uklad meczu).
+            var cfg = plugin.configManager().raw();
+            int min = cfg.getInt("game.min-players-to-countdown", 30);
+            String mode = pl.ultrahc.paper.manager.InstanceManager.modeName(cfg.getInt("game.team-size", 1));
+            int level = profile != null ? profile.getLevel() : 0;
+            int kills = profile != null ? profile.getKills() : 0;
+            int wins = profile != null ? profile.getWins() : 0;
+
+            lines.add(legacy(msg.raw("scoreboard.lobby-state")));
+            lines.add(legacy(msg.raw("scoreboard.lobby-mode", Map.of("mode", mode))));
+            lines.add(legacy(msg.raw("scoreboard.lobby-players", Map.of(
+                    "count", String.valueOf(game.participants().size()), "min", String.valueOf(min)))));
+            if (game.state() == GameState.COUNTDOWN) {
+                lines.add(legacy(msg.raw("scoreboard.lobby-countdown",
+                        Map.of("time", TimeUtil.ms(game.countdownRemaining())))));
+            }
             lines.add("");
+            lines.add(legacy(msg.raw("scoreboard.lobby-stats")));
+            lines.add(legacy(msg.raw("scoreboard.lobby-level", Map.of("level", String.valueOf(level)))));
             lines.add(legacy(msg.raw("scoreboard.currency-label", Map.of("amount", NumberUtil.grouped(currency)))));
-            lines.add(legacy(msg.raw("scoreboard.timer", Map.of("time", TimeUtil.hms(0)))));
+            lines.add(legacy(msg.raw("scoreboard.lobby-kills", Map.of("kills", String.valueOf(kills)))));
+            lines.add(legacy(msg.raw("scoreboard.lobby-wins", Map.of("wins", String.valueOf(wins)))));
+            String lobbyFooter = msg.raw("scoreboard.footer");
+            if (lobbyFooter != null && !lobbyFooter.isBlank()) { lines.add(""); lines.add(legacy(lobbyFooter)); }
             return lines;
         }
 

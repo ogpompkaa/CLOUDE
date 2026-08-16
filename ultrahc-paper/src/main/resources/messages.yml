@@ -171,9 +171,22 @@ scoreboard:
   state-waiting: "&eOczekiwanie..."
   footer: "&eULTRAHC"                             # linia stopki (pusta = brak)
   empty: ""
+  # --- Osobny widok POCZEKALNI (przed startem meczu) ---
+  lobby-state: "&e&lPOCZEKALNIA"
+  lobby-mode: "&7Tryb: &e%mode%"
+  lobby-players: "&7Gracze: &a%count%&7/&e%min%"
+  lobby-countdown: "&7Start za: &e%time%"
+  lobby-stats: "&6Twoje statystyki:"
+  lobby-level: "&7Poziom: &b%level%"
+  lobby-kills: "&7Zabojstwa: &c%kills%"
+  lobby-wins: "&7Wygrane: &a%wins%"
 
 actionbar:
-  hud: "&aZywi: &f%alive% &8• &6Granica: &f%size% &8• &cKille druzyny: &f%kills%"
+  hud: "&e%phase% &8• &aZywi: &f%alive% &8• &6Granica: &f%size% &8• &cKille: &f%kills%"
+  phase-pvp: "&aPvP za %time%"
+  phase-shrink-soon: "&eKurczenie za %time%"
+  phase-shrinking: "&cKurczenie granicy"
+  phase-showdown: "&5Arenka!"
 
 killstreak:
   broadcast: "&c⚔ &e%player% &7ma serie &c%streak% &7zabojstw!"
