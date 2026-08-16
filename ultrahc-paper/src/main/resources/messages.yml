@@ -13,6 +13,9 @@ quit-message: "&8[&c-&8] &e%player%"
 tablist:
   header: "&6&lULTRAHC\n&7Sezonowy tryb UHC\n"
   footer: "\n&7Graczy online: &e%online%"
+  # TAB podczas meczu (naglowek/stopka nad lista graczy na arenie).
+  game-header: "\n&6&lULTRAHC\n&7Zywi: &a%alive% &8• &7Faza: &e%phase%\n&7Czas: &f%time%\n"
+  game-footer: "\n&8Trzymaj sie do konca!\n"
 
 welcome:
   main: "&6&lULTRAHC"
@@ -58,6 +61,10 @@ title:
   kill-reward-sub: "&b+%pd% PD"
   death-main: "&c&lZGINALES"
   death-sub: "&7Zabil Cie: &e%killer%"
+  countdown-main: "&e&l%seconds%"
+  countdown-sub: "&7Przygotuj sie!"
+  start-main: "&a&lSTART!"
+  start-sub: "&7Powodzenia!"
 
 help:
   header: "&6&lUltraHC &7— komendy:"

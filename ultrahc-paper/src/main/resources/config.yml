@@ -301,6 +301,9 @@ effects:
     enabled: true
     lightning: true               # kosmetyczny piorun (bez obrazen)
     pillar: true                  # slup czastek w gore
+  win:                            # pokaz fajerwerkow nad zwyciezcami
+    firework-shots: 6             # ile salw
+    firework-interval-ticks: 12   # odstep miedzy salwami (20 tickow = 1s)
 
 # --------------------------- SEZON -----------------------------------
 season:

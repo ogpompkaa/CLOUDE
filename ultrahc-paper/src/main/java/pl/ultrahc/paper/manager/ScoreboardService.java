@@ -121,6 +121,8 @@ public class ScoreboardService {
         if (obj == null) {
             obj = board.registerNewObjective("uhc", Criteria.DUMMY, currentTitle());
             obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+            // Ukryj czerwone numery po prawej (czysty wyglad tablicy).
+            obj.numberFormat(io.papermc.paper.scoreboard.numbers.NumberFormat.blank());
         } else {
             obj.displayName(currentTitle());
         }
@@ -149,6 +151,18 @@ public class ScoreboardService {
         healthBelowName(board, game);
         colorNametags(player, game, board);
         actionBar(player, game, msg);
+        gameTablist(player, game, msg);
+    }
+
+    /** Naglowek/stopka listy graczy (TAB) podczas meczu: brand + zywi + faza + czas. */
+    private void gameTablist(Player player, GameInstance game, MessagesManager msg) {
+        if (game.state() != GameState.RUNNING || game.teams() == null) return;
+        player.sendPlayerListHeaderAndFooter(
+                LEGACY.deserialize(msg.raw("tablist.game-header", Map.of(
+                        "alive", String.valueOf(game.teams().alivePlayers()),
+                        "phase", phaseLabel(game, msg),
+                        "time", TimeUtil.hms(game.elapsedSeconds())))),
+                LEGACY.deserialize(msg.raw("tablist.game-footer")));
     }
 
     /** Liczba serc pod nickiem kazdego gracza (klasyka UHC). Sterowane configiem. */

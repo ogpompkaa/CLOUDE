@@ -152,8 +152,15 @@ public class GameInstance {
                 || countdownRemaining == 10 || countdownRemaining <= 5) {
             broadcast("game.countdown", Map.of("seconds", String.valueOf(countdownRemaining)));
             if (countdownRemaining <= 5) {
-                // Ostatnie sekundy: rosnacy pitch.
+                // Ostatnie sekundy: rosnacy pitch + wielki tytul odliczania.
                 soundAll(org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f + (5 - countdownRemaining) * 0.15f);
+                var main = plugin.messages().component("title.countdown-main",
+                        Map.of("seconds", String.valueOf(countdownRemaining)));
+                var sub = plugin.messages().component("title.countdown-sub", null);
+                for (UUID id : participants) {
+                    Player p = plugin.getServer().getPlayer(id);
+                    if (p != null) pl.ultrahc.paper.util.Feedback.title(p, main, sub);
+                }
             } else {
                 soundAll(org.bukkit.Sound.BLOCK_NOTE_BLOCK_HAT, 1.0f);
             }
@@ -200,6 +207,7 @@ public class GameInstance {
         }
         int noPvpMin = cfgInt("game.no-pvp-seconds", 600) / 60;
         broadcast("game.started", Map.of("minutes", String.valueOf(noPvpMin)));
+        titleAll("title.start-main", "title.start-sub");       // wielki tytul STARTu
         soundAll(org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 2.0f); // jasny dzwiek startu gry
         if (plugin.rewards() != null) plugin.rewards().startAccrual(this);
         startTicker(); // dziala tez przy force-starcie z WAITING
@@ -312,9 +320,9 @@ public class GameInstance {
                             plugin.messages().component("title.win-sub", null));
                     pl.ultrahc.paper.util.Feedback.win(wp);
                     pl.ultrahc.paper.util.Feedback.winParticles(wp);
-                    pl.ultrahc.paper.util.Feedback.launchFirework(wp.getLocation());
                 }
             }
+            scheduleWinFireworks(winner); // pokaz fajerwerkow nad zwyciezcami (kilka salw)
         } else {
             broadcast("game.death-generic", Map.of("victim", "-"));
         }
@@ -328,6 +336,20 @@ public class GameInstance {
         stopTicker();
         // Sprzatanie zleci GameManager (kasowanie swiata + nowa instancja).
         plugin.games().onInstanceEnded(this);
+    }
+
+    /** Pokaz fajerwerkow nad zwyciezcami: kilka salw w odstepach (konfigurowalny). */
+    private void scheduleWinFireworks(Team winner) {
+        int shots = Math.max(1, cfgInt("effects.win.firework-shots", 6));
+        long interval = Math.max(1, cfgInt("effects.win.firework-interval-ticks", 12));
+        for (int i = 0; i < shots; i++) {
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                for (UUID id : winner.getMembers()) {
+                    Player wp = plugin.getServer().getPlayer(id);
+                    if (wp != null) pl.ultrahc.paper.util.Feedback.launchFirework(wp.getLocation().add(0, 1, 0));
+                }
+            }, i * interval);
+        }
     }
 
     /** Twardy tiebreak przy wymuszonym koncu: kille -> pozostale serca. */
