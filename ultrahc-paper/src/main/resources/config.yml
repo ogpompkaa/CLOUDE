@@ -53,6 +53,7 @@ chat:
 #   /lp user <gracz> permission set ultrahc.rank.vip true
 # Gracz dostaje range o najwyzszej wadze, do ktorej ma uprawnienie; GRACZ = domyslna.
 ranks:
+  op-is-owner: true              # fallback bez LuckPerms: gracz z op dostaje range OWNER
   groups:
     owner:  { weight: 100, permission: "ultrahc.rank.owner",  prefix: "&4[OWNER] ",  name-color: "&4" }
     admin:  { weight: 90,  permission: "ultrahc.rank.admin",  prefix: "&c[ADMIN] ",  name-color: "&c" }

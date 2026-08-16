@@ -56,7 +56,20 @@ public class GroupManager {
         for (Group g : ranked) {
             if (player.hasPermission(g.permission())) return g;
         }
+        // Fallback dla malego/testowego setupu bez LuckPerms: op = OWNER.
+        if (player.isOp() && plugin.configManager().raw().getBoolean("ranks.op-is-owner", true)) {
+            Group owner = ownerGroup();
+            if (owner != null) return owner;
+        }
         return defaultGroup;
+    }
+
+    /** Grupa OWNER (po id albo najwyzsza waga) — do fallbacku op. */
+    private Group ownerGroup() {
+        for (Group g : ranked) {
+            if (g.id().equalsIgnoreCase("owner")) return g;
+        }
+        return ranked.isEmpty() ? null : ranked.get(0);
     }
 
     public String nameColor(Player player) { return of(player).nameColor(); }
