@@ -434,6 +434,13 @@ public class UhcCommand implements CommandExecutor, TabCompleter {
         plugin.messages().load();
         plugin.levels().reload();
         if (plugin.groups() != null) plugin.groups().reload();
+        if (plugin.quests() != null) plugin.quests().loadDefs();        // odswiez definicje questow
+        // WAZNE: reloadConfig() podmienia obiekt configu — odswiez referencje w Feedback.
+        pl.ultrahc.paper.util.Feedback.configure(plugin.configManager().raw());
+        // Zaloguj ewentualne ostrzezenia walidatora po zmianie configu.
+        for (String warn : pl.ultrahc.paper.config.ConfigValidator.validate(plugin.configManager().raw())) {
+            plugin.getLogger().warning("[UltraHC] Config: " + warn);
+        }
         sender.sendMessage(msg.prefixed("general.reloaded", null));
     }
 
