@@ -1,5 +1,7 @@
 package pl.ultrahc.paper.game;
 
+import org.bukkit.Difficulty;
+import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Biome;
@@ -92,12 +94,40 @@ public class WorldManager {
 
     /** Ustawia granice startowa (srodek = spawn, srednica = border.start). */
     public void setupBorder(World world) {
+        applyGameRules(world);
         double start = config.raw().getDouble("border.start", 1000);
         var border = world.getWorldBorder();
         border.setCenter(world.getSpawnLocation());
         border.setSize(start);
         border.setWarningDistance(config.raw().getInt("border.warning-blocks", 30));
         border.setWarningTime(config.raw().getInt("border.warning-seconds", 5));
+    }
+
+    /**
+     * Reguly gry UHC per-swiat (RDZEN trybu). Domyslnie: brak naturalnej regeneracji
+     * (leczenie tylko przez zlote jablka/mikstury/klasy), trudnosc HARD, brak
+     * phantomow i cyklu pogody. Wszystko sterowane z config.yml (world.rules.*).
+     */
+    public void applyGameRules(World world) {
+        var c = config.raw();
+        String diff = c.getString("world.rules.difficulty", "HARD");
+        try {
+            world.setDifficulty(Difficulty.valueOf(diff.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().warning("[UltraHC] Nieznana trudnosc '" + diff + "' — ustawiam HARD.");
+            world.setDifficulty(Difficulty.HARD);
+        }
+        world.setGameRule(GameRule.NATURAL_REGENERATION, c.getBoolean("world.rules.natural-regeneration", false));
+        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, c.getBoolean("world.rules.daylight-cycle", true));
+        world.setGameRule(GameRule.DO_WEATHER_CYCLE, c.getBoolean("world.rules.weather-cycle", false));
+        world.setGameRule(GameRule.DO_INSOMNIA, c.getBoolean("world.rules.insomnia", false));
+        world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, c.getBoolean("world.rules.announce-advancements", false));
+        world.setGameRule(GameRule.KEEP_INVENTORY, c.getBoolean("world.rules.keep-inventory", false));
+        world.setGameRule(GameRule.MOB_GRIEFING, c.getBoolean("world.rules.mob-griefing", true));
+        world.setGameRule(GameRule.DO_FIRE_TICK, c.getBoolean("world.rules.fire-tick", true));
+        world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, c.getBoolean("world.rules.show-death-messages", true));
+        // Pogoda wyczyszczona na start (spojnie z wylaczonym cyklem, jesli wylaczony).
+        if (!c.getBoolean("world.rules.weather-cycle", false)) world.setStorm(false);
     }
 
     /**

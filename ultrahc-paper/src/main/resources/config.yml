@@ -76,6 +76,17 @@ arena-showdown:
 world:
   pool-size: 1                    # ile gotowych swiatow trzymac na arena-serwerze
   delete-after-game: true         # kasowanie swiata po grze
+  rules:                          # RDZEN UHC — reguly gry per-swiat areny
+    difficulty: HARD              # UHC wymaga HARD (glod rani, wieksze obrazenia)
+    natural-regeneration: false   # KLUCZOWE: brak samoistnego regenu; leczenie tylko zlote jablka/mikstury/klasy
+    daylight-cycle: true          # cykl dnia (false = zamrozony czas)
+    weather-cycle: false          # brak deszczu/burz (czysta rozgrywka)
+    insomnia: false               # brak phantomow po 3 dniach bez snu
+    announce-advancements: false  # bez spamu osiagniec na czacie
+    keep-inventory: false         # smierc = utrata ekwipunku (UHC)
+    mob-griefing: true            # creepery niszcza teren (klasyczne UHC)
+    fire-tick: true               # ogien sie rozprzestrzenia
+    show-death-messages: true     # komunikaty smierci
   pregen:
     enabled: true                 # pre-generacja reszty mapy w tle przez Chunky (jesli obecny)
     pad: 32                       # dodatkowe bloki poza granica
