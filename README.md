@@ -39,6 +39,7 @@ Artefakty:
 ## Wariant A — pojedynczy serwer (dev / testy)
 
 Najszybszy sposób sprawdzenia mechanik gry.
+> Gotowy przewodnik krok-po-kroku na pierwszy test solo: [`docs/LOKALNY.md`](docs/LOKALNY.md).
 
 1. Wgraj `UltraHC-*.jar` do `plugins/` na serwerze Paper 1.21.x (Java 21).
 2. Wystartuj serwer — powstaną `plugins/UltraHC/{config.yml, messages.yml, ultrahc.db}`.
