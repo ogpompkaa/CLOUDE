@@ -14,6 +14,7 @@ topki na hologramach, NPC, oraz architektura sieciowa pod ~1000 graczy w wielu g
 - **Velocity 3.3.x** (proxy) — dla sieci wieloserwerowej
 - **MySQL/MariaDB** — dla produkcji/sieci (dev może działać na SQLite)
 - Opcjonalnie na lobby: **Citizens** (NPC) i **DecentHolograms** (hologramy topek)
+- Opcjonalnie gdziekolwiek: **PlaceholderAPI** (placeholdery `%ultrahc_*%`), **Chunky** (pre-gen)
 
 ## Budowanie
 
@@ -61,6 +62,9 @@ Najszybszy sposób sprawdzenia mechanik gry.
 Architektura: **Velocity** (proxy) → **1 lobby** + **N aren** (1 arena-serwer = 1 gra
 = 1 świat 1000×1000). Skalowanie „w bok": dokładasz kolejne arena-serwery.
 Uzasadnienie w [`DECYZJE.md`](DECYZJE.md#1-architektura-sieci).
+
+> **Gotowy zestaw startowy** (przykładowe `velocity.toml`, `server.properties`, skrypty)
+> w [`examples/`](examples), a przewodnik krok-po-kroku w [`docs/SIEC.md`](docs/SIEC.md).
 
 ### 1. Baza danych (MySQL) — WYMAGANA w sieci
 
@@ -156,10 +160,21 @@ Wszystkie z tab-completion.
 Hub (menu główne), Klasy, Sklep, Statystyki, Questy (paski postępu), Topki, Obserwator
 (spectate), Panel admina, Zarządzanie instancjami, Zarządzanie sezonem.
 
+## PlaceholderAPI
+
+Gdy obecne PlaceholderAPI, plugin rejestruje ekspansję `ultrahc`:
+`%ultrahc_level%`, `%ultrahc_xp%`, `%ultrahc_pd%`, `%ultrahc_pd_required%`,
+`%ultrahc_kills%`, `%ultrahc_wins%`, `%ultrahc_class%`, `%ultrahc_star%`,
+`%ultrahc_rank%`, `%ultrahc_party_size%`, `%ultrahc_party_leader%`.
+Brak PlaceholderAPI = placeholdery po prostu nieaktywne (patrz [`docs/SIEC.md`](docs/SIEC.md#7-placeholdery-placeholderapi)).
+
 ## Testy
 
-`mvn test` — testy jednostkowe czystej logiki: krzywa poziomów (tabela ze spec),
-progi nagród, matematyka granicy (sanity min29≈544), formatery czasu/liczb.
+`mvn test` — 37 testów jednostkowych czystej logiki (bez serwera): krzywa poziomów
+(tabela ze spec + wielokrotny awans), progi nagród, matematyka granicy
+(sanity min29≈544), formatery czasu/liczb, warstwa DAO na tymczasowym SQLite
+(profil, topki, reset sezonu, questy, party), oraz reguły party (zaproszenia,
+akceptacja, leave/kick/disband, limity, wygasanie zaproszeń).
 
 ## Uwagi
 

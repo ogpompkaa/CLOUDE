@@ -66,4 +66,10 @@ public class MessagesManager {
     public Component legacy(String withAmpersand) {
         return LEGACY.deserialize(withAmpersand);
     }
+
+    /** Usuwa kody koloru/formatu (&x) — czysty tekst (np. dla placeholderow). */
+    public String legacyStrip(String withAmpersand) {
+        if (withAmpersand == null) return "";
+        return withAmpersand.replaceAll("(?i)&[0-9A-FK-OR]", "").trim();
+    }
 }

@@ -231,6 +231,9 @@ public class UltraHcPlugin extends JavaPlugin {
             });
         }
 
+        // 6. Miekka integracja z PlaceholderAPI (obie role, tylko gdy plugin obecny)
+        pl.ultrahc.paper.integration.PlaceholderIntegration.register(this);
+
         getLogger().info("[UltraHC] Wlaczono. Rola serwera: " + role + ", magazyn: " + configManager.storageType() + ".");
         // TODO(kolejne etapy): LOBBY -> NpcManager/ShopManager/Leaderboards; ARENA -> Border/Scoreboard/Drops.
     }

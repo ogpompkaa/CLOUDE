@@ -7,115 +7,118 @@ import pl.ultrahc.paper.config.MessagesManager;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Zarzadza party (grupami graczy) przed gra — w pamieci serwera. Party trzymaja
- * sie razem w jednej druzynie meczu (grupowanie w TeamManager). Lider zaprasza,
- * czlonkowie akceptuja; lider ruszajac do gry zabiera online czlonkow.
+ * Warstwa serwerowa party: komunikaty, dzwieki, persystencja do DB. Cala logika
+ * regul (zaproszenia, akceptacja, leave/kick/disband, limity) siedzi w
+ * {@link PartyCore} — testowalnej bez serwera. Party trzymaja sie razem w jednej
+ * druzynie meczu (grupowanie w TeamManager); lider ruszajac do gry zabiera online
+ * czlonkow. Sklad persystowany do DB (arena czyta przy starcie gry — cross-server).
  */
 public class PartyManager {
 
     private final UltraHcPlugin plugin;
-    private final Map<UUID, Party> byMember = new ConcurrentHashMap<>();
-    private final Map<UUID, Invite> invites = new ConcurrentHashMap<>();
-
-    private record Invite(UUID leader, long expiresAt) {}
+    private final PartyCore core;
 
     public PartyManager(UltraHcPlugin plugin) {
         this.plugin = plugin;
+        int max = plugin.configManager().raw().getInt("party.max-size", 4);
+        long ttl = plugin.configManager().raw().getInt("party.invite-expiry-seconds", 60) * 1000L;
+        this.core = new PartyCore(max, ttl);
     }
 
     private MessagesManager msg() { return plugin.messages(); }
     public boolean enabled() { return plugin.configManager().raw().getBoolean("party.enabled", true); }
-    public int maxSize() { return plugin.configManager().raw().getInt("party.max-size", 4); }
+    public int maxSize() { return core.maxSize(); }
 
-    public Party get(UUID uuid) { return byMember.get(uuid); }
+    public Party get(UUID uuid) { return core.get(uuid); }
+    public boolean isLeader(UUID uuid) { return core.isLeader(uuid); }
 
     // ----------------------------------------------------------- komendy
     public void invite(Player leader, String targetName) {
         if (!checkEnabled(leader)) return;
         Player target = plugin.getServer().getPlayerExact(targetName);
         if (target == null) { leader.sendMessage(msg().prefixed("party.target-offline", null)); return; }
-        if (target.equals(leader)) { leader.sendMessage(msg().prefixed("party.self-invite", null)); return; }
-        if (byMember.containsKey(target.getUniqueId())) { leader.sendMessage(msg().prefixed("party.target-in-party", null)); return; }
 
-        Party party = byMember.get(leader.getUniqueId());
-        if (party == null) { // auto-zaloz party
-            party = new Party(leader.getUniqueId());
-            byMember.put(leader.getUniqueId(), party);
-            dbSet(leader.getUniqueId(), party.getId().toString());
-            leader.sendMessage(msg().prefixed("party.created", null));
-        } else if (!party.isLeader(leader.getUniqueId())) {
-            leader.sendMessage(msg().prefixed("party.not-leader", null));
-            return;
+        PartyCore.InviteResult r = core.invite(leader.getUniqueId(), target.getUniqueId(), System.currentTimeMillis());
+        switch (r.status()) {
+            case SELF -> leader.sendMessage(msg().prefixed("party.self-invite", null));
+            case ALREADY_IN_PARTY -> leader.sendMessage(msg().prefixed("party.target-in-party", null));
+            case NOT_LEADER -> leader.sendMessage(msg().prefixed("party.not-leader", null));
+            case FULL -> leader.sendMessage(msg().prefixed("party.full", Map.of("max", String.valueOf(maxSize()))));
+            case OK -> {
+                if (r.createdParty()) {
+                    dbSet(leader.getUniqueId(), r.party().getId().toString());
+                    leader.sendMessage(msg().prefixed("party.created", null));
+                }
+                leader.sendMessage(msg().prefixed("party.invited", Map.of("player", target.getName())));
+                target.sendMessage(msg().prefixed("party.invite-received", Map.of("player", leader.getName())));
+            }
+            default -> { }
         }
-        if (party.size() >= maxSize()) {
-            leader.sendMessage(msg().prefixed("party.full", Map.of("max", String.valueOf(maxSize()))));
-            return;
-        }
-        long ttl = plugin.configManager().raw().getInt("party.invite-expiry-seconds", 60) * 1000L;
-        invites.put(target.getUniqueId(), new Invite(leader.getUniqueId(), System.currentTimeMillis() + ttl));
-        leader.sendMessage(msg().prefixed("party.invited", Map.of("player", target.getName())));
-        target.sendMessage(msg().prefixed("party.invite-received", Map.of("player", leader.getName())));
     }
 
     public void accept(Player target) {
         if (!checkEnabled(target)) return;
-        Invite inv = invites.remove(target.getUniqueId());
-        if (inv == null) { target.sendMessage(msg().prefixed("party.invite-none", null)); return; }
-        if (System.currentTimeMillis() > inv.expiresAt()) { target.sendMessage(msg().prefixed("party.invite-expired", null)); return; }
-        Party party = byMember.get(inv.leader());
-        if (party == null) { target.sendMessage(msg().prefixed("party.invite-expired", null)); return; }
-        if (party.size() >= maxSize()) { target.sendMessage(msg().prefixed("party.full", Map.of("max", String.valueOf(maxSize())))); return; }
-
-        party.getMembers().add(target.getUniqueId());
-        byMember.put(target.getUniqueId(), party);
-        dbSet(target.getUniqueId(), party.getId().toString());
-        broadcast(party, "party.joined", Map.of("player", target.getName()));
+        PartyCore.AcceptResult r = core.accept(target.getUniqueId(), System.currentTimeMillis());
+        switch (r.status()) {
+            case NO_INVITE -> target.sendMessage(msg().prefixed("party.invite-none", null));
+            case INVITE_EXPIRED -> target.sendMessage(msg().prefixed("party.invite-expired", null));
+            case ALREADY_IN_PARTY -> target.sendMessage(msg().prefixed("party.target-in-party", null));
+            case FULL -> target.sendMessage(msg().prefixed("party.full", Map.of("max", String.valueOf(maxSize()))));
+            case OK -> {
+                dbSet(target.getUniqueId(), r.party().getId().toString());
+                broadcast(r.party(), "party.joined", Map.of("player", target.getName()));
+            }
+            default -> { }
+        }
     }
 
     public void deny(Player target) {
-        invites.remove(target.getUniqueId());
+        core.deny(target.getUniqueId());
         target.sendMessage(msg().prefixed("party.invite-none", null));
     }
 
     public void leave(Player player) {
-        Party party = byMember.remove(player.getUniqueId());
-        if (party == null) { player.sendMessage(msg().prefixed("party.not-in", null)); return; }
-        party.getMembers().remove(player.getUniqueId());
-        dbClear(player.getUniqueId());
-        if (party.isLeader(player.getUniqueId())) {
-            disbandInternal(party, "party.leader-left");
-        } else {
-            broadcast(party, "party.left", Map.of("player", player.getName()));
-            player.sendMessage(msg().prefixed("party.left", Map.of("player", player.getName())));
+        PartyCore.LeaveResult r = core.leave(player.getUniqueId());
+        if (r.status() == PartyCore.Status.NOT_IN_PARTY) {
+            player.sendMessage(msg().prefixed("party.not-in", null));
+            return;
         }
+        applyDeparture(r, player.getName());
+        if (!r.disbanded()) player.sendMessage(msg().prefixed("party.left", Map.of("player", player.getName())));
     }
 
     public void kick(Player leader, String targetName) {
-        Party party = byMember.get(leader.getUniqueId());
-        if (party == null) { leader.sendMessage(msg().prefixed("party.not-in", null)); return; }
-        if (!party.isLeader(leader.getUniqueId())) { leader.sendMessage(msg().prefixed("party.not-leader", null)); return; }
         Player target = plugin.getServer().getPlayerExact(targetName);
         UUID targetId = target != null ? target.getUniqueId() : null;
-        if (targetId == null || !party.getMembers().contains(targetId)) { leader.sendMessage(msg().prefixed("party.target-in-party", null)); return; }
-        party.getMembers().remove(targetId);
-        byMember.remove(targetId);
-        dbClear(targetId);
-        broadcast(party, "party.kicked", Map.of("player", target.getName()));
-        target.sendMessage(msg().prefixed("party.kicked", Map.of("player", target.getName())));
+        PartyCore.KickResult r = core.kick(leader.getUniqueId(), targetId);
+        switch (r.status()) {
+            case NOT_IN_PARTY -> leader.sendMessage(msg().prefixed("party.not-in", null));
+            case NOT_LEADER -> leader.sendMessage(msg().prefixed("party.not-leader", null));
+            case NOT_MEMBER -> leader.sendMessage(msg().prefixed("party.target-in-party", null));
+            case OK -> {
+                dbClear(r.target());
+                String name = target != null ? target.getName() : nameOf(r.target());
+                broadcast(r.party(), "party.kicked", Map.of("player", name));
+                if (target != null) target.sendMessage(msg().prefixed("party.kicked", Map.of("player", name)));
+            }
+            default -> { }
+        }
     }
 
     public void disband(Player leader) {
-        Party party = byMember.get(leader.getUniqueId());
-        if (party == null) { leader.sendMessage(msg().prefixed("party.not-in", null)); return; }
-        if (!party.isLeader(leader.getUniqueId())) { leader.sendMessage(msg().prefixed("party.not-leader", null)); return; }
-        disbandInternal(party, "party.disbanded");
+        PartyCore.DisbandResult r = core.disband(leader.getUniqueId());
+        switch (r.status()) {
+            case NOT_IN_PARTY -> leader.sendMessage(msg().prefixed("party.not-in", null));
+            case NOT_LEADER -> leader.sendMessage(msg().prefixed("party.not-leader", null));
+            case OK -> notifyAffected(r.affected(), "party.disbanded");
+            default -> { }
+        }
     }
 
     public void list(Player player) {
-        Party party = byMember.get(player.getUniqueId());
+        Party party = core.get(player.getUniqueId());
         if (party == null) { player.sendMessage(msg().prefixed("party.not-in", null)); return; }
         player.sendMessage(msg().prefixed("party.list-header",
                 Map.of("count", String.valueOf(party.size()), "max", String.valueOf(maxSize()))));
@@ -128,7 +131,7 @@ public class PartyManager {
 
     /** Czat party — wiadomosc tylko do czlonkow party. */
     public void chat(Player player, String message) {
-        Party party = byMember.get(player.getUniqueId());
+        Party party = core.get(player.getUniqueId());
         if (party == null) { player.sendMessage(msg().prefixed("party.not-in", null)); return; }
         var comp = msg().legacy(msg().raw("party.chat-format",
                 Map.of("player", player.getName(), "message", message)));
@@ -140,36 +143,39 @@ public class PartyManager {
 
     /** Online czlonkowie party gracza (do zabrania do gry przez lidera). */
     public List<Player> onlineMembers(UUID leader) {
-        Party party = byMember.get(leader);
         List<Player> out = new java.util.ArrayList<>();
-        if (party == null) return out;
-        for (UUID id : party.getMembers()) {
+        for (UUID id : core.members(leader)) {
             Player p = plugin.getServer().getPlayer(id);
             if (p != null) out.add(p);
         }
         return out;
     }
 
-    public boolean isLeader(UUID uuid) {
-        Party p = byMember.get(uuid);
-        return p != null && p.isLeader(uuid);
-    }
-
     /** Sprzatanie przy wyjsciu gracza (usuwa z party, zaproszenia). */
     public void handleQuit(Player player) {
-        invites.remove(player.getUniqueId());
-        if (byMember.containsKey(player.getUniqueId())) leave(player);
+        PartyCore.LeaveResult r = core.handleQuit(player.getUniqueId());
+        if (r.status() == PartyCore.Status.OK) applyDeparture(r, player.getName());
     }
 
     // --------------------------------------------------------- helpers
-    private void disbandInternal(Party party, String reasonKey) {
-        for (UUID id : new java.util.ArrayList<>(party.getMembers())) {
-            byMember.remove(id);
+
+    /** Wspolna obsluga wyjscia/rozwiazania: DB + komunikaty do pozostalych/rozwiazanych. */
+    private void applyDeparture(PartyCore.LeaveResult r, String who) {
+        if (r.disbanded()) {
+            notifyAffected(r.affected(), "party.leader-left");
+        } else {
+            for (UUID id : r.affected()) dbClear(id);
+            if (r.party() != null) broadcast(r.party(), "party.left", Map.of("player", who));
+        }
+    }
+
+    /** DB-clear + komunikat dla listy dotknietych graczy (rozwiazanie party). */
+    private void notifyAffected(List<UUID> affected, String reasonKey) {
+        for (UUID id : affected) {
             dbClear(id);
             Player p = plugin.getServer().getPlayer(id);
             if (p != null) p.sendMessage(msg().prefixed(reasonKey, null));
         }
-        party.getMembers().clear();
     }
 
     // Persystencja skladu party do DB (cross-server: arena czyta przy starcie gry).

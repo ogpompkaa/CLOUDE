@@ -1,0 +1,13 @@
+# =====================================================================
+#  Fragment config/paper-global.yml dla KAZDEGO serwera Paper (lobby i areny).
+#  NIE zastepuj calego pliku — Paper generuje go sam. Wklej/scal tylko sekcje
+#  "proxies" (wciecie musi sie zgadzac). Sekret = ten sam co w Velocity
+#  (examples/velocity/forwarding.secret).
+# =====================================================================
+proxies:
+  velocity:
+    enabled: true
+    online-mode: true
+    secret: "ZMIEN-TEN-SEKRET-NA-LOSOWY-CIAG-32-ZNAKI"
+  bungee-cord:
+    online-mode: true
