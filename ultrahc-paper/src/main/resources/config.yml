@@ -48,6 +48,8 @@ game:
   enemy-compass-unlock-min: 18    # kompas widzi wroga po 18 min
   reconnect-grace-seconds: 180    # okno powrotu po rozlaczeniu
   hard-time-cap-min: 90           # twardy bezpiecznik konca gry
+  spawn-attempts: 30              # ile prob bezpiecznego punktu rozrzutu (lad, nie woda/lawa)
+  show-health-below-name: true    # liczba serc pod nickiem gracza (klasyka UHC)
 
 combat:
   tag-seconds: 10                 # okno przypisania zabojcy (combat-tag)
@@ -277,12 +279,18 @@ effects:
   particles:                      # nazwy enuma org.bukkit.Particle
     kill: CRIT
     win: FIREWORK
+    elimination: FLAME            # slup czastek przy eliminacji
   sounds:                         # klucze Minecraft (z kropkami)
     level-up: "entity.player.levelup"
     buy: "entity.experience_orb.pickup"
     kill: "entity.arrow.hit_player"
     win: "ui.toast.challenge_complete"
     error: "entity.villager.no"
+    elimination: "entity.lightning_bolt.thunder"
+  elimination:                    # bogaty efekt w miejscu smierci gracza
+    enabled: true
+    lightning: true               # kosmetyczny piorun (bez obrazen)
+    pillar: true                  # slup czastek w gore
 
 # --------------------------- SEZON -----------------------------------
 season:

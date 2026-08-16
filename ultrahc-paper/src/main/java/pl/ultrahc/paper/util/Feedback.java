@@ -51,6 +51,27 @@ public final class Feedback {
         loc.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, loc, 12, 0.3, 0.5, 0.3, 0.0);
     }
 
+    /**
+     * Bogaty efekt eliminacji w miejscu smierci: kosmetyczny piorun (bez obrazen),
+     * slup czastek w gore i dzwiek. Wszystko sterowane z config.effects.elimination.*.
+     */
+    public static void elimination(Location loc) {
+        var w = loc.getWorld();
+        if (w == null) return;
+        if (cfg != null && !cfg.getBoolean("effects.elimination.enabled", true)) return;
+
+        if (cfg == null || cfg.getBoolean("effects.elimination.lightning", true)) {
+            w.strikeLightningEffect(loc); // effect = wylacznie wizualny, bez obrazen
+        }
+        if (cfg == null || cfg.getBoolean("effects.elimination.pillar", true)) {
+            Particle p = par("elimination", Particle.FLAME);
+            for (double y = 0; y <= 4.0; y += 0.25) {
+                w.spawnParticle(p, loc.clone().add(0, y, 0), 6, 0.15, 0.1, 0.15, 0.0);
+            }
+        }
+        w.playSound(loc, snd("elimination", Sound.ENTITY_LIGHTNING_BOLT_THUNDER), 0.7f, 1.1f);
+    }
+
     /** Efekt zwyciestwa wokol gracza. */
     public static void winParticles(Player p) {
         Location loc = p.getLocation().add(0, 1, 0);

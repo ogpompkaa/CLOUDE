@@ -127,7 +127,11 @@ Cały balans jest w `config.yml` (nic nie jest zahardkodowane). Najważniejsze:
 
 - `game.team-size` — tryb areny: 1=SOLO, 2=DUO, 3=TRIO, 4=SQUAD. `party.*` — party (max, wygasanie).
   W sieci: różne areny z różnym `team-size`; lobby pokazuje party tylko areny, w które się zmieszczą.
-- `game.*` — progi startu, czasy (no-PvP, countdown, kompas wroga, reconnect), killstreak, niskie HP.
+- `game.*` — progi startu, czasy (no-PvP, countdown, kompas wroga, reconnect), killstreak, niskie HP,
+  bezpieczny rozrzut (`spawn-attempts`), serca pod nickiem (`show-health-below-name`).
+- `world.rules.*` — **reguły UHC per-świat**: `natural-regeneration: false` (rdzeń trybu),
+  `difficulty: HARD`, brak cyklu pogody/phantomów, `keep-inventory: false`.
+- `effects.elimination.*` — piorun + słup cząstek + dźwięk w miejscu eliminacji.
 - `border.*` + `arena-showdown.*` — kurczenie 3-fazowe i arenka (sudden-death).
 - `rewards.*` — nagrody XP/PD za czas/kille/wygraną (progi ze spec).
 - `levels.*` — krzywa poziomów (override 0–2 + wzór LINEAR/GEOMETRIC).

@@ -118,8 +118,9 @@ public class CombatListener implements Listener {
         if (plugin.heads() != null) {
             e.getDrops().add(plugin.heads().createHead(victim, "normal"));
         }
-        // Wybuch czastek w miejscu smierci.
+        // Wybuch czastek + bogaty efekt eliminacji (piorun/slup/dzwiek) w miejscu smierci.
         pl.ultrahc.paper.util.Feedback.killParticles(victim.getLocation().add(0, 1, 0));
+        pl.ultrahc.paper.util.Feedback.elimination(victim.getLocation());
 
         // Personalny title dla ofiary (kto zabil).
         pl.ultrahc.paper.util.Feedback.title(victim,

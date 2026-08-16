@@ -3,7 +3,9 @@ package pl.ultrahc.paper.game;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import pl.ultrahc.paper.UltraHcPlugin;
@@ -354,13 +356,40 @@ public class GameInstance {
         var center = world.getWorldBorder().getCenter();
         int half = (int) (size / 2.0 - 10);
         if (half < 1) { // granica za mala na rozrzut — spawnuj na srodku
-            int cy = world.getHighestBlockYAt(center.getBlockX(), center.getBlockZ()) + 1;
-            return new Location(world, center.getBlockX() + 0.5, cy, center.getBlockZ() + 0.5);
+            return surfaceAt(center.getBlockX(), center.getBlockZ());
         }
-        int x = center.getBlockX() + ThreadLocalRandom.current().nextInt(-half, half);
-        int z = center.getBlockZ() + ThreadLocalRandom.current().nextInt(-half, half);
+        // Losuj punkty i wybierz pierwszy BEZPIECZNY (lad, nie woda/lawa/jaskinia/drzewo).
+        int attempts = Math.max(1, plugin.configManager().raw().getInt("game.spawn-attempts", 30));
+        Location fallback = null;
+        for (int i = 0; i < attempts; i++) {
+            int x = center.getBlockX() + ThreadLocalRandom.current().nextInt(-half, half);
+            int z = center.getBlockZ() + ThreadLocalRandom.current().nextInt(-half, half);
+            Location loc = surfaceAt(x, z);
+            if (fallback == null) fallback = loc;
+            if (isSafeSpawn(loc)) return loc;
+        }
+        return fallback != null ? fallback : surfaceAt(center.getBlockX(), center.getBlockZ());
+    }
+
+    /** Lokalizacja na powierzchni (stopy tuz nad najwyzszym blokiem), wysrodkowana. */
+    private Location surfaceAt(int x, int z) {
         int y = world.getHighestBlockYAt(x, z) + 1;
         return new Location(world, x + 0.5, y, z + 0.5);
+    }
+
+    /** Czy punkt nadaje sie na spawn: staly lad pod stopami, brak cieczy/ognia/drzewa. */
+    private boolean isSafeSpawn(Location loc) {
+        Block ground = loc.clone().subtract(0, 1, 0).getBlock();
+        Block feet = loc.getBlock();
+        Block head = loc.clone().add(0, 1, 0).getBlock();
+        Material g = ground.getType();
+        if (!g.isSolid()) return false;                       // np. woda/lawa maja isSolid()=false
+        String gn = g.name();
+        if (gn.endsWith("_LEAVES") || gn.endsWith("_LOG") || gn.equals("CACTUS")
+                || gn.equals("MAGMA_BLOCK") || gn.equals("CAMPFIRE")) return false; // nie na drzewie/pulapce
+        if (feet.isLiquid() || head.isLiquid()) return false;  // stopy/glowa w wodzie/lawie
+        if (feet.getType() == Material.FIRE) return false;
+        return feet.isPassable() && head.isPassable();         // miejsce na gracza
     }
 
     private void startTicker() {

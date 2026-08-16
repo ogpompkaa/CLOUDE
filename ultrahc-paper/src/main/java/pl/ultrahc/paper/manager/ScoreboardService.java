@@ -136,8 +136,23 @@ public class ScoreboardService {
         }
         lineCount.put(player.getUniqueId(), size);
 
+        healthBelowName(board, game);
         colorNametags(player, game, board);
         actionBar(player, game, msg);
+    }
+
+    /** Liczba serc pod nickiem kazdego gracza (klasyka UHC). Sterowane configiem. */
+    private void healthBelowName(Scoreboard board, GameInstance game) {
+        boolean show = plugin.configManager().raw().getBoolean("game.show-health-below-name", true);
+        Objective health = board.getObjective("health");
+        if (show && game.state() == GameState.RUNNING) {
+            if (health == null) {
+                health = board.registerNewObjective("health", Criteria.HEALTH, LEGACY.deserialize("&c❤"));
+                health.setDisplaySlot(DisplaySlot.BELOW_NAME); // auto-aktualizacja z HP gracza
+            }
+        } else if (health != null) {
+            health.unregister();
+        }
     }
 
     /** HUD na action barze podczas gry: zywi, granica, kille druzyny. */
@@ -163,6 +178,10 @@ public class ScoreboardService {
         if (game.teams() == null) return;
         org.bukkit.scoreboard.Team mates = teamColored(board, "mates", net.kyori.adventure.text.format.NamedTextColor.GREEN);
         org.bukkit.scoreboard.Team foes = teamColored(board, "foes", net.kyori.adventure.text.format.NamedTextColor.RED);
+        // Semantyka druzyny: widac niewidzialnych sojusznikow, twardy brak FF (2. warstwa).
+        mates.setCanSeeFriendlyInvisibles(true);
+        mates.setAllowFriendlyFire(false);
+        foes.setCanSeeFriendlyInvisibles(false);
         var myTeam = game.teams().getTeam(viewer.getUniqueId());
         for (Player other : game.world().getPlayers()) {
             if (other.equals(viewer)) continue;
