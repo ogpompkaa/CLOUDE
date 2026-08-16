@@ -128,15 +128,19 @@ world:
     mob-griefing: true            # creepery niszcza teren (klasyczne UHC)
     fire-tick: true               # ogien sie rozprzestrzenia
     show-death-messages: true     # komunikaty smierci
+    spawn-chunk-radius: 2         # promien trzymanych chunkow spawnu (mniej = lzejszy swiat z puli)
+  pool-refill-delay-ticks: 200    # odstep dogenerowywania puli (rozklada lag generacji, nie stackuje ze startem gry)
   pregen:
     enabled: true                 # pre-generacja reszty mapy w tle przez Chunky (jesli obecny)
     pad: 32                       # dodatkowe bloki poza granica
   generation:
     require-biomes:
-      enabled: true               # gwarancja zimnych biomow przez wybor seeda (Yeti)
+      # UWAGA: wlaczenie probkuje biomy na wielu seedach = wieksze obciazenie generacji.
+      # Domyslnie OFF — Yeti ma fallback (pasywka na dowolnym sniegu/lodzie).
+      enabled: false              # gwarancja zimnych biomow przez wybor seeda (Yeti)
       biomes: [SNOWY_PLAINS, SNOWY_TAIGA, ICE_SPIKES, FROZEN_RIVER]
-      search-radius: 500
-      max-seed-attempts: 40
+      search-radius: 400
+      max-seed-attempts: 20
 
 # --------------------------- POZIOMY (PD) ----------------------------
 # Override 0-2 = dokladnie ze spec; reszta ze wzoru. Sanity: lvl33 -> 66500.

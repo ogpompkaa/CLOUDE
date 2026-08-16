@@ -35,6 +35,7 @@ public class WorldManager {
     private final ConfigManager config;
     private final Deque<World> ready = new ArrayDeque<>();
     private int counter;
+    private boolean warnedNoChunky;
 
     public WorldManager(JavaPlugin plugin, ConfigManager config) {
         this.plugin = plugin;
@@ -57,9 +58,23 @@ public class WorldManager {
     public World takeWorld() {
         World world = ready.poll();
         if (world == null) world = createArenaWorld();
-        // Uzupelnij pule w tle na kolejny tick (nie blokuj biezacej akcji dwa razy).
-        plugin.getServer().getScheduler().runTask(plugin, this::ensurePool);
+        scheduleRefill(); // dogeneruj pule PO odstepie, jeden swiat na raz (nie stackuj lagu ze startem gry)
         return world;
+    }
+
+    /**
+     * Uzupelnia pule po jednym swiecie z odstepem — generacja swiata blokuje watek
+     * glowny, wiec rozkladamy ja w czasie zamiast robic natychmiast po starcie gry.
+     */
+    private void scheduleRefill() {
+        if (ready.size() >= poolSize()) return;
+        long delay = Math.max(20L, config.raw().getLong("world.pool-refill-delay-ticks", 200));
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            if (ready.size() < poolSize()) {
+                ready.add(createArenaWorld());
+                scheduleRefill();
+            }
+        }, delay);
     }
 
     /** Tworzy nowy swiat areny z losowym seedem, ustawia granice startowa. */
@@ -126,6 +141,8 @@ public class WorldManager {
         world.setGameRule(GameRule.MOB_GRIEFING, c.getBoolean("world.rules.mob-griefing", true));
         world.setGameRule(GameRule.DO_FIRE_TICK, c.getBoolean("world.rules.fire-tick", true));
         world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, c.getBoolean("world.rules.show-death-messages", true));
+        // Mniejszy promien trzymanych chunkow spawnu = mniejsze obciazenie bezczynnego swiata z puli.
+        world.setGameRule(GameRule.SPAWN_CHUNK_RADIUS, c.getInt("world.rules.spawn-chunk-radius", 2));
         // Pogoda wyczyszczona na start (spojnie z wylaczonym cyklem, jesli wylaczony).
         if (!c.getBoolean("world.rules.weather-cycle", false)) world.setStorm(false);
     }
@@ -136,7 +153,14 @@ public class WorldManager {
      */
     private void startPregen(World world) {
         if (!config.raw().getBoolean("world.pregen.enabled", true)) return;
-        if (plugin.getServer().getPluginManager().getPlugin("Chunky") == null) return;
+        if (plugin.getServer().getPluginManager().getPlugin("Chunky") == null) {
+            if (!warnedNoChunky) {
+                warnedNoChunky = true;
+                plugin.getLogger().info("[UltraHC] Pre-generacja wlaczona, ale brak pluginu Chunky — "
+                        + "generacja swiatow bedzie obciazac watek glowny. Zainstaluj Chunky dla plynniejszych startow gier.");
+            }
+            return;
+        }
         int radius = (int) (config.raw().getDouble("border.start", 1000) / 2
                 + config.raw().getInt("world.pregen.pad", 32));
         var console = plugin.getServer().getConsoleSender();
