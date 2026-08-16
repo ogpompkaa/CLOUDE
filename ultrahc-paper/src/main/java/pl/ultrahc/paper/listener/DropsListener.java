@@ -47,6 +47,13 @@ public class DropsListener implements Listener {
         Player player = e.getPlayer();
         String clazz = selectedClass(player);
 
+        // UHC: rudy NIE dropia normalnie — surowce zdobywa sie z kamienia (nizej).
+        if (isOre(type) && plugin.configManager().raw().getBoolean("drops.disable-ore-drops", true)) {
+            e.setDropItems(false);
+            e.setExpToDrop(0);
+            return;
+        }
+
         if (isStone(type)) {
             ConfigurationSection sec = plugin.configManager().raw().getConfigurationSection("drops.stone");
             if (sec == null) return;
@@ -92,6 +99,11 @@ public class DropsListener implements Listener {
 
     private boolean isStone(Material m) {
         return m == Material.STONE || m == Material.DEEPSLATE;
+    }
+
+    /** Bloki rud (kazdy wariant, tez deepslate/nether) — rozpoznanie po nazwie. */
+    private boolean isOre(Material m) {
+        return m.name().endsWith("_ORE");
     }
 
     private boolean isLeaves(Material m) {
