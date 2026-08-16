@@ -36,6 +36,12 @@ rank:
 
 chat:
   separator: "&7: &f"
+  hover: "&e%player%\n&7Poziom: &b%level%\n&7Kille: &c%kills%\n&7Wygrane: &a%wins%\n&8(klik = /msg)"
+  team-format: "&2[Druzyna] %prefix%&f%name%&7: "
+  spectator-format: "&8[Martwi] %prefix%&7%name%&8: "
+  cooldown: "&cNie tak szybko — odczekaj chwile."
+  repeat: "&cNie powtarzaj tej samej wiadomosci."
+  ad-blocked: "&cReklama innych serwerow/linki sa zabronione."
 
 bossbar:
   waiting: "&aOczekiwanie na graczy: &e%count%&7/&e%min%"

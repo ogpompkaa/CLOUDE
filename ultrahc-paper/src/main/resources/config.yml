@@ -40,6 +40,15 @@ party:
   max-size: 4                     # max czlonkow party (4 = SQUAD)
   invite-expiry-seconds: 60
 
+# Czat: kanaly, interakcje, anty-spam. Bypass: uprawnienie ultrahc.chat.bypass.
+chat:
+  team-prefix: "@"                # wiadomosc z tym prefiksem leci tylko do druzyny (w grze)
+  mention-ping: true             # dzwiek gdy ktos napisze Twoj nick
+  ping-sound: "block.note_block.pling"
+  cooldown-ms: 1500              # min. odstep miedzy wiadomosciami (0 = wylaczone)
+  block-repeat: true             # blokuj powtarzanie tej samej wiadomosci
+  ad-filter: true                # blokuj adresy/domeny (reklama innych serwerow)
+
 game:
   team-size: 1                    # 1=SOLO, 2=DUO, 3=TRIO, 4=SQUAD (parametr)
   min-players-to-countdown: 30    # 30. gracz uruchamia odliczanie
