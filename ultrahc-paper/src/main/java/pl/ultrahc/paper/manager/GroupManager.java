@@ -20,11 +20,11 @@ import java.util.Map;
  */
 public class GroupManager {
 
-    public record Group(String id, String prefix, String nameColor, int weight, String permission) {}
+    public record Group(String id, String prefix, String nameColor, int weight, String permission, String trail) {}
 
     private final UltraHcPlugin plugin;
     private final List<Group> ranked = new ArrayList<>(); // grupy z uprawnieniem, malejaco wg wagi
-    private Group defaultGroup = new Group("gracz", "&7", "&7", 0, "");
+    private Group defaultGroup = new Group("gracz", "&7", "&7", 0, "", "");
 
     public GroupManager(UltraHcPlugin plugin) {
         this.plugin = plugin;
@@ -33,7 +33,7 @@ public class GroupManager {
 
     public void reload() {
         ranked.clear();
-        defaultGroup = new Group("gracz", "&7", "&7", 0, "");
+        defaultGroup = new Group("gracz", "&7", "&7", 0, "", "");
         ConfigurationSection sec = plugin.configManager().raw().getConfigurationSection("ranks.groups");
         if (sec == null) return;
         for (String id : sec.getKeys(false)) {
@@ -43,7 +43,8 @@ public class GroupManager {
                     g.getString("prefix", "&7"),
                     g.getString("name-color", "&7"),
                     g.getInt("weight", 0),
-                    g.getString("permission", ""));
+                    g.getString("permission", ""),
+                    g.getString("trail", ""));
             if (grp.permission() == null || grp.permission().isBlank()) {
                 defaultGroup = grp; // ranga bez uprawnienia = domyslna (GRACZ)
             } else {

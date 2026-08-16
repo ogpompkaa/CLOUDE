@@ -22,9 +22,10 @@ public class ProfileListener implements Listener {
         plugin.profiles().loadAsync(uuid, player.getName());
         if (plugin.quests() != null) plugin.quests().loadAsync(uuid);
 
-        // Kosmetyka: sformatowany komunikat wejscia + powitanie (w lobby).
+        // Kosmetyka: sformatowany komunikat wejscia (z ranga) + powitanie (w lobby).
+        String rank = plugin.groups() != null ? plugin.groups().groupPrefix(player) : "";
         e.joinMessage(plugin.messages().component("join-message",
-                java.util.Map.of("player", player.getName())));
+                java.util.Map.of("player", player.getName(), "rank", rank)));
         if (plugin.role() == pl.ultrahc.paper.ServerRole.LOBBY) {
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                 if (!player.isOnline()) return;
@@ -46,8 +47,9 @@ public class ProfileListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         var uuid = e.getPlayer().getUniqueId();
+        String rank = plugin.groups() != null ? plugin.groups().groupPrefix(e.getPlayer()) : "";
         e.quitMessage(plugin.messages().component("quit-message",
-                java.util.Map.of("player", e.getPlayer().getName())));
+                java.util.Map.of("player", e.getPlayer().getName(), "rank", rank)));
         plugin.profiles().saveAndUnloadAsync(uuid);
         if (plugin.quests() != null) plugin.quests().unload(uuid);
         if (plugin.compass() != null) plugin.compass().clear(uuid);

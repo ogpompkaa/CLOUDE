@@ -54,14 +54,15 @@ chat:
 # Gracz dostaje range o najwyzszej wadze, do ktorej ma uprawnienie; GRACZ = domyslna.
 ranks:
   op-is-owner: true              # fallback bez LuckPerms: gracz z op dostaje range OWNER
+  # trail = czastka sladu (perk); pusty = brak. Nazwy z enuma org.bukkit.Particle.
   groups:
-    owner:  { weight: 100, permission: "ultrahc.rank.owner",  prefix: "&4&lOWNER ",  name-color: "&4" }
-    admin:  { weight: 90,  permission: "ultrahc.rank.admin",  prefix: "&c&lADMIN ",  name-color: "&c" }
-    mod:    { weight: 80,  permission: "ultrahc.rank.mod",    prefix: "&2&lMOD ",    name-color: "&2" }
-    helper: { weight: 70,  permission: "ultrahc.rank.helper", prefix: "&a&lHELPER ", name-color: "&a" }
-    svip:   { weight: 60,  permission: "ultrahc.rank.svip",   prefix: "&bSVIP ",     name-color: "&b" }
-    vip:    { weight: 50,  permission: "ultrahc.rank.vip",    prefix: "&6VIP ",      name-color: "&6" }
-    gracz:  { weight: 0,   permission: "",                    prefix: "&7",          name-color: "&7" }
+    owner:  { weight: 100, permission: "ultrahc.rank.owner",  prefix: "&4&lOWNER ",  name-color: "&4", trail: "FLAME" }
+    admin:  { weight: 90,  permission: "ultrahc.rank.admin",  prefix: "&c&lADMIN ",  name-color: "&c", trail: "FLAME" }
+    mod:    { weight: 80,  permission: "ultrahc.rank.mod",    prefix: "&2&lMOD ",    name-color: "&2", trail: "COMPOSTER" }
+    helper: { weight: 70,  permission: "ultrahc.rank.helper", prefix: "&a&lHELPER ", name-color: "&a", trail: "COMPOSTER" }
+    svip:   { weight: 60,  permission: "ultrahc.rank.svip",   prefix: "&bSVIP ",     name-color: "&b", trail: "END_ROD" }
+    vip:    { weight: 50,  permission: "ultrahc.rank.vip",    prefix: "&6VIP ",      name-color: "&6", trail: "HAPPY_VILLAGER" }
+    gracz:  { weight: 0,   permission: "",                    prefix: "&7",          name-color: "&7", trail: "" }
 
 game:
   team-size: 1                    # 1=SOLO, 2=DUO, 3=TRIO, 4=SQUAD (parametr)
@@ -342,6 +343,12 @@ effects:
   hit-feedback: true              # czastki + dzwiek przy ciosie (mocniejsze przy krytyku)
   levelup-celebration: true       # spirala czastek + fajerwerk przy awansie
   join-ring: true                 # pierscien czastek + dzwiek przy wejsciu do lobby/poczekalni
+  first-blood: true               # 'Pierwsza krew!' przy pierwszym zabojstwie w grze
+  border-wall: true               # widoczna sciana czastek wzdluz granicy w poblizu graczy
+  border-wall-distance: 8         # od jak blisko krawedzi rysuje sciane
+  border-wall-interval-ticks: 10  # co ile odswieza sciane
+  rank-trails: true               # slad czastek za graczami z ranga (trail w ranks.groups)
+  rank-trail-interval-ticks: 4    # co ile emituje slad
 
 # --------------------------- SEZON -----------------------------------
 season:

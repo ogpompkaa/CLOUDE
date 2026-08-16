@@ -44,6 +44,7 @@ public class GameInstance {
 
     // Progi faz juz "odpalone" (zeby nie powtarzac broadcastow).
     private boolean pvpFired, shrinkFired, accelerateFired, compassFired, showdownFired;
+    private boolean firstBloodDone;
 
     private BukkitTask ticker;
 
@@ -292,6 +293,7 @@ public class GameInstance {
                 Player killerPlayer = plugin.getServer().getPlayer(killerOrNull);
                 if (killerPlayer != null) pl.ultrahc.paper.util.Feedback.kill(killerPlayer);
                 checkKillStreak(killerOrNull);
+                announceFirstBlood(killerOrNull, victim);
             }
         }
         Player victimPlayer = plugin.getServer().getPlayer(victim);
@@ -474,6 +476,28 @@ public class GameInstance {
 
     private int cfgInt(String path, int def) {
         return plugin.configManager().raw().getInt(path, def);
+    }
+
+    private boolean cfgBool(String path, boolean def) {
+        return plugin.configManager().raw().getBoolean(path, def);
+    }
+
+    /** Pierwsza krew w grze: broadcast + title + dzwiek (raz na gre). */
+    private void announceFirstBlood(UUID killer, UUID victim) {
+        if (firstBloodDone || !cfgBool("effects.first-blood", true)) return;
+        firstBloodDone = true;
+        Player kp = plugin.getServer().getPlayer(killer);
+        Player vp = plugin.getServer().getPlayer(victim);
+        String kn = kp != null ? kp.getName() : "-";
+        String vn = vp != null ? vp.getName() : "-";
+        broadcast("game.first-blood", Map.of("killer", kn, "victim", vn));
+        var main = plugin.messages().component("title.first-blood-main", Map.of("killer", kn));
+        var sub = plugin.messages().component("title.first-blood-sub", Map.of("killer", kn, "victim", vn));
+        for (UUID id : participants) {
+            Player p = plugin.getServer().getPlayer(id);
+            if (p != null) pl.ultrahc.paper.util.Feedback.title(p, main, sub);
+        }
+        soundAll(org.bukkit.Sound.ENTITY_WITHER_SPAWN, 1.0f);
     }
 
     // Title na srodku ekranu dla wszystkich uczestnikow.

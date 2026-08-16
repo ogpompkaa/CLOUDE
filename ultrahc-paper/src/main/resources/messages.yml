@@ -7,8 +7,8 @@
 prefix: "&8[&6UltraHC&8] &7"
 
 # --------------------------- WEJSCIE / TABLIST -----------------------
-join-message: "&8[&a+&8] &e%player%"
-quit-message: "&8[&c-&8] &e%player%"
+join-message: "&8[&a+&8] %rank%&e%player%"
+quit-message: "&8[&c-&8] %rank%&e%player%"
 
 tablist:
   header: "&6&lULTRAHC\n&7Sezonowy tryb UHC\n"
@@ -75,6 +75,8 @@ title:
   countdown-sub: "&7Przygotuj sie!"
   start-main: "&a&lSTART!"
   start-sub: "&7Powodzenia!"
+  first-blood-main: "&c&lPIERWSZA KREW"
+  first-blood-sub: "&e%killer% &7przelal pierwsza krew"
 
 help:
   header: "&6&lUltraHC &7— komendy:"
@@ -134,6 +136,7 @@ game:
   join-failed: "&cNie mozna dolaczyc (gra w toku lub pelna)."
   pvp-not-active: "&cPvP jeszcze nieaktywne."
   enderchest-blocked: "&cSkrzynia Endera jest wylaczona."
+  first-blood: "&c&lPIERWSZA KREW! &e%killer% &7zabil %victim%&7 jako pierwszy."
 
 head:
   consumed: "&aZjadles glowke — otrzymujesz efekty."

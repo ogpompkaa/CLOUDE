@@ -98,6 +98,8 @@ public class UltraHcPlugin extends JavaPlugin {
     private RankFormat rankFormat;
     private pl.ultrahc.paper.manager.GroupManager groupManager;
     private pl.ultrahc.paper.manager.AmbientEffects ambientEffects;
+    private pl.ultrahc.paper.manager.RankTrailService rankTrailService;
+    private pl.ultrahc.paper.manager.BorderWallService borderWallService;
     private SpectateGui spectateGui;
     private pl.ultrahc.paper.party.PartyManager partyManager;
     private pl.ultrahc.paper.gui.PartyGui partyGui;
@@ -224,6 +226,8 @@ public class UltraHcPlugin extends JavaPlugin {
                 scoreboardService.start();
                 abilityScheduler.start();
                 bossBarService.start();
+                this.borderWallService = new pl.ultrahc.paper.manager.BorderWallService(this);
+                borderWallService.start(); // widoczna sciana granicy
                 instanceManager.startArena(); // heartbeat stanu instancji do rejestru
                 // Wizualia poczekalni: topki na hologramach + NPC + ambient (jesli ustawione pozycje).
                 leaderboardsManager.start();
@@ -252,6 +256,10 @@ public class UltraHcPlugin extends JavaPlugin {
                 spawnLobbyNpcs();
             });
         }
+
+        // Slad rangi (perk kosmetyczny) — obie role (gracze chodza w lobby i w grze).
+        this.rankTrailService = new pl.ultrahc.paper.manager.RankTrailService(this);
+        rankTrailService.start();
 
         // 6. Miekka integracja z PlaceholderAPI (obie role, tylko gdy plugin obecny)
         pl.ultrahc.paper.integration.PlaceholderIntegration.register(this);
@@ -299,6 +307,8 @@ public class UltraHcPlugin extends JavaPlugin {
         if (bossBarService != null) bossBarService.stop();
         if (rankService != null) rankService.stop();
         if (ambientEffects != null) ambientEffects.stop();
+        if (rankTrailService != null) rankTrailService.stop();
+        if (borderWallService != null) borderWallService.stop();
         if (instanceManager != null) instanceManager.shutdown();
         if (hologramManager != null) hologramManager.removeAll();
         if (npcManager != null) npcManager.removeAll();
