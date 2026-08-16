@@ -158,11 +158,11 @@ public class CombatListener implements Listener {
         // Eliminacja + nagroda za zabojstwo (w GameInstance).
         game.handleElimination(victim.getUniqueId(), killerId);
         if (killer != null) {
-            plugin.getServer().broadcast(plugin.messages().prefixed("game.kill-weapon",
+            plugin.getServer().broadcast(plugin.messages().prefixedFromList("game.kill-messages", "game.kill-weapon",
                     java.util.Map.of("victim", victim.getName(), "killer", killer.getName(),
                             "weapon", weaponName(killer))));
         } else {
-            plugin.getServer().broadcast(plugin.messages().prefixed("game.death-generic",
+            plugin.getServer().broadcast(plugin.messages().prefixedFromList("game.death-messages", "game.death-generic",
                     java.util.Map.of("victim", victim.getName())));
         }
 

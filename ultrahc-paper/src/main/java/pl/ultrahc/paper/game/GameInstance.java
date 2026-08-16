@@ -322,6 +322,9 @@ public class GameInstance {
                             plugin.messages().component("title.win-sub", null));
                     pl.ultrahc.paper.util.Feedback.win(wp);
                     pl.ultrahc.paper.util.Feedback.winParticles(wp);
+                    // Unoszacy sie napis ZWYCIEZCA nad glowa (do sprzatniecia instancji).
+                    pl.ultrahc.paper.util.Feedback.floatingLabel(plugin, wp.getLocation().add(0, 2.4, 0),
+                            plugin.messages().component("title.winner-label", null), 20 * 8);
                 }
             }
             scheduleWinFireworks(winner); // pokaz fajerwerkow nad zwyciezcami (kilka salw)
@@ -340,15 +343,27 @@ public class GameInstance {
         plugin.games().onInstanceEnded(this);
     }
 
-    /** Pokaz fajerwerkow nad zwyciezcami: kilka salw w odstepach (konfigurowalny). */
+    // Paleta kolorow druzyn (fajerwerki zwyciezcy dobierane po id druzyny).
+    private static final org.bukkit.Color[] TEAM_COLORS = {
+            org.bukkit.Color.AQUA, org.bukkit.Color.LIME, org.bukkit.Color.RED, org.bukkit.Color.YELLOW,
+            org.bukkit.Color.FUCHSIA, org.bukkit.Color.ORANGE, org.bukkit.Color.WHITE, org.bukkit.Color.PURPLE
+    };
+
+    private org.bukkit.Color teamColor(Team t) {
+        return TEAM_COLORS[Math.floorMod(t.getId(), TEAM_COLORS.length)];
+    }
+
+    /** Pokaz fajerwerkow nad zwyciezcami: kilka salw w kolorze druzyny. */
     private void scheduleWinFireworks(Team winner) {
         int shots = Math.max(1, cfgInt("effects.win.firework-shots", 6));
         long interval = Math.max(1, cfgInt("effects.win.firework-interval-ticks", 12));
+        org.bukkit.Color color = teamColor(winner);
         for (int i = 0; i < shots; i++) {
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                 for (UUID id : winner.getMembers()) {
                     Player wp = plugin.getServer().getPlayer(id);
-                    if (wp != null) pl.ultrahc.paper.util.Feedback.launchFirework(wp.getLocation().add(0, 1, 0));
+                    if (wp != null) pl.ultrahc.paper.util.Feedback.launchFirework(
+                            wp.getLocation().add(0, 1, 0), color, org.bukkit.Color.WHITE);
                 }
             }, i * interval);
         }

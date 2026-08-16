@@ -63,6 +63,7 @@ title:
   showdown-sub: "&7Sudden-death!"
   win-main: "&6&lWYGRANA!"
   win-sub: "&7Gratulacje"
+  winner-label: "&6&l✦ ZWYCIEZCA ✦"
   levelup-main: "&6&lAWANS"
   levelup-sub: "&ePoziom %level% %star%"
   quest-main: "&a&lQUEST!"
@@ -127,6 +128,18 @@ game:
   kill-weapon: "&c☠ &e%victim% &7zostal zabity przez &c%killer% &7(&f%weapon%&7)"
   weapon-fist: "gole rece"
   death-generic: "&e%victim% &7zostal wyeliminowany."
+  # Losowe opisy smierci (pusta lista = uzyj kill-weapon / death-generic).
+  kill-messages:
+    - "&c☠ &e%victim% &7zostal zabity przez &c%killer% &7(&f%weapon%&7)"
+    - "&c☠ &c%killer% &7rozniosl &e%victim% &7(&f%weapon%&7)"
+    - "&c☠ &e%victim% &7padl z reki &c%killer%"
+    - "&c☠ &c%killer% &7wyeliminowal &e%victim% &7(&f%weapon%&7)"
+    - "&c☠ &e%victim% &7nie dal rady &c%killer%"
+  death-messages:
+    - "&e%victim% &7zostal wyeliminowany."
+    - "&e%victim% &7nie przetrwal."
+    - "&7Koniec gry dla &e%victim%&7."
+    - "&e%victim% &7odpada z gry."
   team-eliminated: "&7Druzyna &e%team% &7zostala wyeliminowana."
   win-team: "&6Wygrywa druzyna &e%team%&6!"
   win-solo: "&6Wygrywa &e%player%&6!"

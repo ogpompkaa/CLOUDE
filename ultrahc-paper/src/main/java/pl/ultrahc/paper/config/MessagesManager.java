@@ -58,6 +58,26 @@ public class MessagesManager {
         return LEGACY.deserialize(prefix + raw(path, placeholders));
     }
 
+    /**
+     * Komponent z prefiksem, losujac linie z listy (np. rozne opisy smierci).
+     * Gdy lista pusta — uzywa pojedynczego klucza fallback.
+     */
+    public Component prefixedFromList(String listPath, String fallbackKey, Map<String, String> placeholders) {
+        java.util.List<String> lines = cfg.getStringList(listPath);
+        String value;
+        if (lines.isEmpty()) {
+            value = raw(fallbackKey, placeholders);
+        } else {
+            value = lines.get(java.util.concurrent.ThreadLocalRandom.current().nextInt(lines.size()));
+            if (placeholders != null) {
+                for (Map.Entry<String, String> e : placeholders.entrySet()) {
+                    value = value.replace("%" + e.getKey() + "%", e.getValue());
+                }
+            }
+        }
+        return LEGACY.deserialize(prefix + value);
+    }
+
     /** Komponent bez prefiksu (scoreboard, tytuly). */
     public Component component(String path, Map<String, String> placeholders) {
         return LEGACY.deserialize(raw(path, placeholders));

@@ -78,6 +78,7 @@ public class SpectateGui implements Listener {
         if (id == null) return;
         Player target = plugin.getServer().getPlayer(UUID.fromString(id));
         if (target != null) {
+            GuiUtil.click(player);
             player.teleport(target.getLocation());
             player.sendMessage(plugin.messages().prefixed("spectate.teleported", Map.of("player", target.getName())));
         }

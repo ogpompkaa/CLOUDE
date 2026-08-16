@@ -36,4 +36,9 @@ public final class GuiUtil {
         player.openInventory(inv);
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.6f, 1.4f);
     }
+
+    /** Delikatny dzwiek klikniecia w menu (tactile feedback nawigacji). */
+    public static void click(Player player) {
+        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.7f);
+    }
 }

@@ -85,6 +85,7 @@ public class PartyGui implements Listener {
         if (clicked == null || !clicked.hasItemMeta()) return;
         String action = clicked.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING);
         if (action == null) return;
+        GuiUtil.click(player);
         switch (action) {
             case "leave" -> { plugin.party().leave(player); player.closeInventory(); }
             case "disband" -> { plugin.party().disband(player); player.closeInventory(); }

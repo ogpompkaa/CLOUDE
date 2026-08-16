@@ -153,18 +153,37 @@ public final class Feedback {
                 : "-" + String.format(Locale.US, "%.1f", dmg);
     }
 
-    /** Wystrzeliwuje fajerwerk (efekt zwyciestwa). */
+    /** Wystrzeliwuje fajerwerk (domyslne zloto/pomarancz). */
     public static void launchFirework(Location loc) {
+        launchFirework(loc, Color.YELLOW, Color.ORANGE);
+    }
+
+    /** Wystrzeliwuje fajerwerk w podanym kolorze (np. kolor druzyny zwyciezcy). */
+    public static void launchFirework(Location loc, Color primary, Color fade) {
         if (loc.getWorld() == null) return;
         var fw = loc.getWorld().spawn(loc, org.bukkit.entity.Firework.class);
         var meta = fw.getFireworkMeta();
         meta.addEffect(org.bukkit.FireworkEffect.builder()
-                .withColor(org.bukkit.Color.YELLOW, org.bukkit.Color.ORANGE)
-                .withFade(org.bukkit.Color.WHITE)
+                .withColor(primary)
+                .withFade(fade)
                 .with(org.bukkit.FireworkEffect.Type.BALL_LARGE)
                 .flicker(true).trail(true).build());
         meta.setPower(1);
         fw.setFireworkMeta(meta);
+    }
+
+    /** Unoszacy sie napis (TextDisplay) nad lokalizacja, znika po ttlTicks. */
+    public static void floatingLabel(Plugin plugin, Location loc, Component text, int ttlTicks) {
+        var w = loc.getWorld();
+        if (w == null) return;
+        TextDisplay td = w.spawn(loc, TextDisplay.class, d -> {
+            d.text(text);
+            d.setBillboard(Display.Billboard.CENTER);
+            d.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
+            d.setShadowed(true);
+            d.setSeeThrough(true);
+        });
+        plugin.getServer().getScheduler().runTaskLater(plugin, td::remove, Math.max(1, ttlTicks));
     }
 
     // --------------------------------------------------------- resolwery
