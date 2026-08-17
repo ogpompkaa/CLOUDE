@@ -55,6 +55,7 @@ public class ProfileListener implements Listener {
         if (plugin.compass() != null) plugin.compass().clear(uuid);
         if (plugin.ranks() != null) plugin.ranks().cleanup(e.getPlayer());
         if (plugin.scoreboard() != null) plugin.scoreboard().clear(uuid);
+        if (plugin.hubScoreboard() != null) plugin.hubScoreboard().clear(uuid);
         if (plugin.party() != null) plugin.party().handleQuit(e.getPlayer());
     }
 }

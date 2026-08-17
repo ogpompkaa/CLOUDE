@@ -86,13 +86,22 @@ public class GroupManager {
      * Dzieki temu uklad rang/poziomu jest w pelni edytowalny (bez podwojnych nawiasow).
      */
     public String displayName(Player player) {
+        return formatName(player, "chat.name-format");
+    }
+
+    /** Nick do TAB (osobny format — np. #1 UHC za nickiem). */
+    public String tabName(Player player) {
+        return formatName(player, "chat.tab-format");
+    }
+
+    private String formatName(Player player, String formatKey) {
         var msg = plugin.messages();
         Group g = of(player);
         PlayerProfile prof = plugin.profiles().get(player.getUniqueId());
         int level = prof != null ? prof.getLevel() : 0;
         // Poziom 0 (nowy gracz) — bez znacznika, zeby nie zasmiecac nicku.
         String levelTag = level > 0 ? msg.raw("chat.level-tag", Map.of("level", String.valueOf(level))) : "";
-        return msg.raw("chat.name-format")
+        return msg.raw(formatKey)
                 .replace("%podium%", plugin.rankFormat().podium(player.getUniqueId()))
                 .replace("%group%", g.prefix())
                 .replace("%level%", levelTag)

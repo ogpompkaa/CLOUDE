@@ -176,7 +176,7 @@ public class ScoreboardService {
 
         // Poczekalnia: nick z ranga (RankService nie dziala na arenie) + info o grze.
         if (plugin.groups() != null) {
-            player.playerListName(LEGACY.deserialize(plugin.groups().displayName(player)));
+            player.playerListName(LEGACY.deserialize(plugin.groups().tabName(player)));
         }
         var cfg = plugin.configManager().raw();
         String mode = pl.ultrahc.paper.manager.InstanceManager.modeName(cfg.getInt("game.team-size", 1));

@@ -42,7 +42,7 @@ public class RankService {
         if (profile == null) return;
 
         // TAB — nick wg szablonu (ten sam co na czacie) + naglowek/stopka ze statystykami.
-        player.playerListName(LEGACY.deserialize(plugin.groups().displayName(player)));
+        player.playerListName(LEGACY.deserialize(plugin.groups().tabName(player)));
         String rank = plugin.groups().groupPrefix(player);
         player.sendPlayerListHeaderAndFooter(
                 LEGACY.deserialize(plugin.messages().raw("tablist.header")),

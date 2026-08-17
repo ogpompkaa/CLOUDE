@@ -43,7 +43,8 @@ chat:
   separator: "&7: &f"
   # Uklad nicku (czat + TAB). Placeholdery: %podium% %group% %level% %namecolor% %name%.
   # Domyslnie: ranga z przodu, poziom subtelnie po nicku (bez podwojnych nawiasow).
-  name-format: "%podium%%level% %group%%namecolor%%name%"
+  name-format: "%level% %group%%namecolor%%name%"           # CZAT — czysto, bez podium
+  tab-format: "%level% %group%%namecolor%%name% %podium%"   # TAB — #1 UHC za nickiem
   level-tag: "&7%level%&8✦"
   hover: "&e%player%\n&7Poziom: &b%level%\n&7Kille: &c%kills%\n&7Wygrane: &a%wins%\n&8(klik = /msg)"
   team-format: "&2[Druzyna] %prefix%&f%name%&7: "
@@ -230,6 +231,15 @@ scoreboard:
   lobby-level: "&7 Poziom: &b%level%✦"
   lobby-kills: "&7 Zabojstwa: &c%kills%"
   lobby-wins: "&7 Wygrane: &a%wins%"
+
+# Sideboard huba (rola LOBBY).
+hub:
+  rank: "&7Ranga: %rank%"
+  level: "&7Poziom: &b%level%✦"
+  xp: "&b✦ &7Xp: &e%xp%"
+  kills: "&c❤ &7Zabojstwa: &c%kills%"
+  wins: "&6★ &7Wygrane: &a%wins%"
+  online: "&a● &7Online: &f%online%"
 
 actionbar:
   hud: "&e%phase% &8• &aZywi: &f%alive% &8• &6Granica: &f%size% &8• &cKille: &f%kills%"

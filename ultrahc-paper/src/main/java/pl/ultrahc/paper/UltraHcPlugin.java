@@ -100,6 +100,7 @@ public class UltraHcPlugin extends JavaPlugin {
     private pl.ultrahc.paper.manager.AmbientEffects ambientEffects;
     private pl.ultrahc.paper.manager.RankTrailService rankTrailService;
     private pl.ultrahc.paper.manager.BorderWallService borderWallService;
+    private pl.ultrahc.paper.manager.HubScoreboardService hubScoreboardService;
     private SpectateGui spectateGui;
     private pl.ultrahc.paper.party.PartyManager partyManager;
     private pl.ultrahc.paper.gui.PartyGui partyGui;
@@ -254,11 +255,13 @@ public class UltraHcPlugin extends JavaPlugin {
             instanceManager.startLobby();
             this.rankService = new RankService(this);
             this.ambientEffects = new pl.ultrahc.paper.manager.AmbientEffects(this);
+            this.hubScoreboardService = new pl.ultrahc.paper.manager.HubScoreboardService(this);
             // Po pelnym starcie: odswiez topki i postaw NPC (swiat lobby musi byc zaladowany).
             getServer().getScheduler().runTask(this, () -> {
                 leaderboardsManager.start();
                 rankService.start();
                 ambientEffects.start();
+                hubScoreboardService.start(); // sideboard huba
                 spawnLobbyNpcs();
             });
         }
@@ -315,6 +318,7 @@ public class UltraHcPlugin extends JavaPlugin {
         if (ambientEffects != null) ambientEffects.stop();
         if (rankTrailService != null) rankTrailService.stop();
         if (borderWallService != null) borderWallService.stop();
+        if (hubScoreboardService != null) hubScoreboardService.stop();
         if (instanceManager != null) instanceManager.shutdown();
         if (hologramManager != null) hologramManager.removeAll();
         if (npcManager != null) npcManager.removeAll();
@@ -363,6 +367,7 @@ public class UltraHcPlugin extends JavaPlugin {
     public pl.ultrahc.paper.manager.GroupManager groups() { return groupManager; }
     public RankService ranks() { return rankService; }
     public ScoreboardService scoreboard() { return scoreboardService; }
+    public pl.ultrahc.paper.manager.HubScoreboardService hubScoreboard() { return hubScoreboardService; }
     public SpectateGui spectateGui() { return spectateGui; }
     public pl.ultrahc.paper.party.PartyManager party() { return partyManager; }
     public pl.ultrahc.paper.gui.PartyGui partyGui() { return partyGui; }
