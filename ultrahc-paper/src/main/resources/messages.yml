@@ -232,14 +232,15 @@ scoreboard:
   lobby-kills: "&7 Zabojstwa: &c%kills%"
   lobby-wins: "&7 Wygrane: &a%wins%"
 
-# Sideboard huba (rola LOBBY).
+# Sideboard huba (rola LOBBY) — uklad wzorowany na VertezHub.
 hub:
-  rank: "&7Ranga: %rank%"
+  player: "&a▶ &f%player%"
+  rank: "%rank%"
   level: "&7Poziom: &b%level%✦"
-  xp: "&b✦ &7Xp: &e%xp%"
-  kills: "&c❤ &7Zabojstwa: &c%kills%"
-  wins: "&6★ &7Wygrane: &a%wins%"
-  online: "&a● &7Online: &f%online%"
+  xp: "&7Xp: &e%xp%"
+  kills: "&7Zabojstwa: &c%kills%"
+  wins: "&7Wygrane: &a%wins%"
+  online: "&7Online: &a%online%"
 
 actionbar:
   hud: "&e%phase% &8• &aZywi: &f%alive% &8• &6Granica: &f%size% &8• &cKille: &f%kills%"

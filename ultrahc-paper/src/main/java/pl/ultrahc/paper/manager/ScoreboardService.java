@@ -121,8 +121,10 @@ public class ScoreboardService {
         if (obj == null) {
             obj = board.registerNewObjective("uhc", Criteria.DUMMY, currentTitle());
             obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-            // Ukryj czerwone numery po prawej (czysty wyglad tablicy).
-            obj.numberFormat(io.papermc.paper.scoreboard.numbers.NumberFormat.blank());
+            // Ukryj czerwone numery po prawej (czysty wyglad) — chyba ze wylaczono w config.
+            if (plugin.configManager().raw().getBoolean("scoreboard.hide-numbers", true)) {
+                obj.numberFormat(io.papermc.paper.scoreboard.numbers.NumberFormat.blank());
+            }
         } else {
             obj.displayName(currentTitle());
         }

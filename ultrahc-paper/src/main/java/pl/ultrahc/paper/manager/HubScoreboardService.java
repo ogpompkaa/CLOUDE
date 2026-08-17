@@ -94,7 +94,9 @@ public class HubScoreboardService {
         if (obj == null) {
             obj = board.registerNewObjective("hub", Criteria.DUMMY, currentTitle());
             obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-            obj.numberFormat(io.papermc.paper.scoreboard.numbers.NumberFormat.blank());
+            if (plugin.configManager().raw().getBoolean("scoreboard.hide-numbers", true)) {
+                obj.numberFormat(io.papermc.paper.scoreboard.numbers.NumberFormat.blank());
+            }
         } else {
             obj.displayName(currentTitle());
         }
@@ -138,7 +140,11 @@ public class HubScoreboardService {
         String rank = plugin.groups() != null ? plugin.groups().groupPrefix(player) : "";
 
         addSep(lines, msg);
-        lines.add(legacy(msg.raw("hub.rank", Map.of("rank", rank))));
+        lines.add(legacy(msg.raw("hub.player", Map.of("player", player.getName()))));
+        // Linia rangi tylko gdy ranga ma widoczna tresc (nie dla domyslnego GRACZ).
+        if (!msg.legacyStrip(rank).isBlank()) {
+            lines.add(legacy(msg.raw("hub.rank", Map.of("rank", rank))));
+        }
         lines.add(legacy(msg.raw("hub.level", Map.of("level", String.valueOf(level)))));
         lines.add(legacy(msg.raw("hub.xp", Map.of("xp", NumberUtil.grouped(xp)))));
         lines.add(legacy(msg.raw("hub.kills", Map.of("kills", String.valueOf(kills)))));

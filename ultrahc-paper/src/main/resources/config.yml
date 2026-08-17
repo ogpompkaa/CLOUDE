@@ -78,6 +78,9 @@ game:
   spawn-attempts: 30              # ile prob bezpiecznego punktu rozrzutu (lad, nie woda/lawa)
   show-health-below-name: true    # liczba serc pod nickiem gracza (klasyka UHC)
 
+scoreboard:
+  hide-numbers: true              # ukryj czerwone numery po prawej stronie tablicy (VertezHub je POKAZUJE — daj false, by bylo jak u nich)
+
 combat:
   tag-seconds: 10                 # okno przypisania zabojcy (combat-tag)
   killstreak-milestones: [3, 5, 7, 10]   # progi serii zabojstw (broadcast + title)
