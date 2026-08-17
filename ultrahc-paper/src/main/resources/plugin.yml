@@ -1,0 +1,69 @@
+name: UltraHC
+version: ${project.version}
+main: pl.ultrahc.paper.UltraHcPlugin
+api-version: '1.21'
+authors: [UltraHC]
+description: Niestandardowy tryb UHC (lobby + areny) dla sieci Paper/Velocity.
+
+# Zaleznosci opcjonalne — brak nie blokuje startu (graceful skip odpowiednich modulow)
+softdepend: [Citizens, DecentHolograms, Chunky, PlaceholderAPI]
+
+commands:
+  uhc:
+    description: Komendy UltraHC (info, admin).
+    usage: /uhc
+    permission: ultrahc.use
+    permission-message: "Brak uprawnien."
+  party:
+    description: System party (DUO/TRIO/SQUAD).
+    usage: /party
+    permission: ultrahc.use
+    permission-message: "Brak uprawnien."
+  pc:
+    description: Czat party.
+    usage: /pc <wiadomosc>
+    permission: ultrahc.use
+    permission-message: "Brak uprawnien."
+  msg:
+    description: Prywatna wiadomosc do gracza.
+    usage: /msg <gracz> <wiadomosc>
+    aliases: [pm, whisper]
+  r:
+    description: Odpowiedz na ostatnia prywatna wiadomosc.
+    usage: /r <wiadomosc>
+    aliases: [odp]
+
+permissions:
+  ultrahc.use:
+    description: Podstawowy dostep do komend UltraHC.
+    default: true
+  ultrahc.admin:
+    description: Pelne uprawnienia administracyjne UltraHC.
+    default: op
+  ultrahc.chat.bypass:
+    description: Pomija anty-spam i filtr reklam na czacie.
+    default: op
+  ultrahc.chat.color:
+    description: Pozwala uzywac kodow koloru (&) w wiadomosciach czatu.
+    default: op
+  ultrahc.build:
+    description: Pozwala budowac w chronionym lobby/poczekalni.
+    default: op
+  ultrahc.rank.owner:
+    description: Ranga OWNER (prefiks na czacie/TAB/nametag).
+    default: false
+  ultrahc.rank.admin:
+    description: Ranga ADMIN.
+    default: false
+  ultrahc.rank.mod:
+    description: Ranga MOD.
+    default: false
+  ultrahc.rank.helper:
+    description: Ranga HELPER.
+    default: false
+  ultrahc.rank.svip:
+    description: Ranga SVIP.
+    default: false
+  ultrahc.rank.vip:
+    description: Ranga VIP.
+    default: false

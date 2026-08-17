@@ -1,0 +1,121 @@
+package pl.ultrahc.paper.manager;
+
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.WorldBorder;
+import org.bukkit.entity.Player;
+import pl.ultrahc.paper.UltraHcPlugin;
+import pl.ultrahc.paper.config.ConfigManager;
+import pl.ultrahc.paper.game.GameInstance;
+import pl.ultrahc.paper.game.Team;
+
+import java.util.UUID;
+
+/**
+ * Kurczenie granicy w 3 fazach + arenka (sudden-death) — patrz DECYZJE, sekcja 2.
+ * Faza 1: 24 bloki/min (min 10-30). Faza 2: 30/min (min 30-45).
+ * Faza 3: od 45 min teleport zywych na arenke, ktora zaciska sie do ~0.
+ *
+ * <p>Wartosci docelowe liczone z tempa w config (nic nie hardkodowane), przez
+ * {@link WorldBorder#setSize(double, long)} (plynna interpolacja liniowa).
+ */
+public class BorderManager {
+
+    private final UltraHcPlugin plugin;
+
+    public BorderManager(UltraHcPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    private ConfigManager cfg() { return plugin.configManager(); }
+
+    /** Buduje krzywa granicy z config (wspoldzielona, testowana matematyka). */
+    private pl.ultrahc.common.game.BorderCurve curve() {
+        var c = cfg().raw();
+        return new pl.ultrahc.common.game.BorderCurve(
+                c.getDouble("border.start", 1000),
+                c.getInt("border.shrink-start-min", 10),
+                c.getDouble("border.blocks-per-min", 24),
+                c.getInt("border.accelerate-min", 30),
+                c.getDouble("border.blocks-per-min-fast", 30));
+    }
+
+    /** Faza 1 (od shrink-start-min): kurczenie tempem blocks-per-min do accelerate-min. */
+    public void beginPhase1(GameInstance game) {
+        var c = cfg().raw();
+        int shrinkStart = c.getInt("border.shrink-start-min", 10);
+        int accelerate = c.getInt("border.accelerate-min", 30);
+        int minutes = Math.max(1, accelerate - shrinkStart);
+        double target = curve().sizeAt(accelerate);
+        game.world().getWorldBorder().setSize(target, minutes * 60L);
+        plugin.getLogger().info("[UltraHC] Granica faza 1 -> " + target + " w " + minutes + " min.");
+    }
+
+    /** Faza 2 (od accelerate-min): przyspieszone tempo blocks-per-min-fast do teleport-min. */
+    public void beginPhase2(GameInstance game) {
+        var c = cfg().raw();
+        int accelerate = c.getInt("border.accelerate-min", 30);
+        int teleport = c.getInt("arena-showdown.teleport-min", 45);
+        int minutes = Math.max(1, teleport - accelerate);
+        double target = curve().sizeAt(teleport);
+        game.world().getWorldBorder().setSize(target, minutes * 60L);
+        plugin.getLogger().info("[UltraHC] Granica faza 2 (przyspieszenie) -> " + target + " w " + minutes + " min.");
+    }
+
+    /** Faza 3 (od teleport-min): arenka — recenter na spawn, zacisk do rozmiaru arenki, TP zywych, kolaps do ~0. */
+    public void beginShowdown(GameInstance game) {
+        var c = cfg().raw();
+        String mode = c.getString("arena-showdown.mode", "BORDER_CLAMP");
+        double size = c.getDouble("arena-showdown.size", 40);
+        int teleport = c.getInt("arena-showdown.teleport-min", 45);
+        int collapseTo = c.getInt("arena-showdown.collapse-to-min", 60);
+
+        World world = game.world();
+        WorldBorder border = world.getWorldBorder();
+        Location center = world.getSpawnLocation();
+        border.setCenter(center);
+        border.setSize(size); // natychmiastowy zacisk do arenki
+
+        // Tryb SCHEMATIC: generujemy plaska platforme-arenke (swiat jest losowy i
+        // regenerowany, wiec paste pliku wymagalby WorldEdit — dajemy niezalezna
+        // od pluginow plaska arene). BORDER_CLAMP zostawia teren bez zmian.
+        int floorY = center.getBlockY();
+        if ("SCHEMATIC".equalsIgnoreCase(mode)) {
+            floorY = buildPlatform(world, center.getBlockX(), center.getBlockZ(), (int) size);
+        }
+
+        // Teleport wszystkich zywych na srodek arenki.
+        if (game.teams() != null) {
+            for (Team team : game.teams().aliveTeams()) {
+                for (UUID id : team.getAlive()) {
+                    Player p = plugin.getServer().getPlayer(id);
+                    if (p == null) continue;
+                    Location loc = "SCHEMATIC".equalsIgnoreCase(mode)
+                            ? new Location(world, center.getBlockX() + 0.5, floorY + 1, center.getBlockZ() + 0.5)
+                            : world.getHighestBlockAt(center).getLocation().add(0.5, 1, 0.5);
+                    p.teleport(loc);
+                }
+            }
+        }
+        // Kolaps arenki do ~0 -> sudden-death zawsze sie rozstrzyga.
+        int minutes = Math.max(1, collapseTo - teleport);
+        border.setSize(1, minutes * 60L);
+        plugin.getLogger().info("[UltraHC] Arenka (" + mode + "): rozmiar " + size + ", kolaps do ~0 w " + minutes + " min.");
+    }
+
+    /** Buduje plaska kamienna platforme size x size wokol srodka; zwraca poziom podlogi. */
+    private int buildPlatform(World world, int cx, int cz, int size) {
+        int floorY = world.getHighestBlockYAt(cx, cz);
+        int half = size / 2;
+        for (int dx = -half; dx <= half; dx++) {
+            for (int dz = -half; dz <= half; dz++) {
+                int x = cx + dx, z = cz + dz;
+                world.getBlockAt(x, floorY, z).setType(org.bukkit.Material.STONE);
+                for (int dy = 1; dy <= 4; dy++) {
+                    world.getBlockAt(x, floorY + dy, z).setType(org.bukkit.Material.AIR);
+                }
+            }
+        }
+        return floorY;
+    }
+}

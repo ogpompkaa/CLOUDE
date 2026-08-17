@@ -1,0 +1,466 @@
+# =====================================================================
+#  UltraHC — messages.yml (PL)
+#  WSZYSTKIE komunikaty do graczy + etykiety scoreboardu. Nic na sztywno w kodzie.
+#  Kolory: uzywaj kodow & (np. &6). Placeholdery: %nazwa%.
+# =====================================================================
+
+prefix: "&8[&6UltraHC&8] &7"
+
+# --------------------------- WEJSCIE / TABLIST -----------------------
+join-message: "&8[&a+&8] %rank%&e%player%"
+quit-message: "&8[&c-&8] %rank%&e%player%"
+
+tablist:
+  # Hub (lobby): branding + Twoje statystyki. Separator = &m na spacjach.
+  header: "&8&m                        &r\n&6&lULTRAHC\n&7Sezonowy tryb UHC\n&8&m                        "
+  footer: "&8&m                        &r\n&7Ranga: %rank%&r  &8•  &7Poziom: &b%level%✦\n&7Xp: &e%xp%  &8•  &7Online: &a%online%\n&8&m                        "
+  # Poczekalnia areny (przed startem meczu).
+  lobby-header: "&8&m                        &r\n&6&lULTRAHC &7Poczekalnia\n&8&m                        "
+  lobby-footer: "&7Tryb: &e%mode%  &8•  &7Gracze: &a%count%&7/&e%min%\n%countdown%&8&m                        "
+  lobby-countdown: "&7Start za: &e%time%\n"
+  # TAB podczas meczu.
+  game-header: "&8&m                        &r\n&6&lULTRAHC\n&7Zywi: &a%alive%  &8•  &7Faza: &e%phase%\n&7Czas: &f%time%\n&8&m                        "
+  game-footer: "&8&m                        &r\n&7Xp: &e%xp%  &8•  &7Kille druzyny: &c%kills%\n&8Trzymaj sie do konca!"
+
+welcome:
+  main: "&6&lULTRAHC"
+  sub: "&7Witaj, &e%player%&7!"
+
+menu-item: "&a&lMENU &7(PPM)"
+
+motd:
+  line1: "&6&lULTRAHC &7— sezonowy tryb UHC"
+  line2: "&7100 graczy • klasy • receptury • sezony"
+
+# --------------------------- RANGI / BOSSBAR / TITLE -----------------
+rank:
+  prefix: "&7[&6%level%✪&7] "        # przy nicku w TAB i nad glowa
+  podium-1: "&6&l#1 UHC "
+  podium-2: "&7&l#2 UHC "
+  podium-3: "&c&l#3 UHC "
+
+chat:
+  separator: "&7: &f"
+  # Uklad nicku (czat + TAB). Placeholdery: %podium% %group% %level% %namecolor% %name%.
+  # Domyslnie: ranga z przodu, poziom subtelnie po nicku (bez podwojnych nawiasow).
+  name-format: "%level% %group%%namecolor%%name%"           # CZAT — czysto, bez podium
+  tab-format: "%level% %group%%namecolor%%name% %podium%"   # TAB — #1 UHC za nickiem
+  level-tag: "&7%level%&8✦"
+  hover: "&e%player%\n&7Poziom: &b%level%\n&7Kille: &c%kills%\n&7Wygrane: &a%wins%\n&8(klik = /msg)"
+  team-format: "&2[Druzyna] %prefix%&f%name%&7: "
+  spectator-format: "&8[Martwi] %prefix%&7%name%&8: "
+  cooldown: "&cNie tak szybko — odczekaj chwile."
+  repeat: "&cNie powtarzaj tej samej wiadomosci."
+  ad-blocked: "&cReklama innych serwerow/linki sa zabronione."
+
+# Prywatne wiadomosci (/msg, /r). format-* bez prefiksu (wlasny naglowek), reszta z prefiksem.
+msg:
+  format-out: "&8[&bTy &7→ &b%player%&8] &f"
+  format-in: "&8[&b%player% &7→ &bTy&8] &f"
+  usage: "&cUzycie: /msg <gracz> <wiadomosc>"
+  usage-reply: "&cUzycie: /r <wiadomosc>"
+  no-target: "&cNie ma takiego gracza online."
+  no-reply: "&cNie masz komu odpowiedziec."
+  self: "&cNie mozesz napisac do siebie."
+
+bossbar:
+  waiting: "&aOczekiwanie na graczy: &e%count%&7/&e%min%"
+  countdown: "&eStart gry za: &6%time%"
+  no-pvp: "&aBrak PvP: &e%time%"
+  pvp: "&cPvP aktywne"
+  shrink-soon: "&eGranica kurczy sie za: &6%time%"
+  shrinking: "&cGranica: &6%size%"
+  showdown: "&4&lSUDDEN-DEATH — ARENKA!"
+
+title:
+  pvp-main: "&c&lPvP!"
+  pvp-sub: "&7Walcz do ostatniej druzyny"
+  showdown-main: "&4&lARENKA"
+  showdown-sub: "&7Sudden-death!"
+  win-main: "&6&lWYGRANA!"
+  win-sub: "&7Gratulacje"
+  winner-label: "&6&l✦ ZWYCIEZCA ✦"
+  levelup-main: "&6&lAWANS"
+  levelup-sub: "&ePoziom %level% %star%"
+  quest-main: "&a&lQUEST!"
+  quest-sub: "&e%name%"
+  kill-reward-main: "&a&l+%xp% XP"
+  kill-reward-sub: "&b+%pd% PD"
+  death-main: "&c&lZGINALES"
+  death-sub: "&7Zabil Cie: &e%killer%"
+  countdown-main: "&e&l%seconds%"
+  countdown-sub: "&7Przygotuj sie!"
+  start-main: "&a&lSTART!"
+  start-sub: "&7Powodzenia!"
+  first-blood-main: "&c&lPIERWSZA KREW"
+  first-blood-sub: "&e%killer% &7przelal pierwsza krew"
+
+help:
+  header: "&6&lUltraHC &7— komendy:"
+  lines:
+    - "&e/uhc menu &7- menu glowne (lobby)"
+    - "&e/uhc classes &7- wybor i kupno klas"
+    - "&e/uhc shop &7- sklep receptur"
+    - "&e/uhc quests &7- twoje questy"
+    - "&e/uhc join &7- dolacz do gry (arena)"
+    - "&e/uhc spectate &7- obserwuj zywych (po smierci)"
+    - "&e/uhc balance &7- twoje XP i poziom"
+  admin: "&c[admin] &7/uhc admin, forcestart, forceend, givexp, givepd, season, stats, setstat, instances, setnpc, sethologram, reload"
+
+general:
+  no-permission: "&cNie masz uprawnien do tej komendy."
+  players-only: "&cTa komenda jest tylko dla graczy."
+  reloaded: "&aKonfiguracja przeladowana."
+  unknown-subcommand: "&cNieznana podkomenda. Uzyj &e/uhc help&c."
+  usage: "&cUzycie: &e%usage%"
+  profile-loading: "&cProfil jeszcze sie laduje, sprobuj za chwile."
+  invalid-number: "&cNiepoprawna liczba."
+  arena-only: "&cTen serwer nie jest arena (rola LOBBY)."
+  no-instance: "&cBrak aktywnej instancji (rola LOBBY?)."
+  lobby-role: "&7Rola LOBBY — brak instancji gry."
+  feature-lobby-only: "&cNiedostepne w tej roli serwera."
+
+currency:
+  name: "XP"                       # nazwa waluty sklepowej (jedno miejsce)
+  balance: "&7Twoje &6%name%&7: &e%amount%"
+  added: "&aDodano &e%amount% %name%&a. Stan: &e%balance%"
+  not-enough: "&cMasz za malo %name% (potrzeba &e%need%&c, masz &e%have%&c)."
+
+progress:
+  name: "PD"
+  gained: "&b+%amount% PD"
+  level-up: "&6Awans! &eOsiagnales poziom &6%level% %star%&e!"
+  status: "&7Poziom &6%level% %star% &7(&b%current%&7/&b%required% PD&7)"
+
+game:
+  waiting: "&7Oczekiwanie na graczy... &e%count%&7/&e%min%"
+  countdown-started: "&aZebrano %min% graczy! Start za &e%seconds%s&a."
+  countdown: "&eStart gry za &6%seconds%&e sekund."
+  started: "&aGra rozpoczeta! &7Brak PvP przez &e%minutes% min&7."
+  pvp-enabled: "&cPvP wlaczone! Walcz!"
+  border-shrinking: "&cGranica mapy zaczela sie kurczyc!"
+  compass-enemy-unlocked: "&6Kompas moze teraz wskazywac najblizszego przeciwnika."
+  showdown: "&4Sudden-death! &cWszyscy zywi trafiaja na arenke!"
+  kill-weapon: "&c☠ &e%victim% &7zostal zabity przez &c%killer% &7(&f%weapon%&7)"
+  weapon-fist: "gole rece"
+  death-generic: "&e%victim% &7zostal wyeliminowany."
+  # Losowe opisy smierci (pusta lista = uzyj kill-weapon / death-generic).
+  kill-messages:
+    - "&c☠ &e%victim% &7zostal zabity przez &c%killer% &7(&f%weapon%&7)"
+    - "&c☠ &c%killer% &7rozniosl &e%victim% &7(&f%weapon%&7)"
+    - "&c☠ &e%victim% &7padl z reki &c%killer%"
+    - "&c☠ &c%killer% &7wyeliminowal &e%victim% &7(&f%weapon%&7)"
+    - "&c☠ &e%victim% &7nie dal rady &c%killer%"
+  death-messages:
+    - "&e%victim% &7zostal wyeliminowany."
+    - "&e%victim% &7nie przetrwal."
+    - "&7Koniec gry dla &e%victim%&7."
+    - "&e%victim% &7odpada z gry."
+  team-eliminated: "&7Druzyna &e%team% &7zostala wyeliminowana."
+  win-team: "&6Wygrywa druzyna &e%team%&6!"
+  win-solo: "&6Wygrywa &e%player%&6!"
+  players-alive: "&7Zywych graczy: &a%count%"
+  join-game: "&aDolaczono do gry &e%instance%&a."
+  reconnect-window: "&eMasz &6%seconds%s &ena powrot do gry."
+  join-failed: "&cNie mozna dolaczyc (gra w toku lub pelna)."
+  pvp-not-active: "&cPvP jeszcze nieaktywne."
+  enderchest-blocked: "&cSkrzynia Endera jest wylaczona."
+  first-blood: "&c&lPIERWSZA KREW! &e%killer% &7zabil %victim%&7 jako pierwszy."
+
+head:
+  consumed: "&aZjadles glowke — otrzymujesz efekty."
+
+spectate:
+  title: "&8Obserwuj gracza"
+  hint: "&7Zginales. Uzyj &e/uhc spectate &7aby obserwowac zywych."
+  teleported: "&aObserwujesz &e%player%&a."
+  not-spectator: "&cTa opcja jest dla obserwatorow."
+
+compass:
+  ally: "&aKompas: sojusznik &e%name% &7(%distance% kratek)"
+  enemy: "&cKompas: najblizszy przeciwnik &7(%distance% kratek)"   # nick ukryty
+  none: "&7Brak celu dla kompasu."
+  enemy-locked: "&7Tryb przeciwnika odblokuje sie po &e%minutes% min&7."
+
+detector:
+  used: "&aWykrywacz aktywowany. Wynik za &e%seconds%s&a."
+  result: "&e%player% &7- &e%distance% &7kratek"
+  cooldown: "&cWykrywacz na cooldownie: &e%seconds%s&c."
+  none: "&7Wykrywacz nie znalazl nikogo w poblizu."
+
+pandora:
+  reward: "&aPuszka Pandory: wypada &e%item%&a!"
+  curse: "&cPuszka Pandory: dopadla cie klatwa!"
+  placed: "&7Puszka Pandory postawiona — kliknij PPM, aby otworzyc."
+
+# --------------------------- SCOREBOARD ------------------------------
+scoreboard:
+  title: "&6&lULTRAHC"
+  # Animowany tytul — klatki cyklicznie (fala jasnosci po literach). Pusta lista = tytul statyczny.
+  title-frames:
+    - "&f&lU&6&lLTRAHC"
+    - "&6&lU&f&lL&6&lTRAHC"
+    - "&6&lUL&f&lT&6&lRAHC"
+    - "&6&lULT&f&lR&6&lAHC"
+    - "&6&lULTR&f&lA&6&lHC"
+    - "&6&lULTRA&f&lH&6&lC"
+    - "&6&lULTRAH&f&lC"
+    - "&6&lULTRA&f&lH&6&lC"
+    - "&6&lULTR&f&lA&6&lHC"
+    - "&6&lULT&f&lR&6&lAHC"
+    - "&6&lUL&f&lT&6&lRAHC"
+    - "&6&lU&f&lL&6&lTRAHC"
+  sep: "&8&m               &r"                    # linia separatora (pusta = brak)
+  top-line: "&e%pos% &f%team% &8⚔ &7%kills%"     # Top 3 druzyny
+  self-marker: "&a▶ &f%team% &8⚔ &7%kills%"      # marker druzyny gracza
+  teammate: "&7 • %name%"                        # wspoltowarzysz (znika w solo)
+  border-line: "&6⬡ Granica: &l%size%"           # zlota liczba = rozmiar granicy
+  currency-label: "&b✦ &7Xp: &e%amount%"         # celowo 'Xp:' jak na zrzucie
+  alive-label: "&c❤ &7Zywi: &a%count%"
+  timer: "&e⏱ &f%time%"                          # HH:MM:SS
+  waiting: "&7Gracze: &a%count%&7/&e%max%"       # widok przed startem
+  state-waiting: "&eOczekiwanie..."
+  footer: "&6&lplay.twojserwer.pl"               # linia stopki (pusta = brak)
+  empty: ""
+  # --- Osobny widok POCZEKALNI (przed startem meczu) ---
+  lobby-state: "&e&lPOCZEKALNIA"
+  lobby-mode: "&7Tryb: &e%mode%"
+  lobby-players: "&7Gracze: &a%count%&7/&e%min%"
+  lobby-countdown: "&e⏱ &7Start za: &e%time%"
+  lobby-stats: "&6✦ Twoje statystyki:"
+  lobby-level: "&7 Poziom: &b%level%✦"
+  lobby-kills: "&7 Zabojstwa: &c%kills%"
+  lobby-wins: "&7 Wygrane: &a%wins%"
+
+# Sideboard huba (rola LOBBY) — uklad wzorowany na VertezHub.
+hub:
+  player: "&a▶ &f%player%"
+  rank: "%rank%"
+  level: "&7Poziom: &b%level%✦"
+  xp: "&7Xp: &e%xp%"
+  kills: "&7Zabojstwa: &c%kills%"
+  wins: "&7Wygrane: &a%wins%"
+  online: "&7Online: &a%online%"
+
+actionbar:
+  hud: "&e%phase% &8• &aZywi: &f%alive% &8• &6Granica: &f%size% &8• &cKille: &f%kills%"
+  phase-pvp: "&aPvP za %time%"
+  phase-shrink-soon: "&eKurczenie za %time%"
+  phase-shrinking: "&cKurczenie granicy"
+  phase-showdown: "&5Arenka!"
+
+killstreak:
+  broadcast: "&c⚔ &e%player% &7ma serie &c%streak% &7zabojstw!"
+  title-main: "&c&lSERIA x%streak%"
+  title-sub: "&7Nie do zatrzymania!"
+
+# --------------------------- TOPKI (hologramy) -----------------------
+leaderboard:
+  title-kills: "&c&lTOP 10 ZABOJSTW"
+  title-wins: "&a&lTOP 10 WYGRANYCH"
+  title-level: "&b&lTOP 10 POZIOMOW"
+  entry: "&e%pos%. &f%name% &7- &6%value%"
+  empty: "&7---"
+
+# --------------------------- NPC -------------------------------------
+npc:
+  mietek-info:
+    - "&6Mietek: &7Witaj w UltraHC!"
+    - "&7Brak PvP przez 10 min, potem walka do ostatniej druzyny."
+    - "&7Kop kamien po surowce, granica kurczy sie od 10 min."
+    - "&7Kup klasy i receptury za XP u Sklepikarza."
+  krzysiu-info: "&6Krzysiu: &7System questow bedzie tutaj."
+  set: "&aUstawiono NPC &e%id% &aw tym miejscu."
+  hologram-set: "&aUstawiono hologram &e%id% &aw tym miejscu."
+  not-configured: "&eNPC/hologram &6%id% &niema ustawionej pozycji."
+
+# --------------------------- WYBOR ARENY (lobby) ---------------------
+arena:
+  gui-title: "&8Wybor areny UHC"
+  instance: "&aArena %id%"
+  lore-state: "&7Stan: &e%state%"
+  lore-mode: "&7Tryb: &e%mode%"
+  lore-players: "&7Gracze: &e%players%&7/&e%max%"
+  none: "&7Brak dostepnych aren — sprobuj za chwile."
+  connecting: "&aLaczenie z &e%id%&a..."
+  quick: "&6&lSzybkie dolaczenie"
+  quick-lore: "&7Dolacz do najlepszej dostepnej areny."
+  lobby-spawn-set: "&aUstawiono spawn poczekalni areny w swiecie &e%world%&a."
+  hub-item: "&c&lPowrot do huba &7(PPM)"
+  returning-hub: "&7Powrot do huba..."
+
+# --------------------------- KLASY / SKLEP ---------------------------
+class:
+  selected: "&aWybrano klase: &e%class%&a."
+  locked: "&cTa klasa nie jest odblokowana."
+  bought: "&aKupiono klase &e%class% &aza &e%price% %currency%&a."
+  already-owned: "&ePosiadasz juz te klase."
+  gui-title: "&8Klasy"
+  price-line: "&7Cena: &e%price% XP"
+  status-selected: "&a▶ Wybrana"
+  status-owned: "&aPosiadana &7(kliknij, aby wybrac)"
+  status-locked: "&cZablokowana &7(kliknij, aby kupic)"
+  not-found: "&cNie ma takiej klasy."
+  list-header: "&6Klasy:"
+  list-entry: "&7- &e%class% &7(%price% XP) %status%"
+  tag-selected: "&a[wybrana]"
+  tag-owned: "&a[posiadana]"
+  tag-locked: "&c[zablokowana]"
+  desc:
+    civil:
+      - "&7Kit: patyk + 8 chlebow"
+      - "&7Umiejetnosc: brak"
+    gornik:
+      - "&7Kit: kamienny kilof (Wydajnosc I) + 3 steaki"
+      - "&7Umiejetnosc: wiekszy drop surowcow i exp ze stone"
+    sniper:
+      - "&7Kit: luk AWP (Niezniszczalnosc II) + 8 strzal"
+      - "&7Umiejetnosc: Regeneracja I po trafieniu przeciwnika"
+    chef:
+      - "&7Kit: 8 steakow + 2 chleby"
+      - "&7Umiejetnosc: przepieczone mieso, wiecej jablek"
+    fisher:
+      - "&7Kit: wedka (Niezniszczalnosc III) + 3 ryby"
+      - "&7Umiejetnosc: buff w wodzie, ksiazki z lowienia"
+    yeti:
+      - "&7Kit: lopata (Wydajnosc II, Nieznisz. II) + 32 sniezki"
+      - "&7Umiejetnosc: Speed na sniegu/lodzie"
+    smith:
+      - "&7Kit: 1 sztabka + 1 surowe zelazo"
+      - "&7Umiejetnosc: surowce wypadaja przepalone"
+    guard:
+      - "&7Kit: 2 dodatkowe serduszka"
+      - "&7Umiejetnosc: Spowolnienie + Odpornosc po ciosie"
+
+# --------------------------- MENU / STATYSTYKI -----------------------
+menu:
+  title: "&8UltraHC — Menu"
+  play: "&a&lGRAJ"
+  play-lore: "&7Wybierz arene UHC i dolacz."
+  classes: "&b&lKLASY"
+  classes-lore: "&7Wybierz i kupuj klasy."
+  shop: "&6&lSKLEP"
+  shop-lore: "&7Kupuj receptury za XP."
+  quests: "&e&lQUESTY"
+  quests-lore: "&7Twoje zadania i nagrody."
+  stats: "&d&lSTATYSTYKI"
+  stats-lore: "&7Twoj postep i wyniki."
+  leaderboards: "&c&lTOPKI"
+  leaderboards-lore: "&7Najlepsi gracze."
+
+leaderboard-gui:
+  title: "&8Topki"
+  kills-icon: "&c&lTOP ZABOJSTW"
+  wins-icon: "&a&lTOP WYGRANYCH"
+  level-icon: "&b&lTOP POZIOMOW"
+
+stats:
+  gui-title: "&8Twoje statystyki"
+  xp: "&6XP (sklep): &e%value%"
+  level: "&bPoziom: &6%level% %star% &7(%current%/%required% PD)"
+  kills: "&cZabojstwa: &f%value%"
+  wins: "&aWygrane: &f%value%"
+  clazz: "&7Wybrana klasa: &e%value%"
+
+shop:
+  bought-recipe: "&aKupiono recepture &e%recipe% &aza &e%price% %currency%&a."
+  already-owned-recipe: "&ePosiadasz juz te recepture."
+  title: "&8Sklep receptur"
+  price-line: "&7Cena: &e%price% XP"
+  status-owned: "&a✔ Posiadasz"
+  status-buy: "&eKliknij, aby kupic"
+  balance: "&6Twoje XP: &e%amount%"
+  balance-lore: "&7Wydawaj na receptury i klasy."
+  desc:
+    gornik-pickaxe:
+      - "&7Zelazny kilof: Wydajnosc III + Niezniszczalnosc III"
+    sharp-sword:
+      - "&7Zelazny miecz: Ostrosc II + Niezniszczalnosc I"
+    fire-sword:
+      - "&7Zelazny miecz: Ognisty Aspekt I"
+    hell-sword:
+      - "&7Diamentowy miecz: Ognisty Aspekt II"
+    enchanter:
+      - "&7Utrudniony crafting enchantu"
+    pandora-box:
+      - "&7Skrzynka: ksiazka z enchantem lub klatwa"
+    golden-head:
+      - "&7Regeneracja II + Szybkosc II + Absorbcja (8s)"
+    detector:
+      - "&7Pokazuje najblizszego gracza (cooldown 1 min)"
+
+quest-bar:
+  filled: "&a▰"
+  empty: "&8▰"
+  line: "&7[%bar%&7] &e%percent%%"
+
+# --------------------------- QUESTY / SEZON --------------------------
+quest:
+  gui-title: "&8Questy — Krzysiu"
+  progress: "&7Postep: &e%progress%&7/&e%target%"
+  done: "&aUkonczono!"
+  reward-line: "&7Nagroda: &6%xp% XP&7, &b%pd% PD"
+  type-daily: "&aDzienny"
+  type-weekly: "&dTygodniowy"
+  type-permanent: "&eStaly"
+  completed: "&aQuest ukonczony: &e%name% &7(+%xp% XP, +%pd% PD)"
+
+season:
+  started: "&aSezon rozpoczety! Powodzenia."
+  ended: "&aSezon zakonczony — nagrody Top 3 wyplacone, poziomy i receptury zresetowane (klasy zostaja)."
+  reward: "&6Nagroda sezonowa &7(#%rank%)&6: &e%xp% XP &7dla &e%player%"
+  gui-title: "&8Zarzadzanie sezonem"
+
+# --------------------------- PARTY -----------------------------------
+party:
+  created: "&aZalozyles party. Zapros graczy: &e/party invite <nick>&a."
+  disabled: "&cSystem party jest wylaczony."
+  already-in: "&cJestes juz w party."
+  not-in: "&cNie jestes w party."
+  not-leader: "&cTylko lider moze to zrobic."
+  full: "&cParty jest pelne (max %max%)."
+  invited: "&aZaproszono &e%player% &ado party."
+  invite-received: "&e%player% &7zaprasza Cie do party. &a/party accept &7lub &c/party deny&7."
+  invite-none: "&cBrak aktywnego zaproszenia."
+  invite-expired: "&cZaproszenie wygaslo."
+  target-in-party: "&cTen gracz jest juz w party."
+  target-offline: "&cGracza nie ma online."
+  joined: "&a%player% &7dolaczyl do party."
+  left: "&7%player% &7opuscil party."
+  kicked: "&c%player% &7zostal wyrzucony z party."
+  disbanded: "&cParty rozwiazane."
+  leader-left: "&cLider opuscil party — rozwiazane."
+  list-header: "&6Party &7(%count%/%max%)&6:"
+  list-leader: "&e★ %player% &7(lider)"
+  list-member: "&7- %player%"
+  self-invite: "&cNie mozesz zaprosic samego siebie."
+  warp: "&aLider rusza do gry — party dolacza."
+  chat-format: "&d[Party] &f%player%&7: &f%message%"
+  gui-title: "&8Party"
+  gui-leave: "&cOpusc party"
+  gui-disband: "&4Rozwiaz party (lider)"
+  gui-invite-hint: "&aZapros: &e/party invite <nick>"
+
+# --------------------------- ADMIN -----------------------------------
+admin:
+  panel-title: "&8Panel admina"
+  panel-season: "&6Zarzadzanie sezonem"
+  panel-instances: "&bInstancje gier"
+  instances-title: "&8Instancje gier"
+  instance-state: "&7Stan: &e%state%"
+  instance-players: "&7Gracze: &e%players%&7/&e%max%"
+  instance-close-hint: "&cKliknij, aby zamknac instancje"
+  instance-close-requested: "&aWyslano zadanie zamkniecia &e%id%&a."
+  instances-empty: "&7Brak zarejestrowanych instancji."
+  currency-given: "&aDodano &e%amount% XP &agraczowi &e%player%&a."
+  pd-given: "&aDodano &e%amount% PD &agraczowi &e%player%&a."
+  season-reset: "&aSezon zresetowany (poziomy, PD, receptury). Klasy zachowane."
+  force-start: "&aWymuszono start gry."
+  force-end: "&aWymuszono koniec gry."
+  player-not-found: "&cNie znaleziono gracza &e%player%&c."
+  stats-header: "&6Statystyki &e%player%&6:"
+  stats-line1: "&7XP: &e%xp% &8| &7PD: &b%pd% &8| &7Poziom: &6%level%"
+  stats-line2: "&7Kille: &e%kills% &8| &7Wygrane: &a%wins% &8| &7Klasa: &e%class%"
+  stat-set: "&aUstawiono &e%field% &adla &e%player% &ana &e%value%"
+  unknown-field: "&cNieznane pole."
+  season-error: "&cBlad resetu sezonu: %error%"

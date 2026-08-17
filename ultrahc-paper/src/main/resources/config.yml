@@ -1,0 +1,366 @@
+# =====================================================================
+#  UltraHC — config.yml
+#  WSZYSTKIE wartosci balansu tutaj. Nic nie jest hardkodowane w kodzie.
+#  Tuning bez rekompilacji. Liczby startowe zgodne z DECYZJE.md i spec.
+# =====================================================================
+
+# Rola tej instancji serwera: LOBBY albo ARENA (patrz DECYZJE, sekcja 1).
+server:
+  role: LOBBY            # LOBBY | ARENA
+  instance-name: ""      # puste = auto (nazwa z proxy/hosta)
+
+# Magazyn danych. SQLITE teraz, MYSQL na produkcje — ta sama warstwa DAO.
+storage:
+  type: SQLITE          # SQLITE | MYSQL
+  sqlite:
+    file: "ultrahc.db"  # w folderze pluginu
+  mysql:                # uzywane dopiero po przelaczeniu type: MYSQL
+    host: "127.0.0.1"
+    port: 3306
+    database: "ultrahc"
+    user: "ultrahc"
+    password: "zmien_mnie"
+    pool-size: 10
+
+# Sieć (koordynacja instancji miedzy serwerami).
+network:
+  hub-server: "lobby"          # nazwa serwera huba w Velocity (powrot z poczekalni areny)
+  registry-poll-ms: 1500       # co ile lobby odpytuje rejestr instancji
+  heartbeat-seconds: 3         # co ile arena-serwer odswieza swoj wiersz
+  instance-stale-seconds: 10   # po tylu s bez heartbeatu instancja jest ignorowana
+  redis:
+    enabled: false             # opcjonalny upgrade (pub/sub); domyslnie MySQL-polling
+    host: "127.0.0.1"
+    port: 6379
+
+# --------------------------- CYKL GRY --------------------------------
+# Party (grupowanie graczy do wspolnej druzyny przed gra).
+party:
+  enabled: true
+  max-size: 4                     # max czlonkow party (4 = SQUAD)
+  invite-expiry-seconds: 60
+
+# Czat: kanaly, interakcje, anty-spam. Bypass: uprawnienie ultrahc.chat.bypass.
+chat:
+  team-prefix: "@"                # wiadomosc z tym prefiksem leci tylko do druzyny (w grze)
+  mention-ping: true             # dzwiek gdy ktos napisze Twoj nick
+  ping-sound: "block.note_block.pling"
+  cooldown-ms: 1500              # min. odstep miedzy wiadomosciami (0 = wylaczone)
+  block-repeat: true             # blokuj powtarzanie tej samej wiadomosci
+  ad-filter: true                # blokuj adresy/domeny (reklama innych serwerow)
+  msg-sound: "entity.experience_orb.pickup"   # dzwiek odebrania prywatnej wiadomosci (/msg)
+
+# Rangi serwerowe (czat/TAB/nametag). Nadawaj uprawnienia np. LuckPermsem:
+#   /lp user <gracz> permission set ultrahc.rank.vip true
+# Gracz dostaje range o najwyzszej wadze, do ktorej ma uprawnienie; GRACZ = domyslna.
+ranks:
+  op-is-owner: true              # fallback bez LuckPerms: gracz z op dostaje range OWNER
+  # trail = czastka sladu (perk); pusty = brak. Nazwy z enuma org.bukkit.Particle.
+  groups:
+    owner:  { weight: 100, permission: "ultrahc.rank.owner",  prefix: "&4&lOWNER ",  name-color: "&4", trail: "FLAME" }
+    admin:  { weight: 90,  permission: "ultrahc.rank.admin",  prefix: "&c&lADMIN ",  name-color: "&c", trail: "FLAME" }
+    mod:    { weight: 80,  permission: "ultrahc.rank.mod",    prefix: "&2&lMOD ",    name-color: "&2", trail: "COMPOSTER" }
+    helper: { weight: 70,  permission: "ultrahc.rank.helper", prefix: "&a&lHELPER ", name-color: "&a", trail: "COMPOSTER" }
+    svip:   { weight: 60,  permission: "ultrahc.rank.svip",   prefix: "&bSVIP ",     name-color: "&b", trail: "END_ROD" }
+    vip:    { weight: 50,  permission: "ultrahc.rank.vip",    prefix: "&6VIP ",      name-color: "&6", trail: "HAPPY_VILLAGER" }
+    gracz:  { weight: 0,   permission: "",                    prefix: "&7",          name-color: "&7", trail: "" }
+
+game:
+  team-size: 1                    # 1=SOLO, 2=DUO, 3=TRIO, 4=SQUAD (parametr)
+  disable-enderchest: true        # blokada skrzyni Endera (brak schowka miedzy smierciami)
+  min-players-to-countdown: 30    # 30. gracz uruchamia odliczanie
+  max-players: 100
+  countdown-seconds: 180          # 3 min po zebraniu 30
+  no-pvp-seconds: 600             # 10 min bez PvP
+  enemy-compass-unlock-min: 18    # kompas widzi wroga po 18 min
+  reconnect-grace-seconds: 180    # okno powrotu po rozlaczeniu
+  hard-time-cap-min: 90           # twardy bezpiecznik konca gry
+  spawn-attempts: 30              # ile prob bezpiecznego punktu rozrzutu (lad, nie woda/lawa)
+  show-health-below-name: true    # liczba serc pod nickiem gracza (klasyka UHC)
+
+scoreboard:
+  hide-numbers: true              # ukryj czerwone numery po prawej stronie tablicy (VertezHub je POKAZUJE — daj false, by bylo jak u nich)
+
+combat:
+  tag-seconds: 10                 # okno przypisania zabojcy (combat-tag)
+  killstreak-milestones: [3, 5, 7, 10]   # progi serii zabojstw (broadcast + title)
+  low-health-hearts: 4            # ponizej tylu serc ostrzezenie dzwiekowe (0 = wylaczone)
+  old-pvp: true                   # PvP jak w 1.8: brak cooldownu ataku + brak sweepa
+  attack-speed: 1024              # wysoka wartosc = klikanie bez paska cooldownu (1.8)
+
+# --------------------------- GRANICA MAPY ----------------------------
+# 3 fazy: normalna (10-30), przyspieszenie (30-45), arenka/sudden-death (45+).
+border:
+  start: 1000
+  shrink-start-min: 10
+  blocks-per-min: 24              # faza 1
+  accelerate-min: 30              # start fazy 2
+  blocks-per-min-fast: 30         # faza 2
+  center: spawn
+  warning-blocks: 30              # od ilu blokow od granicy czerwony ekran
+  warning-seconds: 5              # ostrzezenie gdy granica dojdzie w tylu sekundach
+
+arena-showdown:
+  teleport-min: 45                # start fazy 3 (sudden-death)
+  mode: BORDER_CLAMP              # BORDER_CLAMP | SCHEMATIC
+  size: 40                        # rozmiar arenki (srednica bordera)
+  collapse-to-min: 60             # arenka zaciska sie do 0 do tej minuty
+
+# --------------------------- SWIAT / GENERACJA -----------------------
+# --------------------------- POCZEKALNIA ARENY ----------------------
+# Trwaly swiat, w ktorym gracze czekaja przed meczem (z hologramami/NPC/topkami).
+# Mecz rozgrywa sie w OSOBNYM, kasowanym swiecie (world.* nizej).
+arena:
+  lobby:
+    world: ""                     # nazwa swiata poczekalni; puste = glowny swiat serwera (level-name)
+    auto-join: true               # wchodzacy gracz automatycznie dolacza do gry w stanie WAITING
+    spawn: {}                     # {world,x,y,z,yaw,pitch} — ustaw in-game: /uhc setlobbyspawn
+
+world:
+  pool-size: 1                    # ile gotowych swiatow trzymac na arena-serwerze
+  delete-after-game: true         # kasowanie swiata po grze
+  disable-nether: true            # brak Netheru: portale nie powstaja i nie przenosza
+  disable-end: true               # brak Endu: portal koncowy nieaktywny (blok oka endera)
+  lobby-protection: true          # anti-grief w lobby/poczekalni (bez niszczenia/obrazen/glodu; ekipa: ultrahc.build)
+  rules:                          # RDZEN UHC — reguly gry per-swiat areny
+    difficulty: HARD              # UHC wymaga HARD (glod rani, wieksze obrazenia)
+    natural-regeneration: false   # KLUCZOWE: brak samoistnego regenu; leczenie tylko zlote jablka/mikstury/klasy
+    daylight-cycle: true          # cykl dnia (false = zamrozony czas)
+    weather-cycle: false          # brak deszczu/burz (czysta rozgrywka)
+    insomnia: false               # brak phantomow po 3 dniach bez snu
+    announce-advancements: false  # bez spamu osiagniec na czacie
+    keep-inventory: false         # smierc = utrata ekwipunku (UHC)
+    mob-griefing: true            # creepery niszcza teren (klasyczne UHC)
+    fire-tick: true               # ogien sie rozprzestrzenia
+    show-death-messages: true     # komunikaty smierci
+    spawn-chunk-radius: 2         # promien trzymanych chunkow spawnu (mniej = lzejszy swiat z puli)
+  pool-refill-delay-ticks: 200    # odstep dogenerowywania puli (rozklada lag generacji, nie stackuje ze startem gry)
+  pregen:
+    enabled: true                 # pre-generacja reszty mapy w tle przez Chunky (jesli obecny)
+    pad: 32                       # dodatkowe bloki poza granica
+  generation:
+    require-biomes:
+      # UWAGA: wlaczenie probkuje biomy na wielu seedach = wieksze obciazenie generacji.
+      # Domyslnie OFF — Yeti ma fallback (pasywka na dowolnym sniegu/lodzie).
+      enabled: false              # gwarancja zimnych biomow przez wybor seeda (Yeti)
+      biomes: [SNOWY_PLAINS, SNOWY_TAIGA, ICE_SPIKES, FROZEN_RIVER]
+      search-radius: 400
+      max-seed-attempts: 20
+
+# --------------------------- POZIOMY (PD) ----------------------------
+# Override 0-2 = dokladnie ze spec; reszta ze wzoru. Sanity: lvl33 -> 66500.
+levels:
+  mode: LINEAR                    # LINEAR | GEOMETRIC
+  linear:
+    slope: 2000                   # required(n) = slope*n + intercept  (n>=3)
+    intercept: 500
+  geometric:
+    base: 750
+    growth: 1.35                  # required(n) = base * growth^n
+  overrides:
+    0: 750
+    1: 2800
+    2: 4500
+  star-symbol: "gwiazdka"         # etykieta poziomu (np. "3 gwiazdka")
+
+# --------------------------- NAGRODY ---------------------------------
+rewards:
+  currency:                       # XP sklepowe (waluta sklepowa)
+    per-kill: 100
+    per-win: 1000
+    time:
+      interval-min-min: 1         # nagroda co losowo 1-2 min
+      interval-min-max: 2
+      tiers:                      # do ktorej minuty obowiazuje dana stawka
+        - { to-min: 5,   amount: 4.2 }
+        - { to-min: 15,  amount: 5.8 }
+        - { to-min: 30,  amount: 7.7 }
+        - { to-min: 999, amount: 9.3 }
+  progress:                       # PD (poziomy gwiazdek)
+    per-kill: 30
+    per-win: 250
+    time:
+      interval-min: 2
+      tiers:
+        - { to-min: 5,   amount: 3.06 }
+        - { to-min: 15,  amount: 4.24 }
+        - { to-min: 30,  amount: 5.62 }
+        - { to-min: 999, amount: 6.8 }
+
+# --------------------------- DROPY -----------------------------------
+# Szanse w procentach (spec). Bonusy klasowe dokladane osobno przez ClassesManager.
+drops:
+  stone:
+    diamond: 0.75
+    iron: 4.0
+    coal: 7.0
+    gold: 1.5
+    redstone: 5.0
+    quartz: 2.0
+    lapis: 5.0
+    emerald: 2.5
+  leaves:
+    apple: 6.0
+
+# --------------------------- GLOWKI ----------------------------------
+heads:
+  normal:                         # zwykla glowka gracza (konsumowalna)
+    duration-seconds: 10
+    effects:
+      - { type: REGENERATION, amplifier: 0 }   # Regeneracja I
+      - { type: SPEED,        amplifier: 0 }   # Szybkosc I
+  golden:                         # Pozlacana Glowka (receptura)
+    duration-seconds: 8
+    effects:
+      - { type: REGENERATION, amplifier: 1 }   # Regeneracja II
+      - { type: SPEED,        amplifier: 1 }   # Szybkosc II
+      - { type: ABSORPTION,   amplifier: 0 }   # Absorbcja
+
+# --------------------------- SKLEP: RECEPTURY (ceny w XP) -------------
+shop:
+  recipes:
+    gornik-pickaxe:   { price: 5500 }
+    sharp-sword:      { price: 4800 }
+    fire-sword:       { price: 4300 }
+    hell-sword:       { price: 6666 }
+    enchanter:        { price: 5000 }
+    pandora-box:      { price: 6350 }
+    golden-head:      { price: 9099 }
+    detector:         { price: 5550 }
+
+# --------------------------- KLASY (ceny w XP + parametry umiejetnosci) ------
+classes:
+  civil:
+    price: 0
+  gornik:
+    price: 21750
+    ability:
+      extra-drop-chance: 0.125   # % dodatkowego dropu surowca ze stone (0.100-0.125)
+      extra-xp-orbs: 2           # dodatkowy natywny exp ze stone
+  sniper:
+    price: 29000
+    ability:
+      regen-seconds: 2           # Regeneracja I po trafieniu przeciwnika (1-2 s)
+  chef:
+    price: 14999
+    ability:
+      apple-bonus-chance: 3.0    # dodatkowa szansa (%) na jablko z lisci
+  fisher:
+    price: 25000
+    ability:
+      water-interval-seconds: 12 # co ile w wodzie dostaje buff
+      buff-seconds: 2            # czas Regen I + Speed I
+      book-protection-chance: 1.0    # % na ksiazke Ochrona I z lowienia
+      book-sharpness-chance: 0.65    # % na ksiazke Ostrosc I z lowienia
+  yeti:
+    price: 20000
+    ability:
+      speed-seconds: 2           # Speed I na sniegu/lodzie
+  smith:
+    price: 24000
+  guard:
+    price: 28000
+    ability:
+      extra-hearts: 2            # dodatkowe serduszka (kit)
+      slowness-seconds: 3        # Spowolnienie I + Odpornosc po otrzymaniu ciosu
+
+# Wykrywacz (receptura) — cooldown w sekundach.
+detector:
+  cooldown-seconds: 60
+  reveal-delay-seconds: 5
+  glow-target: true               # podswietl wykrytego gracza (Glowing)
+  glow-seconds: 5
+
+# Zaklinacz (receptura) — utrudniony dostep do enchantu.
+enchanter:
+  disable-vanilla-table: true   # wylacza zwykly przepis na stol do zaklec (wymusza Zaklinacza)
+
+# --------------------------- LOBBY: TOPKI I NPC ----------------------
+# Pozycje ustawiasz in-game: /uhc sethologram <kills|wins|level>, /uhc setnpc <id>.
+lobby:
+  leaderboards:
+    refresh-seconds: 60
+    holograms:
+      kills: {}     # {world, x, y, z} — puste = nieustawione
+      wins: {}
+      level: {}
+  npcs:
+    mietek: {}      # {world, x, y, z, yaw, pitch}
+    krzysiu: {}
+    sklepikarz: {}
+
+# --------------------------- QUESTY (Krzysiu) ------------------------
+# objective: KILLS | WINS | GAMES_PLAYED | PLAY_MINUTES ; type: DAILY | WEEKLY | PERMANENT
+quests:
+  definitions:
+    daily_kill:
+      type: DAILY
+      objective: KILLS
+      target: 5
+      name: "Zabij 5 graczy"
+      reward-xp: 500
+      reward-pd: 100
+    daily_play:
+      type: DAILY
+      objective: PLAY_MINUTES
+      target: 30
+      name: "Zagraj 30 minut"
+      reward-xp: 300
+      reward-pd: 60
+    weekly_win:
+      type: WEEKLY
+      objective: WINS
+      target: 3
+      name: "Wygraj 3 gry w tygodniu"
+      reward-xp: 2500
+      reward-pd: 500
+    perm_games:
+      type: PERMANENT
+      objective: GAMES_PLAYED
+      target: 50
+      name: "Rozegraj 50 gier"
+      reward-xp: 5000
+      reward-pd: 1000
+
+# --------------------------- EFEKTY (dzwieki / czastki) --------------
+effects:
+  particles:                      # nazwy enuma org.bukkit.Particle
+    kill: CRIT
+    win: FIREWORK
+    elimination: FLAME            # slup czastek przy eliminacji
+  sounds:                         # klucze Minecraft (z kropkami)
+    level-up: "entity.player.levelup"
+    buy: "entity.experience_orb.pickup"
+    kill: "entity.arrow.hit_player"
+    win: "ui.toast.challenge_complete"
+    error: "entity.villager.no"
+    elimination: "entity.lightning_bolt.thunder"
+  elimination:                    # bogaty efekt w miejscu smierci gracza
+    enabled: true
+    lightning: true               # kosmetyczny piorun (bez obrazen)
+    pillar: true                  # slup czastek w gore
+  win:                            # pokaz fajerwerkow nad zwyciezcami
+    firework-shots: 6             # ile salw
+    firework-interval-ticks: 12   # odstep miedzy salwami (20 tickow = 1s)
+  damage-numbers: true            # wyskakujace liczby obrazen nad trafionym (TextDisplay)
+  damage-numbers-ttl: 16          # jak dlugo widoczne (ticki)
+  hit-feedback: true              # czastki + dzwiek przy ciosie (mocniejsze przy krytyku)
+  levelup-celebration: true       # spirala czastek + fajerwerk przy awansie
+  join-ring: true                 # pierscien czastek + dzwiek przy wejsciu do lobby/poczekalni
+  first-blood: true               # 'Pierwsza krew!' przy pierwszym zabojstwie w grze
+  border-wall: true               # widoczna sciana czastek wzdluz granicy w poblizu graczy
+  border-wall-distance: 8         # od jak blisko krawedzi rysuje sciane
+  border-wall-interval-ticks: 10  # co ile odswieza sciane
+  rank-trails: true               # slad czastek za graczami z ranga (trail w ranks.groups)
+  rank-trail-interval-ticks: 4    # co ile emituje slad
+
+# --------------------------- SEZON -----------------------------------
+season:
+  top-rewards:                    # nagrody Top 3 wg poziomu (XP sklepowe)
+    1: 50000
+    2: 30000
+    3: 15000
+  prefixes:                       # prefixy przy nicku dla podium
+    1: "#1 UHC"
+    2: "#2 UHC"
+    3: "#3 UHC"
