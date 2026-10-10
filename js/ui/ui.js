@@ -367,9 +367,14 @@
       body.appendChild(el('div', 'stats-grid', stats.map(([v, l]) => '<div class="stat"><b>' + v + '</b><span>' + l + '</span></div>').join('')));
       body.appendChild(el('div', 'sec-title', 'Gra'));
       body.appendChild(el('p', 'muted', 'Postęp zapisuje się automatycznie w tej przeglądarce. Zmiana wyglądu psa nigdy go nie resetuje.'));
+      // potwierdzenie w samej stronie (okna confirm() bywają blokowane, np. w osadzonych widokach)
       const reset = el('button', 'btn', 'Zacznij od nowa');
+      let armed = null;
       reset.addEventListener('click', () => {
-        if (window.confirm('Na pewno? Imię, poziom, więź i ekwipunek zostaną usunięte.')) this.host.resetGame();
+        if (armed) { clearTimeout(armed); this.host.resetGame(); return; }
+        reset.textContent = 'Kliknij ponownie – imię, poziom, więź i ekwipunek zostaną usunięte';
+        reset.classList.add('primary');
+        armed = setTimeout(() => { armed = null; reset.textContent = 'Zacznij od nowa'; reset.classList.remove('primary'); }, 4000);
       });
       body.appendChild(reset);
     }
