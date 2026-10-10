@@ -1,0 +1,5 @@
+Tu wstaw klatki prawdziwego psa dla wariantu klatkowego (skin-klatki.js):
+osobne pliki (np. idle-01.png, idle-02.png…) albo arkusze (np. walk.png = 8 klatek obok siebie).
+Wszystkie klatki w tym samym rozmiarze i z psem w tym samym miejscu (fit.origin).
+Minimum: idle. Zalecane: idle, walk, run, sit, lie, sleep, eat, happy.
+Pełna instrukcja: docs/WYGLAD-PSA.md

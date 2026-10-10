@@ -1,0 +1,26 @@
+Tu wstaw warstwy prawdziwego psa (PNG z przezroczystym tłem, pies patrzy w PRAWO):
+
+  body.png              tułów (bez łap, głowy, ogona)          – WYMAGANE
+  neck.png              szyja
+  head.png              głowa z nosem (bez uszu, oczu, pyska)
+  eyes-open.png         oczy otwarte
+  eyes-closed.png       oczy zamknięte (sen, mruganie)
+  eyes-happy.png        oczy „uśmiechnięte” (opcjonalnie)
+  mouth-closed.png      pysk zamknięty
+  mouth-open.png        pysk otwarty (opcjonalnie)
+  mouth-tongue.png      język na wierzchu (opcjonalnie)
+  mouth-bark.png        szczekanie (opcjonalnie)
+  ear-near.png          ucho bliższe
+  ear-far.png           ucho dalsze (za głową)
+  tail.png              ogon
+  front-leg-near.png    przednia bliższa – ramię
+  front-paw-near.png    przednia bliższa – przedramię z łapą
+  front-leg-far.png     przednia dalsza – ramię
+  front-paw-far.png     przednia dalsza – przedramię z łapą
+  back-leg-near.png     tylna bliższa – udo
+  back-paw-near.png     tylna bliższa – podudzie z łapą
+  back-leg-far.png      tylna dalsza – udo
+  back-paw-far.png      tylna dalsza – podudzie z łapą
+
+Nazwy są dowolne – ważne, żeby zgadzały się ze ścieżkami w skin.js.
+Pełna instrukcja: docs/WYGLAD-PSA.md

@@ -1,0 +1,15 @@
+{
+  "name": "moj-pies",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gra w opiekę nad psem z modułowym systemem wyglądu (wymienne skórki psa).",
+  "scripts": {
+    "test": "node tests/smoke.mjs",
+    "skins:cartoon": "node tools/generate-cartoon-skins.mjs",
+    "skins:bake-frames": "node tools/bake-frames.mjs",
+    "serve": "npx --yes http-server -c-1 -p 8080 ."
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
+  }
+}
